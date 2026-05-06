@@ -1,0 +1,100 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import {
+  LayoutDashboard, Star, TrendingUp, Layers,
+  Building2, Gauge, Wallet, Truck, Receipt, BarChart3, Network,
+} from 'lucide-react'
+import { ModuleCard, type ModuleCardConfig } from './ModuleCard'
+import type { NavModule } from '../data/menuData'
+
+const meta: Meta<typeof ModuleCard> = {
+  title: 'UI/ModuleCard',
+  component: ModuleCard,
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
+}
+
+export default meta
+type Story = StoryObj<typeof ModuleCard>
+
+const makeModule = (id: string, label: string, icon: NavModule['icon']): NavModule => ({
+  id,
+  label,
+  icon,
+  groups: [],
+  flatItems: [],
+})
+
+const configs: Record<string, ModuleCardConfig> = {
+  painel:         { desc: 'Visão geral e indicadores',       iconBg: '#dcfce7', iconColor: '#059669' },
+  favoritos:      { desc: 'Seus atalhos mais usados',        iconBg: '#fef9c3', iconColor: '#d97706' },
+  dashboards:     { desc: 'Análises e gráficos interativos', iconBg: '#dbeafe', iconColor: '#2563eb' },
+  cadastros:      { desc: 'Estrutura, pessoas e produtos',   iconBg: '#ede9fe', iconColor: '#7c3aed' },
+  administrativo: { desc: 'Suprimentos, estoque e RH',       iconBg: '#f3e8ff', iconColor: '#9333ea' },
+  operacional:    { desc: 'Agricultura, pecuária e OS',      iconBg: '#d1fae5', iconColor: '#059669' },
+  financeiro:     { desc: 'Contas, fluxo e conciliações',    iconBg: '#ffedd5', iconColor: '#ea580c' },
+  frota:          { desc: 'Manutenções e abastecimentos',    iconBg: '#fef3c7', iconColor: '#d97706' },
+  fiscal:         { desc: 'NF-e, CT-e, MDF-e e LCDPR',      iconBg: '#fee2e2', iconColor: '#dc2626' },
+  relatorios:     { desc: 'Todos os relatórios do sistema',  iconBg: '#e0f2fe', iconColor: '#0284c7' },
+  integracoes:    { desc: 'Domínio, CSV e exportações',      iconBg: '#f1f5f9', iconColor: '#475569' },
+}
+
+export const Home: Story = {
+  args: {
+    module: makeModule('painel', 'Home', LayoutDashboard),
+    config: configs.painel,
+  },
+}
+
+export const Financeiro: Story = {
+  args: {
+    module: makeModule('financeiro', 'Financeiro', Wallet),
+    config: configs.financeiro,
+  },
+}
+
+export const Fiscal: Story = {
+  args: {
+    module: makeModule('fiscal', 'Fiscal', Receipt),
+    config: configs.fiscal,
+  },
+}
+
+export const AllModules: Story = {
+  render: () => {
+    const modules: Array<{ id: string; label: string; icon: NavModule['icon'] }> = [
+      { id: 'painel', label: 'Home', icon: LayoutDashboard },
+      { id: 'favoritos', label: 'Favoritos', icon: Star },
+      { id: 'dashboards', label: 'Dashboards', icon: TrendingUp },
+      { id: 'cadastros', label: 'Cadastros', icon: Layers },
+      { id: 'administrativo', label: 'Administrativo', icon: Building2 },
+      { id: 'operacional', label: 'Operacional', icon: Gauge },
+      { id: 'financeiro', label: 'Financeiro', icon: Wallet },
+      { id: 'frota', label: 'Frota', icon: Truck },
+      { id: 'fiscal', label: 'Fiscal', icon: Receipt },
+      { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
+      { id: 'integracoes', label: 'Integrações', icon: Network },
+    ]
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 12,
+          maxWidth: 'calc(6 * 180px + 5 * 12px)',
+          padding: 16,
+          background: '#f5f5f5',
+          borderRadius: 16,
+        }}
+      >
+        {modules.map((m) => (
+          <ModuleCard
+            key={m.id}
+            module={makeModule(m.id, m.label, m.icon)}
+            config={configs[m.id]}
+          />
+        ))}
+      </div>
+    )
+  },
+}

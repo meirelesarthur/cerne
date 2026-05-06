@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f5f5;
+}
+
+/* Scrollbar oculta nos painéis de navegação */
+.nav-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scrollbar refinada globalmente */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Nav items - sidebar 1 nível */
+.nav-module-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #404040;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+  padding: 0 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.nav-module-btn:hover {
+  background: rgba(115, 115, 115, 0.08);
+  color: #1a1a1a;
+}
+.nav-module-btn.active {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+  font-weight: 500;
+}
+.nav-module-btn.expanded {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+
+/* Nav items - sidebar icon-only */
+.nav-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #616161;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease;
+  position: relative;
+}
+.nav-icon-btn:hover {
+  background: rgba(115, 115, 115, 0.08);
+  color: #1a1a1a;
+}
+.nav-icon-btn.active {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+.nav-icon-btn.expanded {
+  background: rgba(5, 150, 105, 0.12);
+  color: #059669;
+}
+
+
+/* Nav subitems - secondary panel */
+.nav-sub-btn {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #1a1a1a;
+  text-align: left;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  transition: background 0.12s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-sub-btn:hover {
+  background: rgba(115, 115, 115, 0.06);
+}
+.nav-sub-btn.active {
+  background: rgba(5, 150, 105, 0.1);
+  font-weight: 500;
+  color: #059669;
+}
+
+/* Card hover */
+.module-card {
+  background: transparent;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease;
+}
+.module-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+}

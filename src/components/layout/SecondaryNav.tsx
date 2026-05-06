@@ -11,7 +11,7 @@ function NavHeader({ module, onClose }: { module: NavModule; onClose: () => void
       style={{
         height: 44,
         minHeight: 44,
-        background: '#f0fdf4',
+        background: '#f5f5f5',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -20,12 +20,12 @@ function NavHeader({ module, onClose }: { module: NavModule; onClose: () => void
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Icon size={14} color="#059669" strokeWidth={1.8} />
+        <Icon size={14} color="#525252" strokeWidth={1.8} />
         <span
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: '#059669',
+            color: '#292929',
             fontFamily: "'Outfit', sans-serif",
             letterSpacing: '-0.1px',
           }}
@@ -47,11 +47,11 @@ function NavHeader({ module, onClose }: { module: NavModule; onClose: () => void
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#059669',
+          color: '#525252',
           transition: 'background 0.1s',
         }}
         onMouseEnter={(e) => {
-          ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(5,150,105,0.12)'
+          ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.07)'
         }}
         onMouseLeave={(e) => {
           ;(e.currentTarget as HTMLButtonElement).style.background = 'transparent'

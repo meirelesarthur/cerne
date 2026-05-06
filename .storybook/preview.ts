@@ -1,8 +1,12 @@
 import type { Preview } from '@storybook/react-vite'
 import '../src/index.css'
+import { cerneTheme } from './theme'
 
 const preview: Preview = {
   parameters: {
+    docs: {
+      theme: cerneTheme,
+    },
     backgrounds: {
       default: 'light-gray',
       values: [

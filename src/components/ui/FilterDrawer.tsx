@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { X, SlidersHorizontal } from 'lucide-react'
+import { t } from '../../design/tokens'
 
 interface FilterDrawerProps {
   open: boolean
@@ -19,30 +20,25 @@ export function FilterDrawer({
   activeCount = 0,
 }: FilterDrawerProps) {
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     if (open) document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [open, onClose])
 
   return (
     <>
-      {/* Backdrop */}
       <div
         onClick={onClose}
         style={{
           position: 'fixed',
           inset: 0,
           background: 'rgba(0,0,0,0.18)',
-          zIndex: 200,
+          zIndex: t.zIndex.overlay,
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity 0.2s',
+          transition: `opacity ${t.transition.smooth}`,
         }}
       />
-
-      {/* Drawer */}
       <div
         style={{
           position: 'fixed',
@@ -50,13 +46,13 @@ export function FilterDrawer({
           right: 0,
           height: '100vh',
           width: 320,
-          background: 'white',
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.10)',
-          zIndex: 201,
+          background: t.color.neutral[0],
+          boxShadow: t.shadow.lg,
+          zIndex: t.zIndex.drawer,
           display: 'flex',
           flexDirection: 'column',
           transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.25s cubic-bezier(0.4,0,0.2,1)',
+          transition: `transform ${t.transition.drawer}`,
         }}
       >
         {/* Header */}
@@ -65,18 +61,18 @@ export function FilterDrawer({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '16px 20px',
-            borderBottom: '1px solid #f0f0f0',
+            padding: `${t.space[4]}px ${t.space[5]}px`,
+            borderBottom: `1px solid ${t.color.neutral[150]}`,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <SlidersHorizontal size={15} color="#059669" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+            <SlidersHorizontal size={15} color={t.color.brand[600]} />
             <span
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: '#171717',
-                fontFamily: "'Outfit', sans-serif",
+                fontSize: t.font.size.md,
+                fontWeight: t.font.weight.semibold,
+                color: t.color.neutral[950],
+                fontFamily: t.font.family.sans,
               }}
             >
               {title}
@@ -84,13 +80,13 @@ export function FilterDrawer({
             {activeCount > 0 && (
               <span
                 style={{
-                  background: '#059669',
-                  color: 'white',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '1px 7px',
-                  borderRadius: 9999,
-                  fontFamily: "'Outfit', sans-serif",
+                  background: t.color.brand[600],
+                  color: t.color.neutral[0],
+                  fontSize: t.font.size.xs,
+                  fontWeight: t.font.weight.bold,
+                  padding: `1px ${t.space[1] + t.space[1] / 2}px`,
+                  borderRadius: t.radius.full,
+                  fontFamily: t.font.family.sans,
                 }}
               >
                 {activeCount}
@@ -104,13 +100,14 @@ export function FilterDrawer({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#9ca3af',
+              color: t.color.neutral[400],
               display: 'flex',
               alignItems: 'center',
-              padding: 4,
-              borderRadius: 6,
+              padding: t.space[1],
+              borderRadius: t.radius.md,
+              transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.neutral[100] }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
           >
             <X size={16} />
@@ -122,10 +119,10 @@ export function FilterDrawer({
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '20px',
+            padding: t.space[5],
             display: 'flex',
             flexDirection: 'column',
-            gap: 20,
+            gap: t.space[5],
           }}
         >
           {children}
@@ -134,10 +131,10 @@ export function FilterDrawer({
         {/* Footer */}
         <div
           style={{
-            padding: '14px 20px',
-            borderTop: '1px solid #f0f0f0',
+            padding: `${t.space[3] + t.space[1] / 2}px ${t.space[5]}px`,
+            borderTop: `1px solid ${t.color.neutral[150]}`,
             display: 'flex',
-            gap: 8,
+            gap: t.space[2],
           }}
         >
           <button
@@ -146,17 +143,18 @@ export function FilterDrawer({
             style={{
               flex: 1,
               height: 38,
-              background: 'white',
-              border: '1px solid #e5e5e5',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 500,
-              color: '#616161',
+              background: t.color.neutral[0],
+              border: `1px solid ${t.color.neutral[250]}`,
+              borderRadius: t.radius.DEFAULT,
+              fontSize: t.font.size.base,
+              fontWeight: t.font.weight.medium,
+              color: t.color.neutral[600],
               cursor: 'pointer',
-              fontFamily: "'Outfit', sans-serif",
+              fontFamily: t.font.family.sans,
+              transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'white' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.neutral[50] }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = t.color.neutral[0] }}
           >
             Limpar
           </button>
@@ -166,17 +164,18 @@ export function FilterDrawer({
             style={{
               flex: 1,
               height: 38,
-              background: '#059669',
+              background: t.color.brand[600],
               border: 'none',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'white',
+              borderRadius: t.radius.DEFAULT,
+              fontSize: t.font.size.base,
+              fontWeight: t.font.weight.semibold,
+              color: t.color.neutral[0],
               cursor: 'pointer',
-              fontFamily: "'Outfit', sans-serif",
+              fontFamily: t.font.family.sans,
+              transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#047857' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#059669' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.brand[700] }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = t.color.brand[600] }}
           >
             Aplicar
           </button>

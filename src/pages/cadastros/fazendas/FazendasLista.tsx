@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import { Plus, Pencil, Trash2, Eye, SlidersHorizontal, X } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { PageContainer } from '../../../components/ui/PageContainer'
+import { Button } from '../../../components/ui/Button'
 import { DataTable } from '../../../components/ui/DataTable'
 import { FilterDrawer } from '../../../components/ui/FilterDrawer'
 import { Badge } from '../../../components/ui/Badge'
 import { FormField } from '../../../components/ui/FormField'
 import { FormSelect } from '../../../components/ui/FormSelect'
+import { t } from '../../../design/tokens'
 import { mockFazendas } from './fazendas.mock'
 import type { FazendaRow } from './fazendas.types'
 import type { Column } from '../../../components/ui/DataTable'
@@ -103,83 +106,30 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       sortable: false,
       width: 90,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-          <button
-            type="button"
-            onClick={() => onView(row.id)}
-            title="Visualizar"
-            style={{
-              width: 28, height: 28,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', border: 'none', borderRadius: 6,
-              cursor: 'pointer', color: '#6b7280',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] / 2 }}>
+          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={() => onView(row.id)} title="Visualizar">
             <Eye size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => onEdit(row.id)}
-            title="Editar"
-            style={{
-              width: 28, height: 28,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', border: 'none', borderRadius: 6,
-              cursor: 'pointer', color: '#6b7280',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
+          </Button>
+          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={() => onEdit(row.id)} title="Editar">
             <Pencil size={14} />
-          </button>
-          <button
-            type="button"
-            title="Excluir"
-            style={{
-              width: 28, height: 28,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', border: 'none', borderRadius: 6,
-              cursor: 'pointer', color: '#dc2626',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
+          </Button>
+          <Button variant="destructive" size="sm" style={{ width: 28, height: 28, padding: 0, border: 'none' }} title="Excluir">
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
   ]
 
   return (
-    <div
-      style={{
-        padding: '8px 28px 24px',
-        fontFamily: "'Outfit', sans-serif",
-        boxSizing: 'border-box',
-      }}
-    >
+    <PageContainer>
       <PageHeader
         title="Fazendas"
         count={filtered.length}
         actions={
-          <button
-            type="button"
-            onClick={onNew}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: '#059669', border: 'none', borderRadius: 8,
-              padding: '0 16px', height: 36,
-              fontSize: 13, fontWeight: 600,
-              fontFamily: "'Outfit', sans-serif",
-              color: 'white', cursor: 'pointer',
-            }}
-          >
-            <Plus size={14} />
+          <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
             Nova Fazenda
-          </button>
+          </Button>
         }
       />
 
@@ -307,7 +257,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           />
         </div>
       </FilterDrawer>
-    </div>
+    </PageContainer>
   )
 }
 
@@ -315,16 +265,16 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   return (
     <div
       style={{
-        display: 'flex', alignItems: 'center', gap: 5,
+        display: 'flex', alignItems: 'center', gap: t.space[1],
         height: 32,
-        background: '#f0fdf4',
-        border: '1px solid #bbf7d0',
-        borderRadius: 6,
-        padding: '0 8px 0 10px',
-        fontSize: 12,
-        color: '#059669',
-        fontFamily: "'Outfit', sans-serif",
-        fontWeight: 500,
+        background: t.color.brand[50],
+        border: `1px solid ${t.color.brand[200]}`,
+        borderRadius: t.radius.md,
+        padding: `0 ${t.space[2]}px 0 ${t.space[2] + t.space[1] / 2}px`,
+        fontSize: t.font.size.sm,
+        color: t.color.brand[600],
+        fontFamily: t.font.family.sans,
+        fontWeight: t.font.weight.medium,
       }}
     >
       {label}
@@ -333,7 +283,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
         onClick={onRemove}
         style={{
           background: 'none', border: 'none',
-          cursor: 'pointer', color: '#059669',
+          cursor: 'pointer', color: t.color.brand[600],
           display: 'flex', alignItems: 'center',
           padding: 0,
         }}

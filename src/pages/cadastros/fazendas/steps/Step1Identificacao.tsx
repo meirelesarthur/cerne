@@ -20,7 +20,6 @@ export function Step1Identificacao({ data, errors, onChange }: Step1Props) {
         title="Identificação da Fazenda"
         subtitle="Informe o nome, documento e telefone de contato da propriedade"
       />
-      <FormSection title="Identificação">
       <div
         style={{
           display: 'grid',
@@ -66,7 +65,6 @@ export function Step1Identificacao({ data, errors, onChange }: Step1Props) {
           placeholder="(00) 00000-0000"
         />
       </div>
-    </FormSection>
     </>
   )
 }

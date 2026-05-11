@@ -1,4 +1,5 @@
 import React from 'react'
+import { t } from '../../design/tokens'
 
 interface Step {
   id: number
@@ -19,56 +20,51 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        padding: '12px 16px',
+        padding: `${t.space[3]}px ${t.space[4]}px`,
         boxSizing: 'border-box',
       }}
     >
       {steps.map((step, index) => {
         const isCompleted = completed.includes(step.id)
         const isActive = step.id === current
-        const isFuture = !isCompleted && !isActive
         const isClickable = isCompleted
-
         const circleSize = isActive ? 14 : 10
 
         return (
           <React.Fragment key={step.id}>
-            {/* Step node */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 8,
+                gap: t.space[2],
                 flex: '0 0 auto',
                 cursor: isClickable ? 'pointer' : 'default',
               }}
               onClick={() => isClickable && onStepClick(step.id)}
             >
-              {/* Circle */}
               <div
                 style={{
                   width: circleSize,
                   height: circleSize,
-                  borderRadius: '50%',
+                  borderRadius: t.radius.full,
                   flexShrink: 0,
-                  background: isCompleted ? '#059669' : 'white',
+                  background: isCompleted ? t.color.brand[600] : t.color.neutral[0],
                   border: isCompleted
                     ? 'none'
                     : isActive
-                    ? '2px solid #059669'
-                    : '1.5px solid #d1d5db',
-                  transition: 'all 0.2s',
+                    ? `2px solid ${t.color.brand[600]}`
+                    : `1.5px solid ${t.color.neutral[300]}`,
+                  transition: t.transition.smooth,
                   boxSizing: 'border-box',
                 }}
               />
-              {/* Label */}
               <span
                 style={{
-                  fontSize: 11,
-                  fontWeight: isActive ? 600 : 400,
-                  fontFamily: "'Outfit', sans-serif",
-                  color: isCompleted || isActive ? '#059669' : '#9ca3af',
+                  fontSize: t.font.size.xs,
+                  fontWeight: isActive ? t.font.weight.semibold : t.font.weight.normal,
+                  fontFamily: t.font.family.sans,
+                  color: isCompleted || isActive ? t.color.brand[600] : t.color.neutral[400],
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.1px',
                 }}
@@ -77,15 +73,14 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
               </span>
             </div>
 
-            {/* Connector line */}
             {index < steps.length - 1 && (
               <div
                 style={{
                   flex: 1,
                   height: 1.5,
                   marginBottom: 19,
-                  background: isCompleted ? '#059669' : '#e5e7eb',
-                  transition: 'background 0.2s',
+                  background: isCompleted ? t.color.brand[600] : t.color.neutral[200],
+                  transition: t.transition.smooth,
                 }}
               />
             )}

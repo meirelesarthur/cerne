@@ -1,4 +1,5 @@
 import React from 'react'
+import { t } from '../../design/tokens'
 
 interface StepHeaderProps {
   title: string
@@ -10,31 +11,29 @@ export function StepHeader({ title, subtitle }: StepHeaderProps) {
     <div
       style={{
         textAlign: 'center',
-        marginBottom: 32,
-        paddingBottom: 24,
-        borderBottom: '1px solid #f3f4f6',
+        marginBottom: t.space[8],
       }}
     >
       <h2
         style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color: '#111827',
-          fontFamily: "'Outfit', sans-serif",
-          margin: '0 0 8px',
+          fontSize: t.font.size['2xl'],
+          fontWeight: t.font.weight.bold,
+          color: t.color.neutral[900],
+          fontFamily: t.font.family.sans,
+          margin: `0 0 ${t.space[2]}px`,
           letterSpacing: '-0.4px',
-          lineHeight: 1.3,
+          lineHeight: t.font.lineHeight.tight,
         }}
       >
         {title}
       </h2>
       <p
         style={{
-          fontSize: 13,
-          color: '#9ca3af',
-          fontFamily: "'Outfit', sans-serif",
+          fontSize: t.font.size.base,
+          color: t.color.neutral[400],
+          fontFamily: t.font.family.sans,
           margin: 0,
-          lineHeight: 1.5,
+          lineHeight: t.font.lineHeight.normal,
         }}
       >
         {subtitle}

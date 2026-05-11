@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { PageContainer } from '../../../components/ui/PageContainer'
+import { Button } from '../../../components/ui/Button'
+import { StepFooter } from '../../../components/ui/StepFooter'
 import { Stepper } from '../../../components/ui/Stepper'
 import { Step1Identificacao } from './steps/Step1Identificacao'
 import { Step2Documentacao } from './steps/Step2Documentacao'
-import { Step3Localizacao } from './steps/Step3Localizacao'
+import { Step3Mapa } from './steps/Step3Mapa'
+import { Step4Endereco } from './steps/Step4Endereco'
 import { Step4Financeiro } from './steps/Step4Financeiro'
 import { Step5Configuracoes } from './steps/Step5Configuracoes'
 import { emptyFazendaForm } from './fazendas.types'
@@ -17,9 +21,10 @@ interface FazendaCadastroProps {
 const STEPS = [
   { id: 1, label: 'Identificação' },
   { id: 2, label: 'Documentação' },
-  { id: 3, label: 'Localização' },
-  { id: 4, label: 'Financeiro' },
-  { id: 5, label: 'Configurações' },
+  { id: 3, label: 'Demarcação' },
+  { id: 4, label: 'Endereço' },
+  { id: 5, label: 'Financeiro' },
+  { id: 6, label: 'Configurações' },
 ]
 
 function validateStep(step: number, data: FazendaFormData): Record<string, string> {
@@ -41,7 +46,9 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     }
   }
 
-  if (step === 3) {
+  // Step 3 (Demarcação) is optional — user can advance without drawing
+
+  if (step === 4) {
     if (!data.pais) errors.pais = 'País é obrigatório'
     if (!data.cep) errors.cep = 'CEP é obrigatório'
     if (!data.cidade) errors.cidade = 'Cidade é obrigatória'
@@ -49,7 +56,7 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     if (!data.bairro) errors.bairro = 'Bairro é obrigatório'
   }
 
-  if (step === 4) {
+  if (step === 5) {
     if (!data.areaTotal) errors.areaTotal = 'Área total é obrigatória'
     if (!data.valorHa) errors.valorHa = 'Valor por hectare é obrigatório'
     if (!data.taxaRemuneracao) errors.taxaRemuneracao = 'Taxa de remuneração é obrigatória'
@@ -104,7 +111,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps((prev) => [...prev, currentStep])
     }
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       setCurrentStep(currentStep + 1)
     } else {
       setShowSuccess(true)
@@ -132,8 +139,10 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
       case 2:
         return <Step2Documentacao data={formData} errors={errors} onChange={handleChange} />
       case 3:
-        return <Step3Localizacao data={formData} errors={errors} onChange={handleChange} />
+        return <Step3Mapa data={formData} errors={errors} onChange={handleChange} />
       case 4:
+        return <Step4Endereco data={formData} errors={errors} onChange={handleChange} />
+      case 5:
         return (
           <Step4Financeiro
             data={formData}
@@ -142,7 +151,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
             onBoolChange={handleBoolChange}
           />
         )
-      case 5:
+      case 6:
         return (
           <Step5Configuracoes
             data={formData}
@@ -157,16 +166,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        fontFamily: "'Outfit', sans-serif",
-        padding: '24px 28px 0 28px',
-        boxSizing: 'border-box',
-      }}
-    >
+    <PageContainer>
       {/* Success Toast */}
       {showSuccess && (
         <div
@@ -190,37 +190,16 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         </div>
       )}
 
-      {/* Page Header */}
       <PageHeader
         title="Nova Fazenda"
         description="Preencha os dados para cadastrar uma nova fazenda"
         actions={
-          <button
-            type="button"
-            onClick={onBack}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'white',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              padding: '0 14px',
-              height: 36,
-              fontSize: 13,
-              fontWeight: 500,
-              fontFamily: "'Outfit', sans-serif",
-              color: '#1a1a1a',
-              cursor: 'pointer',
-            }}
-          >
-            <ArrowLeft size={14} />
+          <Button variant="secondary" size="sm" icon={<ArrowLeft size={14} />} onClick={onBack}>
             Voltar
-          </button>
+          </Button>
         }
       />
 
-      {/* Stepper */}
       <Stepper
         steps={STEPS}
         current={currentStep}
@@ -228,14 +207,11 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         onStepClick={handleStepClick}
       />
 
-      {/* Step Content */}
       <div
         style={{
-          flex: 1,
-          overflowY: 'auto',
           background: 'white',
           borderRadius: 12,
-          padding: 24,
+          padding: '32px 24px 80px',
           marginTop: 8,
           boxSizing: 'border-box',
         }}
@@ -243,73 +219,12 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         {renderStep()}
       </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          flexShrink: 0,
-          borderTop: '1px solid #f0f0f0',
-          padding: '12px 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 12,
-            color: '#9ca3af',
-            fontFamily: "'Outfit', sans-serif",
-          }}
-        >
-          Etapa {currentStep} de 5
-        </span>
-
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: 36,
-              padding: '0 16px',
-              background: 'white',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 500,
-              fontFamily: "'Outfit', sans-serif",
-              color: currentStep === 1 ? '#d1d5db' : '#1a1a1a',
-              cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
-              opacity: currentStep === 1 ? 0.6 : 1,
-            }}
-          >
-            Voltar
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNext}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: 36,
-              padding: '0 20px',
-              background: '#059669',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily: "'Outfit', sans-serif",
-              color: 'white',
-              cursor: 'pointer',
-            }}
-          >
-            {currentStep === 5 ? 'Salvar' : 'Próximo'}
-          </button>
-        </div>
-      </div>
-    </div>
+      <StepFooter
+        currentStep={currentStep}
+        totalSteps={6}
+        onBack={handleBack}
+        onNext={handleNext}
+      />
+    </PageContainer>
   )
 }

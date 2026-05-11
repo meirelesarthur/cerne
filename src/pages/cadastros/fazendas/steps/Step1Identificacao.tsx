@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { StepHeader } from '../../../../components/ui/StepHeader'
 import type { FazendaFormData } from '../fazendas.types'

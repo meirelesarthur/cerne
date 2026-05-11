@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
 import { StepHeader } from '../../../../components/ui/StepHeader'
@@ -28,7 +27,6 @@ export function Step2Documentacao({ data, errors, onChange }: Step2Props) {
         title="Documentação Rural"
         subtitle="Cadastre os documentos oficiais e defina o tipo de exploração da propriedade"
       />
-      <FormSection title="Documentação Rural">
       <div
         style={{
           display: 'grid',
@@ -93,7 +91,6 @@ export function Step2Documentacao({ data, errors, onChange }: Step2Props) {
           placeholder="Certificado de Aprovação de EPI"
         />
       </div>
-    </FormSection>
     </>
   )
 }

@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
 import { StepHeader } from '../../../../components/ui/StepHeader'
@@ -27,14 +26,13 @@ export function Step4Endereco({ data, errors, onChange }: Step4EnderecoProps) {
         subtitle="Informe a localização da fazenda para registros e correspondências."
       />
 
-      <FormSection title="Dados de Endereço">
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 16,
-          }}
-        >
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 16,
+        }}
+      >
           <FormSelect
             label="País"
             required
@@ -87,8 +85,7 @@ export function Step4Endereco({ data, errors, onChange }: Step4EnderecoProps) {
             onChange={(e) => onChange('bairro', e.target.value)}
             placeholder="Bairro / Localidade"
           />
-        </div>
-      </FormSection>
+      </div>
     </div>
   )
 }

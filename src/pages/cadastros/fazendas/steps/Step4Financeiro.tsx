@@ -1,5 +1,4 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
 import { StepHeader } from '../../../../components/ui/StepHeader'
@@ -30,7 +29,6 @@ export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4P
         title="Dados Financeiros"
         subtitle="Configure área, valor por hectare e taxas de remuneração da propriedade"
       />
-      <FormSection title="Dados Financeiros e Operacionais">
       <div
         style={{
           display: 'grid',
@@ -102,7 +100,6 @@ export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4P
           onChange={(e) => onBoolChange('usoLivroCaixa', e.target.value === 'true')}
         />
       </div>
-    </FormSection>
     </>
   )
 }

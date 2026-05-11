@@ -16,7 +16,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         height: '100vh',
         width: '100vw',
         fontFamily: "'Outfit', sans-serif",
-        overflow: 'hidden',
+        background: '#f0f2f0',
+        padding: 12,
+        boxSizing: 'border-box',
+        gap: 0,
       }}
     >
       {/* Left panel — form */}
@@ -33,6 +36,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 1,
+          borderRadius: 16,
         }}
       >
         {/* Logo */}
@@ -250,6 +254,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           flex: 1,
           position: 'relative',
           overflow: 'hidden',
+          borderRadius: 16,
+          marginLeft: 12,
         }}
       >
         {/*

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Check } from 'lucide-react'
 
 interface Step {
   id: number
@@ -18,11 +17,9 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
     <div
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         width: '100%',
-        padding: '16px 24px',
-        background: 'white',
-        borderRadius: 12,
+        padding: '12px 16px',
         boxSizing: 'border-box',
       }}
     >
@@ -32,14 +29,17 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
         const isFuture = !isCompleted && !isActive
         const isClickable = isCompleted
 
+        const circleSize = isActive ? 14 : 10
+
         return (
           <React.Fragment key={step.id}>
+            {/* Step node */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 6,
+                gap: 8,
                 flex: '0 0 auto',
                 cursor: isClickable ? 'pointer' : 'default',
               }}
@@ -48,46 +48,29 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
               {/* Circle */}
               <div
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: circleSize,
+                  height: circleSize,
                   borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: isCompleted
-                    ? '#059669'
-                    : isActive
-                    ? '#059669'
-                    : 'white',
-                  border: isFuture ? '1.5px solid #e5e5e5' : 'none',
-                  transition: 'all 0.2s',
                   flexShrink: 0,
+                  background: isCompleted ? '#059669' : 'white',
+                  border: isCompleted
+                    ? 'none'
+                    : isActive
+                    ? '2px solid #059669'
+                    : '1.5px solid #d1d5db',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
                 }}
-              >
-                {isCompleted ? (
-                  <Check size={12} color="white" strokeWidth={2.5} />
-                ) : (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      fontFamily: "'Outfit', sans-serif",
-                      color: isActive ? 'white' : '#9ca3af',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {step.id}
-                  </span>
-                )}
-              </div>
+              />
               {/* Label */}
               <span
                 style={{
                   fontSize: 11,
                   fontWeight: isActive ? 600 : 400,
                   fontFamily: "'Outfit', sans-serif",
-                  color: isCompleted ? '#059669' : isActive ? '#059669' : '#9ca3af',
+                  color: isCompleted || isActive ? '#059669' : '#9ca3af',
                   whiteSpace: 'nowrap',
+                  letterSpacing: '0.1px',
                 }}
               >
                 {step.label}
@@ -99,9 +82,9 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
               <div
                 style={{
                   flex: 1,
-                  height: 2,
-                  marginTop: 13,
-                  background: isCompleted ? '#059669' : '#e5e5e5',
+                  height: 1.5,
+                  marginBottom: 19,
+                  background: isCompleted ? '#059669' : '#e5e7eb',
                   transition: 'background 0.2s',
                 }}
               />

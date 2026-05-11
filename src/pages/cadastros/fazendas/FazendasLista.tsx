@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react'
-import { Plus, Pencil, Trash2, Eye, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Eye, SlidersHorizontal, X } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { DataTable } from '../../../components/ui/DataTable'
+import { FilterDrawer } from '../../../components/ui/FilterDrawer'
 import { Badge } from '../../../components/ui/Badge'
 import { FormField } from '../../../components/ui/FormField'
 import { FormSelect } from '../../../components/ui/FormSelect'
@@ -33,6 +34,7 @@ const ativoOptions = [
 export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaProps) {
   const [filters, setFilters] = useState({ nome: '', tipoExploracao: '', ativo: '' })
   const [data] = useState<FazendaRow[]>(mockFazendas)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const filtered = useMemo(() => {
     return data.filter((row) => {
@@ -45,8 +47,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
     })
   }, [data, filters])
 
-  const hasFilters = filters.nome || filters.tipoExploracao || filters.ativo !== ''
-
+  const activeFilterCount = [filters.nome, filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ nome: '', tipoExploracao: '', ativo: '' })
 
   const columns: Column<FazendaRow>[] = [
@@ -61,14 +62,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'cpfCnpj',
       label: 'CPF / CNPJ',
       render: (row) => (
-        <span style={{ color: '#616161', fontSize: 12 }}>{row.cpfCnpj}</span>
+        <span style={{ color: '#6b7280', fontSize: 12 }}>{row.cpfCnpj}</span>
       ),
     },
     {
       key: 'cidadeUf',
       label: 'Cidade / UF',
       render: (row) => (
-        <span style={{ color: '#616161' }}>
+        <span style={{ color: '#6b7280' }}>
           {row.cidade} — {row.uf}
         </span>
       ),
@@ -83,15 +84,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       label: 'Área Total',
       align: 'right',
       render: (row) => (
-        <span>
-          {row.areaTotal.toLocaleString('pt-BR')} ha
-        </span>
+        <span>{row.areaTotal.toLocaleString('pt-BR')} ha</span>
       ),
     },
     {
       key: 'ativo',
       label: 'Status',
       align: 'center',
+      sortable: false,
       render: (row) => (
         <Badge label={row.ativo ? 'Ativo' : 'Inativo'} variant={row.ativo ? 'success' : 'neutral'} />
       ),
@@ -100,24 +100,19 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'acoes',
       label: 'Ações',
       align: 'center',
-      width: 80,
+      sortable: false,
+      width: 90,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
           <button
             type="button"
             onClick={() => onView(row.id)}
             title="Visualizar"
             style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#616161',
+              width: 28, height: 28,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: 'none', borderRadius: 6,
+              cursor: 'pointer', color: '#6b7280',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
@@ -129,16 +124,10 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             onClick={() => onEdit(row.id)}
             title="Editar"
             style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#616161',
+              width: 28, height: 28,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: 'none', borderRadius: 6,
+              cursor: 'pointer', color: '#6b7280',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
@@ -149,16 +138,10 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             type="button"
             title="Excluir"
             style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#dc2626',
+              width: 28, height: 28,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: 'none', borderRadius: 6,
+              cursor: 'pointer', color: '#dc2626',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
@@ -173,7 +156,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
   return (
     <div
       style={{
-        padding: '24px 28px',
+        padding: '8px 28px 24px',
         fontFamily: "'Outfit', sans-serif",
         boxSizing: 'border-box',
       }}
@@ -186,19 +169,12 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             type="button"
             onClick={onNew}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: '#059669',
-              border: 'none',
-              borderRadius: 8,
-              padding: '0 16px',
-              height: 36,
-              fontSize: 13,
-              fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: '#059669', border: 'none', borderRadius: 8,
+              padding: '0 16px', height: 36,
+              fontSize: 13, fontWeight: 600,
               fontFamily: "'Outfit', sans-serif",
-              color: 'white',
-              cursor: 'pointer',
+              color: 'white', cursor: 'pointer',
             }}
           >
             <Plus size={14} />
@@ -207,19 +183,106 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         }
       />
 
-      {/* Filter Bar */}
+      {/* Toolbar */}
       <div
         style={{
-          background: 'white',
-          borderRadius: 12,
-          padding: 16,
-          marginBottom: 8,
           display: 'flex',
-          alignItems: 'flex-end',
-          gap: 12,
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 12,
         }}
       >
-        <div style={{ flex: 2 }}>
+        {/* Filter chips */}
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            height: 32,
+            background: activeFilterCount > 0 ? '#f0fdf4' : 'white',
+            border: `1px solid ${activeFilterCount > 0 ? '#059669' : '#e5e5e5'}`,
+            borderRadius: 6,
+            padding: '0 12px',
+            fontSize: 12,
+            fontWeight: 500,
+            fontFamily: "'Outfit', sans-serif",
+            color: activeFilterCount > 0 ? '#059669' : '#616161',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? '#dcfce7' : '#f9fafb' }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? '#f0fdf4' : 'white' }}
+        >
+          <SlidersHorizontal size={12} />
+          Filtros
+          {activeFilterCount > 0 && (
+            <span
+              style={{
+                background: '#059669',
+                color: 'white',
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '1px 5px',
+                borderRadius: 9999,
+              }}
+            >
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+
+        {/* Active filter chips */}
+        {filters.nome && (
+          <FilterChip
+            label={`Nome: ${filters.nome}`}
+            onRemove={() => setFilters((f) => ({ ...f, nome: '' }))}
+          />
+        )}
+        {filters.tipoExploracao && (
+          <FilterChip
+            label={`Tipo: ${filters.tipoExploracao}`}
+            onRemove={() => setFilters((f) => ({ ...f, tipoExploracao: '' }))}
+          />
+        )}
+        {filters.ativo && (
+          <FilterChip
+            label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
+            onRemove={() => setFilters((f) => ({ ...f, ativo: '' }))}
+          />
+        )}
+
+        {activeFilterCount > 1 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            style={{
+              background: 'none', border: 'none',
+              fontSize: 12, color: '#9ca3af',
+              cursor: 'pointer', padding: '0 4px',
+              fontFamily: "'Outfit', sans-serif",
+            }}
+          >
+            Limpar tudo
+          </button>
+        )}
+      </div>
+
+      {/* Data Table */}
+      <DataTable<FazendaRow>
+        columns={columns}
+        data={filtered}
+        keyField="id"
+        emptyMessage="Nenhuma fazenda encontrada com os filtros aplicados."
+      />
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Fazendas"
+        activeCount={activeFilterCount}
+      >
+        <div>
           <FormField
             label="Nome"
             value={filters.nome}
@@ -227,8 +290,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             placeholder="Buscar por nome..."
           />
         </div>
-
-        <div style={{ flex: 1 }}>
+        <div>
           <FormSelect
             label="Tipo de Exploração"
             options={tipoOptions}
@@ -236,8 +298,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             onChange={(e) => setFilters((f) => ({ ...f, tipoExploracao: e.target.value }))}
           />
         </div>
-
-        <div style={{ flex: 1 }}>
+        <div>
           <FormSelect
             label="Status"
             options={ativoOptions}
@@ -245,49 +306,40 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             onChange={(e) => setFilters((f) => ({ ...f, ativo: e.target.value }))}
           />
         </div>
+      </FilterDrawer>
+    </div>
+  )
+}
 
-        {hasFilters && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              background: 'white',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              padding: '0 12px',
-              height: 38,
-              fontSize: 12,
-              fontWeight: 500,
-              fontFamily: "'Outfit', sans-serif",
-              color: '#616161',
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-          >
-            <X size={12} />
-            Limpar
-          </button>
-        )}
-      </div>
-
-      {/* Data Table */}
-      <div
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: 5,
+        height: 32,
+        background: '#f0fdf4',
+        border: '1px solid #bbf7d0',
+        borderRadius: 6,
+        padding: '0 8px 0 10px',
+        fontSize: 12,
+        color: '#059669',
+        fontFamily: "'Outfit', sans-serif",
+        fontWeight: 500,
+      }}
+    >
+      {label}
+      <button
+        type="button"
+        onClick={onRemove}
         style={{
-          background: 'white',
-          borderRadius: 12,
-          overflow: 'hidden',
+          background: 'none', border: 'none',
+          cursor: 'pointer', color: '#059669',
+          display: 'flex', alignItems: 'center',
+          padding: 0,
         }}
       >
-        <DataTable<FazendaRow>
-          columns={columns}
-          data={filtered}
-          keyField="id"
-          emptyMessage="Nenhuma fazenda encontrada com os filtros aplicados."
-        />
-      </div>
+        <X size={11} />
+      </button>
     </div>
   )
 }

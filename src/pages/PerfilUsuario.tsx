@@ -341,7 +341,7 @@ export default function PerfilUsuario() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <SubTitle>Newsletter</SubTitle>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
-            <Muted>Receba newsletters, promoções e novidades do AGRO365.</Muted>
+            <Muted>Receba newsletters, promoções e novidades do GB CERNE.</Muted>
             <Toggle checked={newsletter} onChange={() => setNewsletter((v) => !v)} />
           </div>
         </div>

@@ -61,9 +61,9 @@ ModuleCard     — card de módulo do dashboard home
 
 A documentação de componentes está publicada no Chromatic:
 
-**[→ Acessar Storybook no Chromatic](https://69fbb4d23569b2759aad4d30-apyaryibgv.chromatic.com/)**
+**[→ Acessar Storybook no Chromatic](https://69fbb4d23569b2759aad4d30-krqwjaxare.chromatic.com/)**
 
-Cada push para `main` publica uma nova build automaticamente. O Storybook inclui suporte ao **GB Mode** (dark theme) via toolbar de tema.
+Cada push para `main` requer rodar `npm run chromatic` para publicar uma nova build. O Storybook inclui suporte ao **GB Mode** (dark theme) via toolbar de tema.
 
 ---
 

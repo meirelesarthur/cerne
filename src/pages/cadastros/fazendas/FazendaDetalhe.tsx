@@ -421,6 +421,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
               onMouseEnter={(e) => { e.currentTarget.style.color = colors.textPrimary }}
               onMouseLeave={(e) => { e.currentTarget.style.color = colors.textMuted }}
               title="Voltar para Fazendas"
+              aria-label="Voltar para fazendas"
             >
               <ArrowLeft size={20} strokeWidth={2} />
             </button>

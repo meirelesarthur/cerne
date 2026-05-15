@@ -202,24 +202,34 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         }
       />
 
-      <Stepper
-        steps={STEPS}
-        current={currentStep}
-        completed={completedSteps}
-        onStepClick={handleStepClick}
-      />
-
       <div
         style={{
           background: colors.surfaceBg,
           borderRadius: 12,
-          padding: '32px 24px 80px',
-          marginTop: 8,
+          overflow: 'hidden',
           boxSizing: 'border-box',
           transition: 'background 0.2s',
         }}
       >
-        {renderStep()}
+        {/* Stepper dentro do card */}
+        <div
+          style={{
+            padding: '24px 24px 0',
+            borderBottom: `1px solid ${colors.borderSubtle}`,
+          }}
+        >
+          <Stepper
+            steps={STEPS}
+            current={currentStep}
+            completed={completedSteps}
+            onStepClick={handleStepClick}
+          />
+        </div>
+
+        {/* Conteúdo do step */}
+        <div style={{ padding: '28px 24px 80px' }}>
+          {renderStep()}
+        </div>
       </div>
 
       <StepFooter

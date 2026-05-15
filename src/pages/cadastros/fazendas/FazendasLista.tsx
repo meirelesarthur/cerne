@@ -109,10 +109,10 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       width: 72,
       render: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] / 2 }}>
-          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={(e) => { e.stopPropagation(); onEdit(row.id) }} title="Editar">
+          <Button variant="ghost" size="sm" style={{ width: 32, height: 32, padding: 0 }} onClick={(e) => { e.stopPropagation(); onEdit(row.id) }} title="Editar" aria-label="Editar fazenda">
             <Pencil size={14} />
           </Button>
-          <Button variant="destructive" size="sm" style={{ width: 28, height: 28, padding: 0, border: 'none' }} onClick={(e) => e.stopPropagation()} title="Excluir">
+          <Button variant="destructive" size="sm" style={{ width: 32, height: 32, padding: 0, border: 'none' }} onClick={(e) => e.stopPropagation()} title="Excluir" aria-label="Excluir fazenda">
             <Trash2 size={14} />
           </Button>
         </div>

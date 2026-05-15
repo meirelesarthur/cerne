@@ -1,5 +1,6 @@
 import React from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface Step {
   id: number
@@ -14,6 +15,7 @@ interface StepperProps {
 }
 
 export function Stepper({ steps, current, completed, onStepClick }: StepperProps) {
+  const { colors } = useTheme()
   return (
     <div
       style={{
@@ -49,12 +51,12 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   height: circleSize,
                   borderRadius: t.radius.full,
                   flexShrink: 0,
-                  background: isCompleted ? t.color.brand[600] : t.color.neutral[0],
+                  background: isCompleted ? t.color.brand[600] : colors.surfaceBg,
                   border: isCompleted
                     ? 'none'
                     : isActive
                     ? `2px solid ${t.color.brand[600]}`
-                    : `1.5px solid ${t.color.neutral[300]}`,
+                    : `1.5px solid ${colors.border}`,
                   transition: t.transition.smooth,
                   boxSizing: 'border-box',
                 }}
@@ -64,7 +66,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   fontSize: t.font.size.xs,
                   fontWeight: isActive ? t.font.weight.semibold : t.font.weight.normal,
                   fontFamily: t.font.family.sans,
-                  color: isCompleted || isActive ? t.color.brand[600] : t.color.neutral[400],
+                  color: isCompleted || isActive ? t.color.brand[600] : colors.textMuted,
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.1px',
                 }}
@@ -79,7 +81,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   flex: 1,
                   height: 1.5,
                   marginBottom: 19,
-                  background: isCompleted ? t.color.brand[600] : t.color.neutral[200],
+                  background: isCompleted ? t.color.brand[600] : colors.border,
                   transition: t.transition.smooth,
                 }}
               />

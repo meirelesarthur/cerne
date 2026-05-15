@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 export interface Column<T> {
   key: string
@@ -16,14 +17,14 @@ interface DataTableProps<T> {
   keyField: keyof T
   emptyMessage?: string
   loading?: boolean
-  selectable?: boolean
+  onRowClick?: (row: T) => void
 }
 
-function SortIcon({ active }: { active?: boolean }) {
+function SortIcon({ active, color }: { active?: boolean; color: string }) {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: active ? 1 : 0.35 }}>
-      <path d="M7 15l5 5 5-5" stroke={active ? t.color.brand[600] : t.color.neutral[400]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 9l5-5 5 5" stroke={active ? t.color.brand[600] : t.color.neutral[400]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 15l5 5 5-5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 9l5-5 5 5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -34,61 +35,42 @@ export function DataTable<T extends Record<string, unknown>>({
   keyField,
   emptyMessage = 'Nenhum registro encontrado.',
   loading,
-  selectable = true,
+  onRowClick,
 }: DataTableProps<T>) {
+  const { colors, isGbMode } = useTheme()
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
-
-  const allKeys = data.map((r) => String(r[keyField]))
-  const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedRows.has(k))
-  const someSelected = allKeys.some((k) => selectedRows.has(k)) && !allSelected
-
-  const toggleAll = () => {
-    setSelectedRows(allSelected ? new Set() : new Set(allKeys))
-  }
-
-  const toggleRow = (key: string) => {
-    setSelectedRows((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
-  }
 
   const handleSort = (colKey: string) => {
     if (sortCol === colKey) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else { setSortCol(colKey); setSortDir('asc') }
   }
 
-  const emptyColSpan = columns.length + (selectable ? 1 : 0)
+  // Derived colors
+  const borderColor   = colors.border
+  const borderSubtle  = colors.borderSubtle
+  const theadBg       = isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50]
+  const rowBg         = colors.surfaceBg
+  const rowHoverBg    = isGbMode ? 'rgba(16,185,129,0.06)' : t.color.neutral[50]
+  const textHead      = colors.textSecondary
+  const textCell      = colors.textPrimary
+  const emptyColor    = colors.textMuted
 
   return (
     <div
       style={{
-        border: `1px solid ${t.color.neutral[200]}`,
+        border: `1px solid ${borderColor}`,
         borderRadius: t.radius.lg,
         overflow: 'hidden',
         width: '100%',
+        transition: 'border-color 0.2s',
       }}
     >
       <div style={{ overflowX: 'auto', width: '100%' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: t.color.neutral[50], borderBottom: `1px solid ${t.color.neutral[200]}` }}>
-              {selectable && (
-                <th style={{ width: 44, padding: `${t.space[1] + t.space[1] / 2}px ${t.space[3]}px`, textAlign: 'center', borderRight: `1px solid ${t.color.neutral[150]}` }}>
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    ref={(el) => { if (el) el.indeterminate = someSelected }}
-                    onChange={toggleAll}
-                    style={{ cursor: 'pointer', accentColor: t.color.brand[600], width: 14, height: 14 }}
-                  />
-                </th>
-              )}
+            <tr style={{ background: theadBg, borderBottom: `1px solid ${borderColor}` }}>
               {columns.map((col, i) => (
                 <th
                   key={col.key}
@@ -96,7 +78,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   style={{
                     fontSize: t.font.size.sm,
                     fontWeight: t.font.weight.medium,
-                    color: t.color.neutral[500],
+                    color: textHead,
                     fontFamily: t.font.family.sans,
                     padding: `${t.space[1] + t.space[1] / 2}px ${t.space[3] + t.space[1] / 2}px`,
                     textAlign: col.align ?? 'left',
@@ -104,12 +86,13 @@ export function DataTable<T extends Record<string, unknown>>({
                     whiteSpace: 'nowrap',
                     cursor: col.sortable !== false ? 'pointer' : 'default',
                     userSelect: 'none',
-                    borderRight: i < columns.length - 1 ? `1px solid ${t.color.neutral[150]}` : undefined,
+                    borderRight: i < columns.length - 1 ? `1px solid ${borderSubtle}` : undefined,
+                    transition: 'color 0.2s',
                   }}
                 >
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: t.space[1], justifyContent: col.align === 'right' ? 'flex-end' : col.align === 'center' ? 'center' : 'flex-start' }}>
                     {col.label}
-                    {col.sortable !== false && <SortIcon active={sortCol === col.key} />}
+                    {col.sortable !== false && <SortIcon active={sortCol === col.key} color={textHead} />}
                   </div>
                 </th>
               ))}
@@ -117,52 +100,45 @@ export function DataTable<T extends Record<string, unknown>>({
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan={emptyColSpan} style={{ textAlign: 'center', padding: `${t.space[10]}px ${t.space[3]}px`, fontSize: t.font.size.base, color: t.color.neutral[400], fontFamily: t.font.family.sans }}>
+              <tr style={{ background: rowBg }}>
+                <td colSpan={columns.length} style={{ textAlign: 'center', padding: `${t.space[10]}px ${t.space[3]}px`, fontSize: t.font.size.base, color: emptyColor, fontFamily: t.font.family.sans }}>
                   Carregando...
                 </td>
               </tr>
             ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={emptyColSpan} style={{ textAlign: 'center', padding: `${t.space[10]}px ${t.space[3]}px`, fontSize: t.font.size.base, color: t.color.neutral[400], fontFamily: t.font.family.sans }}>
+              <tr style={{ background: rowBg }}>
+                <td colSpan={columns.length} style={{ textAlign: 'center', padding: `${t.space[10]}px ${t.space[3]}px`, fontSize: t.font.size.base, color: emptyColor, fontFamily: t.font.family.sans }}>
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               data.map((row) => {
                 const rowKey = String(row[keyField])
-                const isSelected = selectedRows.has(rowKey)
+                const isHovered = hoveredRow === rowKey
                 return (
                   <tr
                     key={rowKey}
                     onMouseEnter={() => setHoveredRow(rowKey)}
                     onMouseLeave={() => setHoveredRow(null)}
+                    onClick={() => onRowClick?.(row)}
                     style={{
-                      background: isSelected ? t.color.brand[50] : hoveredRow === rowKey ? t.color.neutral[50] : t.color.neutral[0],
-                      borderBottom: `1px solid ${t.color.neutral[150]}`,
+                      background: isHovered ? rowHoverBg : rowBg,
+                      borderBottom: `1px solid ${borderSubtle}`,
                       transition: `background ${t.transition.fast}`,
+                      cursor: onRowClick ? 'pointer' : 'default',
                     }}
                   >
-                    {selectable && (
-                      <td style={{ width: 44, padding: `0 ${t.space[3]}px`, textAlign: 'center', borderRight: `1px solid ${t.color.neutral[150]}` }}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleRow(rowKey)}
-                          style={{ cursor: 'pointer', accentColor: t.color.brand[600], width: 14, height: 14 }}
-                        />
-                      </td>
-                    )}
                     {columns.map((col, i) => (
                       <td
                         key={col.key}
                         style={{
                           fontSize: t.font.size.base,
-                          color: t.color.neutral[900],
+                          color: textCell,
                           fontFamily: t.font.family.sans,
                           padding: `${t.space[1] + t.space[1] / 2}px ${t.space[3] + t.space[1] / 2}px`,
                           textAlign: col.align ?? 'left',
-                          borderRight: i < columns.length - 1 ? `1px solid ${t.color.neutral[150]}` : undefined,
+                          borderRight: i < columns.length - 1 ? `1px solid ${borderSubtle}` : undefined,
+                          transition: 'color 0.2s, background 0.15s',
                         }}
                       >
                         {col.render(row)}

@@ -15,6 +15,7 @@ import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
 import type { FazendaDetalheData } from './fazendas.types'
+import { useTheme } from '../../../context/ThemeContext'
 
 interface FazendaDetalheProps {
   onBack: () => void
@@ -33,17 +34,19 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 function InfoField({ label, value, full }: { label: string; value: React.ReactNode; full?: boolean }) {
+  const { colors } = useTheme()
   return (
     <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
       <div
         style={{
           fontSize: 10,
           fontWeight: 600,
-          color: '#9ca3af',
+          color: colors.textMuted,
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           marginBottom: 4,
           fontFamily: "'Outfit', sans-serif",
+          transition: 'color 0.2s',
         }}
       >
         {label}
@@ -51,13 +54,14 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
       <div
         style={{
           fontSize: 13,
-          color: '#1a1a1a',
+          color: colors.textPrimary,
           fontFamily: "'Outfit', sans-serif",
           fontWeight: 400,
           minHeight: 20,
+          transition: 'color 0.2s',
         }}
       >
-        {value || <span style={{ color: '#d1d5db' }}>—</span>}
+        {value || <span style={{ color: colors.border }}>—</span>}
       </div>
     </div>
   )
@@ -78,18 +82,20 @@ function FieldGrid({ children }: { children: React.ReactNode }) {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme()
   return (
     <div
       style={{
         fontSize: 11,
         fontWeight: 600,
-        color: '#9ca3af',
+        color: colors.textMuted,
         textTransform: 'uppercase',
         letterSpacing: '0.6px',
         marginBottom: 16,
         fontFamily: "'Outfit', sans-serif",
         paddingBottom: 10,
-        borderBottom: '1px solid #f5f5f5',
+        borderBottom: `1px solid ${colors.borderSubtle}`,
+        transition: 'color 0.2s, border-color 0.2s',
       }}
     >
       {children}
@@ -98,13 +104,14 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: boolean; trueLabel?: string; falseLabel?: string }) {
+  const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       {value
-        ? <CheckCircle2 size={14} color="#059669" />
-        : <XCircle size={14} color="#9ca3af" />
+        ? <CheckCircle2 size={14} color={colors.brand} />
+        : <XCircle size={14} color={colors.textMuted} />
       }
-      <span style={{ fontSize: 13, color: value ? '#059669' : '#9ca3af', fontFamily: "'Outfit', sans-serif" }}>
+      <span style={{ fontSize: 13, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
         {value ? trueLabel : falseLabel}
       </span>
     </div>
@@ -139,7 +146,7 @@ function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
         <SectionTitle>Registros Ambientais e Fundiários</SectionTitle>
         <FieldGrid>
           <InfoField label="CAR — Cadastro Ambiental Rural" value={
-            <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#374151' }}>{f.car}</span>
+            <span style={{ fontSize: 12, fontFamily: 'monospace' }}>{f.car}</span>
           } />
           <InfoField label="NIRF — Imóvel Rural" value={f.nirf} />
           <InfoField label="CCIR — Certificado de Cadastro" value={f.ccir} />
@@ -305,7 +312,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
         <SectionTitle>Centros de Custo Vinculados</SectionTitle>
-        <div style={{ background: '#fafafa', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: colors.surfaceSubtle, borderRadius: 10, overflow: 'hidden' }}>
           <DataTable<CCRow>
             columns={columns}
             data={f.centrosCusto}
@@ -321,12 +328,14 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
           <p
             style={{
               fontSize: 13,
-              color: '#374151',
+              color: colors.textSecondary,
               lineHeight: 1.6,
               fontFamily: "'Outfit', sans-serif",
-              background: '#fafafa',
+              background: colors.surfaceSubtle,
               borderRadius: 8,
               padding: '12px 14px',
+              margin: 0,
+              transition: 'color 0.2s, background 0.2s',
             }}
           >
             {f.observacao}
@@ -338,6 +347,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
 }
 
 export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSantaLuzia }: FazendaDetalheProps) {
+  const { colors } = useTheme()
   const [activeTab, setActiveTab] = useState<Tab>('identificacao')
 
   const stats = [
@@ -388,46 +398,47 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
         gap: 16,
       }}
     >
-      {/* Back */}
-      <button
-        type="button"
-        onClick={onBack}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: '#9ca3af',
-          fontSize: 12,
-          fontFamily: "'Outfit', sans-serif",
-          padding: 0,
-          alignSelf: 'flex-start',
-        }}
-      >
-        <ArrowLeft size={13} />
-        Fazendas
-      </button>
-
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+            <button
+              type="button"
+              onClick={onBack}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: colors.textMuted,
+                padding: 0,
+                flexShrink: 0,
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = colors.textPrimary }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = colors.textMuted }}
+              title="Voltar para Fazendas"
+            >
+              <ArrowLeft size={20} strokeWidth={2} />
+            </button>
             <h1
               style={{
-                fontSize: 20,
-                fontWeight: 600,
-                color: '#1a1a1a',
-                letterSpacing: '-0.3px',
+                fontSize: 22,
+                fontWeight: 700,
+                color: colors.textPrimary,
+                letterSpacing: '-0.4px',
                 margin: 0,
+                fontFamily: "'Outfit', sans-serif",
+                transition: 'color 0.2s',
               }}
             >
               {fazenda.nome}
             </h1>
             <Badge label={fazenda.ativo ? 'Ativo' : 'Inativo'} variant={fazenda.ativo ? 'success' : 'neutral'} />
           </div>
-          <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
+          <p style={{ fontSize: 12, color: colors.textSecondary, margin: 0, paddingLeft: 30, transition: 'color 0.2s' }}>
             {fazenda.tipoExploracao} · {fazenda.cidade}, {fazenda.uf}
           </p>
         </div>
@@ -439,7 +450,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: '#059669',
+            background: colors.brand,
             border: 'none',
             borderRadius: 8,
             padding: '0 16px',
@@ -450,7 +461,10 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             cursor: 'pointer',
             fontFamily: "'Outfit', sans-serif",
             flexShrink: 0,
+            transition: 'background 0.15s',
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = colors.brandHover }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = colors.brand }}
         >
           <Pencil size={13} />
           Editar
@@ -463,12 +477,13 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
           <div
             key={s.label}
             style={{
-              background: 'white',
+              background: colors.surfaceBg,
               borderRadius: 10,
               padding: '12px 14px',
               display: 'flex',
               alignItems: 'center',
               gap: 12,
+              transition: 'background 0.2s',
             }}
           >
             <div
@@ -486,10 +501,10 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
               {s.icon}
             </div>
             <div>
-              <div style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
+              <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: 'color 0.2s' }}>
                 {s.label}
               </div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, transition: 'color 0.2s' }}>
                 {s.value}
               </div>
             </div>
@@ -500,19 +515,20 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
       {/* Tabs + content */}
       <div
         style={{
-          background: 'white',
+          background: colors.surfaceBg,
           borderRadius: 12,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          transition: 'background 0.2s',
         }}
       >
         {/* Tab bar */}
         <div
           style={{
             display: 'flex',
-            borderBottom: '1px solid #f0f0f0',
+            borderBottom: `1px solid ${colors.border}`,
             padding: '0 20px',
             gap: 4,
           }}
@@ -529,11 +545,11 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
                   padding: '0 14px',
                   background: 'none',
                   border: 'none',
-                  borderBottom: isActive ? '2px solid #059669' : '2px solid transparent',
+                  borderBottom: isActive ? `2px solid ${colors.brand}` : '2px solid transparent',
                   cursor: 'pointer',
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 400,
-                  color: isActive ? '#059669' : '#6b7280',
+                  color: isActive ? colors.brand : colors.textSecondary,
                   fontFamily: "'Outfit', sans-serif",
                   transition: 'color 0.12s, border-color 0.12s',
                   whiteSpace: 'nowrap',

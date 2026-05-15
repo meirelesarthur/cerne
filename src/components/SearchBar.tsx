@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, ArrowRight, Hash, type LucideIcon } from 'lucide-react'
 import { menuModules } from '../data/menuData'
+import { useTheme } from '../context/ThemeContext'
 
 interface SearchItem {
   id: string
@@ -52,6 +53,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onNavigate }: SearchBarProps) {
+  const { colors, isGbMode } = useTheme()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
@@ -112,13 +114,13 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          background: 'white',
-          border: open ? '1.5px solid #059669' : '1.5px solid #e5e5e5',
+          background: colors.surfaceBg,
+          border: open ? `1.5px solid ${colors.brand}` : `1.5px solid ${colors.border}`,
           borderRadius: isOpen ? '12px 12px 0 0' : 12,
           padding: '0 16px',
           height: 48,
-          boxShadow: open ? '0 0 0 3px rgba(5,150,105,0.08)' : '0 1px 4px rgba(0,0,0,0.06)',
-          transition: 'border-color 0.15s, box-shadow 0.15s',
+          boxShadow: open ? `0 0 0 3px ${colors.brandBg}` : colors.shadow,
+          transition: 'border-color 0.15s, box-shadow 0.15s, background 0.2s',
           cursor: 'text',
         }}
         onClick={() => inputRef.current?.focus()}
@@ -139,18 +141,18 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
             fontSize: 14,
             fontFamily: "'Outfit', sans-serif",
             fontWeight: 400,
-            color: '#1a1a1a',
+            color: colors.textPrimary,
             lineHeight: 1,
           }}
         />
         <kbd
           style={{
             fontSize: 11,
-            background: '#f5f5f5',
-            border: '1px solid #e5e5e5',
+            background: colors.surfaceSubtle,
+            border: `1px solid ${colors.border}`,
             borderRadius: 6,
             padding: '2px 7px',
-            color: '#9ca3af',
+            color: colors.textMuted,
             fontFamily: "'Outfit', sans-serif",
             whiteSpace: 'nowrap',
             flexShrink: 0,
@@ -169,11 +171,11 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
             top: '100%',
             left: 0,
             right: 0,
-            background: 'white',
-            border: '1.5px solid #059669',
-            borderTop: '1px solid #f0f0f0',
+            background: colors.surfaceBg,
+            border: `1.5px solid ${colors.brand}`,
+            borderTop: `1px solid ${colors.borderSubtle}`,
             borderRadius: '0 0 12px 12px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+            boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
             zIndex: 100,
             overflow: 'hidden',
           }}
@@ -193,8 +195,8 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                   padding: '0 16px',
                   height: 48,
                   cursor: 'pointer',
-                  background: isActive ? '#f0fdf4' : 'transparent',
-                  borderBottom: i < results.length - 1 ? '1px solid #f5f5f5' : 'none',
+                  background: isActive ? colors.brandBg : 'transparent',
+                  borderBottom: i < results.length - 1 ? `1px solid ${colors.borderSubtle}` : 'none',
                   transition: 'background 0.1s',
                 }}
               >
@@ -204,7 +206,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                     width: 28,
                     height: 28,
                     borderRadius: 7,
-                    background: isActive ? '#d1fae5' : '#f5f5f5',
+                    background: isActive ? (isGbMode ? 'rgba(16,185,129,0.18)' : '#d1fae5') : colors.surfaceSubtle,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -212,7 +214,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                     transition: 'background 0.1s',
                   }}
                 >
-                  <Icon size={13} color={isActive ? '#059669' : '#737373'} strokeWidth={1.8} />
+                  <Icon size={13} color={isActive ? colors.brand : colors.textSecondary} strokeWidth={1.8} />
                 </div>
 
                 {/* Text — single line with separator */}
@@ -230,7 +232,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                     style={{
                       fontSize: 13,
                       fontWeight: 500,
-                      color: '#1a1a1a',
+                      color: colors.textPrimary,
                       fontFamily: "'Outfit', sans-serif",
                       lineHeight: 1,
                       whiteSpace: 'nowrap',
@@ -241,7 +243,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                     {highlight(item.label, query)}
                   </span>
 
-                  <span style={{ color: '#d4d4d4', fontSize: 12, lineHeight: 1, flexShrink: 0 }}>·</span>
+                  <span style={{ color: colors.border, fontSize: 12, lineHeight: 1, flexShrink: 0 }}>·</span>
 
                   <span
                     style={{
@@ -249,7 +251,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                       alignItems: 'center',
                       gap: 3,
                       fontSize: 11,
-                      color: '#9ca3af',
+                      color: colors.textMuted,
                       fontFamily: "'Outfit', sans-serif",
                       fontWeight: 400,
                       lineHeight: 1,
@@ -261,7 +263,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                     {item.moduleLabel}
                     {item.groupLabel && (
                       <>
-                        <span style={{ color: '#d4d4d4' }}>›</span>
+                        <span style={{ color: colors.border }}>›</span>
                         {item.groupLabel}
                       </>
                     )}
@@ -271,7 +273,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                 {/* Arrow */}
                 <ArrowRight
                   size={13}
-                  color={isActive ? '#059669' : '#d4d4d4'}
+                  color={isActive ? colors.brand : colors.border}
                   style={{ flexShrink: 0, transition: 'color 0.1s' }}
                 />
               </div>
@@ -282,8 +284,8 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
           <div
             style={{
               padding: '6px 16px',
-              background: '#fafafa',
-              borderTop: '1px solid #f0f0f0',
+              background: colors.surfaceSubtle,
+              borderTop: `1px solid ${colors.borderSubtle}`,
               display: 'flex',
               alignItems: 'center',
               gap: 12,
@@ -294,7 +296,7 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
                 key={key}
                 style={{
                   fontSize: 10,
-                  color: '#9ca3af',
+                  color: colors.textMuted,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 4,
@@ -304,12 +306,12 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
               >
                 <kbd
                   style={{
-                    background: '#f0f0f0',
-                    border: '1px solid #e5e5e5',
+                    background: colors.surfaceBg,
+                    border: `1px solid ${colors.border}`,
                     borderRadius: 4,
                     padding: '2px 5px',
                     fontSize: 10,
-                    color: '#616161',
+                    color: colors.textSecondary,
                     lineHeight: 1.4,
                   }}
                 >
@@ -330,19 +332,19 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
             top: '100%',
             left: 0,
             right: 0,
-            background: 'white',
-            border: '1.5px solid #059669',
-            borderTop: '1px solid #f0f0f0',
+            background: colors.surfaceBg,
+            border: `1.5px solid ${colors.brand}`,
+            borderTop: `1px solid ${colors.borderSubtle}`,
             borderRadius: '0 0 12px 12px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+            boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
             zIndex: 100,
             padding: '18px 16px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: 13, color: '#9ca3af', fontFamily: "'Outfit', sans-serif", lineHeight: 1 }}>
+          <div style={{ fontSize: 13, color: colors.textMuted, fontFamily: "'Outfit', sans-serif", lineHeight: 1 }}>
             Nenhum resultado para{' '}
-            <strong style={{ color: '#616161' }}>"{query}"</strong>
+            <strong style={{ color: colors.textSecondary }}>"{query}"</strong>
           </div>
         </div>
       )}

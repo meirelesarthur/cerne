@@ -1,5 +1,6 @@
 import React from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface PageHeaderProps {
   title: string
@@ -9,6 +10,8 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, actions, count }: PageHeaderProps) {
+  const { colors } = useTheme()
+
   return (
     <div
       style={{
@@ -25,8 +28,9 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
             style={{
               fontSize: t.font.size.xl,
               fontWeight: t.font.weight.semibold,
-              color: t.color.neutral[800],
+              color: colors.textPrimary,
               fontFamily: t.font.family.sans,
+              transition: 'color 0.2s',
             }}
           >
             {title}
@@ -34,13 +38,14 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
           {count !== undefined && (
             <span
               style={{
-                background: t.color.neutral[100],
-                color: t.color.neutral[500],
+                background: colors.surfaceSubtle,
+                color: colors.textSecondary,
                 fontSize: t.font.size.xs,
                 fontWeight: t.font.weight.medium,
                 fontFamily: t.font.family.sans,
                 padding: `2px ${t.space[2]}px`,
                 borderRadius: t.radius.full,
+                transition: 'background 0.2s, color 0.2s',
               }}
             >
               {count}
@@ -51,8 +56,9 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
           <span
             style={{
               fontSize: t.font.size.sm,
-              color: t.color.neutral[400],
+              color: colors.textMuted,
               fontFamily: t.font.family.sans,
+              transition: 'color 0.2s',
             }}
           >
             {description}

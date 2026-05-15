@@ -1,4 +1,5 @@
 import type { NavModule } from '../data/menuData'
+import { useTheme } from '../context/ThemeContext'
 
 export interface ModuleCardConfig {
   desc: string
@@ -14,6 +15,8 @@ interface ModuleCardProps {
 
 export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
   const Icon = module.icon
+  const { colors } = useTheme()
+
   return (
     <div
       className="module-card"
@@ -38,9 +41,10 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
         style={{
           fontSize: 13,
           fontWeight: 600,
-          color: '#1a1a1a',
+          color: colors.textPrimary,
           marginBottom: 3,
           fontFamily: "'Outfit', sans-serif",
+          transition: 'color 0.2s',
         }}
       >
         {module.label}
@@ -48,9 +52,10 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
       <div
         style={{
           fontSize: 11,
-          color: '#737373',
+          color: colors.textSecondary,
           lineHeight: 1.4,
           fontFamily: "'Outfit', sans-serif",
+          transition: 'color 0.2s',
         }}
       >
         {config.desc}

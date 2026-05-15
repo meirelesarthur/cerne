@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import t from '../design/tokens'
+import aerialView from '../assets/aerial-view-agricultural-fields.jpg'
+import logoFull from '../assets/Logo.svg'
 
 interface LoginPageProps {
   onLogin: () => void
@@ -13,13 +16,15 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     <div
       style={{
         display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         height: '100vh',
         width: '100vw',
-        fontFamily: "'Outfit', sans-serif",
-        background: '#f0f2f0',
-        padding: 12,
+        fontFamily: t.font.family.sans,
+        background: t.color.neutral[150],
+        padding: t.space[3],
         boxSizing: 'border-box',
-        gap: 0,
+        gap: t.space[3],
       }}
     >
       {/* Left panel — form */}
@@ -27,70 +32,36 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         style={{
           width: '42%',
           minWidth: 380,
-          background: '#ffffff',
+          maxWidth: 520,
+          alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           padding: '48px 56px',
           boxSizing: 'border-box',
-          position: 'relative',
-          zIndex: 1,
-          borderRadius: 16,
+          borderRadius: t.radius['2xl'],
         }}
       >
-        {/* Logo */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 32,
-            left: 40,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              background: '#059669',
-              borderRadius: 6,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L3 7v10l9 5 9-5V7L12 2z" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
-              <path d="M12 2v20M3 7l9 5 9-5" stroke="white" strokeWidth="1.8" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: '#171717',
-              letterSpacing: '-0.3px',
-            }}
-          >
-            GB CERNE
-          </span>
-        </div>
-
         {/* Form container */}
         <div style={{ width: '100%', maxWidth: 360 }}>
+          {/* Logo centralizada */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: t.space[6] }}>
+            <img src={logoFull} alt="GB CERNE" style={{ height: 32 }} />
+          </div>
+
           <h1
             style={{
               fontSize: 26,
               fontWeight: 700,
               color: '#171717',
-              margin: '0 0 32px',
+              margin: `0 0 ${t.space[8]}px`,
               letterSpacing: '-0.5px',
               lineHeight: 1.2,
+              textAlign: 'center',
             }}
           >
-            Bem-vindo ao GB CERNE!
+            Bem vindo ao Cerne
           </h1>
 
           {/* Email */}
@@ -251,22 +222,21 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       {/* Right panel — plantation image */}
       <div
         style={{
-          flex: 1,
+          flex: 'none',
+          width: 'calc(58% * 0.7)',
+          alignSelf: 'stretch',
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 16,
-          marginLeft: 12,
         }}
       >
-        {/*
-          Substitua o background abaixo por:
-          background: `url('/sua-imagem-plantacao.jpg') center/cover no-repeat`
-        */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, #064e3b 0%, #065f46 25%, #047857 55%, #059669 80%, #10b981 100%)',
+            backgroundImage: `url(${aerialView})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         />
 
@@ -280,42 +250,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           }}
         />
 
-        {/* Centered label */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <p
-              style={{
-                fontSize: 32,
-                fontWeight: 800,
-                color: 'white',
-                margin: 0,
-                letterSpacing: '-0.5px',
-                textShadow: '0 2px 12px rgba(0,0,0,0.25)',
-              }}
-            >
-              GB CERNE
-            </p>
-            <p
-              style={{
-                fontSize: 14,
-                color: 'rgba(255,255,255,0.7)',
-                margin: '6px 0 0',
-                fontWeight: 400,
-                letterSpacing: '0.5px',
-              }}
-            >
-              Gestão Agrícola Inteligente
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   )

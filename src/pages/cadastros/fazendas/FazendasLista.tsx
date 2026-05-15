@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Plus, Pencil, Trash2, Eye, SlidersHorizontal, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, SlidersHorizontal, X } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button } from '../../../components/ui/Button'
@@ -9,6 +9,7 @@ import { Badge } from '../../../components/ui/Badge'
 import { FormField } from '../../../components/ui/FormField'
 import { FormSelect } from '../../../components/ui/FormSelect'
 import { t } from '../../../design/tokens'
+import { useTheme } from '../../../context/ThemeContext'
 import { mockFazendas } from './fazendas.mock'
 import type { FazendaRow } from './fazendas.types'
 import type { Column } from '../../../components/ui/DataTable'
@@ -35,6 +36,7 @@ const ativoOptions = [
 ]
 
 export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaProps) {
+  const { colors } = useTheme()
   const [filters, setFilters] = useState({ nome: '', tipoExploracao: '', ativo: '' })
   const [data] = useState<FazendaRow[]>(mockFazendas)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -65,14 +67,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'cpfCnpj',
       label: 'CPF / CNPJ',
       render: (row) => (
-        <span style={{ color: '#6b7280', fontSize: 12 }}>{row.cpfCnpj}</span>
+        <span style={{ color: colors.textSecondary, fontSize: 12 }}>{row.cpfCnpj}</span>
       ),
     },
     {
       key: 'cidadeUf',
       label: 'Cidade / UF',
       render: (row) => (
-        <span style={{ color: '#6b7280' }}>
+        <span style={{ color: colors.textSecondary }}>
           {row.cidade} — {row.uf}
         </span>
       ),
@@ -104,16 +106,13 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       label: 'Ações',
       align: 'center',
       sortable: false,
-      width: 90,
+      width: 72,
       render: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] / 2 }}>
-          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={() => onView(row.id)} title="Visualizar">
-            <Eye size={14} />
-          </Button>
-          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={() => onEdit(row.id)} title="Editar">
+          <Button variant="ghost" size="sm" style={{ width: 28, height: 28, padding: 0 }} onClick={(e) => { e.stopPropagation(); onEdit(row.id) }} title="Editar">
             <Pencil size={14} />
           </Button>
-          <Button variant="destructive" size="sm" style={{ width: 28, height: 28, padding: 0, border: 'none' }} title="Excluir">
+          <Button variant="destructive" size="sm" style={{ width: 28, height: 28, padding: 0, border: 'none' }} onClick={(e) => e.stopPropagation()} title="Excluir">
             <Trash2 size={14} />
           </Button>
         </div>
@@ -127,94 +126,74 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         title="Fazendas"
         count={filtered.length}
         actions={
-          <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
-            Nova Fazenda
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                height: 32,
+                background: activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg,
+                border: `1px solid ${activeFilterCount > 0 ? colors.brand : colors.border}`,
+                borderRadius: 6,
+                padding: '0 12px',
+                fontSize: 12,
+                fontWeight: 500,
+                fontFamily: "'Outfit', sans-serif",
+                color: activeFilterCount > 0 ? colors.brand : colors.textSecondary,
+                cursor: 'pointer',
+                transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceSubtle }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg }}
+            >
+              <SlidersHorizontal size={12} />
+              Filtros
+              {activeFilterCount > 0 && (
+                <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 9999 }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
+              Nova Fazenda
+            </Button>
+          </div>
         }
       />
 
-      {/* Toolbar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          marginBottom: 12,
-        }}
-      >
-        {/* Filter chips */}
-        <button
-          type="button"
-          onClick={() => setDrawerOpen(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            height: 32,
-            background: activeFilterCount > 0 ? '#f0fdf4' : 'white',
-            border: `1px solid ${activeFilterCount > 0 ? '#059669' : '#e5e5e5'}`,
-            borderRadius: 6,
-            padding: '0 12px',
-            fontSize: 12,
-            fontWeight: 500,
-            fontFamily: "'Outfit', sans-serif",
-            color: activeFilterCount > 0 ? '#059669' : '#616161',
-            cursor: 'pointer',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? '#dcfce7' : '#f9fafb' }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? '#f0fdf4' : 'white' }}
-        >
-          <SlidersHorizontal size={12} />
-          Filtros
-          {activeFilterCount > 0 && (
-            <span
-              style={{
-                background: '#059669',
-                color: 'white',
-                fontSize: 10,
-                fontWeight: 700,
-                padding: '1px 5px',
-                borderRadius: 9999,
-              }}
-            >
-              {activeFilterCount}
-            </span>
+      {/* Active filter chips */}
+      {activeFilterCount > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          {filters.nome && (
+            <FilterChip
+              label={`Nome: ${filters.nome}`}
+              onRemove={() => setFilters((f) => ({ ...f, nome: '' }))}
+            />
           )}
-        </button>
-
-        {/* Active filter chips */}
-        {filters.nome && (
-          <FilterChip
-            label={`Nome: ${filters.nome}`}
-            onRemove={() => setFilters((f) => ({ ...f, nome: '' }))}
-          />
-        )}
-        {filters.tipoExploracao && (
-          <FilterChip
-            label={`Tipo: ${filters.tipoExploracao}`}
-            onRemove={() => setFilters((f) => ({ ...f, tipoExploracao: '' }))}
-          />
-        )}
-        {filters.ativo && (
-          <FilterChip
-            label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
-            onRemove={() => setFilters((f) => ({ ...f, ativo: '' }))}
-          />
-        )}
-
-        {activeFilterCount > 1 && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              background: 'none', border: 'none',
-              fontSize: 12, color: '#9ca3af',
-              cursor: 'pointer', padding: '0 4px',
-              fontFamily: "'Outfit', sans-serif",
-            }}
-          >
-            Limpar tudo
-          </button>
-        )}
-      </div>
+          {filters.tipoExploracao && (
+            <FilterChip
+              label={`Tipo: ${filters.tipoExploracao}`}
+              onRemove={() => setFilters((f) => ({ ...f, tipoExploracao: '' }))}
+            />
+          )}
+          {filters.ativo && (
+            <FilterChip
+              label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
+              onRemove={() => setFilters((f) => ({ ...f, ativo: '' }))}
+            />
+          )}
+          {activeFilterCount > 1 && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              style={{ background: 'none', border: 'none', fontSize: 12, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: "'Outfit', sans-serif" }}
+            >
+              Limpar tudo
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Data Table */}
       <DataTable<FazendaRow>
@@ -222,6 +201,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         data={filtered}
         keyField="id"
         emptyMessage="Nenhuma fazenda encontrada com os filtros aplicados."
+        onRowClick={(row) => onView(row.id)}
       />
 
       {/* Filter Drawer */}
@@ -262,17 +242,18 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 }
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  const { colors } = useTheme()
   return (
     <div
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1],
         height: 32,
-        background: t.color.brand[50],
-        border: `1px solid ${t.color.brand[200]}`,
+        background: colors.brandBg,
+        border: `1px solid ${colors.brand}`,
         borderRadius: t.radius.md,
         padding: `0 ${t.space[2]}px 0 ${t.space[2] + t.space[1] / 2}px`,
         fontSize: t.font.size.sm,
-        color: t.color.brand[600],
+        color: colors.brand,
         fontFamily: t.font.family.sans,
         fontWeight: t.font.weight.medium,
       }}
@@ -283,7 +264,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
         onClick={onRemove}
         style={{
           background: 'none', border: 'none',
-          cursor: 'pointer', color: t.color.brand[600],
+          cursor: 'pointer', color: colors.brand,
           display: 'flex', alignItems: 'center',
           padding: 0,
         }}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { t } from '../../design/tokens'
 import { Button } from './Button'
+import { useTheme } from '../../context/ThemeContext'
 
 interface StepFooterProps {
   currentStep: number
@@ -23,6 +24,7 @@ export function StepFooter({
   nextLabel,
   backLabel = 'Voltar',
 }: StepFooterProps) {
+  const { colors } = useTheme()
   const isFirst = currentStep === 1
   const isLast  = currentStep === totalSteps
   const label   = nextLabel ?? (isLast ? 'Salvar' : 'Próximo')
@@ -40,8 +42,9 @@ export function StepFooter({
       <span
         style={{
           fontSize: t.font.size.sm,
-          color: t.color.neutral[400],
+          color: colors.textMuted,
           fontFamily: t.font.family.sans,
+          transition: 'color 0.2s',
         }}
       >
         Etapa {currentStep} de {totalSteps}

@@ -1,8 +1,10 @@
 import { ArrowRight, Plus, ExternalLink } from 'lucide-react'
+import t from '../design/tokens'
 import SearchBar from '../components/SearchBar'
 import { ModuleCard, type ModuleCardConfig } from '../components/ModuleCard'
 import { menuModules } from '../data/menuData'
 import { useNavigation } from '../context/NavigationContext'
+import { useTheme } from '../context/ThemeContext'
 
 const moduleCardConfig: Record<string, ModuleCardConfig> = {
   painel:         { desc: 'Visão geral e indicadores',       iconBg: '#dcfce7', iconColor: '#059669' },
@@ -40,14 +42,15 @@ const favorites = [
 ]
 
 function SectionHeader({ title, action }: { title: string; action?: string }) {
+  const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{title}</h3>
+      <h3 style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
       {action && (
         <button
           style={{
             fontSize: 11,
-            color: '#059669',
+            color: colors.brand,
             background: 'none',
             border: 'none',
             cursor: 'pointer',
@@ -66,6 +69,7 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
 
 export default function Dashboard() {
   const { navigateTo } = useNavigation()
+  const { colors } = useTheme()
 
   return (
     <div style={{ padding: '28px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
@@ -75,10 +79,11 @@ export default function Dashboard() {
           style={{
             fontSize: 26,
             fontWeight: 600,
-            color: '#1a1a1a',
-            marginBottom: 4,
+            color: colors.textPrimary,
+            marginBottom: t.space[2],
             letterSpacing: '-0.4px',
             fontFamily: "'Outfit', sans-serif",
+            transition: 'color 0.2s',
           }}
         >
           Bom dia, vamos começar!
@@ -117,7 +122,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: 12 }}>
 
         {/* Últimos acessos */}
-        <div style={{ background: 'white', borderRadius: 12, padding: 18 }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Últimos acessos" action="Ver todos" />
           {recentItems.map((item) => (
             <div
@@ -128,21 +133,21 @@ export default function Dashboard() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '9px 0',
-                borderBottom: '1px solid #f9f9f9',
+                borderBottom: `1px solid ${colors.borderSubtle}`,
                 cursor: 'pointer',
               }}
             >
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: '#1a1a1a' }}>{item.label}</div>
-                <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>{item.module}</div>
+                <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
+                <div style={{ fontSize: 10, color: colors.textMuted, marginTop: 1, transition: 'color 0.2s' }}>{item.module}</div>
               </div>
-              <ExternalLink size={12} color="#d4d4d4" />
+              <ExternalLink size={12} color={colors.border} />
             </div>
           ))}
         </div>
 
         {/* Fazendas */}
-        <div style={{ background: 'white', borderRadius: 12, padding: 18 }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Fazendas" action="Ver todas" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {farms.map((farm) => (
@@ -154,15 +159,16 @@ export default function Dashboard() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 12px',
-                  background: '#f9fafb',
+                  background: colors.surfaceSubtle,
                   borderRadius: 8,
                   cursor: 'pointer',
-                  border: '1px solid #f0f0f0',
+                  border: `1px solid ${colors.border}`,
+                  transition: 'background 0.2s',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1a1a1a' }}>{farm.name}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{farm.area}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
+                  <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2, transition: 'color 0.2s' }}>{farm.area}</div>
                 </div>
                 <span
                   style={{
@@ -187,11 +193,12 @@ export default function Dashboard() {
                 gap: 6,
                 padding: '9px',
                 borderRadius: 8,
-                border: '1px dashed #d4d4d4',
+                border: `1px dashed ${colors.border}`,
                 background: 'transparent',
                 cursor: 'pointer',
                 fontSize: 12,
-                color: '#9ca3af',
+                color: colors.textMuted,
+                transition: 'color 0.2s',
               }}
             >
               <Plus size={13} /> Nova fazenda
@@ -200,7 +207,7 @@ export default function Dashboard() {
         </div>
 
         {/* Favoritos */}
-        <div style={{ background: 'white', borderRadius: 12, padding: 18 }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Favoritos" action="Gerenciar" />
           {favorites.map((fav) => (
             <div
@@ -211,7 +218,7 @@ export default function Dashboard() {
                 alignItems: 'center',
                 gap: 10,
                 padding: '8px 0',
-                borderBottom: '1px solid #f9f9f9',
+                borderBottom: `1px solid ${colors.borderSubtle}`,
                 cursor: 'pointer',
               }}
             >
@@ -219,13 +226,14 @@ export default function Dashboard() {
                 style={{
                   width: 26,
                   height: 26,
-                  background: '#f5f5f5',
+                  background: colors.surfaceSubtle,
                   borderRadius: 6,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 13,
                   flexShrink: 0,
+                  transition: 'background 0.2s',
                 }}
               >
                 {fav.emoji}
@@ -235,16 +243,17 @@ export default function Dashboard() {
                   style={{
                     fontSize: 12,
                     fontWeight: 500,
-                    color: '#1a1a1a',
+                    color: colors.textPrimary,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
+                    transition: 'color 0.2s',
                   }}
                 >
                   {fav.label}
                 </div>
               </div>
-              <ArrowRight size={12} color="#d4d4d4" style={{ flexShrink: 0 }} />
+              <ArrowRight size={12} color={colors.border} style={{ flexShrink: 0 }} />
             </div>
           ))}
         </div>

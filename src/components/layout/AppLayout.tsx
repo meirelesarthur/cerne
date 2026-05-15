@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import Sidebar from './Sidebar'
 import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
+import { useTheme } from '../../context/ThemeContext'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage from '../../pages/cadastros/fazendas/FazendasPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
@@ -13,6 +14,7 @@ interface AppLayoutProps {
 }
 
 function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?: NavModule }) {
+  const { colors } = useTheme()
   const allItems = [
     ...(module?.flatItems ?? []),
     ...(module?.groups?.flatMap((g: NavGroup) => g.items) ?? []),
@@ -37,19 +39,19 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
           width: 52,
           height: 52,
           borderRadius: 14,
-          background: '#f0fdf4',
+          background: colors.brandBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Construction size={24} color="#059669" strokeWidth={1.5} />
+        <Construction size={24} color={colors.brand} strokeWidth={1.5} />
       </div>
       <div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: colors.textPrimary, fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
           {item?.label ?? 'Funcionalidade'}
         </div>
-        <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: "'Outfit', sans-serif" }}>
+        <div style={{ fontSize: 12, color: colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
           Esta tela será implementada em breve.
         </div>
       </div>
@@ -65,6 +67,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
+  const { colors } = useTheme()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeModuleId, setActiveModuleId] = useState<string>('painel')
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null)
@@ -133,14 +136,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
         display: 'flex',
         width: '100vw',
         height: '100vh',
-        background: '#f5f5f5',
+        background: colors.pageBg,
         padding: 8,
         gap: 8,
         boxSizing: 'border-box',
         fontFamily: "'Outfit', sans-serif",
+        transition: 'background 0.2s ease',
       }}
     >
-      {/* Primary Sidebar — colapso independente do secondary nav */}
+      {/* Primary Sidebar */}
       <Sidebar
         modules={menuModules}
         mode={sidebarCollapsed ? 'icon-only' : 'full'}
@@ -150,11 +154,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
         onToggle={handleToggleSidebar}
       />
 
-      {/* Outer card #fafafa */}
+      {/* Outer content card */}
       <div
         style={{
           flex: 1,
-          background: '#fafafa',
+          background: colors.outerCardBg,
           borderRadius: 16,
           display: 'flex',
           flexDirection: 'column',
@@ -162,6 +166,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           gap: 8,
           minWidth: 0,
           overflow: 'hidden',
+          transition: 'background 0.2s ease',
         }}
       >
         <Topbar expandedModule={expandedModule} activeItemId={activeItemId} />
@@ -172,7 +177,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
               module={expandedModule}
               activeItemId={activeItemId}
               onItemClick={handleItemClick}
-              onClose={handleCloseSecondary}
             />
           )}
 

@@ -2,6 +2,7 @@ import React from 'react'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip } from '../Tooltip'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
@@ -11,6 +12,7 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function FormField({ label, required, error, hint, style, ...inputProps }: FormFieldProps) {
+  const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: 2 }}>
@@ -18,8 +20,9 @@ export function FormField({ label, required, error, hint, style, ...inputProps }
           style={{
             fontSize: t.font.size.sm,
             fontWeight: t.font.weight.medium,
-            color: t.color.neutral[800],
+            color: colors.textPrimary,
             fontFamily: t.font.family.sans,
+            transition: 'color 0.2s',
           }}
         >
           {label}
@@ -42,24 +45,24 @@ export function FormField({ label, required, error, hint, style, ...inputProps }
           height: 38,
           border: error
             ? `1.5px solid ${t.color.error.text}`
-            : `1.5px solid ${t.color.neutral[250]}`,
+            : `1.5px solid ${colors.border}`,
           borderRadius: t.radius.DEFAULT,
           padding: `0 ${t.space[2] + t.space[1] / 2}px`,
           fontSize: t.font.size.base,
           fontFamily: t.font.family.sans,
-          color: t.color.neutral[800],
-          background: t.color.neutral[0],
+          color: colors.textPrimary,
+          background: colors.inputBg,
           outline: 'none',
           boxSizing: 'border-box',
-          transition: `border-color ${t.transition.DEFAULT}`,
+          transition: `border-color ${t.transition.DEFAULT}, background 0.2s, color 0.2s`,
           ...style,
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = error ? t.color.error.text : t.color.brand[600]
+          e.currentTarget.style.borderColor = error ? t.color.error.text : colors.brand
           inputProps.onFocus?.(e)
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = error ? t.color.error.text : t.color.neutral[250]
+          e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border
           inputProps.onBlur?.(e)
         }}
       />

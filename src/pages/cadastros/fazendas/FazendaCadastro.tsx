@@ -5,6 +5,7 @@ import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button } from '../../../components/ui/Button'
 import { StepFooter } from '../../../components/ui/StepFooter'
 import { Stepper } from '../../../components/ui/Stepper'
+import { useTheme } from '../../../context/ThemeContext'
 import { Step1Identificacao } from './steps/Step1Identificacao'
 import { Step2Documentacao } from './steps/Step2Documentacao'
 import { Step3Mapa } from './steps/Step3Mapa'
@@ -66,6 +67,7 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
 }
 
 export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
+  const { colors } = useTheme()
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [formData, setFormData] = useState<FazendaFormData>(emptyFazendaForm)
@@ -209,11 +211,12 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
 
       <div
         style={{
-          background: 'white',
+          background: colors.surfaceBg,
           borderRadius: 12,
           padding: '32px 24px 80px',
           marginTop: 8,
           boxSizing: 'border-box',
+          transition: 'background 0.2s',
         }}
       >
         {renderStep()}

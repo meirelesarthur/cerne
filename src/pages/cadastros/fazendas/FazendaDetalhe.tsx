@@ -255,6 +255,7 @@ function TabFinanceiro({ f }: { f: FazendaDetalheData }) {
 
 function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
   type CCRow = FazendaDetalheData['centrosCusto'][number]
+  const { colors } = useTheme()
 
   const columns: Column<CCRow>[] = [
     {

@@ -20,6 +20,7 @@ const makeModule = (id: string, label: string, icon: NavModule['icon']): NavModu
   id,
   label,
   icon,
+  emoji: '',
   groups: [],
   flatItems: [],
 })

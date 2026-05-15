@@ -104,8 +104,8 @@ const ThemeContext = createContext<ThemeContextValue>({
   isGbMode: false,
 })
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('light')
+export function ThemeProvider({ children, defaultMode = 'light' }: { children: React.ReactNode; defaultMode?: ThemeMode }) {
+  const [mode, setMode] = useState<ThemeMode>(defaultMode)
   const toggle = () => setMode((m) => (m === 'light' ? 'gbMode' : 'light'))
   const colors = palettes[mode]
 

@@ -1,10 +1,9 @@
 import type { NavModule } from '../data/menuData'
 import { useTheme } from '../context/ThemeContext'
+import t from '../design/tokens'
 
 export interface ModuleCardConfig {
   desc: string
-  iconBg: string
-  iconColor: string
 }
 
 interface ModuleCardProps {
@@ -27,7 +26,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
         style={{
           width: 40,
           height: 40,
-          background: config.iconBg,
+          background: t.color.brand[100],
           borderRadius: 10,
           display: 'flex',
           alignItems: 'center',
@@ -35,7 +34,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
           marginBottom: 12,
         }}
       >
-        <Icon size={19} color={config.iconColor} strokeWidth={1.6} />
+        <Icon size={19} color={t.color.brand[600]} strokeWidth={1.6} />
       </div>
       <div
         style={{

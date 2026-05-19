@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import t from '../design/tokens'
-import aerialView from '../assets/aerial-view-agricultural-fields.jpg'
 import logoFull from '../assets/Logo.svg'
+import vid0 from '../assets/agricultura.mp4'
+import vid1 from '../assets/apicultura.mp4'
+import vid2 from '../assets/avicultura.mp4'
+import vid3 from '../assets/ovicultura.mp4'
+import vid4 from '../assets/Psicultura.mp4'
+
+const VIDEOS = [vid0, vid1, vid2, vid3, vid4]
 
 interface LoginPageProps {
   onLogin: () => void
@@ -11,6 +17,27 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   const [email] = useState('admin@gbcerne.com.br')
   const [password] = useState('agro@2025')
   const [showPassword, setShowPassword] = useState(false)
+
+  // ── video cycling ──────────────────────────────────────────────────────────
+  const [vidIdx, setVidIdx] = useState(0)
+  const [fadeIn, setFadeIn] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const advanceVideo = useCallback(() => {
+    setFadeIn(false)
+    setTimeout(() => {
+      setVidIdx((i) => (i + 1) % VIDEOS.length)
+      setFadeIn(true)
+    }, 600)
+  }, [])
+
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    el.src = VIDEOS[vidIdx]
+    el.load()
+    el.play().catch(() => {})
+  }, [vidIdx])
 
   return (
     <div
@@ -219,7 +246,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </div>
       </div>
 
-      {/* Right panel — plantation image */}
+      {/* Right panel — video reel */}
       <div
         style={{
           flex: 'none',
@@ -228,28 +255,65 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 16,
+          background: '#051008',
         }}
       >
+        {/* Video */}
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          onEnded={advanceVideo}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: fadeIn ? 1 : 0,
+            transition: 'opacity 0.6s ease',
+          }}
+        />
+
+        {/* Green overlay */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url(${aerialView})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundImage: `radial-gradient(ellipse at 30% 60%, rgba(16,185,129,0.3) 0%, transparent 60%),
+                              radial-gradient(ellipse at 75% 30%, rgba(4,120,87,0.35) 0%, transparent 55%)`,
+            pointerEvents: 'none',
           }}
         />
 
-        {/* Overlay texture */}
+        {/* Dots indicator */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `radial-gradient(ellipse at 30% 60%, rgba(16,185,129,0.35) 0%, transparent 60%),
-                              radial-gradient(ellipse at 75% 30%, rgba(4,120,87,0.4) 0%, transparent 55%)`,
+            bottom: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 6,
           }}
-        />
-
+        >
+          {VIDEOS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setVidIdx(i); setFadeIn(true) }}
+              style={{
+                width: i === vidIdx ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                border: 'none',
+                background: i === vidIdx ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'width 0.3s ease, background 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )

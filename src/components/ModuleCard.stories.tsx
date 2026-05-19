@@ -26,17 +26,17 @@ const makeModule = (id: string, label: string, icon: NavModule['icon']): NavModu
 })
 
 const configs: Record<string, ModuleCardConfig> = {
-  painel:         { desc: 'Visão geral e indicadores',       iconBg: '#dcfce7', iconColor: '#059669' },
-  favoritos:      { desc: 'Seus atalhos mais usados',        iconBg: '#fef9c3', iconColor: '#d97706' },
-  dashboards:     { desc: 'Análises e gráficos interativos', iconBg: '#dbeafe', iconColor: '#2563eb' },
-  cadastros:      { desc: 'Estrutura, pessoas e produtos',   iconBg: '#ede9fe', iconColor: '#7c3aed' },
-  administrativo: { desc: 'Suprimentos, estoque e RH',       iconBg: '#f3e8ff', iconColor: '#9333ea' },
-  operacional:    { desc: 'Agricultura, pecuária e OS',      iconBg: '#d1fae5', iconColor: '#059669' },
-  financeiro:     { desc: 'Contas, fluxo e conciliações',    iconBg: '#ffedd5', iconColor: '#ea580c' },
-  frota:          { desc: 'Manutenções e abastecimentos',    iconBg: '#fef3c7', iconColor: '#d97706' },
-  fiscal:         { desc: 'NF-e, CT-e, MDF-e e LCDPR',      iconBg: '#fee2e2', iconColor: '#dc2626' },
-  relatorios:     { desc: 'Todos os relatórios do sistema',  iconBg: '#e0f2fe', iconColor: '#0284c7' },
-  integracoes:    { desc: 'Domínio, CSV e exportações',      iconBg: '#f1f5f9', iconColor: '#475569' },
+  painel:         { desc: 'Visão geral e indicadores' },
+  favoritos:      { desc: 'Seus atalhos mais usados' },
+  dashboards:     { desc: 'Análises e gráficos interativos' },
+  cadastros:      { desc: 'Estrutura, pessoas e produtos' },
+  administrativo: { desc: 'Suprimentos, estoque e RH' },
+  operacional:    { desc: 'Agricultura, pecuária e OS' },
+  financeiro:     { desc: 'Contas, fluxo e conciliações' },
+  frota:          { desc: 'Manutenções e abastecimentos' },
+  fiscal:         { desc: 'NF-e, CT-e, MDF-e e LCDPR' },
+  relatorios:     { desc: 'Todos os relatórios do sistema' },
+  integracoes:    { desc: 'Domínio, CSV e exportações' },
 }
 
 export const Home: Story = {

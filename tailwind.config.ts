@@ -21,7 +21,6 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Outfit', 'sans-serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
       },
       borderRadius: {
         panel: '16px',

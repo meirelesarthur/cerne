@@ -5,7 +5,7 @@
   grid-template-columns: 1fr 480px;
   width: 100%;
   min-height: 100vh;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 /* ── LEFT PANEL ──────────────────────────────────────────── */
@@ -146,7 +146,7 @@
 }
 
 .lgn-h1 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Outfit', sans-serif;
   font-size: clamp(38px, 4.5vw, 58px);
   line-height: 1.08;
   color: #fff;
@@ -198,7 +198,7 @@
 }
 
 .lgn-stat-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Outfit', sans-serif;
   font-size: 26px;
   color: #fff;
   line-height: 1;
@@ -343,7 +343,7 @@
   border-radius: 12px;
   padding: 0 46px 0 44px;
   font-size: 14.5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
   color: #1c1917;
   background: #fafaf9;
   outline: none;
@@ -462,7 +462,7 @@
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -518,7 +518,7 @@
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
   color: #44403c;
   cursor: pointer;
   display: flex;

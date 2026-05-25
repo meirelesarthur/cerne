@@ -51,3 +51,50 @@ npm run build      # Build de produção (TS check + Vite)
 - `components/layout/` — AppLayout, Sidebar, Topbar, SecondaryNav
 - `components/ui/` — componentes reutilizáveis (Badge, FormField, DataTable…)
 - `components/*.stories.tsx` — stories do Storybook
+
+---
+
+## Leis do Projeto
+
+Estas políticas são invioláveis e se aplicam a toda geração de código neste projeto.
+
+### Lei 1 — Component-First (Componentização Obrigatória)
+
+Todo elemento visível na tela é um componente de `src/components/ui/`.
+
+**Proibido usar diretamente em páginas:** `<button>`, `<input>`, `<select>`, `<table>`, `<thead>`, `<tr>`, `<td>`, `<h1>`–`<h6>`.
+
+- Ao criar uma nova tela, apenas **importar e chamar** componentes existentes
+- Se o componente necessário não existe no catálogo, criá-lo em `src/components/ui/` **antes** de usá-lo na tela
+- Catálogo atual: `Button`, `FormField`, `FormSelect`, `DataTable`, `Badge`, `PageHeader`, `PageContainer`, `Stepper`, `StepHeader`, `StepFooter`, `FilterDrawer`, `FormSection`
+
+### Lei 2 — Fonte Única de Verdade (Propagação Global)
+
+Alterações em componentes de `src/components/ui/` refletem automaticamente em todas as telas — esse é o objetivo.
+
+**Proibido em páginas/telas:**
+- Sobrescrever estilos com `style={}` inline sobre um componente existente
+- Duplicar lógica de estilo que o componente já oferece via prop (ex.: criar spinner manual quando `Button` tem `loading`)
+- Clonar/reimplementar um componente UI dentro de uma página
+
+Extensões de comportamento são feitas adicionando props ao componente em `src/components/ui/`, nunca por patch local.
+
+### Lei 3 — Fonte & Tokenização Acima de Tudo
+
+**Tipografia:** única fonte permitida é **Outfit**. Não usar `font-montserrat`, fontes do sistema ou qualquer alternativa como valor de apresentação.
+
+**Tokens:** todo valor de design (cor, espaço, raio, sombra, tamanho de fonte, peso) vem de `src/design/tokens.ts` via `t.*`.
+
+```ts
+// Correto
+color: t.color.brand[600]
+fontSize: t.font.size.sm
+padding: t.space[4]
+
+// Violação — hardcoded fora do arquivo de tokens
+color: '#059669'
+fontSize: '0.875rem'
+padding: '16px'
+```
+
+Valores hardcoded fora de `src/design/tokens.ts` e `tailwind.config.ts` são violação de política.

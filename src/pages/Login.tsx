@@ -128,7 +128,6 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
             ref={videoRef}
             className="lgn-video lgn-video--on"
             src={slide.src}
-            poster={slide.poster}
             autoPlay
             muted
             loop

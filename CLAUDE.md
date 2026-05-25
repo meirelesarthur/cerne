@@ -98,3 +98,11 @@ padding: '16px'
 ```
 
 Valores hardcoded fora de `src/design/tokens.ts` e `tailwind.config.ts` são violação de política.
+
+### Lei 4 — Commits Obrigatórios, Push sob Demanda
+
+Após toda mudança concluída, um commit **deve ser criado imediatamente** — sem aguardar solicitação.
+
+- O push **nunca é feito automaticamente** — somente quando o usuário solicitar explicitamente
+- Mensagens de commit seguem o padrão Conventional Commits (`feat:`, `fix:`, `style:`, `refactor:`, `docs:`, etc.)
+- Um commit por unidade lógica de mudança — não acumular alterações não relacionadas no mesmo commit

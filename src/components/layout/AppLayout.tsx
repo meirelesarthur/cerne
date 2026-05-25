@@ -5,6 +5,7 @@ import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage from '../../pages/cadastros/fazendas/FazendasPage'
+import Pluviometria from '../../pages/dashboards/Pluviometria'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
 import { NavigationContext } from '../../context/NavigationContext'
@@ -63,6 +64,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (!itemId) return null
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
   if (itemId === 'cad-est-faz') return <FazendasPage />
+  if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 

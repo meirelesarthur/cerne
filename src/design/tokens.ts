@@ -171,8 +171,41 @@ export const transition = {
   drawer:  '0.25s cubic-bezier(0.4, 0, 0.2, 1)',
 }
 
+// ─── Animações ───────────────────────────────────────────────────────────────
+
+export const animation = {
+  duration: {
+    fast:   '150ms',
+    normal: '200ms',
+    slow:   '300ms',
+    slower: '400ms',
+  },
+  easing: {
+    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    easeOut:  'cubic-bezier(0, 0, 0.2, 1)',
+    easeIn:   'cubic-bezier(0.4, 0, 1, 1)',
+    spring:   'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  },
+}
+
+// ─── Glow / Focus rings ───────────────────────────────────────────────────────
+
+export const glow = {
+  brand:   '0 0 0 3px rgba(5,150,105, 0.12)',
+  brandLg: '0 8px 32px rgba(5,150,105, 0.28)',
+  error:   '0 0 0 3px rgba(220,38,38, 0.10)',
+}
+
+// ─── Tema da tela de login ────────────────────────────────────────────────────
+
+export const loginTheme = {
+  leftBg:     '#081a12',         // Verde muito escuro — substitui marrom #1c1917
+  rightBg:    '#fafaf9',         // Warm white — substitui branco frio #ffffff
+  accentGlow: 'rgba(5,150,105, 0.05)',
+}
+
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, radius, shadow, border, zIndex, transition }
+export const t = { color, font, space, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme }
 export default t

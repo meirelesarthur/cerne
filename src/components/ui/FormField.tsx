@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip } from '../Tooltip'
 import { t } from '../../design/tokens'
@@ -17,7 +17,7 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: 'idle' | 'ok' | 'err'
 }
 
-export function FormField({
+export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function FormField({
   label,
   required,
   error,
@@ -27,7 +27,7 @@ export function FormField({
   status,
   style,
   ...inputProps
-}: FormFieldProps) {
+}, ref) {
   const { colors } = useTheme()
 
   const isError = !!error || status === 'err'
@@ -82,6 +82,7 @@ export function FormField({
         )}
 
         <input
+          ref={ref}
           {...inputProps}
           style={{
             width: '100%',
@@ -104,8 +105,8 @@ export function FormField({
           onFocus={(e) => {
             e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.brand
             e.currentTarget.style.boxShadow = isError
-              ? '0 0 0 3px rgba(239,68,68,.1)'
-              : '0 0 0 3.5px rgba(34,197,94,.12)'
+              ? t.glow.error
+              : t.glow.brand
             inputProps.onFocus?.(e)
           }}
           onBlur={(e) => {
@@ -143,4 +144,4 @@ export function FormField({
       )}
     </div>
   )
-}
+})

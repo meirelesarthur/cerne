@@ -1,3 +1,5 @@
+// PROTÓTIPO — este componente não está em uso (App.tsx usa Login.tsx).
+// Remova este arquivo antes de qualquer deploy em ambiente de produção ou homologação.
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import t from '../design/tokens'
 import logoFull from '../assets/Logo.svg'
@@ -14,8 +16,8 @@ interface LoginPageProps {
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
-  const [email] = useState('admin@gbcerne.com.br')
-  const [password] = useState('agro@2025')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
   // ── video cycling ──────────────────────────────────────────────────────────
@@ -107,7 +109,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <input
               type="email"
               value={email}
-              readOnly
+              onChange={(e) => setEmail(e.target.value)}
               style={{
                 width: '100%',
                 height: 42,
@@ -158,7 +160,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                readOnly
+                onChange={(e) => setPassword(e.target.value)}
                 style={{
                   width: '100%',
                   height: 42,

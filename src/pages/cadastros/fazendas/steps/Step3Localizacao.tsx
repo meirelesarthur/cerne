@@ -3,6 +3,7 @@ import { MapPin, Upload } from 'lucide-react'
 import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
+import { StepHeader } from '../../../../components/ui/StepHeader'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step3Props {
@@ -22,6 +23,10 @@ const paisOptions = [
 export function Step3Localizacao({ data, errors, onChange }: Step3Props) {
   return (
     <div>
+      <StepHeader
+        title="Localização da Fazenda"
+        subtitle="Defina o perímetro no mapa e informe o endereço completo da propriedade"
+      />
       {/* Info Banner */}
       <div
         style={{

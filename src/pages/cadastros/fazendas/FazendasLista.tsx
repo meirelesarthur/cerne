@@ -1,10 +1,15 @@
 import React, { useState, useMemo } from 'react'
-import { Plus, Pencil, Trash2, Eye, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, SlidersHorizontal, X } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { PageContainer } from '../../../components/ui/PageContainer'
+import { Button } from '../../../components/ui/Button'
 import { DataTable } from '../../../components/ui/DataTable'
+import { FilterDrawer } from '../../../components/ui/FilterDrawer'
 import { Badge } from '../../../components/ui/Badge'
 import { FormField } from '../../../components/ui/FormField'
 import { FormSelect } from '../../../components/ui/FormSelect'
+import { t } from '../../../design/tokens'
+import { useTheme } from '../../../context/ThemeContext'
 import { mockFazendas } from './fazendas.mock'
 import type { FazendaRow } from './fazendas.types'
 import type { Column } from '../../../components/ui/DataTable'
@@ -31,8 +36,10 @@ const ativoOptions = [
 ]
 
 export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaProps) {
+  const { colors } = useTheme()
   const [filters, setFilters] = useState({ nome: '', tipoExploracao: '', ativo: '' })
   const [data] = useState<FazendaRow[]>(mockFazendas)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const filtered = useMemo(() => {
     return data.filter((row) => {
@@ -45,8 +52,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
     })
   }, [data, filters])
 
-  const hasFilters = filters.nome || filters.tipoExploracao || filters.ativo !== ''
-
+  const activeFilterCount = [filters.nome, filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ nome: '', tipoExploracao: '', ativo: '' })
 
   const columns: Column<FazendaRow>[] = [
@@ -61,14 +67,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'cpfCnpj',
       label: 'CPF / CNPJ',
       render: (row) => (
-        <span style={{ color: '#616161', fontSize: 12 }}>{row.cpfCnpj}</span>
+        <span style={{ color: colors.textSecondary, fontSize: 12 }}>{row.cpfCnpj}</span>
       ),
     },
     {
       key: 'cidadeUf',
       label: 'Cidade / UF',
       render: (row) => (
-        <span style={{ color: '#616161' }}>
+        <span style={{ color: colors.textSecondary }}>
           {row.cidade} — {row.uf}
         </span>
       ),
@@ -83,15 +89,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       label: 'Área Total',
       align: 'right',
       render: (row) => (
-        <span>
-          {row.areaTotal.toLocaleString('pt-BR')} ha
-        </span>
+        <span>{row.areaTotal.toLocaleString('pt-BR')} ha</span>
       ),
     },
     {
       key: 'ativo',
       label: 'Status',
       align: 'center',
+      sortable: false,
       render: (row) => (
         <Badge label={row.ativo ? 'Ativo' : 'Inativo'} variant={row.ativo ? 'success' : 'neutral'} />
       ),
@@ -100,126 +105,114 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'acoes',
       label: 'Ações',
       align: 'center',
-      width: 80,
+      sortable: false,
+      width: 72,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-          <button
-            type="button"
-            onClick={() => onView(row.id)}
-            title="Visualizar"
-            style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#616161',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
-            <Eye size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => onEdit(row.id)}
-            title="Editar"
-            style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#616161',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f5f5f5' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] / 2 }}>
+          <Button variant="ghost" size="sm" style={{ width: 32, height: 32, padding: 0 }} onClick={(e) => { e.stopPropagation(); onEdit(row.id) }} title="Editar" aria-label="Editar fazenda">
             <Pencil size={14} />
-          </button>
-          <button
-            type="button"
-            title="Excluir"
-            style={{
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              color: '#dc2626',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-          >
+          </Button>
+          <Button variant="destructive" size="sm" style={{ width: 32, height: 32, padding: 0, border: 'none' }} onClick={(e) => e.stopPropagation()} title="Excluir" aria-label="Excluir fazenda">
             <Trash2 size={14} />
-          </button>
+          </Button>
         </div>
       ),
     },
   ]
 
   return (
-    <div
-      style={{
-        padding: '24px 28px',
-        fontFamily: "'Outfit', sans-serif",
-        boxSizing: 'border-box',
-      }}
-    >
+    <PageContainer>
       <PageHeader
         title="Fazendas"
         count={filtered.length}
         actions={
-          <button
-            type="button"
-            onClick={onNew}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: '#059669',
-              border: 'none',
-              borderRadius: 8,
-              padding: '0 16px',
-              height: 36,
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily: "'Outfit', sans-serif",
-              color: 'white',
-              cursor: 'pointer',
-            }}
-          >
-            <Plus size={14} />
-            Nova Fazenda
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                height: 32,
+                background: activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg,
+                border: `1px solid ${activeFilterCount > 0 ? colors.brand : colors.border}`,
+                borderRadius: 6,
+                padding: '0 12px',
+                fontSize: 12,
+                fontWeight: 500,
+                fontFamily: "'Outfit', sans-serif",
+                color: activeFilterCount > 0 ? colors.brand : colors.textSecondary,
+                cursor: 'pointer',
+                transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceSubtle }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg }}
+            >
+              <SlidersHorizontal size={12} />
+              Filtros
+              {activeFilterCount > 0 && (
+                <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 9999 }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
+              Nova Fazenda
+            </Button>
+          </div>
         }
       />
 
-      {/* Filter Bar */}
-      <div
-        style={{
-          background: 'white',
-          borderRadius: 12,
-          padding: 16,
-          marginBottom: 8,
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: 12,
-        }}
+      {/* Active filter chips */}
+      {activeFilterCount > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          {filters.nome && (
+            <FilterChip
+              label={`Nome: ${filters.nome}`}
+              onRemove={() => setFilters((f) => ({ ...f, nome: '' }))}
+            />
+          )}
+          {filters.tipoExploracao && (
+            <FilterChip
+              label={`Tipo: ${filters.tipoExploracao}`}
+              onRemove={() => setFilters((f) => ({ ...f, tipoExploracao: '' }))}
+            />
+          )}
+          {filters.ativo && (
+            <FilterChip
+              label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
+              onRemove={() => setFilters((f) => ({ ...f, ativo: '' }))}
+            />
+          )}
+          {activeFilterCount > 1 && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              style={{ background: 'none', border: 'none', fontSize: 12, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: "'Outfit', sans-serif" }}
+            >
+              Limpar tudo
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Data Table */}
+      <DataTable<FazendaRow>
+        columns={columns}
+        data={filtered}
+        keyField="id"
+        emptyMessage="Nenhuma fazenda encontrada com os filtros aplicados."
+        onRowClick={(row) => onView(row.id)}
+      />
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Fazendas"
+        activeCount={activeFilterCount}
       >
-        <div style={{ flex: 2 }}>
+        <div>
           <FormField
             label="Nome"
             value={filters.nome}
@@ -227,8 +220,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             placeholder="Buscar por nome..."
           />
         </div>
-
-        <div style={{ flex: 1 }}>
+        <div>
           <FormSelect
             label="Tipo de Exploração"
             options={tipoOptions}
@@ -236,8 +228,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             onChange={(e) => setFilters((f) => ({ ...f, tipoExploracao: e.target.value }))}
           />
         </div>
-
-        <div style={{ flex: 1 }}>
+        <div>
           <FormSelect
             label="Status"
             options={ativoOptions}
@@ -245,49 +236,41 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             onChange={(e) => setFilters((f) => ({ ...f, ativo: e.target.value }))}
           />
         </div>
+      </FilterDrawer>
+    </PageContainer>
+  )
+}
 
-        {hasFilters && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              background: 'white',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              padding: '0 12px',
-              height: 38,
-              fontSize: 12,
-              fontWeight: 500,
-              fontFamily: "'Outfit', sans-serif",
-              color: '#616161',
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-          >
-            <X size={12} />
-            Limpar
-          </button>
-        )}
-      </div>
-
-      {/* Data Table */}
-      <div
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  const { colors } = useTheme()
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: t.space[1],
+        height: 32,
+        background: colors.brandBg,
+        border: `1px solid ${colors.brand}`,
+        borderRadius: t.radius.md,
+        padding: `0 ${t.space[2]}px 0 ${t.space[2] + t.space[1] / 2}px`,
+        fontSize: t.font.size.sm,
+        color: colors.brand,
+        fontFamily: t.font.family.sans,
+        fontWeight: t.font.weight.medium,
+      }}
+    >
+      {label}
+      <button
+        type="button"
+        onClick={onRemove}
         style={{
-          background: 'white',
-          borderRadius: 12,
-          overflow: 'hidden',
+          background: 'none', border: 'none',
+          cursor: 'pointer', color: colors.brand,
+          display: 'flex', alignItems: 'center',
+          padding: 0,
         }}
       >
-        <DataTable<FazendaRow>
-          columns={columns}
-          data={filtered}
-          keyField="id"
-          emptyMessage="Nenhuma fazenda encontrada com os filtros aplicados."
-        />
-      </div>
+        <X size={11} />
+      </button>
     </div>
   )
 }

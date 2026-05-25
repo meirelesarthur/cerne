@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import vid0 from '../assets/agricultura.mp4'
+import vid1 from '../assets/apicultura.mp4'
+import vid2 from '../assets/avicultura.mp4'
+import vid3 from '../assets/ovicultura.mp4'
+import vid4 from '../assets/Psicultura.mp4'
 import './Login.css'
 
-// ─── Slide configuration ───────────────────────────────────────────────────
-// Add your video files to public/videos/ and update the src paths below.
-// Each slide has its own eyebrow + headline + description that matches
-// the scene playing in the video.
 const SLIDES = [
   {
-    src: '/videos/campo.mp4',
-    poster: '/videos/campo.jpg',
+    src: vid0,
     eyebrow: 'Gestão rural inteligente',
     h1a: 'Sua fazenda,',
     h1em: 'gerenciada',
@@ -16,22 +16,36 @@ const SLIDES = [
     desc: 'Do campo ao escritório, controle produção, custos, colheita e equipes em uma plataforma pensada para o agronegócio brasileiro.',
   },
   {
-    src: '/videos/colheita.mp4',
-    poster: '/videos/colheita.jpg',
-    eyebrow: 'Controle de produção',
-    h1a: 'Colheita',
+    src: vid1,
+    eyebrow: 'Apicultura de precisão',
+    h1a: 'Produção de mel',
     h1em: 'monitorada',
     h1b: 'em tempo real.',
-    desc: 'Registre talhões, produtividade por hectare e previsões de safra com dados precisos e relatórios automáticos.',
+    desc: 'Gerencie colmeias, floradas e extração com rastreabilidade completa do campo até a embalagem.',
   },
   {
-    src: '/videos/financeiro.mp4',
-    poster: '/videos/financeiro.jpg',
-    eyebrow: 'Análise financeira',
-    h1a: 'Decisões',
-    h1em: 'mais rentáveis,',
-    h1b: 'mais precisas.',
-    desc: 'Fluxo de caixa, custo por atividade e DRE da fazenda com visibilidade total sobre cada centavo investido.',
+    src: vid2,
+    eyebrow: 'Avicultura integrada',
+    h1a: 'Lotes e aves',
+    h1em: 'controlados',
+    h1b: 'sem esforço.',
+    desc: 'Ciclos de produção, conversão alimentar e sanidade animal integrados em um único painel.',
+  },
+  {
+    src: vid3,
+    eyebrow: 'Ovinocultura moderna',
+    h1a: 'Rebanho',
+    h1em: 'acompanhado',
+    h1b: 'do nascimento ao abate.',
+    desc: 'Rastreie cada animal, controle peso, vacinação e genealogia com registros precisos e auditáveis.',
+  },
+  {
+    src: vid4,
+    eyebrow: 'Piscicultura eficiente',
+    h1a: 'Tanques e safras',
+    h1em: 'gerenciados',
+    h1b: 'com inteligência.',
+    desc: 'Controle qualidade da água, biometria e despesca com análises automáticas e alertas em tempo real.',
   },
 ]
 

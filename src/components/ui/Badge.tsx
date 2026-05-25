@@ -1,4 +1,5 @@
 import React from 'react'
+import { t } from '../../design/tokens'
 
 type BadgeVariant = 'success' | 'danger' | 'warning' | 'neutral'
 
@@ -8,10 +9,10 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, { background: string; color: string }> = {
-  success: { background: '#d1fae5', color: '#059669' },
-  danger: { background: '#fee2e2', color: '#dc2626' },
-  warning: { background: '#fef3c7', color: '#d97706' },
-  neutral: { background: '#f5f5f5', color: '#737373' },
+  success: { background: t.color.success.bg,   color: t.color.success.text },
+  danger:  { background: t.color.error.bg,     color: t.color.error.text },
+  warning: { background: t.color.warning.bg,   color: t.color.warning.text },
+  neutral: { background: t.color.neutral[100], color: t.color.neutral[500] },
 }
 
 export function Badge({ label, variant }: BadgeProps) {
@@ -20,11 +21,11 @@ export function Badge({ label, variant }: BadgeProps) {
     <span
       style={{
         display: 'inline-block',
-        padding: '2px 10px',
-        borderRadius: 9999,
-        fontSize: 11,
-        fontWeight: 500,
-        fontFamily: "'Outfit', sans-serif",
+        padding: `${t.space[1] / 2}px ${t.space[2] + t.space[1] / 2}px`,
+        borderRadius: t.radius.full,
+        fontSize: t.font.size.xs,
+        fontWeight: t.font.weight.medium,
+        fontFamily: t.font.family.sans,
         background: style.background,
         color: style.color,
         whiteSpace: 'nowrap',

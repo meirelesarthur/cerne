@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
+import { StepHeader } from '../../../../components/ui/StepHeader'
 import { mockCentrosCusto } from '../fazendas.mock'
 import type { FazendaFormData } from '../fazendas.types'
 
@@ -35,9 +35,12 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
 
   return (
     <div>
-      {/* Observações Section */}
-      <FormSection title="Observações">
-        <div style={{ position: 'relative' }}>
+      <StepHeader
+        title="Centros de Custo e Configurações"
+        subtitle="Vincule a fazenda aos centros de custo e adicione observações relevantes"
+      />
+      {/* Observações */}
+      <div style={{ position: 'relative' }}>
           <textarea
             value={data.observacao}
             onChange={(e) => onChange('observacao', e.target.value)}
@@ -74,11 +77,10 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
           >
             {data.observacao.length}/1000
           </span>
-        </div>
-      </FormSection>
+      </div>
 
-      {/* Centro de Custo Section */}
-      <FormSection title="Centro de Custo">
+      {/* Centro de Custo */}
+      <div style={{ marginTop: 24 }}>
         {selected.length === 0 && (
           <div
             style={{
@@ -212,7 +214,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
             </tbody>
           </table>
         </div>
-      </FormSection>
+      </div>
     </div>
   )
 }

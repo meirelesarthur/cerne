@@ -22,7 +22,10 @@ export interface FazendaFormData {
   ccir: string
   cafir: string
   caepi: string
-  // Step 3
+  // Step 3 – Demarcação
+  perimetroGeoJSON: string
+  kmlFileName: string
+  // Step 4 – Endereço
   pais: string
   cep: string
   cidade: string
@@ -96,6 +99,8 @@ export const emptyFazendaForm: FazendaFormData = {
   ccir: '',
   cafir: '',
   caepi: '',
+  perimetroGeoJSON: '',
+  kmlFileName: '',
   pais: 'Brasil',
   cep: '',
   cidade: '',

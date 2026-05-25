@@ -1,5 +1,6 @@
 import { Bell, Search, ChevronRight } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
+import { useTheme } from '../../context/ThemeContext'
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -7,6 +8,8 @@ interface TopbarProps {
 }
 
 export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
+  const { colors } = useTheme()
+
   const activeItem =
     expandedModule && activeItemId
       ? [
@@ -36,26 +39,28 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           fontFamily: "'Outfit', sans-serif",
           fontWeight: 300,
           fontSize: 12,
-          color: '#1a1a1a',
+          color: colors.textPrimary,
         }}
       >
-        <span style={{ color: '#616161' }}>Início</span>
+        <span style={{ color: colors.textSecondary }}>Início</span>
         {expandedModule && (
           <>
-            <ChevronRight size={13} style={{ color: '#d4d4d4', flexShrink: 0 }} />
-            <span style={{ color: activeItem ? '#616161' : '#1a1a1a' }}>{expandedModule.label}</span>
+            <ChevronRight size={13} style={{ color: colors.border, flexShrink: 0 }} />
+            <span style={{ color: activeItem ? colors.textSecondary : colors.textPrimary }}>
+              {expandedModule.label}
+            </span>
           </>
         )}
         {activeItem && (
           <>
-            <ChevronRight size={13} style={{ color: '#d4d4d4', flexShrink: 0 }} />
-            <span style={{ color: '#1a1a1a', fontWeight: 400 }}>{activeItem.label}</span>
+            <ChevronRight size={13} style={{ color: colors.border, flexShrink: 0 }} />
+            <span style={{ color: colors.textPrimary, fontWeight: 400 }}>{activeItem.label}</span>
           </>
         )}
       </nav>
 
       {/* Right side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         {/* Search */}
         <button
           style={{
@@ -65,12 +70,13 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             gap: 6,
             padding: '0 12px',
             borderRadius: 8,
-            border: '1px solid #e5e5e5',
-            background: 'white',
+            border: `1px solid ${colors.border}`,
+            background: colors.surfaceBg,
             cursor: 'pointer',
-            color: '#9ca3af',
+            color: colors.textMuted,
             fontSize: 12,
             fontFamily: "'Outfit', sans-serif",
+            transition: 'background 0.15s',
           }}
         >
           <Search size={13} />
@@ -78,11 +84,11 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           <kbd
             style={{
               fontSize: 10,
-              background: '#f5f5f5',
-              border: '1px solid #e5e5e5',
+              background: colors.surfaceSubtle,
+              border: `1px solid ${colors.border}`,
               borderRadius: 4,
               padding: '1px 4px',
-              color: '#9ca3af',
+              color: colors.textMuted,
               fontFamily: 'monospace',
             }}
           >
@@ -103,8 +109,11 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#616161',
+            color: colors.textSecondary,
+            transition: 'background 0.15s',
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = colors.navItemHover }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
         >
           <Bell size={16} />
           <span
@@ -134,7 +143,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             width: 34,
             height: 34,
             borderRadius: 9999,
-            background: 'linear-gradient(135deg, #059669, #34d399)',
+            background: `linear-gradient(135deg, ${colors.brand}, #34d399)`,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',

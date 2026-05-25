@@ -1,64 +1,39 @@
 import { useState } from 'react'
-import { PanelLeftClose, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
+import { useTheme } from '../../context/ThemeContext'
 
 // ─── sub-components ──────────────────────────────────────────────────────────
 
-function NavHeader({ module, onClose }: { module: NavModule; onClose: () => void }) {
+function NavHeader({ module }: { module: NavModule }) {
   const Icon = module.icon
+  const { colors } = useTheme()
   return (
     <div
       style={{
         height: 44,
         minHeight: 44,
-        background: '#f5f5f5',
+        background: colors.surfaceSubtle,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
         padding: '0 12px',
         flexShrink: 0,
+        gap: 8,
+        transition: 'background 0.2s',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Icon size={14} color="#525252" strokeWidth={1.8} />
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: '#292929',
-            fontFamily: "'Outfit', sans-serif",
-            letterSpacing: '-0.1px',
-          }}
-        >
-          {module.label}
-        </span>
-      </div>
-
-      <button
-        onClick={onClose}
-        title="Recolher menu"
+      <Icon size={14} color={colors.textSecondary} strokeWidth={1.8} />
+      <span
         style={{
-          width: 26,
-          height: 26,
-          borderRadius: 6,
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#525252',
-          transition: 'background 0.1s',
-        }}
-        onMouseEnter={(e) => {
-          ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.07)'
-        }}
-        onMouseLeave={(e) => {
-          ;(e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+          fontSize: 13,
+          fontWeight: 600,
+          color: colors.textPrimary,
+          fontFamily: "'Outfit', sans-serif",
+          letterSpacing: '-0.1px',
         }}
       >
-        <PanelLeftClose size={14} strokeWidth={1.8} />
-      </button>
+        {module.label}
+      </span>
     </div>
   )
 }
@@ -98,6 +73,7 @@ function NavGroupSection({
   onItemClick: (id: string) => void
 }) {
   const GroupIcon = group.icon
+  const { colors } = useTheme()
 
   return (
     <div style={{ marginBottom: 4 }}>
@@ -109,9 +85,8 @@ function NavGroupSection({
           alignItems: 'center',
           gap: 5,
           fontSize: 10,
-          fontWeight: 600,
-          color: anyOpen ? '#9ca3af' : '#1a1a1a',
-          fontWeight: anyOpen ? 500 : 400,
+          fontWeight: anyOpen ? 500 : 600,
+          color: anyOpen ? colors.textMuted : colors.textPrimary,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
           padding: '6px 10px',
@@ -120,9 +95,9 @@ function NavGroupSection({
           border: 'none',
           cursor: 'pointer',
           borderRadius: 6,
-          transition: 'background 0.1s, color 0.15s, font-weight 0.15s',
+          transition: 'background 0.1s, color 0.15s',
         }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(115,115,115,0.06)' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = colors.navItemHover }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
       >
         <GroupIcon size={10} strokeWidth={2} style={{ flexShrink: 0 }} />
@@ -183,14 +158,12 @@ interface SecondaryNavProps {
   module: NavModule
   activeItemId: string | null
   onItemClick: (id: string) => void
-  onClose: () => void
 }
 
 export default function SecondaryNav({
   module,
   activeItemId,
   onItemClick,
-  onClose,
 }: SecondaryNavProps) {
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>()
@@ -210,19 +183,22 @@ export default function SecondaryNav({
     })
   }
 
+  const { colors } = useTheme()
+
   return (
     <div
       style={{
         width: 224,
         minWidth: 224,
-        background: 'white',
+        background: colors.surfaceBg,
         borderRadius: 12,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        transition: 'background 0.2s',
       }}
     >
-      <NavHeader module={module} onClose={onClose} />
+      <NavHeader module={module} />
 
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 8px' }}>
         {module.flatItems ? (

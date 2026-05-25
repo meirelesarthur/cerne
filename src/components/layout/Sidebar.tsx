@@ -1,8 +1,11 @@
-import { Bell, Settings, ChevronRight } from 'lucide-react'
+import { Bell, Settings, ChevronRight, PanelLeftClose, Moon, Sun } from 'lucide-react'
 import logoFull from '../../assets/Logo.svg'
+import logoFullWhite from '../../assets/Logo-white.svg'
 import logoMin from '../../assets/logo-min.svg'
+import logoMinWhite from '../../assets/logo-min-white.svg'
 import { Tooltip } from '../Tooltip'
 import type { NavModule } from '../../data/menuData'
+import { useTheme } from '../../context/ThemeContext'
 
 interface SidebarProps {
   modules: NavModule[]
@@ -21,6 +24,7 @@ export default function Sidebar({
   onModuleClick,
   onToggle,
 }: SidebarProps) {
+  const { colors, isGbMode, toggle } = useTheme()
   const isIconOnly = mode === 'icon-only'
   const w = isIconOnly ? 56 : 240
 
@@ -30,31 +34,64 @@ export default function Sidebar({
       style={{
         width: w,
         minWidth: w,
-        background: 'white',
+        background: colors.sidebarBg,
         borderRadius: 16,
         display: 'flex',
         flexDirection: 'column',
         padding: '12px 8px',
-        transition: 'width 0.2s ease, min-width 0.2s ease',
+        transition: 'width 0.2s ease, min-width 0.2s ease, background 0.2s ease',
         overflow: 'hidden',
         cursor: 'default',
       }}
     >
-      {/* Logo — sem botão, clique bubbles para o root */}
+      {/* Logo */}
       <div
         style={{
           height: 48,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isIconOnly ? 'center' : 'flex-start',
+          justifyContent: isIconOnly ? 'center' : 'space-between',
           paddingLeft: isIconOnly ? 0 : 8,
+          paddingRight: isIconOnly ? 0 : 4,
           marginBottom: 8,
           flexShrink: 0,
         }}
       >
         {isIconOnly
-          ? <img src={logoMin} alt="GB" style={{ height: 28, width: 'auto', pointerEvents: 'none' }} />
-          : <img src={logoFull} alt="GB Agritech" style={{ height: 28, width: 'auto', pointerEvents: 'none' }} />
+          ? <img src={isGbMode ? logoMinWhite : logoMin} alt="GB" style={{ height: 28, width: 'auto', pointerEvents: 'none' }} />
+          : <>
+              <img src={isGbMode ? logoFullWhite : logoFull} alt="GB Agritech" style={{ height: 28, width: 'auto', pointerEvents: 'none' }} />
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggle() }}
+                title="Recolher menu"
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 6,
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.textMuted,
+                  flexShrink: 0,
+                  transition: 'background 0.1s, color 0.1s',
+                }}
+                onMouseEnter={(e) => {
+                  const b = e.currentTarget
+                  b.style.background = colors.navItemHover
+                  b.style.color = colors.navTextActive
+                }}
+                onMouseLeave={(e) => {
+                  const b = e.currentTarget
+                  b.style.background = 'transparent'
+                  b.style.color = colors.textMuted
+                }}
+              >
+                <PanelLeftClose size={15} strokeWidth={1.8} />
+              </button>
+            </>
         }
       </div>
 
@@ -98,7 +135,7 @@ export default function Sidebar({
                   size={13}
                   style={{
                     flexShrink: 0,
-                    color: highlighted ? '#059669' : '#9ca3af',
+                    color: highlighted ? colors.brand : colors.textMuted,
                     transform: isExpanded ? 'rotate(90deg)' : 'none',
                     transition: 'transform 0.15s ease',
                   }}
@@ -110,7 +147,7 @@ export default function Sidebar({
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: '#f0f0f0', margin: '8px 4px' }} />
+      <div style={{ height: 1, background: colors.navDivider, margin: '8px 4px', transition: 'background 0.2s' }} />
 
       {/* Bottom actions — sempre param propagação */}
       <div
@@ -149,6 +186,16 @@ export default function Sidebar({
             >
               3
             </span>
+          </button>
+        </Tooltip>
+
+        <Tooltip label={isGbMode ? 'Modo claro' : 'GB Mode'}>
+          <button
+            className="nav-icon-btn"
+            onClick={(e) => { e.stopPropagation(); toggle() }}
+            style={{ color: isGbMode ? colors.brand : undefined }}
+          >
+            {isGbMode ? <Sun size={15} /> : <Moon size={15} />}
           </button>
         </Tooltip>
 

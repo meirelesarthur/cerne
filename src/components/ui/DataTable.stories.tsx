@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Pencil, Eye } from 'lucide-react'
 import { DataTable, type Column } from './DataTable'

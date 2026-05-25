@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── CSS Custom Properties ─────────────────────────────────────────────────── */
+
+:root {
+  /* Light mode (default) */
+  --nav-btn-color:          #404040;
+  --nav-btn-hover-bg:       rgba(115,115,115,0.08);
+  --nav-btn-hover-color:    #1a1a1a;
+  --nav-btn-active-bg:      rgba(5,150,105,0.10);
+  --nav-btn-active-color:   #059669;
+  --nav-icon-color:         #616161;
+  --nav-sub-color:          #1a1a1a;
+  --nav-sub-hover-bg:       rgba(115,115,115,0.06);
+  --nav-sub-active-bg:      rgba(5,150,105,0.10);
+  --nav-sub-active-color:   #059669;
+  --scrollbar-thumb:        #d1d5db;
+  --scrollbar-thumb-hover:  #9ca3af;
+  --module-card-hover-bg:   rgba(0,0,0,0.04);
+}
+
+/* GB Mode overrides */
+[data-theme="gbMode"] {
+  --nav-btn-color:          rgba(216,237,226,0.55);
+  --nav-btn-hover-bg:       rgba(255,255,255,0.04);
+  --nav-btn-hover-color:    #d8ede2;
+  --nav-btn-active-bg:      rgba(16,185,129,0.12);
+  --nav-btn-active-color:   #10b981;
+  --nav-icon-color:         rgba(216,237,226,0.5);
+  --nav-sub-color:          rgba(216,237,226,0.7);
+  --nav-sub-hover-bg:       rgba(255,255,255,0.04);
+  --nav-sub-active-bg:      rgba(16,185,129,0.12);
+  --nav-sub-active-color:   #10b981;
+  --scrollbar-thumb:        #1c3f2c;
+  --scrollbar-thumb-hover:  #2a5c40;
+  --module-card-hover-bg:   rgba(16,185,129,0.08);
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────────────────── */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,7 +53,8 @@ body {
   background: #f5f5f5;
 }
 
-/* Scrollbar oculta nos painéis de navegação */
+/* ─── Scrollbars ─────────────────────────────────────────────────────────────── */
+
 .nav-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -24,7 +63,6 @@ body {
   display: none;
 }
 
-/* Scrollbar refinada globalmente */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -33,14 +71,15 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Nav items - sidebar 1 nível */
+/* ─── Nav — primary sidebar ───────────────────────────────────────────────── */
+
 .nav-module-btn {
   width: 100%;
   display: flex;
@@ -51,7 +90,7 @@ body {
   border: none;
   cursor: pointer;
   background: transparent;
-  color: #404040;
+  color: var(--nav-btn-color);
   text-align: left;
   transition: background 0.12s ease, color 0.12s ease;
   padding: 0 10px;
@@ -62,20 +101,21 @@ body {
   overflow: hidden;
 }
 .nav-module-btn:hover {
-  background: rgba(115, 115, 115, 0.08);
-  color: #1a1a1a;
+  background: var(--nav-btn-hover-bg);
+  color: var(--nav-btn-hover-color);
 }
 .nav-module-btn.active {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-color);
   font-weight: 500;
 }
 .nav-module-btn.expanded {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-color);
 }
 
-/* Nav items - sidebar icon-only */
+/* ─── Nav — icon-only sidebar ─────────────────────────────────────────────── */
+
 .nav-icon-btn {
   width: 36px;
   height: 36px;
@@ -83,7 +123,7 @@ body {
   border: none;
   cursor: pointer;
   background: transparent;
-  color: #616161;
+  color: var(--nav-icon-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,20 +131,20 @@ body {
   position: relative;
 }
 .nav-icon-btn:hover {
-  background: rgba(115, 115, 115, 0.08);
-  color: #1a1a1a;
+  background: var(--nav-btn-hover-bg);
+  color: var(--nav-btn-hover-color);
 }
 .nav-icon-btn.active {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-color);
 }
 .nav-icon-btn.expanded {
-  background: rgba(5, 150, 105, 0.12);
-  color: #059669;
+  background: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-color);
 }
 
+/* ─── Nav — secondary panel ────────────────────────────────────────────────── */
 
-/* Nav subitems - secondary panel */
 .nav-sub-btn {
   width: 100%;
   height: 32px;
@@ -115,26 +155,27 @@ body {
   border: none;
   cursor: pointer;
   background: transparent;
-  color: #1a1a1a;
+  color: var(--nav-sub-color);
   text-align: left;
   font-family: 'Outfit', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  transition: background 0.12s ease;
+  transition: background 0.12s ease, color 0.12s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .nav-sub-btn:hover {
-  background: rgba(115, 115, 115, 0.06);
+  background: var(--nav-sub-hover-bg);
 }
 .nav-sub-btn.active {
-  background: rgba(5, 150, 105, 0.1);
+  background: var(--nav-sub-active-bg);
   font-weight: 500;
-  color: #059669;
+  color: var(--nav-sub-active-color);
 }
 
-/* Card hover */
+/* ─── Module card (dashboard) ───────────────────────────────────────────────── */
+
 .module-card {
   background: transparent;
   border-radius: 12px;
@@ -144,5 +185,5 @@ body {
   transition: background 0.15s ease;
 }
 .module-card:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--module-card-hover-bg);
 }

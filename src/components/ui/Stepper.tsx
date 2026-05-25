@@ -1,5 +1,6 @@
 import React from 'react'
-import { Check } from 'lucide-react'
+import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface Step {
   id: number
@@ -14,23 +15,22 @@ interface StepperProps {
 }
 
 export function Stepper({ steps, current, completed, onStepClick }: StepperProps) {
+  const { colors } = useTheme()
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         width: '100%',
-        padding: '16px 24px',
-        background: 'white',
-        borderRadius: 12,
+        padding: `${t.space[3]}px ${t.space[4]}px`,
         boxSizing: 'border-box',
       }}
     >
       {steps.map((step, index) => {
         const isCompleted = completed.includes(step.id)
         const isActive = step.id === current
-        const isFuture = !isCompleted && !isActive
         const isClickable = isCompleted
+        const circleSize = isActive ? 14 : 10
 
         return (
           <React.Fragment key={step.id}>
@@ -39,70 +39,50 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 6,
+                gap: t.space[2],
                 flex: '0 0 auto',
                 cursor: isClickable ? 'pointer' : 'default',
               }}
               onClick={() => isClickable && onStepClick(step.id)}
             >
-              {/* Circle */}
               <div
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: isCompleted
-                    ? '#059669'
-                    : isActive
-                    ? '#059669'
-                    : 'white',
-                  border: isFuture ? '1.5px solid #e5e5e5' : 'none',
-                  transition: 'all 0.2s',
+                  width: circleSize,
+                  height: circleSize,
+                  borderRadius: t.radius.full,
                   flexShrink: 0,
+                  background: isCompleted ? t.color.brand[600] : colors.surfaceBg,
+                  border: isCompleted
+                    ? 'none'
+                    : isActive
+                    ? `2px solid ${t.color.brand[600]}`
+                    : `1.5px solid ${colors.border}`,
+                  transition: t.transition.smooth,
+                  boxSizing: 'border-box',
                 }}
-              >
-                {isCompleted ? (
-                  <Check size={12} color="white" strokeWidth={2.5} />
-                ) : (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      fontFamily: "'Outfit', sans-serif",
-                      color: isActive ? 'white' : '#9ca3af',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {step.id}
-                  </span>
-                )}
-              </div>
-              {/* Label */}
+              />
               <span
                 style={{
-                  fontSize: 11,
-                  fontWeight: isActive ? 600 : 400,
-                  fontFamily: "'Outfit', sans-serif",
-                  color: isCompleted ? '#059669' : isActive ? '#059669' : '#9ca3af',
+                  fontSize: t.font.size.xs,
+                  fontWeight: isActive ? t.font.weight.semibold : t.font.weight.normal,
+                  fontFamily: t.font.family.sans,
+                  color: isCompleted || isActive ? t.color.brand[600] : colors.textMuted,
                   whiteSpace: 'nowrap',
+                  letterSpacing: '0.1px',
                 }}
               >
                 {step.label}
               </span>
             </div>
 
-            {/* Connector line */}
             {index < steps.length - 1 && (
               <div
                 style={{
                   flex: 1,
-                  height: 2,
-                  marginTop: 13,
-                  background: isCompleted ? '#059669' : '#e5e5e5',
-                  transition: 'background 0.2s',
+                  height: 1.5,
+                  marginBottom: 19,
+                  background: isCompleted ? t.color.brand[600] : colors.border,
+                  transition: t.transition.smooth,
                 }}
               />
             )}

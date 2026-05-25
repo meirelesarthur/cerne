@@ -1,6 +1,6 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
+import { StepHeader } from '../../../../components/ui/StepHeader'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step1Props {
@@ -14,7 +14,11 @@ export function Step1Identificacao({ data, errors, onChange }: Step1Props) {
   const showInscricaoEstadual = cpfCnpjDigits.length >= 14
 
   return (
-    <FormSection title="Identificação">
+    <>
+      <StepHeader
+        title="Identificação da Fazenda"
+        subtitle="Informe o nome, documento e telefone de contato da propriedade"
+      />
       <div
         style={{
           display: 'grid',
@@ -60,6 +64,6 @@ export function Step1Identificacao({ data, errors, onChange }: Step1Props) {
           placeholder="(00) 00000-0000"
         />
       </div>
-    </FormSection>
+    </>
   )
 }

@@ -1,0 +1,178 @@
+/**
+ * GB CERNE Design Tokens
+ * Nomenclatura inspirada no Tailwind CSS, adaptada para o contexto agrícola.
+ * Toda decisão visual do sistema deve referenciar este arquivo.
+ */
+
+// ─── Cores ─────────────────────────────────────────────────────────────────
+
+export const color = {
+  /** Verde primário — identidade GB CERNE */
+  brand: {
+    50:  '#f0fdf4',
+    100: '#dcfce7',
+    200: '#bbf7d0',
+    300: '#86efac',
+    400: '#4ade80',
+    500: '#22c55e',
+    600: '#059669', // principal
+    700: '#047857', // hover
+    800: '#065f46',
+    900: '#064e3b',
+  },
+
+  /** Escala de neutros (cinzas e pretos) */
+  neutral: {
+    0:   '#ffffff',
+    50:  '#fafafa',
+    100: '#f5f5f5',
+    150: '#f3f4f6',
+    200: '#e5e7eb',
+    250: '#e5e5e5',
+    300: '#d1d5db',
+    400: '#9ca3af',
+    500: '#6b7280',
+    600: '#616161',
+    700: '#404040',
+    800: '#1a1a1a',
+    900: '#111827',
+    950: '#171717',
+  },
+
+  /** Semânticos */
+  success: {
+    bg:     '#f0fdf4',
+    border: '#bbf7d0',
+    text:   '#059669',
+    solid:  '#059669',
+  },
+  error: {
+    bg:     '#fee2e2',
+    border: '#fca5a5',
+    text:   '#dc2626',
+    solid:  '#dc2626',
+  },
+  warning: {
+    bg:     '#fffbeb',
+    border: '#fde68a',
+    text:   '#d97706',
+    solid:  '#f59e0b',
+  },
+  info: {
+    bg:     '#eff6ff',
+    border: '#bfdbfe',
+    text:   '#2563eb',
+    solid:  '#3b82f6',
+  },
+}
+
+// ─── Tipografia ─────────────────────────────────────────────────────────────
+
+export const font = {
+  family: {
+    sans: "'Outfit', sans-serif",
+  },
+
+  /** Em pixels — equivalentes Tailwind: xs=11 sm=12 base=13 md=14 lg=15 xl=16 */
+  size: {
+    xs:   11,
+    sm:   12,
+    base: 13,
+    md:   14,
+    lg:   15,
+    xl:   16,
+    '2xl': 22,
+    '3xl': 26,
+    '4xl': 32,
+  },
+
+  weight: {
+    normal:    400,
+    medium:    500,
+    semibold:  600,
+    bold:      700,
+    extrabold: 800,
+  },
+
+  lineHeight: {
+    tight:  1.2,
+    snug:   1.35,
+    normal: 1.5,
+    relaxed: 1.625,
+  },
+}
+
+// ─── Espaçamento ─────────────────────────────────────────────────────────────
+// Base 4px — idêntico ao Tailwind (space[1]=4px, space[2]=8px...)
+
+export const space = {
+  0:  0,
+  1:  4,
+  2:  8,
+  3:  12,
+  4:  16,
+  5:  20,
+  6:  24,
+  7:  28,
+  8:  32,
+  10: 40,
+  12: 48,
+  16: 64,
+  20: 80,
+}
+
+// ─── Border radius ────────────────────────────────────────────────────────────
+
+export const radius = {
+  sm:      4,
+  md:      6,
+  DEFAULT: 8,   // inputs, botões
+  lg:      10,  // tabelas com borda
+  xl:      12,  // cards de formulário
+  '2xl':   16,  // container principal
+  full:    9999,
+}
+
+// ─── Sombras ─────────────────────────────────────────────────────────────────
+
+export const shadow = {
+  sm:   '0 1px 2px rgba(0,0,0,0.05)',
+  DEFAULT: '0 1px 4px rgba(0,0,0,0.08)',
+  md:   '0 4px 12px rgba(0,0,0,0.08)',
+  lg:   '0 8px 24px rgba(0,0,0,0.10)',
+  brand: '0 4px 16px rgba(5,150,105,0.25)',
+}
+
+// ─── Bordas ───────────────────────────────────────────────────────────────────
+
+export const border = {
+  DEFAULT: `1px solid ${color.neutral[200]}`,
+  medium:  `1.5px solid ${color.neutral[250]}`,
+  brand:   `1px solid ${color.brand[200]}`,
+  error:   `1.5px solid ${color.error.solid}`,
+}
+
+// ─── Z-index ──────────────────────────────────────────────────────────────────
+
+export const zIndex = {
+  base:    1,
+  dropdown: 100,
+  overlay: 200,
+  drawer:  201,
+  toast:   9999,
+}
+
+// ─── Transições ───────────────────────────────────────────────────────────────
+
+export const transition = {
+  fast:    '0.1s ease',
+  DEFAULT: '0.15s ease',
+  smooth:  '0.2s ease',
+  drawer:  '0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+}
+
+// ─── Atalho global ────────────────────────────────────────────────────────────
+// Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
+
+export const t = { color, font, space, radius, shadow, border, zIndex, transition }
+export default t

@@ -7,3 +7,6 @@ dist/
 .DS_Store
 Thumbs.db
 storybook-static/
+
+# Claude Code plugins (local only — não versionar)
+# .claude/plugins/ui-ux-pro-max/

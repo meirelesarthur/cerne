@@ -1,7 +1,7 @@
 import React from 'react'
-import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
+import { StepHeader } from '../../../../components/ui/StepHeader'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step4Props {
@@ -24,7 +24,11 @@ const simNaoOptions = [
 
 export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4Props) {
   return (
-    <FormSection title="Dados Financeiros e Operacionais">
+    <>
+      <StepHeader
+        title="Dados Financeiros"
+        subtitle="Configure área, valor por hectare e taxas de remuneração da propriedade"
+      />
       <div
         style={{
           display: 'grid',
@@ -96,6 +100,6 @@ export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4P
           onChange={(e) => onBoolChange('usoLivroCaixa', e.target.value === 'true')}
         />
       </div>
-    </FormSection>
+    </>
   )
 }

@@ -2,17 +2,24 @@ import { useState } from 'react'
 import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
+import { SplashScreen } from './components/SplashScreen'
+import { ThemeProvider } from './context/ThemeContext'
 
 export default function App() {
-  const [authenticated, setAuthenticated] = useState(false)
-
-  if (!authenticated) {
-    return <Login onLogin={() => setAuthenticated(true)} />
-  }
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [splashing, setSplashing] = useState(false)
 
   return (
-    <AppLayout>
-      <Dashboard />
-    </AppLayout>
+    <ThemeProvider>
+      {splashing ? (
+        <SplashScreen onDone={() => { setSplashing(false); setLoggedIn(true) }} />
+      ) : !loggedIn ? (
+        <Login onLogin={() => setSplashing(true)} />
+      ) : (
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      )}
+    </ThemeProvider>
   )
 }

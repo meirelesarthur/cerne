@@ -504,9 +504,6 @@
 }
 .lgn-divider span {
   flex: 1;
-  height: 1px;
-  background: #e7e5e4;
-  display: block;
 }
 
 /* SSO button */

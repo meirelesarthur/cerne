@@ -328,7 +328,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
           {/* Divider */}
           <div className="lgn-divider">
-            <span /><span style={{ whiteSpace: 'nowrap' }}>ou acesse com</span><span />
+            <span style={{ whiteSpace: 'nowrap' }}>ou acesse com</span>
           </div>
 
           {/* SSO */}

@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { FormField } from '../components/ui/FormField'
+import { t } from '../design/tokens'
 import vid0 from '../assets/agricultura.mp4'
 import vid1 from '../assets/apicultura.mp4'
 import vid2 from '../assets/avicultura.mp4'
@@ -227,77 +229,84 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
           <form onSubmit={handleSubmit} noValidate>
             {/* Email */}
-            <div className={`lgn-field${emailStatus === 'ok' ? ' lgn-field--ok' : emailStatus === 'err' ? ' lgn-field--err' : ''}`}>
-              <label className="lgn-label">E-mail corporativo</label>
-              <div className="lgn-input-wrap">
-                <span className="lgn-input-icon">
-                  <svg viewBox="0 0 16 16" fill="none">
+            <div style={{ marginBottom: t.space[5] }}>
+              <FormField
+                label="E-mail corporativo"
+                type="email"
+                placeholder="voce@suafazenda.com.br"
+                value={email}
+                autoComplete="email"
+                onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
+                onBlur={handleEmailBlur}
+                onFocus={() => setEmailStatus('idle')}
+                status={emailStatus}
+                error={emailStatus === 'err' ? 'Insira um e-mail válido' : undefined}
+                style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                iconLeft={
+                  <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
                     <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
                     <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
                   </svg>
-                </span>
-                <input
-                  type="email"
-                  className="lgn-input"
-                  placeholder="voce@suafazenda.com.br"
-                  value={email}
-                  autoComplete="email"
-                  onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
-                  onBlur={handleEmailBlur}
-                  onFocus={() => setEmailStatus('idle')}
-                />
-                {emailStatus === 'ok' && (
-                  <span className="lgn-check">
-                    <svg viewBox="0 0 16 16" fill="none">
+                }
+                iconRight={emailStatus === 'ok' ? (
+                  <span style={{ color: t.color.success.text, display: 'flex', alignItems: 'center' }}>
+                    <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
                       <path d="M3 8l4 4 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </span>
-                )}
-              </div>
-              {emailStatus === 'err' && (
-                <div className="lgn-err-msg">Insira um e-mail válido</div>
-              )}
+                ) : undefined}
+              />
             </div>
 
             {/* Password */}
-            <div className={`lgn-field${passErr ? ' lgn-field--err' : ''}`}>
-              <label className="lgn-label">Senha</label>
-              <div className="lgn-input-wrap">
-                <span className="lgn-input-icon">
-                  <svg viewBox="0 0 16 16" fill="none">
+            <div style={{ marginBottom: t.space[5] }}>
+              <FormField
+                label="Senha"
+                type={showPw ? 'text' : 'password'}
+                placeholder="••••••••••"
+                value={password}
+                autoComplete="current-password"
+                onChange={e => { setPassword(e.target.value); setPassErr(false) }}
+                onFocus={() => setPassErr(false)}
+                status={passErr ? 'err' : 'idle'}
+                error={passErr ? 'Insira sua senha' : undefined}
+                style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                iconLeft={
+                  <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
                     <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
                     <path d="M5 7V5.5a3 3 0 016 0V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
                   </svg>
-                </span>
-                <input
-                  type={showPw ? 'text' : 'password'}
-                  className="lgn-input"
-                  placeholder="••••••••••"
-                  value={password}
-                  autoComplete="current-password"
-                  onChange={e => { setPassword(e.target.value); setPassErr(false) }}
-                  onFocus={() => setPassErr(false)}
-                />
-                <button
-                  type="button"
-                  className="lgn-pw-toggle"
-                  onClick={() => setShowPw(v => !v)}
-                  tabIndex={-1}
-                >
-                  {showPw ? (
-                    <svg viewBox="0 0 16 16" fill="none">
-                      <path d="M2 2l12 12M6.5 6.7a2 2 0 002.8 2.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                      <path d="M4 4.6C2.7 5.5 1.7 6.7 1 8c1.5 3 4 5 7 5 1.3 0 2.6-.4 3.7-1.1M12.5 11.5C13.5 10.6 14.4 9.4 15 8c-1.5-3-4-5-7-5-.8 0-1.7.2-2.5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 16 16" fill="none">
-                      <ellipse cx="8" cy="8" rx="7" ry="4.5" stroke="currentColor" strokeWidth="1.4"/>
-                      <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.4"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {passErr && <div className="lgn-err-msg">Insira sua senha</div>}
+                }
+                iconRight={
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(v => !v)}
+                    tabIndex={-1}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: t.color.neutral[400],
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: t.space[1],
+                      borderRadius: t.radius.md,
+                    }}
+                  >
+                    {showPw ? (
+                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
+                        <path d="M2 2l12 12M6.5 6.7a2 2 0 002.8 2.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                        <path d="M4 4.6C2.7 5.5 1.7 6.7 1 8c1.5 3 4 5 7 5 1.3 0 2.6-.4 3.7-1.1M12.5 11.5C13.5 10.6 14.4 9.4 15 8c-1.5-3-4-5-7-5-.8 0-1.7.2-2.5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
+                        <ellipse cx="8" cy="8" rx="7" ry="4.5" stroke="currentColor" strokeWidth="1.4"/>
+                        <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.4"/>
+                      </svg>
+                    )}
+                  </button>
+                }
+              />
             </div>
 
             {/* Remember + forgot */}
@@ -333,13 +342,13 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
           {/* SSO */}
           <button type="button" className="lgn-sso">
-            <svg viewBox="0 0 18 18" fill="none">
-              <rect x="1" y="1" width="7.5" height="7.5" fill="#F25022"/>
-              <rect x="9.5" y="1" width="7.5" height="7.5" fill="#7FBA00"/>
-              <rect x="1" y="9.5" width="7.5" height="7.5" fill="#00A4EF"/>
-              <rect x="9.5" y="9.5" width="7.5" height="7.5" fill="#FFB900"/>
+            <svg viewBox="0 0 18 18" fill="none" width={18} height={18}>
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z" fill="#EA4335"/>
             </svg>
-            Entrar com Microsoft 365
+            Entrar com Google
           </button>
 
           {/* Trust */}

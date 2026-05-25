@@ -9,10 +9,35 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   required?: boolean
   error?: string
   hint?: string
+  /** Ícone posicionado à esquerda do input */
+  iconLeft?: React.ReactNode
+  /** Ícone ou botão posicionado à direita do input */
+  iconRight?: React.ReactNode
+  /** Estado visual: 'ok' = borda verde, 'err' = borda vermelha */
+  status?: 'idle' | 'ok' | 'err'
 }
 
-export function FormField({ label, required, error, hint, style, ...inputProps }: FormFieldProps) {
+export function FormField({
+  label,
+  required,
+  error,
+  hint,
+  iconLeft,
+  iconRight,
+  status,
+  style,
+  ...inputProps
+}: FormFieldProps) {
   const { colors } = useTheme()
+
+  const isError = !!error || status === 'err'
+  const isOk = !isError && status === 'ok'
+  const borderColor = isError
+    ? t.color.error.text
+    : isOk
+    ? t.color.success.text
+    : colors.border
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: 2 }}>
@@ -38,36 +63,81 @@ export function FormField({ label, required, error, hint, style, ...inputProps }
           </Tooltip>
         )}
       </div>
-      <input
-        {...inputProps}
-        style={{
-          width: '100%',
-          height: 38,
-          border: error
-            ? `1.5px solid ${t.color.error.text}`
-            : `1.5px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
-          padding: `0 ${t.space[2] + t.space[1] / 2}px`,
-          fontSize: t.font.size.base,
-          fontFamily: t.font.family.sans,
-          color: colors.textPrimary,
-          background: colors.inputBg,
-          outline: 'none',
-          boxSizing: 'border-box',
-          transition: `border-color ${t.transition.DEFAULT}, background 0.2s, color 0.2s`,
-          ...style,
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = error ? t.color.error.text : colors.brand
-          inputProps.onFocus?.(e)
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border
-          inputProps.onBlur?.(e)
-        }}
-      />
-      {error && (
-        <span style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans }}>
+
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        {iconLeft && (
+          <span
+            style={{
+              position: 'absolute',
+              left: 14,
+              display: 'flex',
+              alignItems: 'center',
+              color: t.color.neutral[400],
+              pointerEvents: 'none',
+              zIndex: 1,
+            }}
+          >
+            {iconLeft}
+          </span>
+        )}
+
+        <input
+          {...inputProps}
+          style={{
+            width: '100%',
+            height: 38,
+            border: `1.5px solid ${borderColor}`,
+            borderRadius: t.radius.DEFAULT,
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingLeft: iconLeft ? 44 : t.space[2] + t.space[1] / 2,
+            paddingRight: iconRight ? 46 : t.space[2] + t.space[1] / 2,
+            fontSize: t.font.size.base,
+            fontFamily: t.font.family.sans,
+            color: colors.textPrimary,
+            background: isError ? t.color.error.bg : colors.inputBg,
+            outline: 'none',
+            boxSizing: 'border-box',
+            transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
+            ...style,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.brand
+            e.currentTarget.style.boxShadow = isError
+              ? '0 0 0 3px rgba(239,68,68,.1)'
+              : '0 0 0 3.5px rgba(34,197,94,.12)'
+            inputProps.onFocus?.(e)
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = borderColor
+            e.currentTarget.style.boxShadow = 'none'
+            inputProps.onBlur?.(e)
+          }}
+        />
+
+        {iconRight && (
+          <span
+            style={{
+              position: 'absolute',
+              right: 12,
+              display: 'flex',
+              alignItems: 'center',
+              zIndex: 1,
+            }}
+          >
+            {iconRight}
+          </span>
+        )}
+      </div>
+
+      {isError && error && (
+        <span
+          style={{
+            fontSize: t.font.size.xs,
+            color: t.color.error.text,
+            fontFamily: t.font.family.sans,
+          }}
+        >
           {error}
         </span>
       )}

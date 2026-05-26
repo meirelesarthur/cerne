@@ -410,11 +410,11 @@ function TalhoesMap() {
         offset: [12, 0],
       })
 
-      poly.on('mouseover', function () {
-        this.setStyle({ weight: 3.5, fillOpacity: Math.min(talhao.fillOpacity + 0.18, 0.65) })
+      poly.on('mouseover', () => {
+        poly.setStyle({ weight: 3.5, fillOpacity: Math.min(talhao.fillOpacity + 0.18, 0.65) })
       })
-      poly.on('mouseout', function () {
-        this.setStyle({ weight: 2.5, fillOpacity: talhao.fillOpacity })
+      poly.on('mouseout', () => {
+        poly.setStyle({ weight: 2.5, fillOpacity: talhao.fillOpacity })
       })
 
       poly.addTo(map)

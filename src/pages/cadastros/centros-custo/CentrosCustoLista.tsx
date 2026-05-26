@@ -719,7 +719,7 @@ function Modal({
         background: 'rgba(0,0,0,0.45)',
         backdropFilter: 'blur(4px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.modal,
+        zIndex: t.zIndex.overlay,
         padding: 24,
       }}
       onClick={onClose}
@@ -731,7 +731,7 @@ function Modal({
           padding: 28,
           width: '100%',
           maxWidth: width,
-          boxShadow: t.shadow.xl,
+          boxShadow: t.shadow.lg,
         }}
         onClick={e => e.stopPropagation()}
       >

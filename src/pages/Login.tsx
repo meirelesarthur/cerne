@@ -6,11 +6,12 @@ import { SSOButton } from '../components/ui/SSOButton'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
-import vid0 from '../assets/agricultura.mp4'
-import vid1 from '../assets/apicultura.mp4'
-import vid2 from '../assets/avicultura.mp4'
-import vid3 from '../assets/ovicultura.mp4'
-import vid4 from '../assets/Psicultura.mp4'
+// Vídeos servidos diretamente do CDN via public/ — não importar como módulo ES
+const vid0 = '/videos/agricultura.mp4'
+const vid1 = '/videos/apicultura.mp4'
+const vid2 = '/videos/avicultura.mp4'
+const vid3 = '/videos/ovicultura.mp4'
+const vid4 = '/videos/Psicultura.mp4'
 import './Login.css'
 
 // ─── Constantes ────────────────────────────────────────────────────────────

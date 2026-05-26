@@ -105,11 +105,13 @@ const MACHINERY = [
 
 // ─── Style helper ─────────────────────────────────────────────────────────────
 
-function card(colors: ThemeColors, extra?: React.CSSProperties): React.CSSProperties {
+function card(colors: ThemeColors, isGbMode: boolean, extra?: React.CSSProperties): React.CSSProperties {
   return {
     background: colors.surfaceBg,
-    border: `1px solid ${colors.border}`,
     borderRadius: t.radius['2xl'],
+    boxShadow: isGbMode
+      ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+      : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
     ...extra,
   }
 }
@@ -123,17 +125,20 @@ interface KpiProps {
   subColor?: string
   alert?: boolean
   colors: ThemeColors
+  isGbMode: boolean
 }
 
-function KpiCard({ label, value, sub, subColor, alert, colors }: KpiProps) {
+function KpiCard({ label, value, sub, subColor, alert, colors, isGbMode }: KpiProps) {
   return (
     <div
       style={{
-        ...card(colors),
+        ...card(colors, isGbMode),
         padding: `${t.space[4]}px ${t.space[5]}px`,
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[2],
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -432,10 +437,10 @@ function TalhoesMap() {
 
 // ─── Cost Distribution ────────────────────────────────────────────────────────
 
-function CostDistribution({ colors }: { colors: ThemeColors }) {
+function CostDistribution({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const total = COST_DATA.reduce((s, d) => s + d.value, 0)
   return (
-    <div style={{ ...card(colors), padding: t.space[4] }}>
+    <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
         <span style={{
           fontSize: t.font.size.sm,
@@ -512,9 +517,9 @@ function CostDistribution({ colors }: { colors: ThemeColors }) {
 
 // ─── Storage Utilization ──────────────────────────────────────────────────────
 
-function StorageUtil({ colors }: { colors: ThemeColors }) {
+function StorageUtil({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   return (
-    <div style={{ ...card(colors), padding: t.space[4] }}>
+    <div style={{ ...card(colors, isGbMode), padding: t.space[4], height: '100%', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
         <span style={{
           fontSize: t.font.size.sm,
@@ -575,7 +580,7 @@ function StorageUtil({ colors }: { colors: ThemeColors }) {
 
 // ─── Harvest Progress (Donut) ─────────────────────────────────────────────────
 
-function HarvestProgress({ colors }: { colors: ThemeColors }) {
+function HarvestProgress({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const pct = 65
   const R = 44, cx = 56, cy = 56, sw = 11
   const circ = 2 * Math.PI * R
@@ -588,7 +593,7 @@ function HarvestProgress({ colors }: { colors: ThemeColors }) {
   ]
 
   return (
-    <div style={{ ...card(colors), padding: t.space[4], display: 'flex', flexDirection: 'column' }}>
+    <div style={{ ...card(colors, isGbMode), padding: t.space[4], display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
         <span style={{
           fontSize: t.font.size.sm,
@@ -653,9 +658,9 @@ function HarvestProgress({ colors }: { colors: ThemeColors }) {
 
 // ─── Machinery Status ─────────────────────────────────────────────────────────
 
-function MachineryStatus({ colors }: { colors: ThemeColors }) {
+function MachineryStatus({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   return (
-    <div style={{ ...card(colors), padding: t.space[4], display: 'flex', flexDirection: 'column' }}>
+    <div style={{ ...card(colors, isGbMode), padding: t.space[4], display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
         <span style={{
           fontSize: t.font.size.sm,
@@ -712,7 +717,7 @@ function MachineryStatus({ colors }: { colors: ThemeColors }) {
 // ─── Overview Panel (Main Page) ───────────────────────────────────────────────
 
 export default function OverviewPanel() {
-  const { colors } = useTheme()
+  const { colors, isGbMode } = useTheme()
 
   return (
     <div
@@ -803,6 +808,7 @@ export default function OverviewPanel() {
           sub="+3% vs last season"
           subColor={t.color.brand[600]}
           colors={colors}
+          isGbMode={isGbMode}
         />
         <KpiCard
           label="Expected Yield Forecast"
@@ -810,6 +816,7 @@ export default function OverviewPanel() {
           sub="+12% vs last year"
           subColor={t.color.brand[600]}
           colors={colors}
+          isGbMode={isGbMode}
         />
         <KpiCard
           label="Projected Revenue"
@@ -817,6 +824,7 @@ export default function OverviewPanel() {
           sub="FOI: +18% across all crops"
           subColor={t.color.brand[600]}
           colors={colors}
+          isGbMode={isGbMode}
         />
         <KpiCard
           label="Operational Risks Alerts"
@@ -825,6 +833,7 @@ export default function OverviewPanel() {
           subColor={t.color.warning.text}
           alert
           colors={colors}
+          isGbMode={isGbMode}
         />
       </div>
 
@@ -835,7 +844,7 @@ export default function OverviewPanel() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
 
           {/* Yield Line Chart */}
-          <div style={{ ...card(colors), padding: t.space[4] }}>
+          <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -893,10 +902,10 @@ export default function OverviewPanel() {
           </div>
 
           {/* Bottom row: Storage | Harvest | Machinery */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 1fr', gap: t.space[3] }}>
-            <StorageUtil colors={colors} />
-            <HarvestProgress colors={colors} />
-            <MachineryStatus colors={colors} />
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 1fr', gap: t.space[3], alignItems: 'stretch' }}>
+            <StorageUtil    colors={colors} isGbMode={isGbMode} />
+            <HarvestProgress colors={colors} isGbMode={isGbMode} />
+            <MachineryStatus colors={colors} isGbMode={isGbMode} />
           </div>
         </div>
 
@@ -905,7 +914,7 @@ export default function OverviewPanel() {
 
           {/* Talhões Map */}
           <div style={{
-            ...card(colors),
+            ...card(colors, isGbMode),
             overflow: 'hidden',
             flex: '1 1 auto',
             minHeight: 340,
@@ -958,7 +967,7 @@ export default function OverviewPanel() {
           </div>
 
           {/* Cost Distribution */}
-          <CostDistribution colors={colors} />
+          <CostDistribution colors={colors} isGbMode={isGbMode} />
         </div>
       </div>
     </div>

@@ -43,9 +43,9 @@ const variantHover: Record<ButtonVariant, string> = {
 }
 
 const sizeStyle: Record<ButtonSize, React.CSSProperties> = {
-  sm: { height: 32, padding: `0 ${t.space[3]}px`, fontSize: t.font.size.sm },
-  md: { height: 40, padding: `0 ${t.space[4]}px`, fontSize: t.font.size.base },
-  lg: { height: 44, padding: `0 ${t.space[5]}px`, fontSize: t.font.size.md },
+  sm: { height: 32,  padding: `0 ${t.space[3]}px`, fontSize: t.font.size.sm },
+  md: { height: 36,  padding: `0 ${t.space[4]}px`, fontSize: t.font.size.base },
+  lg: { height: 44,  padding: `0 ${t.space[5]}px`, fontSize: t.font.size.md },
 }
 
 export function Button({

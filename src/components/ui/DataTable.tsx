@@ -71,22 +71,23 @@ export function DataTable<T extends object>({
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: theadBg, borderBottom: `1px solid ${borderColor}` }}>
-              {columns.map((col, i) => (
+              {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => col.sortable !== false && handleSort(col.key)}
                   style={{
-                    fontSize: t.font.size.sm,
-                    fontWeight: t.font.weight.medium,
+                    fontSize: t.font.size.xs,
+                    fontWeight: t.font.weight.semibold,
                     color: textHead,
                     fontFamily: t.font.family.sans,
-                    padding: `${t.space[1] + t.space[1] / 2}px ${t.space[3] + t.space[1] / 2}px`,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    padding: `${t.space[2] + 2}px ${t.space[4]}px`,
                     textAlign: col.align ?? 'left',
                     width: col.width,
                     whiteSpace: 'nowrap',
                     cursor: col.sortable !== false ? 'pointer' : 'default',
                     userSelect: 'none',
-                    borderRight: i < columns.length - 1 ? `1px solid ${borderSubtle}` : undefined,
                     transition: 'color 0.2s',
                   }}
                 >
@@ -128,16 +129,15 @@ export function DataTable<T extends object>({
                       cursor: onRowClick ? 'pointer' : 'default',
                     }}
                   >
-                    {columns.map((col, i) => (
+                    {columns.map((col) => (
                       <td
                         key={col.key}
                         style={{
                           fontSize: t.font.size.base,
                           color: textCell,
                           fontFamily: t.font.family.sans,
-                          padding: `${t.space[1] + t.space[1] / 2}px ${t.space[3] + t.space[1] / 2}px`,
+                          padding: `${t.space[2] + 4}px ${t.space[4]}px`,
                           textAlign: col.align ?? 'left',
-                          borderRight: i < columns.length - 1 ? `1px solid ${borderSubtle}` : undefined,
                           transition: 'color 0.2s, background 0.15s',
                         }}
                       >

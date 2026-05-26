@@ -13,7 +13,7 @@ export function PageContainer({ children }: PageContainerProps) {
   return (
     <div
       style={{
-        padding: `0 ${t.space[7]}px ${t.space[6]}px`,
+        padding: `0 ${t.space[6]}px ${t.space[6]}px`,
         fontFamily: t.font.family.sans,
         boxSizing: 'border-box',
       }}

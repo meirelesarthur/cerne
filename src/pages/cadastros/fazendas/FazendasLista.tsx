@@ -132,14 +132,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               onClick={() => setDrawerOpen(true)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                height: 32,
+                height: 36,
                 background: activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg,
-                border: `1px solid ${activeFilterCount > 0 ? colors.brand : colors.border}`,
-                borderRadius: 6,
-                padding: '0 12px',
-                fontSize: 12,
-                fontWeight: 500,
-                fontFamily: "'Outfit', sans-serif",
+                border: `1.5px solid ${activeFilterCount > 0 ? colors.brand : colors.border}`,
+                borderRadius: t.radius.DEFAULT,
+                padding: '0 14px',
+                fontSize: t.font.size.base,
+                fontWeight: t.font.weight.medium,
+                fontFamily: t.font.family.sans,
                 color: activeFilterCount > 0 ? colors.brand : colors.textSecondary,
                 cursor: 'pointer',
                 transition: 'background 0.15s, border-color 0.15s, color 0.15s',
@@ -147,15 +147,15 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               onMouseEnter={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceSubtle }}
               onMouseLeave={(e) => { e.currentTarget.style.background = activeFilterCount > 0 ? colors.brandBg : colors.surfaceBg }}
             >
-              <SlidersHorizontal size={12} />
+              <SlidersHorizontal size={13} />
               Filtros
               {activeFilterCount > 0 && (
-                <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 9999 }}>
+                <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999 }}>
                   {activeFilterCount}
                 </span>
               )}
             </button>
-            <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
+            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Fazenda
             </Button>
           </div>

@@ -18,18 +18,20 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: t.space[2],
-        marginBottom: t.space[5],
+        paddingTop: t.space[4],
+        paddingBottom: t.space[4],
+        marginBottom: t.space[2],
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] / 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <span
             style={{
-              fontSize: t.font.size.xl,
-              fontWeight: t.font.weight.semibold,
+              fontSize: t.font.size['2xl'],
+              fontWeight: t.font.weight.bold,
               color: colors.textPrimary,
               fontFamily: t.font.family.sans,
+              lineHeight: 1.2,
               transition: 'color 0.2s',
             }}
           >
@@ -39,12 +41,13 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
             <span
               style={{
                 background: colors.surfaceSubtle,
-                color: colors.textSecondary,
-                fontSize: t.font.size.xs,
+                color: colors.textMuted,
+                fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.medium,
                 fontFamily: t.font.family.sans,
-                padding: `2px ${t.space[2]}px`,
-                borderRadius: t.radius.full,
+                padding: `2px 7px`,
+                borderRadius: t.radius.md,
+                lineHeight: 1.6,
                 transition: 'background 0.2s, color 0.2s',
               }}
             >

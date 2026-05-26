@@ -8,6 +8,10 @@ import type { ThemeMode } from '../src/context/ThemeContext'
 // ─── Decorator ────────────────────────────────────────────────────────────────
 // Wraps every story in ThemeProvider. The `key` forces a remount when mode
 // changes so the initial state resets correctly.
+//
+// NOTA: minHeight removido do wrapper — 100vh forçava caixa enorme abaixo de
+// componentes pequenos (StepFooter, Button, etc). Stories fullscreen controlam
+// sua própria altura via parameters: { layout: 'fullscreen' }.
 
 const withTheme: Decorator = (Story, context) => {
   const mode: ThemeMode = context.globals.theme === 'gbMode' ? 'gbMode' : 'light'
@@ -22,7 +26,6 @@ const withTheme: Decorator = (Story, context) => {
       {
         style: {
           background: bg,
-          minHeight: '100vh',
           padding: 24,
           transition: 'background 0.2s',
         },

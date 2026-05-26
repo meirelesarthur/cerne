@@ -115,6 +115,7 @@ export const menuModules: NavModule[] = [
               { id: 'cad-est-pro-lista', label: 'Catálogo',       path: '/cadastros/produtos/catalogo' },
               { id: 'cad-est-emb',       label: 'Embalagens',     path: '/cadastros/embalagens' },
               { id: 'cad-est-arm',       label: 'Armazéns',       path: '/cadastros/armazens' },
+              { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',  path: '/cadastros/estoques-iniciais' },
             ],
           },
           { id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios' },

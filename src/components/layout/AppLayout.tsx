@@ -11,6 +11,7 @@ import EmbalagensPage    from '../../pages/cadastros/embalagens/EmbalagensPage'
 import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
 import ArmazensPage      from '../../pages/cadastros/armazens/ArmazensPage'
 import ProdutosPage      from '../../pages/cadastros/produtos/ProdutosPage'
+import EstoquesIniciaisPage from '../../pages/cadastros/estoques-iniciais/EstoquesIniciaisPage'
 import Pluviometria from '../../pages/dashboards/Pluviometria'
 import OverviewPanel from '../../pages/dashboards/OverviewPanel'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
@@ -77,6 +78,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-est-end')      return <EnderecosPage />
   if (itemId === 'cad-est-arm')      return <ArmazensPage />
   if (itemId === 'cad-est-pro-lista') return <ProdutosPage />
+  if (itemId === 'cad-est-sal-ini')  return <EstoquesIniciaisPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />

@@ -4,8 +4,9 @@ import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
 import PerfilUsuario from '../../pages/PerfilUsuario'
-import FazendasPage from '../../pages/cadastros/fazendas/FazendasPage'
-import SafrasPage   from '../../pages/cadastros/safras/SafrasPage'
+import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
+import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
+import CentrosCustoPage  from '../../pages/cadastros/centros-custo/CentrosCustoPage'
 import Pluviometria from '../../pages/dashboards/Pluviometria'
 import OverviewPanel from '../../pages/dashboards/OverviewPanel'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
@@ -67,6 +68,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
   if (itemId === 'cad-est-faz') return <FazendasPage />
   if (itemId === 'cad-est-saf') return <SafrasPage />
+  if (itemId === 'cad-est-cc')  return <CentrosCustoPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />

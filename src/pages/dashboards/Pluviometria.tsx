@@ -58,11 +58,10 @@ function glassCard(
     background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.surfaceBg,
     backdropFilter: isGbMode ? 'blur(20px)' : undefined,
     WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
-    border: `1px solid ${isGbMode ? 'rgba(16,185,129,0.12)' : colors.border}`,
     borderRadius: t.radius['2xl'],
     boxShadow: isGbMode
-      ? '0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)'
-      : colors.shadow,
+      ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+      : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
     ...extra,
   } as React.CSSProperties
 }
@@ -116,6 +115,8 @@ function KpiCard({ icon: Icon, label, value, sub, accent = 'green', colors, isGb
         position: 'relative',
         overflow: 'hidden',
         borderTop: `2px solid ${ac}`,
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {isGbMode && (
@@ -572,7 +573,7 @@ export default function Pluviometria() {
       </FilterDrawer>
 
       {/* ── KPI Cards ───────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3] }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3], alignItems: 'stretch' }}>
         <KpiCard
           icon={CloudRain}
           label="Acumulado (7 dias)"
@@ -611,21 +612,21 @@ export default function Pluviometria() {
       </div>
 
       {/* ── Bar chart + Right panel ──────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[3] }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[3], alignItems: 'stretch' }}>
         {/* Bar chart */}
-        <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4] }}>
+        <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
           <PluvioBarChart colors={colors} isGbMode={isGbMode} />
         </div>
 
         {/* Right panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], height: '100%' }}>
           {/* Alert */}
           <div
             style={{
               ...glassCard(colors, isGbMode),
               background: isGbMode ? 'rgba(180,120,0,0.07)' : '#fffbeb',
-              border: `1px solid ${isGbMode ? 'rgba(245,158,11,0.18)' : '#fde68a'}`,
               padding: t.space[4],
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: '#f59e0b', fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
@@ -643,7 +644,7 @@ export default function Pluviometria() {
           </div>
 
           {/* Forecast */}
-          <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], flex: 1 }}>
+          <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], flex: 1, boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
               <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
                 Previsão da Semana
@@ -709,7 +710,7 @@ export default function Pluviometria() {
       </div>
 
       {/* ── Volume area chart ────────────────────────────────────────── */}
-      <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4] }}>
+      <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
         <VolumeAreaChart colors={colors} isGbMode={isGbMode} />
       </div>
     </div>

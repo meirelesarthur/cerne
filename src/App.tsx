@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import AppLayout from './components/layout/AppLayout'
-import OverviewPanel from './pages/dashboards/OverviewPanel'
+import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import { SplashScreen } from './components/SplashScreen'
 import { ThemeProvider } from './context/ThemeContext'
@@ -17,7 +17,7 @@ export default function App() {
         <Login onLogin={() => setSplashing(true)} />
       ) : (
         <AppLayout>
-          <OverviewPanel />
+          <Dashboard />
         </AppLayout>
       )}
     </ThemeProvider>

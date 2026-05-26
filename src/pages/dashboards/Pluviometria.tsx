@@ -644,9 +644,10 @@ export default function Pluviometria() {
           </div>
 
           {/* Forecast */}
-          <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], flex: 1, boxSizing: 'border-box' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+          <div style={{ ...glassCard(colors, isGbMode), padding: `${t.space[4]}px ${t.space[3]}px`, flex: 1, boxSizing: 'border-box' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1], paddingInline: t.space[1] }}>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
                 Previsão da Semana
               </span>
               <span style={{
@@ -656,50 +657,100 @@ export default function Pluviometria() {
                 background: colors.brandBg,
                 borderRadius: t.radius.full,
                 padding: `2px ${t.space[2]}px`,
-                border: `1px solid ${isGbMode ? 'rgba(16,185,129,0.2)' : 'transparent'}`,
               }}>
                 Open-Meteo
               </span>
             </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[3] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[3], paddingInline: t.space[1] }}>
               Prata (MG)
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* 7-day strip */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
               {FORECAST.map((f, i) => {
-                const hasRain  = f.rain > 0
+                const hasRain   = f.rain > 0
                 const rainColor = isGbMode ? '#60a5fa' : '#3b82f6'
                 const sunColor  = isGbMode ? '#6ee7b7' : '#d97706'
+                const iconColor = hasRain ? rainColor : sunColor
+                const isToday   = i === 0
+                const DAY_ABBR  = ['Hoje', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+
                 return (
                   <div
                     key={f.day}
                     style={{
-                      display: 'flex', alignItems: 'center',
-                      padding: `${t.space[2]}px ${t.space[1]}px`,
-                      borderBottom: i < FORECAST.length - 1 ? `1px solid ${colors.borderSubtle}` : undefined,
-                      borderRadius: i === 0 ? t.radius.md : undefined,
-                      background: i === 0 && isGbMode ? 'rgba(16,185,129,0.04)' : undefined,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: `${t.space[2]}px 0`,
+                      borderRadius: t.radius.lg,
+                      background: isToday
+                        ? isGbMode ? 'rgba(16,185,129,0.10)' : 'rgba(5,150,105,0.07)'
+                        : 'transparent',
                     }}
                   >
-                    <div style={{ width: 22, display: 'flex', justifyContent: 'center', marginRight: t.space[2] }}>
-                      <WeatherIcon condition={f.condition} size={15} color={hasRain ? rainColor : sunColor} />
-                    </div>
-                    <div style={{ flex: 1, fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontWeight: i === 0 ? t.font.weight.semibold : t.font.weight.normal }}>
-                      {f.day}
-                    </div>
-                    <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginRight: t.space[2] }}>
-                      {f.min}° / {f.max}°
-                    </div>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 3,
-                      fontSize: t.font.size.xs,
-                      color: hasRain ? rainColor : colors.textMuted,
+                    {/* Day label */}
+                    <span style={{
+                      fontSize: 10,
                       fontFamily: t.font.family.sans,
-                      fontWeight: hasRain ? t.font.weight.semibold : t.font.weight.normal,
-                      minWidth: 40, justifyContent: 'flex-end' as const,
+                      fontWeight: isToday ? t.font.weight.semibold : t.font.weight.normal,
+                      color: isToday ? colors.brand : colors.textMuted,
+                      letterSpacing: '0.03em',
+                      lineHeight: 1,
                     }}>
-                      {hasRain && <Droplets size={10} />}
-                      {hasRain ? `${f.rain}mm` : '0mm'}
+                      {DAY_ABBR[i]}
+                    </span>
+
+                    {/* Weather icon */}
+                    <WeatherIcon condition={f.condition} size={17} color={iconColor} />
+
+                    {/* Max temp */}
+                    <span style={{
+                      fontSize: t.font.size.sm,
+                      fontFamily: t.font.family.sans,
+                      fontWeight: t.font.weight.semibold,
+                      color: isToday
+                        ? (isGbMode ? '#4ade80' : '#059669')
+                        : colors.textPrimary,
+                      lineHeight: 1,
+                    }}>
+                      {f.max}°
+                    </span>
+
+                    {/* Min temp */}
+                    <span style={{
+                      fontSize: 10,
+                      fontFamily: t.font.family.sans,
+                      color: colors.textMuted,
+                      lineHeight: 1,
+                    }}>
+                      {f.min}°
+                    </span>
+
+                    {/* Rain indicator */}
+                    <div style={{
+                      height: 14,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {hasRain ? (
+                        <span style={{
+                          fontSize: 9,
+                          fontFamily: t.font.family.sans,
+                          fontWeight: t.font.weight.semibold,
+                          color: rainColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                        }}>
+                          <Droplets size={8} />
+                          {f.rain}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 9, color: colors.borderSubtle, fontFamily: t.font.family.sans }}>—</span>
+                      )}
                     </div>
                   </div>
                 )

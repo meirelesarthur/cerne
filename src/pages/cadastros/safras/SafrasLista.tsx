@@ -146,7 +146,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         overflow: 'hidden',
         marginBottom: 16,
       }}>
-        <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} />
+        <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} hasBorderRight />
         <KpiCard
           label="Ativas"
           value={String(kpis.ativas)}

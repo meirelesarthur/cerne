@@ -218,19 +218,13 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
       <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
 
-      {/* ── Toolbar: toggle + search + chips ────────────────────────────── */}
+      {/* ── Toolbar: search (esq.) → chips → [spacer] → toggle (dir.) ────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, marginTop: 4, flexWrap: 'wrap' }}>
 
-        {/* View mode toggle */}
-        <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
-
-        {/* Separator */}
-        <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
-
-        {/* Search */}
+        {/* Busca — extrema esquerda */}
         <SearchInput value={search} onChange={setSearch} colors={colors} />
 
-        {/* Active filter chips */}
+        {/* Chips de filtro ativos */}
         {filters.tipoExploracao && (
           <FilterChip
             label={`Tipo: ${filters.tipoExploracao}`}
@@ -256,6 +250,15 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             Limpar tudo
           </button>
         )}
+
+        {/* Espaçador */}
+        <div style={{ flex: 1 }} />
+
+        {/* Separador vertical */}
+        <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
+
+        {/* Toggle Lista / Cards — extrema direita */}
+        <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
       </div>
 
       {/* ── Conteúdo: Lista ou Cards ─────────────────────────────────────── */}

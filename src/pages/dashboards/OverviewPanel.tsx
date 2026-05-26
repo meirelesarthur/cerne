@@ -547,7 +547,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
 
       {/* Chart */}
       <div style={{ overflowX: 'auto' }}>
-        <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
           {/* Y axis grid lines and labels */}
           {yLabels.map((yl, i) => {
             const y = toY(yl.val)

@@ -223,7 +223,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
         </div>
       </div>
 
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
         <defs>
           <linearGradient id="gbBar" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stopColor={green2} />
@@ -330,7 +330,7 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
         </div>
       </div>
 
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
         <defs>
           <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stopColor={line} stopOpacity={isGbMode ? '0.4' : '0.2'} />

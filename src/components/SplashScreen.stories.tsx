@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SplashScreen } from './SplashScreen'
 
@@ -10,7 +10,7 @@ const meta: Meta<typeof SplashScreen> = {
     docs: {
       description: {
         component:
-          'Tela de boas-vindas exibida após o login. Animação CSS pura: logo entra com spring (cubic-bezier), tagline sobe com fade, tela faz fade-out em 2,8 s e chama `onDone`.',
+          'Tela de carregamento exibida após o login bem-sucedido. Fundo verde-noite (#081a12), anéis orbitais animados, hexágono com triângulo e wordmark CERNE em destaque (42 px / 800w). Duração total: 3 s com fade-out suave. CSS keyframes puros, sem dependências.',
       },
     },
   },
@@ -28,9 +28,9 @@ export const Default: Story = {
 
 export const Replay: Story = {
   render: () => {
-    const [key, setKey] = React.useState(0)
+    const [key, setKey] = useState(0)
     return (
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
         <SplashScreen key={key} onDone={() => {}} />
         <button
           onClick={() => setKey((k) => k + 1)}
@@ -39,7 +39,7 @@ export const Replay: Story = {
             bottom: 24,
             right: 24,
             zIndex: 99999,
-            padding: '8px 16px',
+            padding: '8px 18px',
             background: '#059669',
             color: 'white',
             border: 'none',
@@ -48,6 +48,7 @@ export const Replay: Story = {
             fontFamily: "'Outfit', sans-serif",
             fontWeight: 600,
             cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(5,150,105,0.35)',
           }}
         >
           ↺ Replay

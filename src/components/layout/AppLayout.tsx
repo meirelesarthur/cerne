@@ -7,6 +7,8 @@ import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
 import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
 import CentrosCustoPage  from '../../pages/cadastros/centros-custo/CentrosCustoPage'
+import EmbalagensPage    from '../../pages/cadastros/embalagens/EmbalagensPage'
+import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
 import Pluviometria from '../../pages/dashboards/Pluviometria'
 import OverviewPanel from '../../pages/dashboards/OverviewPanel'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
@@ -69,6 +71,8 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-est-faz') return <FazendasPage />
   if (itemId === 'cad-est-saf') return <SafrasPage />
   if (itemId === 'cad-est-cc')  return <CentrosCustoPage />
+  if (itemId === 'cad-est-emb') return <EmbalagensPage />
+  if (itemId === 'cad-est-end') return <EnderecosPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
@@ -86,11 +90,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Module that owns the active item — stays stable even when secondary nav is closed
   const activeItemModule = activeItemId
-    ? menuModules.find((m) =>
-        [...(m.flatItems ?? []), ...(m.groups?.flatMap((g) => g.items) ?? [])].some(
-          (i) => i.id === activeItemId
+    ? menuModules.find((m) => {
+        const allItems = [
+          ...(m.flatItems ?? []),
+          ...(m.groups?.flatMap((g) => g.items) ?? []),
+        ]
+        return allItems.some(
+          (i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId)
         )
-      )
+      })
     : undefined
 
   const handleModuleClick = (module: NavModule) => {

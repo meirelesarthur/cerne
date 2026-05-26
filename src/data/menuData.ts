@@ -37,6 +37,7 @@ export interface NavSubItem {
   id: string
   label: string
   path: string
+  children?: Omit<NavSubItem, 'children'>[]
 }
 
 export interface NavGroup {
@@ -108,8 +109,18 @@ export const menuModules: NavModule[] = [
           { id: 'cad-est-cc', label: 'Centros de Custo', path: '/cadastros/centros-custo' },
           { id: 'cad-est-faz', label: 'Fazendas', path: '/cadastros/fazendas' },
           { id: 'cad-est-saf', label: 'Safras', path: '/cadastros/safras' },
-          { id: 'cad-est-pro', label: 'Produtos', path: '/cadastros/produtos' },
-          { id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios' },
+          {
+            id: 'cad-est-pro', label: 'Produtos', path: '/cadastros/produtos',
+            children: [
+              { id: 'cad-est-emb', label: 'Embalagens', path: '/cadastros/embalagens' },
+            ],
+          },
+          {
+            id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios',
+            children: [
+              { id: 'cad-est-end', label: 'Endereçamentos', path: '/cadastros/enderecos' },
+            ],
+          },
         ],
       },
       {

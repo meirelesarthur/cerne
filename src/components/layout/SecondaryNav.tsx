@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 
 // ─── sub-components ──────────────────────────────────────────────────────────
 
@@ -41,19 +42,66 @@ function NavHeader({ module }: { module: NavModule }) {
 function NavItem({
   item,
   isActive,
+  activeItemId,
   onClick,
+  onChildClick,
 }: {
-  item: NavSubItem
-  isActive: boolean
-  onClick: () => void
+  item:          NavSubItem
+  isActive:      boolean
+  activeItemId:  string | null
+  onClick:       () => void
+  onChildClick:  (id: string) => void
 }) {
+  const { colors } = useTheme()
+  const hasChildren = item.children && item.children.length > 0
+  const hasActiveChild = hasChildren && item.children!.some(c => c.id === activeItemId)
+  const [expanded, setExpanded] = useState(hasActiveChild)
+
+  const handleClick = () => {
+    if (hasChildren) {
+      setExpanded(prev => !prev)
+    } else {
+      onClick()
+    }
+  }
+
   return (
-    <button
-      className={`nav-sub-btn ${isActive ? 'active' : ''}`}
-      onClick={onClick}
-    >
-      {item.label}
-    </button>
+    <div>
+      <button
+        className={`nav-sub-btn ${isActive && !hasChildren ? 'active' : ''}`}
+        onClick={handleClick}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+      >
+        <span>{item.label}</span>
+        {hasChildren && (
+          <ChevronRight
+            size={10}
+            strokeWidth={2.2}
+            style={{
+              flexShrink: 0,
+              transform: expanded ? 'rotate(90deg)' : 'none',
+              transition: 'transform 0.15s ease',
+              color: colors.textMuted,
+              marginLeft: 4,
+            }}
+          />
+        )}
+      </button>
+      {expanded && hasChildren && (
+        <div style={{ paddingBottom: 2 }}>
+          {item.children!.map(child => (
+            <button
+              key={child.id}
+              className={`nav-sub-btn ${activeItemId === child.id ? 'active' : ''}`}
+              onClick={() => onChildClick(child.id)}
+              style={{ paddingLeft: 22 }}
+            >
+              {child.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -120,7 +168,9 @@ function NavGroupSection({
               key={item.id}
               item={item}
               isActive={activeItemId === item.id}
+              activeItemId={activeItemId}
               onClick={() => onItemClick(item.id)}
+              onChildClick={onItemClick}
             />
           ))}
         </div>
@@ -145,7 +195,9 @@ function NavFlatList({
           key={item.id}
           item={item}
           isActive={activeItemId === item.id}
+          activeItemId={activeItemId}
           onClick={() => onItemClick(item.id)}
+          onChildClick={onItemClick}
         />
       ))}
     </div>
@@ -168,7 +220,10 @@ export default function SecondaryNav({
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>()
     module.groups?.forEach((g) => {
-      if (g.items.some((i) => i.id === activeItemId)) initial.add(g.id)
+      const matches = g.items.some(
+        (i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId)
+      )
+      if (matches) initial.add(g.id)
     })
     return initial
   })

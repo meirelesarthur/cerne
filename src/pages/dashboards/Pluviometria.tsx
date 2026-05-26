@@ -191,11 +191,11 @@ function KpiCard({ icon: Icon, label, value, sub, accent = 'green', colors, isGb
 function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const [hovered, setHovered] = useState<number | null>(null)
 
-  const W = 760, H = 220, PL = 50, PT = 16, PR = 16, PB = 44
+  const W = 760, H = 190, PL = 46, PT = 14, PR = 14, PB = 38
   const cW = W - PL - PR, cH = H - PT - PB
   const MAX_Y = 35, scaleY = cH / MAX_Y
   const groupW = cW / BAR_DATA.length
-  const barW = 20, barGap = 3
+  const barW = 14, barGap = 3
 
   const green   = isGbMode ? '#10b981' : '#059669'
   const green2  = isGbMode ? '#34d399' : '#047857'
@@ -244,7 +244,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
               <line x1={PL} y1={y} x2={W - PR} y2={y}
                 stroke={grid} strokeWidth={v === 0 ? 1.5 : 0.5}
                 strokeDasharray={v === 0 ? undefined : '4 3'} />
-              <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={10} fill={axis} fontFamily="Outfit, sans-serif">{v}</text>
+              <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={9} fill={axis} fontFamily="Outfit, sans-serif">{v}</text>
             </g>
           )
         })}
@@ -264,17 +264,17 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
                 filter={isGbMode && isH ? 'url(#barGlow)' : undefined} />
               <rect x={cx + barGap / 2} y={baseY - sH} width={barW} height={sH} rx={4}
                 fill={gray} opacity={dim ? 0.3 : 1} />
-              <text x={cx} y={baseY + 18} textAnchor="middle" fontSize={10}
+              <text x={cx} y={baseY + 16} textAnchor="middle" fontSize={9}
                 fill={isH ? colors.brand : axis} fontFamily="Outfit, sans-serif"
                 fontWeight={isH ? 600 : 400}>{d.month}</text>
 
               {isH && (
                 <g>
-                  <rect x={cx - 54} y={tip} width={108} height={50} rx={8}
+                  <rect x={cx - 50} y={tip} width={100} height={46} rx={7}
                     fill={isGbMode ? '#0b1e14' : '#1c1917'} opacity={0.95} />
-                  <text x={cx} y={tip + 18} textAnchor="middle" fontSize={11} fill={green} fontFamily="Outfit, sans-serif" fontWeight={700}>{d.month} 2025/26</text>
-                  <text x={cx - 6} y={tip + 34} textAnchor="end" fontSize={10} fill="#4ade80" fontFamily="Outfit, sans-serif">● {d.comChuva}d chuva</text>
-                  <text x={cx + 6} y={tip + 34} textAnchor="start" fontSize={10} fill="#6b7280" fontFamily="Outfit, sans-serif">● {d.semChuva}d seco</text>
+                  <text x={cx} y={tip + 16} textAnchor="middle" fontSize={10} fill={green} fontFamily="Outfit, sans-serif" fontWeight={700}>{d.month} 2025/26</text>
+                  <text x={cx - 5} y={tip + 31} textAnchor="end" fontSize={9} fill="#4ade80" fontFamily="Outfit, sans-serif">● {d.comChuva}d chuva</text>
+                  <text x={cx + 5} y={tip + 31} textAnchor="start" fontSize={9} fill="#6b7280" fontFamily="Outfit, sans-serif">● {d.semChuva}d seco</text>
                 </g>
               )}
             </g>
@@ -282,8 +282,8 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
         })}
 
         <line x1={PL} y1={baseY + 1} x2={W - PR} y2={baseY + 1} stroke={grid} strokeWidth={1} />
-        <text x={PL + 2.5 * groupW} y={H - 4} textAnchor="middle" fontSize={9} fill={`${axis}88`} fontFamily="Outfit, sans-serif">◀ Jun–Dez 2025</text>
-        <text x={PL + 9 * groupW}   y={H - 4} textAnchor="middle" fontSize={9} fill={`${axis}88`} fontFamily="Outfit, sans-serif">Jan–Mai 2026 ▶</text>
+        <text x={PL + 2.5 * groupW} y={H - 4} textAnchor="middle" fontSize={8} fill={`${axis}88`} fontFamily="Outfit, sans-serif">◀ Jun–Dez 2025</text>
+        <text x={PL + 9 * groupW}   y={H - 4} textAnchor="middle" fontSize={8} fill={`${axis}88`} fontFamily="Outfit, sans-serif">Jan–Mai 2026 ▶</text>
       </svg>
     </div>
   )
@@ -294,7 +294,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
 function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const [hovered, setHovered] = useState<number | null>(null)
 
-  const W = 760, H = 200, PL = 55, PT = 16, PR = 16, PB = 36
+  const W = 760, H = 170, PL = 50, PT = 14, PR = 14, PB = 30
   const cW = W - PL - PR, cH = H - PT - PB
   const MAX_Y = 250
 
@@ -358,7 +358,7 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
               <line x1={PL} y1={y} x2={W - PR} y2={y}
                 stroke={grid} strokeWidth={v === 0 ? 1.5 : 0.5}
                 strokeDasharray={v === 0 ? undefined : '4 3'} />
-              <text x={PL - 8} y={y + 4} textAnchor="end" fontSize={10} fill={axis} fontFamily="Outfit, sans-serif">
+              <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={9} fill={axis} fontFamily="Outfit, sans-serif">
                 {v === 0 ? '0' : v}
               </text>
             </g>
@@ -374,18 +374,18 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
           const tipY = p.y - 50
           return (
             <g key={i} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} style={{ cursor: 'default' }}>
-              <circle cx={p.x} cy={p.y} r={isH ? 7 : 4}
-                fill={line} stroke={isGbMode ? '#051008' : '#fff'} strokeWidth={2}
+              <circle cx={p.x} cy={p.y} r={isH ? 5 : 3}
+                fill={line} stroke={isGbMode ? '#051008' : '#fff'} strokeWidth={1.5}
                 filter={isGbMode && isH ? 'url(#dotGlow)' : undefined} />
-              <text x={p.x} y={PT + cH + 22} textAnchor="middle" fontSize={9}
+              <text x={p.x} y={PT + cH + 18} textAnchor="middle" fontSize={8}
                 fill={isH ? colors.brand : axis} fontFamily="Outfit, sans-serif">{VOLUME_LABELS[i]}</text>
 
               {isH && (
                 <g>
-                  <rect x={p.x - 44} y={tipY} width={88} height={38} rx={8}
+                  <rect x={p.x - 40} y={tipY} width={80} height={36} rx={7}
                     fill={isGbMode ? '#0b1e14' : '#1c1917'} opacity={0.95} />
-                  <text x={p.x} y={tipY + 16} textAnchor="middle" fontSize={10} fill={line} fontFamily="Outfit, sans-serif" fontWeight={600}>{VOLUME_LABELS[i]}</text>
-                  <text x={p.x} y={tipY + 30} textAnchor="middle" fontSize={13} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>{p.v}mm</text>
+                  <text x={p.x} y={tipY + 14} textAnchor="middle" fontSize={9} fill={line} fontFamily="Outfit, sans-serif" fontWeight={600}>{VOLUME_LABELS[i]}</text>
+                  <text x={p.x} y={tipY + 28} textAnchor="middle" fontSize={11} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>{p.v}mm</text>
                 </g>
               )}
             </g>

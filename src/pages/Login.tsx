@@ -66,8 +66,8 @@ const STATS = [
 ]
 
 const MAX_ATTEMPTS = 5
-const LS_REMEMBER = 'agro365_remember'
-const LS_EMAIL    = 'agro365_email'
+const LS_REMEMBER = 'cerne_remember'
+const LS_EMAIL    = 'cerne_email'
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
@@ -276,8 +276,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   <path d="M12 8v8M8 10l4-2 4 2" stroke="rgba(20,83,45,.6)" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
-              <span className="lgn-logo-text">AGRO365</span>
-              <span className="lgn-logo-badge">Cerne</span>
+              <span className="lgn-logo-text">CERNE</span>
             </div>
 
             {/* Slide copy */}
@@ -313,7 +312,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Stats */}
-            <div className="lgn-stats" aria-label="Números do AGRO365">
+            <div className="lgn-stats" aria-label="Números do CERNE">
               {STATS.map(s => (
                 <div key={s.label}>
                   <div className="lgn-stat-num">{s.value}</div>
@@ -376,7 +375,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                 {displayName ? `Bem-vindo de volta` : 'Entrar na sua conta'}
               </h2>
               <p className="lgn-form-sub">
-                Novo no AGRO365?{' '}
+                Novo no CERNE?{' '}
                 <a href="#solicitar" onClick={e => e.preventDefault()}>
                   Solicitar acesso
                 </a>
@@ -547,7 +546,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
             <p className="lgn-legal">
               Ao acessar, você concorda com os{' '}
               <a href="#">Termos de Uso</a> e{' '}
-              <a href="#">Política de Privacidade</a> do AGRO365.
+              <a href="#">Política de Privacidade</a> do CERNE.
             </p>
 
           </div>

@@ -83,6 +83,7 @@ export const menuModules: NavModule[] = [
     emoji: '📈',
     icon: TrendingUp,
     flatItems: [
+      { id: 'dash-overview', label: 'Visão Geral', path: '/dashboards/visao-geral' },
       { id: 'dash-fin', label: 'Financeiros', path: '/dashboards/financeiros' },
       { id: 'dash-sup', label: 'Suprimentos', path: '/dashboards/suprimentos' },
       { id: 'dash-pec', label: 'Pecuária de Corte', path: '/dashboards/pecuaria' },

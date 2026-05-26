@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { FormField } from '../components/ui/FormField'
+import { Checkbox } from '../components/ui/Checkbox'
+import { Divider } from '../components/ui/Divider'
+import { SSOButton } from '../components/ui/SSOButton'
+import { ProgressBar } from '../components/ui/ProgressBar'
+import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
 import vid0 from '../assets/agricultura.mp4'
 import vid1 from '../assets/apicultura.mp4'
@@ -7,6 +12,8 @@ import vid2 from '../assets/avicultura.mp4'
 import vid3 from '../assets/ovicultura.mp4'
 import vid4 from '../assets/Psicultura.mp4'
 import './Login.css'
+
+// ─── Constantes ────────────────────────────────────────────────────────────
 
 const SLIDES = [
   {
@@ -53,40 +60,86 @@ const SLIDES = [
 
 const STATS = [
   { value: '2.400+', label: 'Fazendas ativas' },
-  { value: 'R$ 4,2B', label: 'Gerenciados' },
-  { value: '98,7%', label: 'Uptime SLA' },
+  { value: 'R$ 4,2B', label: 'Em produção gerenciada' },
+  { value: '99,7%', label: 'Uptime SLA garantido' },
 ]
 
+const MAX_ATTEMPTS = 5
+const LS_REMEMBER = 'agro365_remember'
+const LS_EMAIL    = 'agro365_email'
+
 // ─── Component ─────────────────────────────────────────────────────────────
+
 export default function Login({ onLogin }: { onLogin: () => void }) {
-  const [slideIdx, setSlideIdx] = useState(0)
+  // ── Slide state ──────────────────────────────────────────────────────────
+  const [slideIdx, setSlideIdx]     = useState(0)
   const [textVisible, setTextVisible] = useState(true)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const timerRef = useRef<ReturnType<typeof setInterval>>()
+  const videoRef  = useRef<HTMLVideoElement>(null)
+  const timerRef  = useRef<ReturnType<typeof setInterval>>()
 
-  const [email, setEmail] = useState('')
+  // Detecta prefers-reduced-motion uma vez na montagem
+  const prefersReduced = useRef(
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+
+  // ── Form state ───────────────────────────────────────────────────────────
+  const emailRef = useRef<HTMLInputElement>(null)
+
+  const [email, setEmail] = useState<string>(
+    () => localStorage.getItem(LS_EMAIL) ?? ''
+  )
   const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
-  const [remember, setRemember] = useState(false)
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'ok' | 'err'>('idle')
-  const [passErr, setPassErr] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [globalErr, setGlobalErr] = useState(false)
+  const [showPw,   setShowPw]   = useState(false)
+  const [remember, setRemember] = useState<boolean>(
+    () => localStorage.getItem(LS_REMEMBER) === '1'
+  )
 
+  // Pré-valida se há email salvo
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'ok' | 'err'>(
+    () => (localStorage.getItem(LS_EMAIL) ? 'ok' : 'idle')
+  )
+  const [passErr,   setPassErr]   = useState(false)
+  const [passShake, setPassShake] = useState(false)
+
+  // ── Auth state ───────────────────────────────────────────────────────────
+  const [progressState, setProgressState] = useState<ProgressState>('idle')
+  const [globalErr,     setGlobalErr]     = useState(false)
+  const [attempts,      setAttempts]      = useState(0)
+
+  // ── Forgot password state ────────────────────────────────────────────────
+  const [forgotOpen,    setForgotOpen]    = useState(false)
+  const [forgotEmail,   setForgotEmail]   = useState('')
+  const [forgotLoading, setForgotLoading] = useState(false)
+  const [forgotSent,    setForgotSent]    = useState(false)
+
+  const isBlocked = attempts >= MAX_ATTEMPTS
+
+  // ── Auto-focus email (somente se não há email salvo) ─────────────────────
+  useEffect(() => {
+    if (!localStorage.getItem(LS_EMAIL)) {
+      const timer = setTimeout(() => emailRef.current?.focus(), 80)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  // ── Slide timer (desativado com reduced-motion) ───────────────────────────
   const goTo = useCallback((i: number) => {
-    setTextVisible(false)
+    if (!prefersReduced.current) setTextVisible(false)
+    const delay = prefersReduced.current ? 0 : 400
     setTimeout(() => {
       setSlideIdx(i)
       setTextVisible(true)
-      if (videoRef.current) {
+      if (videoRef.current && !prefersReduced.current) {
         videoRef.current.src = SLIDES[i].src
         videoRef.current.load()
         videoRef.current.play().catch(() => {})
       }
-    }, 500)
+    }, delay)
   }, [])
 
   useEffect(() => {
+    if (prefersReduced.current) return
     timerRef.current = setInterval(() => {
       setSlideIdx(prev => {
         const next = (prev + 1) % SLIDES.length
@@ -99,290 +152,493 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
   const slide = SLIDES[slideIdx]
 
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+
+  const triggerShake = () => {
+    setPassShake(true)
+    setTimeout(() => setPassShake(false), 400)
+  }
+
+  // ── Handlers — form principal ─────────────────────────────────────────────
   const handleEmailBlur = () => {
     if (!email) return
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    setEmailStatus(ok ? 'ok' : 'err')
+    setEmailStatus(validateEmail(email) ? 'ok' : 'err')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isBlocked || progressState === 'loading' || progressState === 'success') return
+
     let valid = true
-    if (!email || emailStatus === 'err') { setEmailStatus('err'); valid = false }
-    if (!password) { setPassErr(true); valid = false }
+    if (!email || !validateEmail(email)) { setEmailStatus('err'); valid = false }
+    if (!password)                        { setPassErr(true); triggerShake(); valid = false }
     if (!valid) return
 
-    setLoading(true)
+    setProgressState('loading')
     setGlobalErr(false)
-    setTimeout(() => {
-      setLoading(false)
-      onLogin()
-    }, 1500)
+
+    // Simulação de autenticação — substituir pelo serviço real
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const authOk = true // ← integrar com authService.login(email, password)
+
+    if (authOk) {
+      if (remember) {
+        localStorage.setItem(LS_REMEMBER, '1')
+        localStorage.setItem(LS_EMAIL, email)
+      } else {
+        localStorage.removeItem(LS_REMEMBER)
+        localStorage.removeItem(LS_EMAIL)
+      }
+      setProgressState('success')
+      setTimeout(() => onLogin(), 700)
+    } else {
+      const next = attempts + 1
+      setAttempts(next)
+      setProgressState('error')
+      setGlobalErr(true)
+      setPassword('')
+      triggerShake()
+      setTimeout(() => {
+        setProgressState('idle')
+        emailRef.current?.focus()
+      }, 800)
+    }
   }
 
-  return (
-    <div className="lgn-root">
-      {/* ── LEFT PANEL ─────────────────────────────────────── */}
-      <div className="lgn-left">
-        {/* Video background */}
-        <div className="lgn-video-wrap">
-          <video
-            ref={videoRef}
-            className="lgn-video lgn-video--on"
-            src={slide.src}
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-          <div className="lgn-video-overlay" />
-          <div className="lgn-video-lines">
-            <svg viewBox="0 0 600 800" fill="none" preserveAspectRatio="xMidYMid slice">
-              <path d="M-50 200 Q150 100 300 250 T600 200" stroke="rgba(255,255,255,0.12)" strokeWidth="1" fill="none"/>
-              <path d="M-50 380 Q200 280 350 420 T700 360" stroke="rgba(255,255,255,0.07)" strokeWidth="1" fill="none"/>
-              <path d="M100 -50 Q200 160 150 360 T200 760" stroke="rgba(34,197,94,0.12)" strokeWidth="1" fill="none"/>
-              <circle cx="480" cy="160" r="130" stroke="rgba(255,255,255,0.04)" strokeWidth="1" fill="none"/>
-              <circle cx="480" cy="160" r="85" stroke="rgba(255,255,255,0.04)" strokeWidth="1" fill="none"/>
-              <circle cx="480" cy="160" r="42" stroke="rgba(34,197,94,0.07)" strokeWidth="1" fill="none"/>
-            </svg>
-          </div>
-        </div>
+  // ── Handlers — forgot password ────────────────────────────────────────────
+  const openForgot = () => {
+    setForgotEmail(email)
+    setForgotSent(false)
+    setForgotOpen(true)
+  }
 
-        {/* Content */}
-        <div className="lgn-left-content">
-          {/* Logo */}
-          <div className="lgn-logo">
-            <div className="lgn-logo-mark">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3L4 8v8l8 5 8-5V8L12 3z" fill="rgba(255,255,255,.9)"/>
-                <path d="M12 8v8M8 10l4-2 4 2" stroke="rgba(20,83,45,.6)" strokeWidth="1.5" strokeLinecap="round"/>
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!forgotEmail || !validateEmail(forgotEmail)) return
+    setForgotLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    setForgotLoading(false)
+    setForgotSent(true)
+  }
+
+  // ── Login contextual ───────────────────────────────────────────────────────
+  // Extrai um "nome de exibição" do email salvo (ex: "joao.silva@..." → "joao")
+  const savedEmail    = localStorage.getItem(LS_EMAIL)
+  const displayName   = savedEmail
+    ? savedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    : null
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  return (
+    <>
+      <div className="lgn-root">
+
+        {/* ══ LEFT PANEL ══════════════════════════════════════════════════ */}
+        <div className="lgn-left">
+
+          {/* Vídeo de fundo */}
+          <div className="lgn-video-wrap">
+            {!prefersReduced.current && (
+              <video
+                ref={videoRef}
+                className="lgn-video lgn-video--on"
+                src={slide.src}
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            )}
+            <div className="lgn-video-overlay" />
+            <div className="lgn-video-lines" aria-hidden="true">
+              <svg viewBox="0 0 600 800" fill="none" preserveAspectRatio="xMidYMid slice">
+                <path d="M-50 200 Q150 100 300 250 T600 200" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none"/>
+                <path d="M-50 380 Q200 280 350 420 T700 360" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="none"/>
+                <path d="M100 -50 Q200 160 150 360 T200 760" stroke="rgba(34,197,94,0.10)" strokeWidth="1" fill="none"/>
+                <circle cx="480" cy="160" r="130" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none"/>
+                <circle cx="480" cy="160" r="85"  stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none"/>
+                <circle cx="480" cy="160" r="42"  stroke="rgba(34,197,94,0.06)"   strokeWidth="1" fill="none"/>
               </svg>
             </div>
-            <span className="lgn-logo-text">AGRO365</span>
-            <span className="lgn-logo-badge">Cerne</span>
           </div>
 
-          {/* Slide copy */}
-          <div className={`lgn-slide-copy${textVisible ? ' lgn-slide-copy--in' : ' lgn-slide-copy--out'}`}>
-            <div className="lgn-eyebrow">{slide.eyebrow}</div>
-            <h1 className="lgn-h1">
-              {slide.h1a}<br />
-              <em>{slide.h1em}</em><br />
-              {slide.h1b}
-            </h1>
-            <p className="lgn-desc">{slide.desc}</p>
-          </div>
+          {/* Conteúdo */}
+          <div className="lgn-left-content">
 
-          {/* Dots */}
-          <div className="lgn-dots">
-            {SLIDES.map((_, i) => (
-              <button
-                key={i}
-                className={`lgn-dot${i === slideIdx ? ' lgn-dot--active' : ''}`}
-                onClick={() => {
-                  clearInterval(timerRef.current)
-                  goTo(i)
-                }}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-
-          {/* Stats */}
-          <div className="lgn-stats">
-            {STATS.map(s => (
-              <div key={s.label}>
-                <div className="lgn-stat-num">{s.value}</div>
-                <div className="lgn-stat-label">{s.label}</div>
+            {/* Logo */}
+            <div className="lgn-logo">
+              <div className="lgn-logo-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3L4 8v8l8 5 8-5V8L12 3z" fill="rgba(255,255,255,.9)"/>
+                  <path d="M12 8v8M8 10l4-2 4 2" stroke="rgba(20,83,45,.6)" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
               </div>
-            ))}
+              <span className="lgn-logo-text">AGRO365</span>
+              <span className="lgn-logo-badge">Cerne</span>
+            </div>
+
+            {/* Slide copy */}
+            <div
+              className={`lgn-slide-copy${textVisible ? ' lgn-slide-copy--in' : ' lgn-slide-copy--out'}`}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <div className="lgn-eyebrow">{slide.eyebrow}</div>
+              <h1 className="lgn-h1">
+                {slide.h1a}<br />
+                <em>{slide.h1em}</em><br />
+                {slide.h1b}
+              </h1>
+              <p className="lgn-desc">{slide.desc}</p>
+            </div>
+
+            {/* Dots */}
+            <div className="lgn-dots" role="tablist" aria-label="Slides de produto">
+              {SLIDES.map((s, i) => (
+                <button
+                  key={i}
+                  role="tab"
+                  aria-selected={i === slideIdx}
+                  aria-label={s.eyebrow}
+                  className={`lgn-dot${i === slideIdx ? ' lgn-dot--active' : ''}`}
+                  onClick={() => {
+                    clearInterval(timerRef.current)
+                    goTo(i)
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="lgn-stats" aria-label="Números do AGRO365">
+              {STATS.map(s => (
+                <div key={s.label}>
+                  <div className="lgn-stat-num">{s.value}</div>
+                  <div className="lgn-stat-label">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
-      </div>
 
-      {/* ── RIGHT PANEL ────────────────────────────────────── */}
-      <div className="lgn-right">
-        {loading && (
-          <div className="lgn-progress">
-            <div className="lgn-progress-fill" />
-          </div>
-        )}
+        {/* ══ RIGHT PANEL ═════════════════════════════════════════════════ */}
+        <div className="lgn-right">
 
-        <div className="lgn-form-wrap">
-          {globalErr && (
-            <div className="lgn-alert">
-              <svg viewBox="0 0 16 16" fill="none">
+          {/* Barra de progresso de autenticação */}
+          <ProgressBar state={progressState} />
+
+          <div className="lgn-form-wrap">
+
+            {/* Status do sistema */}
+            <div className="lgn-system-status" aria-label="Status dos sistemas">
+              <span className="lgn-system-status-dot" aria-hidden="true" />
+              <span>Todos os sistemas operacionais</span>
+            </div>
+
+            {/* Alerta de erro global — sempre renderizado, visível via CSS */}
+            <div
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+              className={`lgn-alert${globalErr ? ' lgn-alert--visible' : ''}`}
+            >
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
                 <path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
               <div>
                 <strong>Credenciais inválidas</strong>
-                Verifique seu e-mail e senha. Após 5 tentativas, sua conta será bloqueada.
+                {isBlocked ? (
+                  <span>
+                    Conta bloqueada temporariamente.{' '}
+                    <button type="button" className="lgn-alert-link" onClick={openForgot}>
+                      Recuperar acesso
+                    </button>
+                  </span>
+                ) : attempts > 0 ? (
+                  <span>
+                    Tentativa {attempts} de {MAX_ATTEMPTS}.{' '}
+                    {MAX_ATTEMPTS - attempts} restante{MAX_ATTEMPTS - attempts !== 1 ? 's' : ''} antes do bloqueio.
+                  </span>
+                ) : (
+                  <span>Verifique seu e-mail e senha.</span>
+                )}
               </div>
             </div>
-          )}
 
-          <div className="lgn-form-header">
-            <h2 className="lgn-form-title">Entrar na sua conta</h2>
-            <p className="lgn-form-sub">Novo no AGRO365? <a href="#">Solicitar acesso</a></p>
-          </div>
+            {/* Cabeçalho do form */}
+            <div className="lgn-form-header">
+              <h2 className="lgn-form-title">
+                {displayName ? `Bem-vindo de volta` : 'Entrar na sua conta'}
+              </h2>
+              <p className="lgn-form-sub">
+                Novo no AGRO365?{' '}
+                <a href="#solicitar" onClick={e => e.preventDefault()}>
+                  Solicitar acesso
+                </a>
+              </p>
+            </div>
 
-          <form onSubmit={handleSubmit} noValidate>
-            {/* Email */}
-            <div style={{ marginBottom: t.space[5] }}>
-              <FormField
-                label="E-mail corporativo"
-                type="email"
-                placeholder="voce@suafazenda.com.br"
-                value={email}
-                autoComplete="email"
-                onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
-                onBlur={handleEmailBlur}
-                onFocus={() => setEmailStatus('idle')}
-                status={emailStatus}
-                error={emailStatus === 'err' ? 'Insira um e-mail válido' : undefined}
-                style={{ height: t.space[12], borderRadius: t.radius.xl }}
-                iconLeft={
-                  <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
-                    <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
-                    <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                  </svg>
-                }
-                iconRight={emailStatus === 'ok' ? (
-                  <span style={{ color: t.color.success.text, display: 'flex', alignItems: 'center' }}>
-                    <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
-                      <path d="M3 8l4 4 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <form onSubmit={handleSubmit} noValidate>
+
+              {/* Campo e-mail */}
+              <div className="lgn-field-wrap">
+                <FormField
+                  ref={emailRef}
+                  label="E-mail corporativo"
+                  type="email"
+                  id="login-email"
+                  placeholder="voce@suafazenda.com.br"
+                  value={email}
+                  autoComplete="email"
+                  disabled={isBlocked}
+                  onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
+                  onBlur={handleEmailBlur}
+                  onFocus={() => setEmailStatus('idle')}
+                  status={emailStatus}
+                  error={emailStatus === 'err' ? 'Insira um e-mail válido' : undefined}
+                  style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                  iconLeft={
+                    <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                      <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+                      <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
                     </svg>
-                  </span>
-                ) : undefined}
-              />
-            </div>
-
-            {/* Password */}
-            <div style={{ marginBottom: t.space[5] }}>
-              <FormField
-                label="Senha"
-                type={showPw ? 'text' : 'password'}
-                placeholder="••••••••••"
-                value={password}
-                autoComplete="current-password"
-                onChange={e => { setPassword(e.target.value); setPassErr(false) }}
-                onFocus={() => setPassErr(false)}
-                status={passErr ? 'err' : 'idle'}
-                error={passErr ? 'Insira sua senha' : undefined}
-                style={{ height: t.space[12], borderRadius: t.radius.xl }}
-                iconLeft={
-                  <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
-                    <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
-                    <path d="M5 7V5.5a3 3 0 016 0V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                  </svg>
-                }
-                iconRight={
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(v => !v)}
-                    tabIndex={-1}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: t.color.neutral[400],
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: t.space[1],
-                      borderRadius: t.radius.md,
-                    }}
-                  >
-                    {showPw ? (
-                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
-                        <path d="M2 2l12 12M6.5 6.7a2 2 0 002.8 2.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                        <path d="M4 4.6C2.7 5.5 1.7 6.7 1 8c1.5 3 4 5 7 5 1.3 0 2.6-.4 3.7-1.1M12.5 11.5C13.5 10.6 14.4 9.4 15 8c-1.5-3-4-5-7-5-.8 0-1.7.2-2.5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                  }
+                  iconRight={emailStatus === 'ok' ? (
+                    <span
+                      style={{ color: t.color.success.text, display: 'flex', alignItems: 'center' }}
+                      aria-label="E-mail válido"
+                    >
+                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                        <path d="M3 8l4 4 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                    ) : (
-                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16}>
-                        <ellipse cx="8" cy="8" rx="7" ry="4.5" stroke="currentColor" strokeWidth="1.4"/>
-                        <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.4"/>
-                      </svg>
-                    )}
-                  </button>
-                }
-              />
-            </div>
-
-            {/* Remember + forgot */}
-            <div className="lgn-row">
-              <label className="lgn-checkbox">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={e => setRemember(e.target.checked)}
+                    </span>
+                  ) : undefined}
                 />
-                <span className="lgn-checkbox-box">
-                  {remember && (
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </div>
+
+              {/* Campo senha */}
+              <div className={`lgn-field-wrap${passShake ? ' lgn-field--shake' : ''}`}>
+                <FormField
+                  label="Senha"
+                  type={showPw ? 'text' : 'password'}
+                  id="login-password"
+                  placeholder="••••••••••"
+                  value={password}
+                  autoComplete="current-password"
+                  disabled={isBlocked}
+                  onChange={e => { setPassword(e.target.value); setPassErr(false) }}
+                  onFocus={() => setPassErr(false)}
+                  status={passErr ? 'err' : 'idle'}
+                  error={passErr ? 'Insira sua senha' : undefined}
+                  style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                  iconLeft={
+                    <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                      <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
+                      <path d="M5 7V5.5a3 3 0 016 0V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
                     </svg>
-                  )}
-                </span>
-                Manter conectado
-              </label>
-              <a href="#" className="lgn-forgot">Esqueci a senha</a>
+                  }
+                  iconRight={
+                    <button
+                      type="button"
+                      aria-label={showPw ? 'Ocultar senha' : 'Mostrar senha'}
+                      aria-pressed={showPw}
+                      onClick={() => setShowPw(v => !v)}
+                      className="lgn-pw-toggle"
+                    >
+                      {showPw ? (
+                        <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                          <path d="M2 2l12 12M6.5 6.7a2 2 0 002.8 2.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                          <path d="M4 4.6C2.7 5.5 1.7 6.7 1 8c1.5 3 4 5 7 5 1.3 0 2.6-.4 3.7-1.1M12.5 11.5C13.5 10.6 14.4 9.4 15 8c-1.5-3-4-5-7-5-.8 0-1.7.2-2.5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                          <ellipse cx="8" cy="8" rx="7" ry="4.5" stroke="currentColor" strokeWidth="1.4"/>
+                          <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.4"/>
+                        </svg>
+                      )}
+                    </button>
+                  }
+                />
+              </div>
+
+              {/* Manter conectado + Esqueci a senha */}
+              <div className="lgn-row">
+                <Checkbox
+                  label="Manter conectado"
+                  checked={remember}
+                  onChange={setRemember}
+                  disabled={isBlocked}
+                />
+                <button
+                  type="button"
+                  className="lgn-forgot"
+                  onClick={openForgot}
+                >
+                  Esqueci a senha
+                </button>
+              </div>
+
+              {/* Botão de submit */}
+              <button
+                type="submit"
+                className={`lgn-btn${progressState === 'success' ? ' lgn-btn--success' : ''}`}
+                disabled={progressState === 'loading' || progressState === 'success' || isBlocked}
+                aria-busy={progressState === 'loading'}
+              >
+                {progressState === 'loading' ? (
+                  <span className="lgn-spinner" aria-hidden="true" />
+                ) : progressState === 'success' ? (
+                  <>
+                    <svg viewBox="0 0 20 20" fill="none" width={18} height={18} aria-hidden="true">
+                      <path d="M4 10l5 5 7-7" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Acesso autorizado
+                  </>
+                ) : isBlocked ? (
+                  'Conta bloqueada'
+                ) : (
+                  'Acessar plataforma'
+                )}
+              </button>
+
+            </form>
+
+            {/* Divider */}
+            <div className="lgn-divider-wrap">
+              <Divider label="ou acesse com" />
             </div>
 
-            {/* Submit */}
-            <button type="submit" className="lgn-btn" disabled={loading}>
-              {loading ? <span className="lgn-spinner" /> : 'Acessar plataforma'}
-            </button>
-          </form>
+            {/* SSO Google */}
+            <SSOButton
+              provider="google"
+              onClick={() => { /* integrar com Google OAuth */ }}
+            />
 
-          {/* Divider */}
-          <div className="lgn-divider">
-            <span style={{ whiteSpace: 'nowrap' }}>ou acesse com</span>
+            {/* Trust badges */}
+            <div className="lgn-trust" aria-label="Certificações de segurança">
+              <div className="lgn-trust-item">
+                <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1L2 3.5v4c0 3 2.5 5 5 6 2.5-1 5-3 5-6v-4L7 1z" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M4.5 7l2 2 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                SSL 256-bit
+              </div>
+              <div className="lgn-trust-item">
+                <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <rect x="1" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M4 4V3a3 3 0 016 0v1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                LGPD Conforme
+              </div>
+              <div className="lgn-trust-item">
+                <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M7 4.5v3l1.5 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                99,7% uptime
+              </div>
+            </div>
+
+            <p className="lgn-legal">
+              Ao acessar, você concorda com os{' '}
+              <a href="#">Termos de Uso</a> e{' '}
+              <a href="#">Política de Privacidade</a> do AGRO365.
+            </p>
+
           </div>
-
-          {/* SSO */}
-          <button type="button" className="lgn-sso">
-            <svg viewBox="0 0 18 18" fill="none" width={18} height={18}>
-              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-              <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z" fill="#EA4335"/>
-            </svg>
-            Entrar com Google
-          </button>
-
-          {/* Trust */}
-          <div className="lgn-trust">
-            <div className="lgn-trust-item">
-              <svg viewBox="0 0 14 14" fill="none">
-                <path d="M7 1L2 3.5v4c0 3 2.5 5 5 6 2.5-1 5-3 5-6v-4L7 1z" stroke="currentColor" strokeWidth="1.3" fill="none"/>
-                <path d="M4.5 7l2 2 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              SSL 256-bit
-            </div>
-            <div className="lgn-trust-item">
-              <svg viewBox="0 0 14 14" fill="none">
-                <rect x="1" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M4 4V3a3 3 0 016 0v1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
-              LGPD Conforme
-            </div>
-            <div className="lgn-trust-item">
-              <svg viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M7 4.5v3l1.5 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
-              99,7% uptime
-            </div>
-          </div>
-
-          <p className="lgn-legal">
-            Ao acessar, você concorda com os{' '}
-            <a href="#">Termos de Uso</a> e{' '}
-            <a href="#">Política de Privacidade</a> do AGRO365.
-          </p>
         </div>
       </div>
-    </div>
+
+      {/* ══ MODAL — Esqueci a senha ══════════════════════════════════════════ */}
+      {forgotOpen && (
+        <div
+          className="lgn-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="forgot-title"
+          onClick={e => { if (e.target === e.currentTarget) setForgotOpen(false) }}
+        >
+          <div className="lgn-modal">
+
+            <button
+              type="button"
+              className="lgn-modal-close"
+              aria-label="Fechar modal"
+              onClick={() => setForgotOpen(false)}
+            >
+              <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            {!forgotSent ? (
+              <>
+                <h3 id="forgot-title" className="lgn-modal-title">Recuperar acesso</h3>
+                <p className="lgn-modal-sub">
+                  Informe seu e-mail corporativo. Enviaremos um link para redefinir sua senha.
+                </p>
+
+                <form onSubmit={handleForgotSubmit} noValidate>
+                  <FormField
+                    label="E-mail corporativo"
+                    type="email"
+                    placeholder="voce@suafazenda.com.br"
+                    value={forgotEmail}
+                    autoComplete="email"
+                    onChange={e => setForgotEmail(e.target.value)}
+                    style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                    iconLeft={
+                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+                        <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                      </svg>
+                    }
+                  />
+
+                  <button
+                    type="submit"
+                    className="lgn-btn lgn-btn--modal"
+                    disabled={forgotLoading || !forgotEmail}
+                    aria-busy={forgotLoading}
+                    style={{ marginTop: t.space[5] }}
+                  >
+                    {forgotLoading
+                      ? <span className="lgn-spinner" aria-hidden="true" />
+                      : 'Enviar link de recuperação'}
+                  </button>
+                </form>
+
+                <button type="button" className="lgn-modal-back" onClick={() => setForgotOpen(false)}>
+                  ← Voltar ao login
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="lgn-modal-success-icon" aria-hidden="true">
+                  <svg viewBox="0 0 56 56" fill="none">
+                    <circle cx="28" cy="28" r="28" fill="rgba(5,150,105,.10)"/>
+                    <path d="M16 28l9 9 15-15" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <h3 id="forgot-title" className="lgn-modal-title">Link enviado!</h3>
+                <p className="lgn-modal-sub">
+                  Enviamos as instruções de recuperação para{' '}
+                  <strong>{forgotEmail}</strong>.{' '}
+                  Verifique sua caixa de entrada e a pasta de spam.
+                </p>
+                <button type="button" className="lgn-modal-back" onClick={() => setForgotOpen(false)}>
+                  ← Voltar ao login
+                </button>
+              </>
+            )}
+
+          </div>
+        </div>
+      )}
+    </>
   )
 }

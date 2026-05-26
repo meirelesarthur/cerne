@@ -1,0 +1,30 @@
+/* ProgressBar — estados de animação */
+
+.pb-fill--indeterminate {
+  width: 45%;
+  animation: pb-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.pb-fill--complete {
+  width: 100%;
+  transition: width 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.pb-fill--error {
+  width: 100%;
+  transition: width 0.25s cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes pb-sweep {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(180%); }
+  100% { transform: translateX(180%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-fill--indeterminate {
+    animation: none;
+    width: 60%;
+    opacity: 0.6;
+  }
+}

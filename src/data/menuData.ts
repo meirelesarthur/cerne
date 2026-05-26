@@ -117,12 +117,8 @@ export const menuModules: NavModule[] = [
               { id: 'cad-est-arm',       label: 'Armazéns',       path: '/cadastros/armazens' },
             ],
           },
-          {
-            id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios',
-            children: [
-              { id: 'cad-est-end', label: 'Endereçamentos', path: '/cadastros/enderecos' },
-            ],
-          },
+          { id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios' },
+          { id: 'cad-est-end', label: 'Endereçamentos', path: '/cadastros/enderecos' },
         ],
       },
       {

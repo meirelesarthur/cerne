@@ -7,7 +7,6 @@ import { t } from '../../design/tokens'
 // ─── sub-components ──────────────────────────────────────────────────────────
 
 function NavHeader({ module }: { module: NavModule }) {
-  const Icon = module.icon
   const { colors } = useTheme()
   return (
     <div
@@ -19,11 +18,9 @@ function NavHeader({ module }: { module: NavModule }) {
         alignItems: 'center',
         padding: '0 12px',
         flexShrink: 0,
-        gap: 8,
         transition: 'background 0.2s',
       }}
     >
-      <Icon size={14} color={colors.textSecondary} strokeWidth={1.8} />
       <span
         style={{
           fontSize: 13,

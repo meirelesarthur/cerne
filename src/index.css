@@ -187,3 +187,48 @@ body {
 .module-card:hover {
   background: var(--module-card-hover-bg);
 }
+
+/* ─── Leaflet talhão tooltip ─────────────────────────────────────────────────── */
+
+.talh-tooltip-wrap {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.talh-tooltip-wrap::before {
+  display: none !important;
+}
+
+.talh-tip {
+  font-family: 'Outfit', sans-serif;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.talh-tip-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 6px;
+}
+.talh-tip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+.talh-tip-badge {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 2px 10px;
+}

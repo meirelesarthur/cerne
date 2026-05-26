@@ -9,6 +9,8 @@ import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
 import CentrosCustoPage  from '../../pages/cadastros/centros-custo/CentrosCustoPage'
 import EmbalagensPage    from '../../pages/cadastros/embalagens/EmbalagensPage'
 import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
+import ArmazensPage      from '../../pages/cadastros/armazens/ArmazensPage'
+import ProdutosPage      from '../../pages/cadastros/produtos/ProdutosPage'
 import Pluviometria from '../../pages/dashboards/Pluviometria'
 import OverviewPanel from '../../pages/dashboards/OverviewPanel'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
@@ -71,8 +73,10 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-est-faz') return <FazendasPage />
   if (itemId === 'cad-est-saf') return <SafrasPage />
   if (itemId === 'cad-est-cc')  return <CentrosCustoPage />
-  if (itemId === 'cad-est-emb') return <EmbalagensPage />
-  if (itemId === 'cad-est-end') return <EnderecosPage />
+  if (itemId === 'cad-est-emb')      return <EmbalagensPage />
+  if (itemId === 'cad-est-end')      return <EnderecosPage />
+  if (itemId === 'cad-est-arm')      return <ArmazensPage />
+  if (itemId === 'cad-est-pro-lista') return <ProdutosPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />

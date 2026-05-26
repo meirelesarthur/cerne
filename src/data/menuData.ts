@@ -112,7 +112,9 @@ export const menuModules: NavModule[] = [
           {
             id: 'cad-est-pro', label: 'Produtos', path: '/cadastros/produtos',
             children: [
-              { id: 'cad-est-emb', label: 'Embalagens', path: '/cadastros/embalagens' },
+              { id: 'cad-est-pro-lista', label: 'Catálogo',       path: '/cadastros/produtos/catalogo' },
+              { id: 'cad-est-emb',       label: 'Embalagens',     path: '/cadastros/embalagens' },
+              { id: 'cad-est-arm',       label: 'Armazéns',       path: '/cadastros/armazens' },
             ],
           },
           {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
 import type { ThemeColors } from '../../context/ThemeContext'
@@ -8,7 +8,10 @@ import {
 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { FormField } from '../../components/ui/FormField'
+import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Skeleton } from '../../components/ui/Skeleton'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -197,8 +200,8 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
   const groupW = cW / BAR_DATA.length
   const barW = 14, barGap = 3
 
-  const green   = isGbMode ? '#10b981' : '#059669'
-  const green2  = isGbMode ? '#34d399' : '#047857'
+  const green   = isGbMode ? '#10b981' : t.color.brand[600]
+  const green2  = isGbMode ? '#34d399' : t.color.brand[700]
   const gray    = isGbMode ? 'rgba(28,63,44,0.75)' : '#e5e7eb'
   const grid    = isGbMode ? 'rgba(28,63,44,0.5)'  : '#f0f0f0'
   const axis    = isGbMode ? 'rgba(125,168,147,0.6)' : '#9ca3af'
@@ -271,7 +274,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
               {isH && (
                 <g>
                   <rect x={cx - 50} y={tip} width={100} height={46} rx={7}
-                    fill={isGbMode ? '#0b1e14' : '#1c1917'} opacity={0.95} />
+                    fill={isGbMode ? '#0b1e14' : t.dashboard.tileDark} opacity={0.95} />
                   <text x={cx} y={tip + 16} textAnchor="middle" fontSize={10} fill={green} fontFamily="Outfit, sans-serif" fontWeight={700}>{d.month} 2025/26</text>
                   <text x={cx - 5} y={tip + 31} textAnchor="end" fontSize={9} fill="#4ade80" fontFamily="Outfit, sans-serif">● {d.comChuva}d chuva</text>
                   <text x={cx + 5} y={tip + 31} textAnchor="start" fontSize={9} fill="#6b7280" fontFamily="Outfit, sans-serif">● {d.semChuva}d seco</text>
@@ -313,7 +316,7 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
 
   const areaPath = `${linePath} L ${pts[pts.length - 1].x} ${PT + cH} L ${pts[0].x} ${PT + cH} Z`
 
-  const line   = isGbMode ? '#10b981' : '#059669'
+  const line   = isGbMode ? '#10b981' : t.color.brand[600]
   const grid   = isGbMode ? 'rgba(28,63,44,0.5)'    : '#f0f0f0'
   const axis   = isGbMode ? 'rgba(125,168,147,0.6)'  : '#9ca3af'
 
@@ -383,7 +386,7 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
               {isH && (
                 <g>
                   <rect x={p.x - 40} y={tipY} width={80} height={36} rx={7}
-                    fill={isGbMode ? '#0b1e14' : '#1c1917'} opacity={0.95} />
+                    fill={isGbMode ? '#0b1e14' : t.dashboard.tileDark} opacity={0.95} />
                   <text x={p.x} y={tipY + 14} textAnchor="middle" fontSize={9} fill={line} fontFamily="Outfit, sans-serif" fontWeight={600}>{VOLUME_LABELS[i]}</text>
                   <text x={p.x} y={tipY + 28} textAnchor="middle" fontSize={11} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>{p.v}mm</text>
                 </g>
@@ -400,11 +403,16 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
 
 export default function Pluviometria() {
   const { colors, isGbMode } = useTheme()
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedAreas, setSelectedAreas] = useState<string[]>(ALL_AREAS)
   const [dateStart, setDateStart] = useState('01/06/2025')
   const [dateEnd, setDateEnd] = useState('25/05/2026')
-
   const [filterOpen, setFilterOpen] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
 
   const removeArea = (area: string) => setSelectedAreas(p => p.filter(a => a !== area))
 
@@ -419,23 +427,6 @@ export default function Pluviometria() {
     (dateEnd !== '25/05/2026' ? 1 : 0) +
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
-  const selectStyle: React.CSSProperties = {
-    height: 38,
-    border: `1.5px solid ${colors.border}`,
-    borderRadius: t.radius.DEFAULT,
-    padding: `0 ${t.space[3]}px`,
-    fontSize: t.font.size.base,
-    fontFamily: t.font.family.sans,
-    color: colors.textPrimary,
-    background: colors.inputBg,
-    outline: 'none',
-    width: '100%',
-    boxSizing: 'border-box',
-    cursor: 'pointer',
-    WebkitAppearance: 'none' as React.CSSProperties['WebkitAppearance'],
-    MozAppearance: 'none' as React.CSSProperties['MozAppearance'],
-  }
-
   return (
     <div
       style={{
@@ -449,16 +440,16 @@ export default function Pluviometria() {
       }}
     >
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <div>
-        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[1] }}>
-          Dashboards /{' '}
-          <span style={{ color: colors.brand }}>Pluviometria</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 style={{ margin: 0, fontSize: t.font.size['2xl'], fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-            Pluviômetro
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
+      <PageHeader
+        title="Pluviômetro"
+        breadcrumb={
+          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+            Dashboards /{' '}
+            <span style={{ color: colors.brand }}>Pluviometria</span>
+          </span>
+        }
+        actions={
+          <>
             {isGbMode && (
               <span style={{
                 fontSize: t.font.size.xs,
@@ -477,9 +468,9 @@ export default function Pluviometria() {
             <Button icon={<Filter size={14} />} size="md" onClick={() => setFilterOpen(true)}>
               Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
             </Button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* ── Filter Drawer ────────────────────────────────────────────── */}
       <FilterDrawer
@@ -504,14 +495,10 @@ export default function Pluviometria() {
             onChange={e => setDateEnd(e.target.value)}
             placeholder="DD/MM/AAAA"
           />
-          <div>
-            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: t.color.neutral[700], fontFamily: t.font.family.sans, display: 'block', marginBottom: t.space[2] }}>
-              Fazenda
-            </span>
-            <select style={selectStyle}>
-              <option>Fazenda Araprata — Wilmar Alves Lima</option>
-            </select>
-          </div>
+          <FormSelect
+            label="Fazenda"
+            options={[{ value: 'fazenda-araprata', label: 'Fazenda Araprata — Wilmar Alves Lima' }]}
+          />
           <div>
             <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: t.color.neutral[700], fontFamily: t.font.family.sans, display: 'block', marginBottom: t.space[2] }}>
               Áreas ({selectedAreas.length}/{ALL_AREAS.length})
@@ -573,7 +560,12 @@ export default function Pluviometria() {
       </FilterDrawer>
 
       {/* ── KPI Cards ───────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3], alignItems: 'stretch' }}>
+      {isLoading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3] }}>
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height={120} />)}
+        </div>
+      ) : null}
+      {!isLoading && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3], alignItems: 'stretch' }}>
         <KpiCard
           icon={CloudRain}
           label="Acumulado (7 dias)"
@@ -609,9 +601,12 @@ export default function Pluviometria() {
           colors={colors}
           isGbMode={isGbMode}
         />
-      </div>
+      </div>}
 
       {/* ── Bar chart + Right panel ──────────────────────────────────── */}
+      {isLoading ? (
+        <Skeleton height={300} />
+      ) : (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[3], alignItems: 'stretch' }}>
         {/* Bar chart */}
         <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
@@ -629,7 +624,7 @@ export default function Pluviometria() {
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: '#f59e0b', fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.notification, fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
               Janela de Aplicação
             </div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: isGbMode ? '#fbbf24' : '#92400e', fontFamily: t.font.family.sans, marginBottom: t.space[2], textShadow: isGbMode ? '0 0 20px rgba(251,191,36,0.4)' : undefined }}>
@@ -638,7 +633,7 @@ export default function Pluviometria() {
             <div style={{ fontSize: t.font.size.sm, color: isGbMode ? 'rgba(251,191,36,0.65)' : '#78350f', fontFamily: t.font.family.sans, lineHeight: 1.65, marginBottom: t.space[2] }}>
               Vento em 2.4km/h e probabilidade de chuva de 4% para as próximas 8 horas.
             </div>
-            <div style={{ fontSize: t.font.size.xs, color: '#f59e0b', fontFamily: t.font.family.sans, opacity: 0.65 }}>
+            <div style={{ fontSize: t.font.size.xs, color: t.color.notification, fontFamily: t.font.family.sans, opacity: 0.65 }}>
               Fonte: Open-Meteo · Prata (MG)
             </div>
           </div>
@@ -711,7 +706,7 @@ export default function Pluviometria() {
                       fontFamily: t.font.family.sans,
                       fontWeight: t.font.weight.semibold,
                       color: isToday
-                        ? (isGbMode ? '#4ade80' : '#059669')
+                        ? (isGbMode ? t.color.brand[400] : t.color.brand[600])
                         : colors.textPrimary,
                       lineHeight: 1,
                     }}>
@@ -759,11 +754,16 @@ export default function Pluviometria() {
           </div>
         </div>
       </div>
+      )}
 
       {/* ── Volume area chart ────────────────────────────────────────── */}
+      {isLoading ? (
+        <Skeleton height={220} />
+      ) : (
       <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
         <VolumeAreaChart colors={colors} isGbMode={isGbMode} />
       </div>
+      )}
     </div>
   )
 }

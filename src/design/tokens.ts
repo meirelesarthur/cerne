@@ -39,6 +39,9 @@ export const color = {
     950: '#171717',
   },
 
+  /** Notificação — âmbar (substitui valores hardcoded #f59e0b) */
+  notification: '#f59e0b',
+
   /** Semânticos */
   success: {
     bg:     '#f0fdf4',
@@ -130,17 +133,22 @@ export const radius = {
   lg:      10,  // tabelas com borda
   xl:      12,  // cards de formulário
   '2xl':   16,  // container principal
+  '3xl':   20,  // modais grandes
+  '4xl':   24,  // containers expandidos
+  modal:   20,  // alias semântico para modais
   full:    9999,
 }
 
 // ─── Sombras ─────────────────────────────────────────────────────────────────
 
 export const shadow = {
-  sm:   '0 1px 2px rgba(0,0,0,0.05)',
+  sm:      '0 1px 2px rgba(0,0,0,0.05)',
   DEFAULT: '0 1px 4px rgba(0,0,0,0.08)',
-  md:   '0 4px 12px rgba(0,0,0,0.08)',
-  lg:   '0 8px 24px rgba(0,0,0,0.10)',
-  brand: '0 4px 16px rgba(5,150,105,0.25)',
+  md:      '0 4px 12px rgba(0,0,0,0.08)',
+  lg:      '0 8px 24px rgba(0,0,0,0.10)',
+  brand:   '0 4px 16px rgba(5,150,105,0.25)',
+  overlay: '0 24px 64px rgba(0,0,0,0.14)', // sombra para modais/overlays
+  modal:   '0 8px 40px rgba(0,0,0,0.12)',  // sombra focada para dialogs
 }
 
 // ─── Bordas ───────────────────────────────────────────────────────────────────

@@ -20,20 +20,20 @@ export function TableSearchInput({
   return (
     <div
       style={{
-        display: 'flex', alignItems: 'center', gap: 7,
-        height: 34,
+        display: 'flex', alignItems: 'center', gap: t.space[2],
+        height: 38,
         border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
         borderRadius: t.radius.DEFAULT,
-        padding: '0 10px',
+        padding: `0 ${t.space[2] + 2}px`,
         background: colors.surfaceBg,
-        transition: 'border-color 0.15s',
+        transition: `border-color ${t.transition.DEFAULT}`,
         minWidth: 220,
       }}
     >
       <Search
         size={13}
         color={focused ? t.color.brand[600] : colors.textMuted}
-        style={{ flexShrink: 0, transition: 'color 0.15s' }}
+        style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
       />
       <input
         type="search"
@@ -74,7 +74,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
     <div
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1],
-        height: 34,
+        height: 38,
         background: colors.brandBg,
         border: `1.5px solid ${colors.brand}`,
         borderRadius: t.radius.DEFAULT,
@@ -123,19 +123,19 @@ export function FilterButton({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        height: 36,
+        display: 'flex', alignItems: 'center', gap: t.space[1] + 2, // 6px
+        height: 38,
         background: active    ? colors.brandBg
           : hovered ? colors.surfaceSubtle : colors.surfaceBg,
         border: `1.5px solid ${active ? colors.brand : colors.border}`,
         borderRadius: t.radius.DEFAULT,
-        padding: '0 14px',
+        padding: `0 ${t.space[3] + 2}px`, // 14px
         fontSize: t.font.size.base,
         fontWeight: t.font.weight.medium,
         fontFamily: t.font.family.sans,
         color: active ? colors.brand : colors.textSecondary,
         cursor: 'pointer',
-        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+        transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
       }}
     >
       <SlidersHorizontal size={13} />

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, SlidersHorizontal, X,
   List, LayoutGrid, MapPin, Layers, Ruler, Eye,
@@ -12,6 +12,7 @@ import { Badge }         from '../../../components/ui/Badge'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { SearchInput }   from '../../../components/ui/SearchInput'
 import { Modal }         from '../../../components/ui/Modal'
+import { Pagination }    from '../../../components/ui/Pagination'
 import { KpiBar }        from '../../../components/ui/KpiBar'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
@@ -68,7 +69,11 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
   const [filters,    setFilters]    = useState({ tipoExploracao: '', ativo: '' })
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<FazendaRow | null>(null)
+  const [page,       setPage]       = useState(1)
+  const [pageSize,   setPageSize]   = useState(10)
   const { toasts, show } = useToast()
+
+  useEffect(() => { setPage(1) }, [search, filters])
 
   // ── KPIs derivados dos dados brutos (não filtrados) ───────────────────────
   const kpis = useMemo(() => {
@@ -98,6 +103,11 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       return matchSearch && matchTipo && matchAtivo
     })
   }, [data, search, filters])
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
+  )
 
   const activeFilterCount = [filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipoExploracao: '', ativo: '' })
@@ -296,19 +306,27 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       {viewMode === 'list' ? (
         <DataTable<FazendaRow>
           columns={columns}
-          data={filtered}
+          data={paginated}
           keyField="id"
           emptyMessage="Nenhuma fazenda encontrada."
           onRowClick={(row) => onView(row.id)}
         />
       ) : (
         <CardsGrid
-          data={filtered}
+          data={paginated}
           onView={onView}
           onEdit={onEdit}
           colors={colors}
         />
       )}
+
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* ── Filter Drawer ────────────────────────────────────────────────── */}
       <FilterDrawer

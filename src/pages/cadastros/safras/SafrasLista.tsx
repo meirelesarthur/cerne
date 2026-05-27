@@ -14,6 +14,7 @@ import type { Safra }    from './safras.types'
 import { useToast, TOAST_BG }    from '../../../hooks/useToast'
 import { SearchInput }            from '../../../components/ui/SearchInput'
 import { Modal }                  from '../../../components/ui/Modal'
+import { Pagination }             from '../../../components/ui/Pagination'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -38,6 +39,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const [openDropId,    setOpenDropId]    = useState<number | null>(null)
   const [deleteTarget,  setDeleteTarget]  = useState<Safra | null>(null)
   const [showInfo,      setShowInfo]      = useState(false)
+  const [page,          setPage]          = useState(1)
+  const [pageSize,      setPageSize]      = useState(10)
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -46,6 +49,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     document.addEventListener('click', handler)
     return () => document.removeEventListener('click', handler)
   }, [openDropId])
+
+  useEffect(() => { setPage(1) }, [search, statusFilter])
 
   // ── Safra atual (ativa com ini mais recente) ─────────────────────────────
   const safrAtual = useMemo(() => {
@@ -73,6 +78,11 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       return matchSearch && matchStatus
     })
   }, [safras, search, statusFilter])
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
+  )
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -228,11 +238,11 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           </div>
 
           {/* Linhas */}
-          {filtered.map((safra, idx) => (
+          {paginated.map((safra, idx) => (
             <SafraRow
               key={safra.id}
               safra={safra}
-              isLast={idx === filtered.length - 1}
+              isLast={idx === paginated.length - 1}
               openDropId={openDropId}
               onOpenDrop={setOpenDropId}
               onView={onView}
@@ -245,10 +255,13 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         </div>
       )}
 
-      {/* Rodapé */}
-      <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        N. Registros: {filtered.length}
-      </div>
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
       {deleteTarget && (

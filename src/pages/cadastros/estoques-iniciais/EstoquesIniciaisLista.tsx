@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import {
-  Plus, Search, Pencil, Trash2, X, ChevronDown, ChevronUp,
+  Plus, Pencil, Trash2, X, ChevronDown, ChevronUp,
   ChevronLeft, ChevronRight, Download, Package,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
@@ -9,6 +9,9 @@ import { Button }        from '../../../components/ui/Button'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import type { EstoqueInicial } from './estoques-iniciais.types'
+import { useToast, TOAST_BG, type ToastItem } from '../../../hooks/useToast'
+import { SearchInput }            from '../../../components/ui/SearchInput'
+import { Modal }                  from '../../../components/ui/Modal'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -19,30 +22,16 @@ interface Props {
   onDelete: (id: number) => void
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface Toast { id: number; message: string; type: 'success' | 'error' }
-
-function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const show = (message: string, type: Toast['type'] = 'success') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500)
-  }
-  return { toasts, show }
-}
-
 // ─── ToastList ────────────────────────────────────────────────────────────────
 
-function ToastList({ toasts }: { toasts: Toast[] }) {
+function ToastList({ toasts }: { toasts: ToastItem[] }) {
   return (
     <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
       {toasts.map(toast => (
         <div
           key={toast.id}
           style={{
-            background: toast.type === 'success' ? '#14532d' : '#dc2626',
+            background: TOAST_BG[toast.type],
             color: 'white',
             padding: '11px 18px',
             borderRadius: t.radius.lg,
@@ -61,26 +50,6 @@ function ToastList({ toasts }: { toasts: Toast[] }) {
         </div>
       ))}
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
-    </div>
-  )
-}
-
-// ─── Modal (delete confirmation) ──────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: t.zIndex.overlay, padding: 24 }}
-      onClick={onClose}
-    >
-      <div
-        style={{ background: colors.surfaceBg, borderRadius: 24, padding: '28px', maxWidth: 420, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)', animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)' }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-      <style>{`@keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
     </div>
   )
 }
@@ -483,32 +452,6 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
         <ActionBtn icon={<Pencil size={13} />} label="Editar"  onClick={onEdit}      colors={colors} />
         <ActionBtn icon={<Trash2 size={13} />} label="Excluir" onClick={onDeleteReq} colors={colors} danger />
       </div>
-    </div>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, height: 34, border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.DEFAULT, padding: '0 10px', background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 260 }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
     </div>
   )
 }

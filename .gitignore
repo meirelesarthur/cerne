@@ -10,3 +10,8 @@ storybook-static/
 
 # Claude Code plugins (local only — não versionar)
 # .claude/plugins/ui-ux-pro-max/
+
+# Vídeos — hospedados no Cloudflare R2, não versionar
+*.mp4
+*.mov
+*.webm

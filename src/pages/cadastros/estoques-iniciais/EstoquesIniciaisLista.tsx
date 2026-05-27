@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, X, ChevronUp,
+  Plus, Pencil, Trash2, X, ChevronUp, ChevronDown,
   Download, Package,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'

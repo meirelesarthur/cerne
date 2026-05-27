@@ -1,18 +1,20 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import {
-  Plus, X, MoreVertical, Eye, Pencil, Trash2,
+  Plus, MoreVertical, Eye, Pencil, Trash2,
   Info, Calendar, CheckCircle2,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
 import { Badge }           from '../../../components/ui/Badge'
+import { Modal }           from '../../../components/ui/Modal'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
-import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
+import { EmptyState }      from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { fmtYMDtoDMY }    from './safras.types'
@@ -31,9 +33,9 @@ interface SafrasListaProps {
 // ─── Toast ───────────────────────────────────────────────────────────────────
 
 interface ToastItem {
-  id: number
+  id:      number
   message: string
-  type: 'ok' | 'inf' | 'error'
+  type:    'ok' | 'inf' | 'error'
 }
 
 function useToast() {
@@ -47,9 +49,9 @@ function useToast() {
 }
 
 const TOAST_BG: Record<ToastItem['type'], string> = {
-  ok:    '#14532d',
-  inf:   '#1d4ed8',
-  error: '#dc2626',
+  ok:    t.color.success.solid,
+  inf:   t.color.info.solid,
+  error: t.color.error.solid,
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -75,13 +77,11 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     return () => clearTimeout(timer)
   }, [])
 
-  // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, statusFilter])
 
   const activeFilterCount = statusFilter !== 'todas' ? 1 : 0
   const clearFilters = () => setStatusFilter('todas')
 
-  // Fechar dropdown ao clicar fora
   useEffect(() => {
     if (openDropId === null) return
     const handler = () => setOpenDropId(null)
@@ -89,21 +89,18 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     return () => document.removeEventListener('click', handler)
   }, [openDropId])
 
-  // ── Safra atual (ativa com ini mais recente) ─────────────────────────────
   const safrAtual = useMemo(() => {
     const ativas = safras.filter(s => s.ativo === 'sim')
     if (!ativas.length) return null
     return ativas.reduce((a, b) => a.ini > b.ini ? a : b)
   }, [safras])
 
-  // ── KPIs ─────────────────────────────────────────────────────────────────
   const kpis = useMemo(() => ({
-    total:     safras.length,
-    ativas:    safras.filter(s => s.ativo === 'sim').length,
+    total:      safras.length,
+    ativas:     safras.filter(s => s.ativo === 'sim').length,
     encerradas: safras.filter(s => s.ativo === 'nao').length,
   }), [safras])
 
-  // ── Filtro ────────────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return safras.filter(s => {
@@ -126,8 +123,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     show(`Safra "${deleteTarget.desc}" excluída.`, 'inf')
   }
 
-  const cardBg   = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
-  const border   = colors.border
+  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
+  const border  = colors.border
 
   return (
     <PageContainer>
@@ -137,7 +134,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         title="Safras"
         count={safras.length}
         actions={
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: t.space[2], alignItems: 'center' }}>
             <Button
               variant="secondary"
               size="sm"
@@ -173,7 +170,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           border: `1px solid ${border}`,
           borderRadius: t.radius.lg,
           overflow: 'hidden',
-          marginBottom: 16,
+          marginBottom: t.space[4],
         }}>
           <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} hasBorderRight />
           <KpiCard
@@ -182,7 +179,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             sub=""
             bg={cardBg}
             border={border}
-            accent="#16a34a"
+            accent={t.color.success.text}
             hasBorderRight
           />
           <KpiCard
@@ -200,13 +197,13 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             sub=""
             bg={cardBg}
             border={border}
-            accent="#94a3b8"
+            accent={t.color.neutral[400]}
           />
         </div>
       )}
 
       {/* ── Toolbar ───────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + 2, marginBottom: t.space[3], flexWrap: 'wrap' }}>
         <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar safra..." />
         {statusFilter !== 'todas' && (
           <FilterChip
@@ -227,35 +224,37 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <EmptyStateUI
+        <EmptyState
           message="Nenhuma safra encontrada."
-          description="Tente ajustar os filtros ou limpar a busca."
+          description="Tente ajustar os filtros ou cadastre uma nova safra."
+          icon={<Calendar size={40} strokeWidth={1.5} />}
+          action={{ label: 'Nova Safra', onClick: onNew }}
         />
       ) : (
         <>
           <div style={{
-            background: colors.surfaceBg,
-            border: `1px solid ${border}`,
+            background:   colors.surfaceBg,
+            border:       `1px solid ${border}`,
             borderRadius: t.radius.lg,
-            overflow: 'hidden',
+            overflow:     'hidden',
           }}>
             {/* Cabeçalho */}
             <div style={{
-              display: 'grid',
+              display:         'grid',
               gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-              padding: '10px 16px',
-              background: colors.surfaceSubtle,
-              borderBottom: `1px solid ${border}`,
+              padding:         `${t.space[2] + 2}px ${t.space[4]}px`,
+              background:      colors.surfaceSubtle,
+              borderBottom:    `1px solid ${border}`,
             }}>
               {['Descrição', 'Dt. Início', 'Dt. Fim', 'Status', 'Semanas', ''].map((h, i) => (
                 <span key={i} style={{
-                  fontSize: t.font.size.xs,
-                  fontWeight: t.font.weight.semibold,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
+                  fontSize:      t.font.size.xs,
+                  fontWeight:    t.font.weight.semibold,
+                  color:         colors.textMuted,
+                  fontFamily:    t.font.family.sans,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  textAlign: i >= 4 ? 'center' : undefined,
+                  textAlign:     i >= 4 ? 'center' : undefined,
                 }}>
                   {h}
                 </span>
@@ -281,9 +280,9 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
 
           {totalFiltered > PAGE_SIZE && (
             <div style={{
-              marginTop: t.space[4],
+              marginTop:  t.space[4],
               paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
+              borderTop:  `1px solid ${colors.borderSubtle}`,
             }}>
               <Pagination
                 page={page}
@@ -296,95 +295,100 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         </>
       )}
 
-      {/* Rodapé */}
-      {!isLoading && filtered.length > 0 && (
-        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          N. Registros: {filtered.length}
-        </div>
-      )}
-
       {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
-      {deleteTarget && (
-        <Modal onClose={() => setDeleteTarget(null)}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%',
-              background: '#fee2e2',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}>
-              <Trash2 size={22} color="#dc2626" />
-            </div>
-            <div style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.semibold, color: '#171717', marginBottom: 8, fontFamily: t.font.family.sans }}>
-              Excluir Safra
-            </div>
-            <p style={{ fontSize: t.font.size.base, color: '#6b7280', lineHeight: 1.6, fontFamily: t.font.family.sans, margin: '0 0 24px' }}>
-              Tem certeza que deseja excluir{' '}
-              <strong style={{ color: '#171717' }}>{deleteTarget.desc}</strong>?{' '}
-              Esta ação não pode ser desfeita.
-            </p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
-                Cancelar
-              </Button>
-              <Button
-                variant="destructive"
-                style={{ background: '#dc2626', color: 'white', border: 'none' }}
-                onClick={handleDeleteConfirm}
-              >
-                <Trash2 size={13} />
-                Excluir
-              </Button>
-            </div>
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              <Trash2 size={13} />
+              Excluir Safra…
+            </Button>
+          </>
+        }
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width:          52,
+            height:         52,
+            borderRadius:   '50%',
+            background:     t.color.error.bg,
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            margin:         '0 auto',
+            marginBottom:   t.space[4],
+          }}>
+            <Trash2 size={22} color={t.color.error.solid} />
           </div>
-        </Modal>
-      )}
+          <p style={{
+            fontSize:   t.font.size.base,
+            color:      colors.textSecondary,
+            lineHeight: t.font.lineHeight.relaxed,
+            fontFamily: t.font.family.sans,
+            margin:     0,
+          }}>
+            Tem certeza que deseja excluir{' '}
+            <strong style={{ color: colors.textPrimary }}>{deleteTarget?.desc}</strong>?{' '}
+            Esta ação não pode ser desfeita.
+          </p>
+        </div>
+      </Modal>
 
       {/* ── Modal: Saiba Mais ────────────────────────────────────────────── */}
-      {showInfo && (
-        <Modal onClose={() => setShowInfo(false)}>
-          <div>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%',
-              background: '#dbeafe',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}>
-              <Info size={22} color="#1d4ed8" />
-            </div>
-            <div style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.semibold, color: '#171717', marginBottom: 12, textAlign: 'center', fontFamily: t.font.family.sans }}>
-              Sobre as Safras
-            </div>
-            <div style={{ fontSize: t.font.size.base, color: '#404040', lineHeight: 1.7, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p style={{ margin: 0 }}>
-                Uma <strong>Safra</strong> é o período agrícola de referência que serve como eixo temporal de toda a gestão da fazenda, definindo o intervalo no qual produção, movimentação de rebanho, custos e receitas são contabilizados.
-              </p>
-              <p style={{ margin: 0 }}>
-                As <strong>cores das semanas</strong> formam um código visual compartilhado em todo o sistema. Em calendários de vacinação, relatórios de produção e controle de rebanho, cada semana é exibida com sua cor identificadora — permitindo que a equipe de campo reconheça períodos rapidamente.
-              </p>
-              <p style={{ margin: 0 }}>
-                Toda entrada de dados no sistema fica <strong>tagueada com a cor da semana vigente</strong> da safra ativa, tornando possível agrupar e filtrar visualmente por período em relatórios.
-              </p>
-            </div>
-            <div style={{ marginTop: 24, textAlign: 'center' }}>
-              <Button variant="primary" onClick={() => setShowInfo(false)}>
-                <CheckCircle2 size={14} />
-                Entendido
-              </Button>
-            </div>
+      <Modal
+        open={showInfo}
+        onClose={() => setShowInfo(false)}
+        title="Sobre as Safras"
+        size="sm"
+        footer={
+          <Button variant="primary" onClick={() => setShowInfo(false)}>
+            <CheckCircle2 size={14} />
+            Entendido
+          </Button>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
+          <div style={{
+            width:          52,
+            height:         52,
+            borderRadius:   '50%',
+            background:     t.color.info.bg,
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            margin:         '0 auto',
+          }}>
+            <Info size={22} color={t.color.info.text} />
           </div>
-        </Modal>
-      )}
+          <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, lineHeight: t.font.lineHeight.relaxed, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: t.space[2] + 2 }}>
+            <p style={{ margin: 0 }}>
+              Uma <strong>Safra</strong> é o período agrícola de referência que serve como eixo temporal de toda a gestão da fazenda, definindo o intervalo no qual produção, movimentação de rebanho, custos e receitas são contabilizados.
+            </p>
+            <p style={{ margin: 0 }}>
+              As <strong>cores das semanas</strong> formam um código visual compartilhado em todo o sistema. Em calendários de vacinação, relatórios de produção e controle de rebanho, cada semana é exibida com sua cor identificadora — permitindo que a equipe de campo reconheça períodos rapidamente.
+            </p>
+            <p style={{ margin: 0 }}>
+              Toda entrada de dados no sistema fica <strong>tagueada com a cor da semana vigente</strong> da safra ativa, tornando possível agrupar e filtrar visualmente por período em relatórios.
+            </p>
+          </div>
+        </div>
+      </Modal>
 
       {/* ── Toasts ──────────────────────────────────────────────────────── */}
       <div style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        display: 'flex',
+        position:      'fixed',
+        bottom:        t.space[6],
+        right:         t.space[6],
+        display:       'flex',
         flexDirection: 'column',
-        gap: 8,
-        zIndex: t.zIndex.toast,
+        gap:           t.space[2],
+        zIndex:        t.zIndex.toast,
         pointerEvents: 'none',
       }}>
         {toasts.map(toast => (
@@ -393,15 +397,15 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             role="status"
             aria-live="polite"
             style={{
-              background: TOAST_BG[toast.type],
-              color: 'white',
-              padding: '11px 18px',
+              background:  TOAST_BG[toast.type],
+              color:       t.color.neutral[0],
+              padding:     `${t.space[2] + 3}px ${t.space[4] + 2}px`,
               borderRadius: t.radius.lg,
-              fontSize: t.font.size.base,
-              fontWeight: t.font.weight.medium,
-              fontFamily: t.font.family.sans,
-              boxShadow: t.shadow.lg,
-              animation: 'toastIn 0.22s ease',
+              fontSize:    t.font.size.base,
+              fontWeight:  t.font.weight.medium,
+              fontFamily:  t.font.family.sans,
+              boxShadow:   t.shadow.lg,
+              animation:   'toastIn 0.22s ease',
             }}
           >
             {toast.message}
@@ -413,6 +417,12 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         @keyframes toastIn {
           from { opacity: 0; transform: translateX(16px); }
           to   { opacity: 1; transform: translateX(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes toastIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+          }
         }
       `}</style>
 
@@ -453,33 +463,31 @@ function SafraRow({
   colors,
   border,
 }: {
-  safra: Safra
-  isLast: boolean
-  openDropId: number | null
-  onOpenDrop: (id: number | null) => void
-  onView: (id: number) => void
-  onEdit: (id: number) => void
-  onDeleteReq: (s: Safra) => void
-  colors: ReturnType<typeof useTheme>['colors']
-  border: string
+  safra:        Safra
+  isLast:       boolean
+  openDropId:   number | null
+  onOpenDrop:   (id: number | null) => void
+  onView:       (id: number) => void
+  onEdit:       (id: number) => void
+  onDeleteReq:  (s: Safra) => void
+  colors:       ReturnType<typeof useTheme>['colors']
+  border:       string
 }) {
   const [hovered, setHovered] = useState(false)
-  const btnRef = useRef<HTMLButtonElement>(null)
-  const isOpen = openDropId === safra.id
-
+  const isOpen  = openDropId === safra.id
   const isAtiva = safra.ativo === 'sim'
 
   return (
     <div
       style={{
-        display: 'grid',
+        display:         'grid',
         gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-        padding: '12px 16px',
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        background: hovered ? colors.surfaceSubtle : 'transparent',
-        transition: 'background 0.12s',
-        cursor: 'pointer',
-        alignItems: 'center',
+        padding:         `${t.space[3]}px ${t.space[4]}px`,
+        borderBottom:    isLast ? 'none' : `1px solid ${border}`,
+        background:      hovered ? colors.surfaceSubtle : 'transparent',
+        transition:      `background ${t.transition.fast}`,
+        cursor:          'pointer',
+        alignItems:      'center',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -500,21 +508,9 @@ function SafraRow({
         {fmtYMDtoDMY(safra.fim)}
       </span>
 
-      {/* Status badge */}
+      {/* Status badge — usa componente Badge */}
       <div>
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', gap: 5,
-          padding: '2px 9px',
-          background: isAtiva ? '#dcfce7' : '#f1f5f9',
-          color: isAtiva ? '#166534' : '#475569',
-          borderRadius: t.radius.full,
-          fontSize: t.font.size.xs,
-          fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans,
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: isAtiva ? '#16a34a' : '#94a3b8', flexShrink: 0 }} />
-          {isAtiva ? 'Ativa' : 'Inativa'}
-        </span>
+        <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
       </div>
 
       {/* Semanas */}
@@ -522,90 +518,55 @@ function SafraRow({
         {safra.weeks.length} sem.
       </span>
 
-      {/* Ações */}
+      {/* Ações — dropdown */}
       <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <button
-          ref={btnRef}
-          type="button"
-          onClick={e => {
-            e.stopPropagation()
-            onOpenDrop(isOpen ? null : safra.id)
-          }}
-          style={{
-            width: 30, height: 30,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: isOpen ? colors.surfaceSubtle : 'transparent',
-            border: `1px solid ${isOpen ? border : 'transparent'}`,
-            borderRadius: t.radius.DEFAULT,
-            cursor: 'pointer',
-            color: colors.textMuted,
-            transition: 'background 0.12s, border-color 0.12s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle; e.currentTarget.style.borderColor = border }}
-          onMouseLeave={e => {
-            if (!isOpen) {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.borderColor = 'transparent'
-            }
-          }}
-          aria-label="Ações"
-        >
-          <MoreVertical size={14} />
-        </button>
+        <IconButton
+          icon={<MoreVertical size={14} />}
+          aria-label="Ações da safra"
+          size="sm"
+          variant={isOpen ? 'outline' : 'ghost'}
+          onClick={() => onOpenDrop(isOpen ? null : safra.id)}
+        />
 
         {isOpen && (
           <div
+            role="menu"
             style={{
-              position: 'absolute',
-              top: '100%',
-              right: 0,
-              marginTop: 4,
-              background: '#ffffff',
-              border: `1px solid #e5e7eb`,
+              position:    'absolute',
+              top:         '100%',
+              right:       0,
+              marginTop:   t.space[1],
+              background:  colors.surfaceBg,
+              border:      `1px solid ${colors.border}`,
               borderRadius: t.radius.lg,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              minWidth: 140,
-              zIndex: t.zIndex.dropdown,
-              overflow: 'hidden',
-              animation: 'dropIn 0.12s ease',
+              boxShadow:   t.shadow.lg,
+              minWidth:    140,
+              zIndex:      t.zIndex.dropdown,
+              overflow:    'hidden',
+              animation:   'dropIn 0.12s ease',
             }}
           >
-            <DropItem icon={<Eye size={13} />} label="Visualizar" onClick={() => { onOpenDrop(null); onView(safra.id) }} />
-            <DropItem icon={<Pencil size={13} />} label="Editar" onClick={() => { onOpenDrop(null); onEdit(safra.id) }} />
-            <div style={{ height: 1, background: '#f1f5f9', margin: '2px 0' }} />
-            <DropItem icon={<Trash2 size={13} />} label="Excluir" onClick={() => { onOpenDrop(null); onDeleteReq(safra) }} danger />
+            <Button block variant="ghost" size="sm" icon={<Eye size={13} />}
+              onClick={() => { onOpenDrop(null); onView(safra.id) }}
+            >
+              Visualizar
+            </Button>
+            <Button block variant="ghost" size="sm" icon={<Pencil size={13} />}
+              onClick={() => { onOpenDrop(null); onEdit(safra.id) }}
+            >
+              Editar
+            </Button>
+            <div style={{ height: 1, background: colors.borderSubtle, margin: `${t.space[1]}px 0` }} />
+            <Button block variant="ghost" size="sm" icon={<Trash2 size={13} />}
+              style={{ color: t.color.error.text }}
+              onClick={() => { onOpenDrop(null); onDeleteReq(safra) }}
+            >
+              Excluir
+            </Button>
           </div>
         )}
       </div>
     </div>
-  )
-}
-
-function DropItem({ icon, label, onClick, danger }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        width: '100%', textAlign: 'left',
-        padding: '8px 14px',
-        background: hov ? (danger ? '#fee2e2' : '#f5f5f5') : 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: t.font.size.sm,
-        color: danger ? '#dc2626' : '#404040',
-        fontFamily: t.font.family.sans,
-        fontWeight: t.font.weight.medium,
-        transition: 'background 0.1s',
-      }}
-    >
-      {icon}
-      {label}
-    </button>
   )
 }
 
@@ -620,21 +581,23 @@ function KpiCard({
   const { colors } = useTheme()
   return (
     <div style={{
-      padding: `${t.space[4]}px ${t.space[5]}px`,
-      background: bg,
+      padding:     `${t.space[4]}px ${t.space[5]}px`,
+      background:  bg,
       borderRight: hasBorderRight ? `1px solid ${border}` : undefined,
-      display: 'flex', flexDirection: 'column', gap: 4,
+      display:     'flex',
+      flexDirection: 'column',
+      gap:         t.space[1],
     }}>
       <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textMuted, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         {label}
       </span>
       <span style={{
-        fontSize: compact ? t.font.size.md : t.font.size['3xl'],
+        fontSize:   compact ? t.font.size.md : t.font.size['3xl'],
         fontWeight: t.font.weight.bold,
-        color: accent ?? colors.textPrimary,
+        color:      accent ?? colors.textPrimary,
         fontFamily: t.font.family.sans,
         lineHeight: 1.1,
-        wordBreak: 'break-word',
+        wordBreak:  'break-word',
       }}>
         {value}
       </span>
@@ -647,69 +610,25 @@ function KpiCard({
   )
 }
 
-// ─── EmptyState ───────────────────────────────────────────────────────────────
+// ─── Animações ────────────────────────────────────────────────────────────────
 
-function EmptyState({ onNew }: { onNew: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '60px 20px', gap: 12, textAlign: 'center',
-    }}>
-      <div style={{
-        width: 56, height: 56, borderRadius: 16, background: colors.brandBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Calendar size={24} color={colors.brand} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-        Nenhuma safra encontrada
-      </div>
-      <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        Ajuste os filtros ou crie uma nova safra.
-      </div>
-      <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-        Adicionar Safra
-      </Button>
-    </div>
-  )
-}
+const globalStyles = `
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-5px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    @keyframes dropIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  }
+`
 
-// ─── Modal ───────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay,
-        padding: 24,
-        animation: 'fadeIn 0.15s ease',
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: 24,
-          padding: '32px 28px',
-          maxWidth: 440,
-          width: '100%',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-          animation: 'modalIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-      <style>{`
-        @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes modalIn { from { opacity: 0; transform: scale(.94) translateY(10px) } to { opacity: 1; transform: scale(1) translateY(0) } }
-        @keyframes dropIn  { from { opacity: 0; transform: translateY(-5px) scale(.97) } to { opacity: 1; transform: translateY(0) scale(1) } }
-      `}</style>
-    </div>
-  )
+// Injetar estilos globais uma vez
+if (typeof document !== 'undefined' && !document.getElementById('safras-lista-styles')) {
+  const s = document.createElement('style')
+  s.id = 'safras-lista-styles'
+  s.textContent = globalStyles
+  document.head.appendChild(s)
 }

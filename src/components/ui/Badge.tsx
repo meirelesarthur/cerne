@@ -1,10 +1,10 @@
 import React from 'react'
 import { t } from '../../design/tokens'
 
-type BadgeVariant = 'success' | 'danger' | 'warning' | 'neutral'
+export type BadgeVariant = 'success' | 'danger' | 'warning' | 'neutral' | 'info' | 'purple' | 'cyan'
 
 interface BadgeProps {
-  label: string
+  label:   string
   variant: BadgeVariant
 }
 
@@ -13,6 +13,9 @@ const variantStyles: Record<BadgeVariant, { background: string; color: string }>
   danger:  { background: t.color.error.bg,     color: t.color.error.text },
   warning: { background: t.color.warning.bg,   color: t.color.warning.text },
   neutral: { background: t.color.neutral[100], color: t.color.neutral[500] },
+  info:    { background: t.color.info.bg,      color: t.color.info.text },
+  purple:  { background: '#f5f3ff',            color: '#7c3aed' },
+  cyan:    { background: '#ecfeff',            color: '#0891b2' },
 }
 
 export function Badge({ label, variant }: BadgeProps) {

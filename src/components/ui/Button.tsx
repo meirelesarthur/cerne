@@ -6,9 +6,10 @@ type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
-  size?: ButtonSize
+  size?:    ButtonSize
   loading?: boolean
-  icon?: React.ReactNode
+  icon?:    React.ReactNode
+  block?:   boolean
   children: React.ReactNode
 }
 
@@ -50,16 +51,17 @@ const sizeStyle: Record<ButtonSize, React.CSSProperties> = {
 
 export function Button({
   variant = 'primary',
-  size = 'md',
+  size    = 'md',
   loading = false,
+  block   = false,
   icon,
   children,
   style,
   disabled,
   ...props
 }: ButtonProps) {
-  const base = variantBase[variant]
-  const sz = sizeStyle[size]
+  const base       = variantBase[variant]
+  const sz         = sizeStyle[size]
   const isDisabled = disabled || loading
 
   return (
@@ -67,9 +69,10 @@ export function Button({
       {...props}
       disabled={isDisabled}
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display:        'inline-flex',
+        alignItems:     'center',
+        justifyContent: block ? 'flex-start' : 'center',
+        width:          block ? '100%' : undefined,
         gap: t.space[1] + t.space[1] / 2,
         borderRadius: t.radius.DEFAULT,
         fontFamily: t.font.family.sans,

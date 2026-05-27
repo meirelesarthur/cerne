@@ -3,24 +3,32 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
 interface PageHeaderProps {
-  title: string
+  title:        string
   description?: string
-  actions?: React.ReactNode
-  count?: number
+  actions?:     React.ReactNode
+  count?:       number
+  breadcrumb?:  React.ReactNode
 }
 
-export function PageHeader({ title, description, actions, count }: PageHeaderProps) {
+export function PageHeader({ title, description, actions, count, breadcrumb }: PageHeaderProps) {
   const { colors } = useTheme()
 
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: t.space[4],
+        paddingTop:    t.space[4],
         paddingBottom: t.space[4],
-        marginBottom: t.space[2],
+        marginBottom:  t.space[2],
+      }}
+    >
+      {breadcrumb && (
+        <div style={{ marginBottom: t.space[2] }}>{breadcrumb}</div>
+      )}
+    <div
+      style={{
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'space-between',
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] / 2 }}>
@@ -73,6 +81,7 @@ export function PageHeader({ title, description, actions, count }: PageHeaderPro
           {actions}
         </div>
       )}
+    </div>
     </div>
   )
 }

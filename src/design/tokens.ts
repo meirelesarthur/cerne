@@ -212,8 +212,26 @@ export const loginTheme = {
   accentGlow: 'rgba(5,150,105, 0.05)',
 }
 
+// ─── Tokens para tiles de dashboard ──────────────────────────────────────────
+// Backgrounds escuros exclusivos da visualização de scoreboards no OverviewPanel
+
+export const dashboard = {
+  tileRevenue:    '#1b4332',  // verde escuro — receitas
+  tileExpense:    '#7f1d1d',  // vermelho escuro — despesas
+  tileFinance:    '#1e3a5f',  // azul escuro — análise financeira
+  tileProduction: '#14532d',  // verde escuro alt — produção
+  tileDark:       '#1c1917',  // quase-preto — produtividade / neutro
+}
+
+// ─── Tokens para séries de gráficos ──────────────────────────────────────────
+
+export const chart = {
+  revenue: '#3b82f6',  // azul — receitas (equivale a color.info.solid)
+  expense: '#ef4444',  // vermelho vivo — despesas
+}
+
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme }
+export const t = { color, font, space, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart }
 export default t

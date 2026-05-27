@@ -10,6 +10,9 @@ import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import {
@@ -44,6 +47,12 @@ export default function CentrosCustoLista({
   const [deleteId,    setDeleteId]    = useState<number | null>(null)
   const [saibaMais,   setSaibaMais]   = useState(false)
   const [openMenuId,  setOpenMenuId]  = useState<number | null>(null)
+  const [isLoading,   setIsLoading]   = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
 
   const activeFilterCount = [filters.condicao, filters.classe, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '' })
@@ -71,7 +80,7 @@ export default function CentrosCustoLista({
   }, [centros, search, filters])
 
   // Reset para página 1 ao filtrar
-  useEffect(() => { setPage(1) }, [search])
+  useEffect(() => { setPage(1) }, [search, filters.condicao, filters.classe, filters.ativo])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -159,7 +168,14 @@ export default function CentrosCustoLista({
       />
 
       {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-      <div style={{
+      {isLoading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={80} />
+          ))}
+        </div>
+      ) : null}
+      {!isLoading && <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: 1,
@@ -240,7 +256,7 @@ export default function CentrosCustoLista({
             </div>
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -279,71 +295,85 @@ export default function CentrosCustoLista({
       </div>
 
       {/* ── Tabela ──────────────────────────────────────────────────────── */}
-      <div style={{
-        background: colors.surfaceBg,
-        border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
-        overflow: 'hidden',
-      }}>
-        {/* Cabeçalho */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
-          padding: '10px 16px',
-          borderBottom: `1px solid ${border}`,
-          background: colors.surfaceSubtle,
-        }}>
-          {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
-            <div
-              key={h}
-              style={{
-                fontSize: t.font.size.xs,
-                fontWeight: t.font.weight.semibold,
-                color: colors.textMuted,
-                fontFamily: t.font.family.sans,
-                letterSpacing: '0.06em',
-                textAlign: i >= 4 ? 'center' : 'left',
-              }}
-            >
-              {h}
-            </div>
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
           ))}
         </div>
-
-        {/* Linhas */}
-        {paginated.length === 0 ? (
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhum centro de custo encontrado."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
+      ) : (
+        <>
           <div style={{
-            padding: '48px 16px',
-            textAlign: 'center',
-            color: colors.textMuted,
-            fontSize: t.font.size.base,
-            fontFamily: t.font.family.sans,
+            background: colors.surfaceBg,
+            border: `1px solid ${border}`,
+            borderRadius: t.radius.lg,
+            overflow: 'hidden',
           }}>
-            Nenhum centro de custo encontrado.
-          </div>
-        ) : (
-          paginated.map((cc, idx) => (
-            <CCRow
-              key={cc.id}
-              cc={cc}
-              isLast={idx === paginated.length - 1}
-              isMenuOpen={openMenuId === cc.id}
-              onMenuToggle={(e) => {
-                e.stopPropagation()
-                setOpenMenuId(prev => prev === cc.id ? null : cc.id)
-              }}
-              onEdit={() => { setOpenMenuId(null); onEdit(cc.id) }}
-              onDelete={() => { setOpenMenuId(null); setDeleteId(cc.id) }}
-              colors={colors}
-              border={border}
-            />
-          ))
-        )}
-      </div>
+            {/* Cabeçalho */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
+              padding: '10px 16px',
+              borderBottom: `1px solid ${border}`,
+              background: colors.surfaceSubtle,
+            }}>
+              {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
+                <div
+                  key={h}
+                  style={{
+                    fontSize: t.font.size.xs,
+                    fontWeight: t.font.weight.semibold,
+                    color: colors.textMuted,
+                    fontFamily: t.font.family.sans,
+                    letterSpacing: '0.06em',
+                    textAlign: i >= 4 ? 'center' : 'left',
+                  }}
+                >
+                  {h}
+                </div>
+              ))}
+            </div>
 
-      {/* ── Paginação ───────────────────────────────────────────────────── */}
-      {totalPages > 1 && (
-        <Pagination page={page} total={totalPages} onChange={setPage} colors={colors} />
+            {/* Linhas */}
+            {paginated.map((cc, idx) => (
+              <CCRow
+                key={cc.id}
+                cc={cc}
+                isLast={idx === paginated.length - 1}
+                isMenuOpen={openMenuId === cc.id}
+                onMenuToggle={(e) => {
+                  e.stopPropagation()
+                  setOpenMenuId(prev => prev === cc.id ? null : cc.id)
+                }}
+                onEdit={() => { setOpenMenuId(null); onEdit(cc.id) }}
+                onDelete={() => { setOpenMenuId(null); setDeleteId(cc.id) }}
+                colors={colors}
+                border={border}
+              />
+            ))}
+          </div>
+
+          {/* ── Paginação ─────────────────────────────────────────────── */}
+          {filtered.length > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={filtered.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
@@ -652,82 +682,6 @@ function DropdownItem({
       }}
     >
       {icon}
-      {label}
-    </button>
-  )
-}
-
-// ─── Paginação ────────────────────────────────────────────────────────────────
-
-function Pagination({
-  page, total, onChange, colors,
-}: {
-  page:     number
-  total:    number
-  onChange: (p: number) => void
-  colors:   ReturnType<typeof useTheme>['colors']
-}) {
-  const pages = Array.from({ length: total }, (_, i) => i + 1)
-
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-      gap: 4, marginTop: 16,
-    }}>
-      <PageBtn
-        label="‹"
-        disabled={page === 1}
-        onClick={() => onChange(page - 1)}
-        colors={colors}
-      />
-      {pages.map(p => (
-        <PageBtn
-          key={p}
-          label={String(p)}
-          active={p === page}
-          onClick={() => onChange(p)}
-          colors={colors}
-        />
-      ))}
-      <PageBtn
-        label="›"
-        disabled={page === total}
-        onClick={() => onChange(page + 1)}
-        colors={colors}
-      />
-    </div>
-  )
-}
-
-function PageBtn({
-  label, active = false, disabled = false, onClick, colors,
-}: {
-  label:     string
-  active?:   boolean
-  disabled?: boolean
-  onClick:   () => void
-  colors:    ReturnType<typeof useTheme>['colors']
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        width: 32, height: 32,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: `1px solid ${active ? colors.brand : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
-        background: active ? colors.brandBg : 'transparent',
-        color: active ? colors.brand : disabled ? colors.textMuted : colors.textSecondary,
-        fontSize: t.font.size.sm,
-        fontFamily: t.font.family.sans,
-        fontWeight: active ? t.font.weight.semibold : t.font.weight.normal,
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.4 : 1,
-        transition: 'background 0.12s, border-color 0.12s',
-      }}
-    >
       {label}
     </button>
   )

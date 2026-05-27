@@ -3,12 +3,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import t from '../design/tokens'
 import logoFull from '../assets/Logo.svg'
-// Vídeos servidos diretamente do CDN via public/ — não importar como módulo ES
-const vid0 = '/videos/agricultura.mp4'
-const vid1 = '/videos/apicultura.mp4'
-const vid2 = '/videos/avicultura.mp4'
-const vid3 = '/videos/ovicultura.mp4'
-const vid4 = '/videos/Psicultura.mp4'
+const CDN = 'https://pub-0f1e695318f140f895ccdb13696c1c62.r2.dev'
+const vid0 = `${CDN}/agricultura.mp4`
+const vid1 = `${CDN}/apicultura.mp4`
+const vid2 = `${CDN}/avicultura.mp4`
+const vid3 = `${CDN}/ovicultura.mp4`
+const vid4 = `${CDN}/Psicultura.mp4`
 
 const VIDEOS = [vid0, vid1, vid2, vid3, vid4]
 

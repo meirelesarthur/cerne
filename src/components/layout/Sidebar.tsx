@@ -6,6 +6,7 @@ import logoMinWhite from '../../assets/logo-min-white.svg'
 import { Tooltip } from '../Tooltip'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 
 interface SidebarProps {
   modules: NavModule[]
@@ -35,10 +36,10 @@ export default function Sidebar({
         width: w,
         minWidth: w,
         background: colors.sidebarBg,
-        borderRadius: 16,
+        borderRadius: t.radius['2xl'],
         display: 'flex',
         flexDirection: 'column',
-        padding: '12px 8px',
+        padding: `${t.space[3]}px ${t.space[2]}px`,
         transition: 'width 0.2s ease, min-width 0.2s ease, background 0.2s ease',
         overflow: 'hidden',
         cursor: 'default',
@@ -53,7 +54,7 @@ export default function Sidebar({
           justifyContent: isIconOnly ? 'center' : 'space-between',
           paddingLeft: isIconOnly ? 0 : 8,
           paddingRight: isIconOnly ? 0 : 4,
-          marginBottom: 8,
+          marginBottom: t.space[2],
           flexShrink: 0,
         }}
       >
@@ -67,7 +68,7 @@ export default function Sidebar({
                 style={{
                   width: 28,
                   height: 28,
-                  borderRadius: 6,
+                  borderRadius: t.radius.md,
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -147,7 +148,7 @@ export default function Sidebar({
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: colors.navDivider, margin: '8px 4px', transition: 'background 0.2s' }} />
+      <div style={{ height: 1, background: colors.navDivider, margin: `${t.space[2]}px 4px`, transition: 'background 0.2s' }} />
 
       {/* Bottom actions — sempre param propagação */}
       <div
@@ -172,16 +173,16 @@ export default function Sidebar({
                 position: 'absolute',
                 top: 4,
                 right: 4,
-                background: '#ff58ae',
+                background: t.color.notification,
                 color: 'white',
-                borderRadius: 9999,
+                borderRadius: t.radius.full,
                 width: 13,
                 height: 13,
-                fontSize: 8,
+                fontSize: t.font.size.xs - 3, // ~8px (badge de notificação)
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: 700,
+                fontWeight: t.font.weight.bold,
               }}
             >
               3

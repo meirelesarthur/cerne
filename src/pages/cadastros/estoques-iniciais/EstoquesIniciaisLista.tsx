@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, X, ChevronUp,
-  ChevronLeft, ChevronRight, Download, Package,
+  Download, Package,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -9,6 +9,9 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import type { EstoqueInicial } from './estoques-iniciais.types'
@@ -152,6 +155,15 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   const [sortDir,       setSortDir]       = useState<'asc' | 'desc'>('desc')
   const [deleteId,      setDeleteId]      = useState<number | null>(null)
   const [page,          setPage]          = useState(1)
+  const [isLoading,     setIsLoading]     = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, filterArmazem])
 
   const activeFilterCount = filterArmazem !== '' ? 1 : 0
   const clearFilters = () => { setFilterArmazem(''); setPage(1) }
@@ -268,81 +280,80 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
       </div>
 
       {/* Table card */}
-      {filtered.length === 0 ? (
-        <EmptyState hasSearch={hasFilters} onNew={onNew} colors={colors} />
-      ) : (
-        <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-          {/* Header row */}
-          <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
-            <span style={colStyle}>Produto</span>
-            <span style={colStyle}>Un.</span>
-            <span style={colStyle}>Armazém</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
-            <button
-              type="button"
-              onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-              style={{ ...colStyle, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3, textAlign: 'left' as const }}
-            >
-              Dt. Movimento
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.3 }} />
-                <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.3 }} />
-              </span>
-            </button>
-            <span style={colStyle}>Lote</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-          </div>
-
-          {/* Rows */}
-          {pageSlice.map((r, idx) => (
-            <TableRow
-              key={r.id}
-              registro={r}
-              isLast={idx === pageSlice.length - 1}
-              onEdit={() => onEdit(r.id)}
-              onDeleteReq={() => setDeleteId(r.id)}
-              colors={colors}
-              border={border}
-              colTemplate={colTemplate}
-            />
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
           ))}
         </div>
-      )}
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhum registro encontrado."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
+      ) : (
+        <>
+          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+            {/* Header row */}
+            <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
+              <span style={colStyle}>Produto</span>
+              <span style={colStyle}>Un.</span>
+              <span style={colStyle}>Armazém</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
+              <button
+                type="button"
+                onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                style={{ ...colStyle, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3, textAlign: 'left' as const }}
+              >
+                Dt. Movimento
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.3 }} />
+                  <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.3 }} />
+                </span>
+              </button>
+              <span style={colStyle}>Lote</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+            </div>
 
-      {/* Pagination */}
-      {filtered.length > PAGE_SIZE && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          <span>{filtered.length} registros</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button
-              type="button"
-              disabled={safePage === 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, cursor: safePage === 1 ? 'not-allowed' : 'pointer', color: safePage === 1 ? colors.textMuted : colors.textPrimary, opacity: safePage === 1 ? 0.4 : 1 }}
-            >
-              <ChevronLeft size={13} />
-            </button>
-            <span style={{ color: colors.textPrimary, fontWeight: t.font.weight.medium }}>
-              {safePage} / {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={safePage === totalPages}
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, cursor: safePage === totalPages ? 'not-allowed' : 'pointer', color: safePage === totalPages ? colors.textMuted : colors.textPrimary, opacity: safePage === totalPages ? 0.4 : 1 }}
-            >
-              <ChevronRight size={13} />
-            </button>
+            {/* Rows */}
+            {pageSlice.map((r, idx) => (
+              <TableRow
+                key={r.id}
+                registro={r}
+                isLast={idx === pageSlice.length - 1}
+                onEdit={() => onEdit(r.id)}
+                onDeleteReq={() => setDeleteId(r.id)}
+                colors={colors}
+                border={border}
+                colTemplate={colTemplate}
+              />
+            ))}
           </div>
-        </div>
-      )}
 
-      {filtered.length > 0 && filtered.length <= PAGE_SIZE && (
-        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </div>
+          {/* Pagination */}
+          {filtered.length > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={safePage}
+                total={filtered.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+
+          {filtered.length <= PAGE_SIZE && (
+            <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+              {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
+            </div>
+          )}
+        </>
       )}
 
       {/* Delete modal */}

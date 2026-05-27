@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, X,
   List, LayoutGrid, MapPin, Layers, Ruler, Eye,
@@ -12,6 +12,9 @@ import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { Badge }           from '../../../components/ui/Badge'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState }      from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { mockFazendas }  from './fazendas.mock'
@@ -65,6 +68,17 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
   const [search,     setSearch]     = useState('')
   const [filters,    setFilters]    = useState({ tipoExploracao: '', ativo: '' })
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isLoading,  setIsLoading]  = useState(true)
+  const [page,       setPage]       = useState(1)
+  const PAGE_SIZE = 10
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, filters.tipoExploracao, filters.ativo])
 
   // ── KPIs derivados dos dados brutos (não filtrados) ───────────────────────
   const kpis = useMemo(() => {
@@ -94,6 +108,9 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       return matchSearch && matchTipo && matchAtivo
     })
   }, [data, search, filters])
+
+  const totalFiltered = filtered.length
+  const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const activeFilterCount = [filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipoExploracao: '', ativo: '' })
@@ -216,7 +233,15 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       />
 
       {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-      <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
+      {isLoading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={80} />
+          ))}
+        </div>
+      ) : (
+        <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
+      )}
 
       {/* ── Toolbar: search (esq.) → chips → [spacer] → toggle (dir.) ────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, marginTop: 4, flexWrap: 'wrap' }}>
@@ -262,21 +287,64 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       </div>
 
       {/* ── Conteúdo: Lista ou Cards ─────────────────────────────────────── */}
-      {viewMode === 'list' ? (
-        <DataTable<FazendaRow>
-          columns={columns}
-          data={filtered}
-          keyField="id"
-          emptyMessage="Nenhuma fazenda encontrada."
-          onRowClick={(row) => onView(row.id)}
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          message="Nenhuma fazenda encontrada."
+          description="Tente ajustar os filtros ou limpar a busca."
         />
+      ) : viewMode === 'list' ? (
+        <>
+          <DataTable<FazendaRow>
+            columns={columns}
+            data={paginatedData}
+            keyField="id"
+            emptyMessage="Nenhuma fazenda encontrada."
+            onRowClick={(row) => onView(row.id)}
+          />
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       ) : (
-        <CardsGrid
-          data={filtered}
-          onView={onView}
-          onEdit={onEdit}
-          colors={colors}
-        />
+        <>
+          <CardsGrid
+            data={paginatedData}
+            onView={onView}
+            onEdit={onEdit}
+            colors={colors}
+          />
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Filter Drawer ────────────────────────────────────────────────── */}
@@ -514,20 +582,6 @@ function CardsGrid({
   onEdit: (id: string) => void
   colors: ReturnType<typeof useTheme>['colors']
 }) {
-  if (data.length === 0) {
-    return (
-      <div style={{
-        textAlign: 'center',
-        padding: `${t.space[16]}px ${t.space[4]}px`,
-        color: colors.textMuted,
-        fontSize: t.font.size.base,
-        fontFamily: t.font.family.sans,
-      }}>
-        Nenhuma fazenda encontrada.
-      </div>
-    )
-  }
-
   return (
     <div style={{
       display: 'grid',

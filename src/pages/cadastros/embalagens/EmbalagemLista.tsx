@@ -9,6 +9,9 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
@@ -56,6 +59,17 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Embalagem | null>(null)
+  const [isLoading,    setIsLoading]   = useState(true)
+  const [page,         setPage]        = useState(1)
+  const PAGE_SIZE = 10
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, filters.unidade])
 
   const border  = colors.border
   const activeFilterCount = [filters.unidade].filter(Boolean).length
@@ -74,6 +88,9 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
     })
     return base
   }, [embalagens, search, filters, sortDir])
+
+  const totalFiltered = filtered.length
+  const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -121,70 +138,96 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
       </div>
 
       {/* ── Tabela ──────────────────────────────────────────────────────────── */}
-      {filtered.length === 0 ? (
-        <EmptyState onNew={onNew} hasSearch={search.length > 0} />
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhuma embalagem encontrada."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
       ) : (
-        <div style={{
-          background: colors.surfaceBg,
-          border: `1px solid ${border}`,
-          borderRadius: t.radius.lg,
-          overflow: 'hidden',
-        }}>
-          {/* Cabeçalho */}
+        <>
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 140px 160px 96px',
-            padding: '10px 16px',
-            background: colors.surfaceSubtle,
-            borderBottom: `1px solid ${border}`,
+            background: colors.surfaceBg,
+            border: `1px solid ${border}`,
+            borderRadius: t.radius.lg,
+            overflow: 'hidden',
           }}>
-            {/* Descrição — ordenável */}
-            <button
-              type="button"
-              onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                color: colors.textMuted, fontFamily: t.font.family.sans,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-              }}
-            >
-              Descrição
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.35 }} />
-                <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.35 }} />
-              </span>
-            </button>
-            {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
-              <span key={h} style={{
-                fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                color: colors.textMuted, fontFamily: t.font.family.sans,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-                textAlign: i === 2 ? 'right' : 'left',
-              }}>
-                {h}
-              </span>
+            {/* Cabeçalho */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 140px 160px 96px',
+              padding: '10px 16px',
+              background: colors.surfaceSubtle,
+              borderBottom: `1px solid ${border}`,
+            }}>
+              {/* Descrição — ordenável */}
+              <button
+                type="button"
+                onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                  color: colors.textMuted, fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                }}
+              >
+                Descrição
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.35 }} />
+                  <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.35 }} />
+                </span>
+              </button>
+              {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
+                <span key={h} style={{
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                  color: colors.textMuted, fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                  textAlign: i === 2 ? 'right' : 'left',
+                }}>
+                  {h}
+                </span>
+              ))}
+            </div>
+
+            {/* Linhas */}
+            {paginatedData.map((emb, idx) => (
+              <EmbalagemRow
+                key={emb.id}
+                emb={emb}
+                isLast={idx === paginatedData.length - 1}
+                onEdit={() => onEdit(emb.id)}
+                onDeleteReq={() => setDeleteTarget(emb)}
+                colors={colors}
+                border={border}
+              />
             ))}
           </div>
 
-          {/* Linhas */}
-          {filtered.map((emb, idx) => (
-            <EmbalagemRow
-              key={emb.id}
-              emb={emb}
-              isLast={idx === filtered.length - 1}
-              onEdit={() => onEdit(emb.id)}
-              onDeleteReq={() => setDeleteTarget(emb)}
-              colors={colors}
-              border={border}
-            />
-          ))}
-        </div>
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Rodapé */}
-      {filtered.length > 0 && (
+      {!isLoading && filtered.length > 0 && (
         <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
           N. Registros: {filtered.length}
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, Warehouse, X,
   ChevronUp, ChevronDown,
@@ -6,9 +6,14 @@ import {
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
+import { Modal }           from '../../../components/ui/Modal'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import {
@@ -28,7 +33,7 @@ interface Props {
 // ─── Toast ────────────────────────────────────────────────────────────────────
 
 interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-const TOAST_BG: Record<ToastItem['type'], string> = { ok: '#14532d', err: '#dc2626', neutral: '#374151' }
+const TOAST_BG: Record<ToastItem['type'], string> = { ok: t.color.brand[900], err: t.color.error.solid, neutral: t.color.neutral[700] }
 
 function useToast() {
   const [toasts, setToasts] = useState<ToastItem[]>([])
@@ -64,6 +69,17 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const [sortField,    setSortField]   = useState<SortField>('sigla')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
+  const [isLoading,    setIsLoading]   = useState(true)
+  const [page,         setPage]        = useState(1)
+  const PAGE_SIZE = 10
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, filters.tipo, filters.ativo])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -87,6 +103,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
     })
     return base
   }, [armazens, search, filters, sortField, sortDir])
+
+  const totalFiltered = filtered.length
+  const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -160,64 +179,91 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       </div>
 
       {/* Tabela */}
-      {filtered.length === 0 ? (
-        <EmptyState onNew={onNew} hasSearch={search.length > 0} />
-      ) : (
-        <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-          {/* Cabeçalho */}
-          <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
-            <SortBtn label="Sigla" field="sigla" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="sigla" />} />
-            <SortBtn label="Descrição" field="descricao" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="descricao" />} />
-            <span style={colStyle}>Tipo</span>
-            <span style={colStyle}>Status</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-          </div>
-
-          {filtered.map((arm, idx) => (
-            <ArmazemRow
-              key={arm.id}
-              arm={arm}
-              isLast={idx === filtered.length - 1}
-              onEdit={() => onEdit(arm.id)}
-              onDeleteReq={() => setDeleteTarget(arm)}
-              colors={colors}
-              border={border}
-            />
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
           ))}
         </div>
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhum armazém encontrado."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
+      ) : (
+        <>
+          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+            {/* Cabeçalho */}
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
+              <SortBtn label="Sigla" field="sigla" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="sigla" />} />
+              <SortBtn label="Descrição" field="descricao" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="descricao" />} />
+              <span style={colStyle}>Tipo</span>
+              <span style={colStyle}>Status</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+            </div>
+
+            {paginatedData.map((arm, idx) => (
+              <ArmazemRow
+                key={arm.id}
+                arm={arm}
+                isLast={idx === paginatedData.length - 1}
+                onEdit={() => onEdit(arm.id)}
+                onDeleteReq={() => setDeleteTarget(arm)}
+                colors={colors}
+                border={border}
+              />
+            ))}
+          </div>
+
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
-      {filtered.length > 0 && (
+      {!isLoading && filtered.length > 0 && (
         <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
           N. Registros: {filtered.length}
         </div>
       )}
 
       {/* Modal exclusão */}
-      {deleteTarget && (
-        <Modal onClose={() => setDeleteTarget(null)}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '4px 0' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Trash2 size={22} color="#dc2626" />
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans, marginBottom: 8 }}>
-                Excluir armazém?
-              </div>
-              <p style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0 }}>
-                <strong style={{ color: colors.textPrimary }}>{deleteTarget.sigla} — {deleteTarget.descricao}</strong>{' '}
-                será excluído permanentemente. Esta ação não pode ser desfeita.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
-              <Button variant="secondary" style={{ flex: 1 }} onClick={() => setDeleteTarget(null)}>Cancelar</Button>
-              <Button variant="destructive" style={{ flex: 1 }} onClick={handleDeleteConfirm}>
-                <Trash2 size={13} /> Excluir
-              </Button>
-            </div>
+      <Modal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Excluir armazém"
+        subtitle="Esta ação não pode ser desfeita."
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              <Trash2 size={13} /> Excluir
+            </Button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: t.space[4], padding: `${t.space[1]}px 0` }}>
+          <div style={{ width: 52, height: 52, borderRadius: t.radius.full, background: t.color.error.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Trash2 size={22} color={t.color.error.solid} />
           </div>
-        </Modal>
-      )}
+          <p style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0, textAlign: 'center' }}>
+            <strong style={{ color: colors.textPrimary }}>{deleteTarget?.sigla} — {deleteTarget?.descricao}</strong>{' '}
+            será excluído permanentemente.
+          </p>
+        </div>
+      </Modal>
 
       {/* Toasts */}
       <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
@@ -312,27 +358,15 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
           {arm.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-        <ActionBtn icon={<Pencil size={13} />} label="Editar"  onClick={onEdit}      colors={colors} />
-        <ActionBtn icon={<Trash2 size={13} />} label="Excluir" onClick={onDeleteReq} colors={colors} danger />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }}>
+        <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={onEdit}      />
+        <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={onDeleteReq} danger />
       </div>
     </div>
   )
 }
 
-// ─── ActionBtn ────────────────────────────────────────────────────────────────
-
-function ActionBtn({ icon, label, onClick, colors, danger = false }: {
-  icon: React.ReactNode; label: string; onClick: () => void
-  colors: ReturnType<typeof useTheme>['colors']; danger?: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button type="button" title={label} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent', border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`, borderRadius: t.radius.DEFAULT, cursor: 'pointer', color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted, transition: 'background 0.12s, border-color 0.12s, color 0.12s' }}>
-      {icon}
-    </button>
-  )
-}
+// ActionBtn foi substituído por IconButton de src/components/ui/IconButton
 
 // ─── EmptyState ───────────────────────────────────────────────────────────────
 
@@ -340,7 +374,7 @@ function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolea
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: 12, textAlign: 'center' }}>
-      <div style={{ width: 56, height: 56, borderRadius: 16, background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 56, height: 56, borderRadius: t.radius['2xl'], background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Warehouse size={24} color={colors.brand} strokeWidth={1.5} />
       </div>
       <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
@@ -358,16 +392,4 @@ function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolea
   )
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: t.zIndex.overlay, padding: 24 }} onClick={onClose}>
-      <div style={{ background: colors.surfaceBg, borderRadius: 24, padding: '28px', maxWidth: 420, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)', animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)' }} onClick={e => e.stopPropagation()}>
-        {children}
-      </div>
-      <style>{`@keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
-    </div>
-  )
-}
+// Modal local substituído por Modal de src/components/ui/Modal

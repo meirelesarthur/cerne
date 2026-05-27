@@ -1,6 +1,7 @@
 import { Bell, Search, ChevronRight } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -25,7 +26,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 12px',
+        padding: `0 ${t.space[3]}px`,
         flexShrink: 0,
         background: 'transparent',
       }}
@@ -36,9 +37,9 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          fontFamily: "'Outfit', sans-serif",
-          fontWeight: 300,
-          fontSize: 12,
+          fontFamily: t.font.family.sans,
+          fontWeight: t.font.weight.normal,
+          fontSize: t.font.size.sm,
           color: colors.textPrimary,
         }}
       >
@@ -68,14 +69,14 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            padding: '0 12px',
-            borderRadius: 8,
+            padding: `0 ${t.space[3]}px`,
+            borderRadius: t.radius.DEFAULT,
             border: `1px solid ${colors.border}`,
             background: colors.surfaceBg,
             cursor: 'pointer',
             color: colors.textMuted,
-            fontSize: 12,
-            fontFamily: "'Outfit', sans-serif",
+            fontSize: t.font.size.sm,
+            fontFamily: t.font.family.sans,
             transition: 'background 0.15s',
           }}
         >
@@ -83,10 +84,10 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           <span>Buscar...</span>
           <kbd
             style={{
-              fontSize: 10,
+              fontSize: t.font.size.xs - 1, // ~10px (abaixo do mínimo do token)
               background: colors.surfaceSubtle,
               border: `1px solid ${colors.border}`,
-              borderRadius: 4,
+              borderRadius: t.radius.sm,
               padding: '1px 4px',
               color: colors.textMuted,
               fontFamily: 'monospace',
@@ -102,7 +103,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             position: 'relative',
             width: 34,
             height: 34,
-            borderRadius: 8,
+            borderRadius: t.radius.DEFAULT,
             border: 'none',
             background: 'transparent',
             cursor: 'pointer',
@@ -121,16 +122,16 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
               position: 'absolute',
               top: 5,
               right: 5,
-              background: '#ff58ae',
+              background: t.color.notification,
               color: 'white',
-              borderRadius: 9999,
+              borderRadius: t.radius.full,
               width: 14,
               height: 14,
-              fontSize: 8,
+              fontSize: t.font.size.xs - 3, // ~8px (badge de notificação, abaixo do mínimo do token)
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
+              fontWeight: t.font.weight.bold,
             }}
           >
             3
@@ -142,16 +143,16 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           style={{
             width: 34,
             height: 34,
-            borderRadius: 9999,
-            background: `linear-gradient(135deg, ${colors.brand}, #34d399)`,
+            borderRadius: t.radius.full,
+            background: `linear-gradient(135deg, ${colors.brand}, ${t.color.brand[300]})`,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
-            fontSize: 12,
-            fontWeight: 600,
+            fontSize: t.font.size.sm,
+            fontWeight: t.font.weight.semibold,
             letterSpacing: '0.3px',
           }}
           title="Silvio Ventura"

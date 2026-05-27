@@ -10,6 +10,9 @@ import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { fmtYMDtoDMY }    from './safras.types'
@@ -63,6 +66,17 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const [openDropId,   setOpenDropId]   = useState<number | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Safra | null>(null)
   const [showInfo,     setShowInfo]     = useState(false)
+  const [isLoading,    setIsLoading]    = useState(true)
+  const [page,         setPage]         = useState(1)
+  const PAGE_SIZE = 10
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, statusFilter])
 
   const activeFilterCount = statusFilter !== 'todas' ? 1 : 0
   const clearFilters = () => setStatusFilter('todas')
@@ -101,6 +115,9 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       return matchSearch && matchStatus
     })
   }, [safras, search, statusFilter])
+
+  const totalFiltered = filtered.length
+  const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -142,43 +159,51 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       />
 
       {/* ── KPI cards ─────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 1,
-        border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
-        overflow: 'hidden',
-        marginBottom: 16,
-      }}>
-        <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} hasBorderRight />
-        <KpiCard
-          label="Ativas"
-          value={String(kpis.ativas)}
-          sub=""
-          bg={cardBg}
-          border={border}
-          accent="#16a34a"
-          hasBorderRight
-        />
-        <KpiCard
-          label="Safra Atual"
-          value={safrAtual?.desc ?? '—'}
-          sub={safrAtual ? `${fmtYMDtoDMY(safrAtual.ini)} — ${fmtYMDtoDMY(safrAtual.fim)}` : 'Nenhuma ativa'}
-          bg={cardBg}
-          border={border}
-          hasBorderRight
-          compact
-        />
-        <KpiCard
-          label="Encerradas"
-          value={String(kpis.encerradas)}
-          sub=""
-          bg={cardBg}
-          border={border}
-          accent="#94a3b8"
-        />
-      </div>
+      {isLoading ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={80} />
+          ))}
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 1,
+          border: `1px solid ${border}`,
+          borderRadius: t.radius.lg,
+          overflow: 'hidden',
+          marginBottom: 16,
+        }}>
+          <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} hasBorderRight />
+          <KpiCard
+            label="Ativas"
+            value={String(kpis.ativas)}
+            sub=""
+            bg={cardBg}
+            border={border}
+            accent="#16a34a"
+            hasBorderRight
+          />
+          <KpiCard
+            label="Safra Atual"
+            value={safrAtual?.desc ?? '—'}
+            sub={safrAtual ? `${fmtYMDtoDMY(safrAtual.ini)} — ${fmtYMDtoDMY(safrAtual.fim)}` : 'Nenhuma ativa'}
+            bg={cardBg}
+            border={border}
+            hasBorderRight
+            compact
+          />
+          <KpiCard
+            label="Encerradas"
+            value={String(kpis.encerradas)}
+            sub=""
+            bg={cardBg}
+            border={border}
+            accent="#94a3b8"
+          />
+        </div>
+      )}
 
       {/* ── Toolbar ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -195,60 +220,88 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       </div>
 
       {/* ── Tabela ────────────────────────────────────────────────────────── */}
-      {filtered.length === 0 ? (
-        <EmptyState onNew={onNew} />
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhuma safra encontrada."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
       ) : (
-        <div style={{
-          background: colors.surfaceBg,
-          border: `1px solid ${border}`,
-          borderRadius: t.radius.lg,
-          overflow: 'hidden',
-        }}>
-          {/* Cabeçalho */}
+        <>
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-            padding: '10px 16px',
-            background: colors.surfaceSubtle,
-            borderBottom: `1px solid ${border}`,
+            background: colors.surfaceBg,
+            border: `1px solid ${border}`,
+            borderRadius: t.radius.lg,
+            overflow: 'hidden',
           }}>
-            {['Descrição', 'Dt. Início', 'Dt. Fim', 'Status', 'Semanas', ''].map((h, i) => (
-              <span key={i} style={{
-                fontSize: t.font.size.xs,
-                fontWeight: t.font.weight.semibold,
-                color: colors.textMuted,
-                fontFamily: t.font.family.sans,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                textAlign: i >= 4 ? 'center' : undefined,
-              }}>
-                {h}
-              </span>
+            {/* Cabeçalho */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
+              padding: '10px 16px',
+              background: colors.surfaceSubtle,
+              borderBottom: `1px solid ${border}`,
+            }}>
+              {['Descrição', 'Dt. Início', 'Dt. Fim', 'Status', 'Semanas', ''].map((h, i) => (
+                <span key={i} style={{
+                  fontSize: t.font.size.xs,
+                  fontWeight: t.font.weight.semibold,
+                  color: colors.textMuted,
+                  fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  textAlign: i >= 4 ? 'center' : undefined,
+                }}>
+                  {h}
+                </span>
+              ))}
+            </div>
+
+            {/* Linhas */}
+            {paginatedData.map((safra, idx) => (
+              <SafraRow
+                key={safra.id}
+                safra={safra}
+                isLast={idx === paginatedData.length - 1}
+                openDropId={openDropId}
+                onOpenDrop={setOpenDropId}
+                onView={onView}
+                onEdit={onEdit}
+                onDeleteReq={setDeleteTarget}
+                colors={colors}
+                border={border}
+              />
             ))}
           </div>
 
-          {/* Linhas */}
-          {filtered.map((safra, idx) => (
-            <SafraRow
-              key={safra.id}
-              safra={safra}
-              isLast={idx === filtered.length - 1}
-              openDropId={openDropId}
-              onOpenDrop={setOpenDropId}
-              onView={onView}
-              onEdit={onEdit}
-              onDeleteReq={setDeleteTarget}
-              colors={colors}
-              border={border}
-            />
-          ))}
-        </div>
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Rodapé */}
-      <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        N. Registros: {filtered.length}
-      </div>
+      {!isLoading && filtered.length > 0 && (
+        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          N. Registros: {filtered.length}
+        </div>
+      )}
 
       {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
       {deleteTarget && (

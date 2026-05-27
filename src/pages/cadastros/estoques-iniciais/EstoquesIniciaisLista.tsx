@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import {
   Plus, Pencil, Trash2, X, ChevronDown, ChevronUp,
-  ChevronLeft, ChevronRight, Download, Package,
+  Download, Package,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
@@ -12,6 +12,7 @@ import type { EstoqueInicial } from './estoques-iniciais.types'
 import { useToast, TOAST_BG, type ToastItem } from '../../../hooks/useToast'
 import { SearchInput }            from '../../../components/ui/SearchInput'
 import { Modal }                  from '../../../components/ui/Modal'
+import { Pagination }             from '../../../components/ui/Pagination'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -117,6 +118,7 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   const [sortDir,       setSortDir]       = useState<'asc' | 'desc'>('desc')
   const [deleteId,      setDeleteId]      = useState<number | null>(null)
   const [page,          setPage]          = useState(1)
+  const [pageSize,      setPageSize]      = useState(PAGE_SIZE)
 
   // Armazém options
   const armazemOpts = useMemo(() => {
@@ -139,9 +141,9 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
     return base
   }, [registros, search, filterArmazem, sortDir])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const safePage   = Math.min(page, totalPages)
-  const pageSlice  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+  const pageSlice  = filtered.slice((safePage - 1) * pageSize, safePage * pageSize)
 
   const hasFilters = search !== '' || filterArmazem !== ''
 
@@ -310,38 +312,13 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
       )}
 
       {/* Pagination */}
-      {filtered.length > PAGE_SIZE && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          <span>{filtered.length} registros</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button
-              type="button"
-              disabled={safePage === 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, cursor: safePage === 1 ? 'not-allowed' : 'pointer', color: safePage === 1 ? colors.textMuted : colors.textPrimary, opacity: safePage === 1 ? 0.4 : 1 }}
-            >
-              <ChevronLeft size={13} />
-            </button>
-            <span style={{ color: colors.textPrimary, fontWeight: t.font.weight.medium }}>
-              {safePage} / {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={safePage === totalPages}
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, cursor: safePage === totalPages ? 'not-allowed' : 'pointer', color: safePage === totalPages ? colors.textMuted : colors.textPrimary, opacity: safePage === totalPages ? 0.4 : 1 }}
-            >
-              <ChevronRight size={13} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {filtered.length > 0 && filtered.length <= PAGE_SIZE && (
-        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </div>
-      )}
+      <Pagination
+        page={safePage}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* Delete modal */}
       {deleteId !== null && (

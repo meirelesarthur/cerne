@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, X, Pencil, Trash2, Package,
-  ChevronUp, ChevronDown, ChevronLeft, ChevronRight,
+  ChevronUp, ChevronDown,
   Download, CheckSquare,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
@@ -17,6 +17,7 @@ import {
 import { useToast, TOAST_BG }    from '../../../hooks/useToast'
 import { SearchInput }            from '../../../components/ui/SearchInput'
 import { Modal }                  from '../../../components/ui/Modal'
+import { Pagination }             from '../../../components/ui/Pagination'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -276,29 +277,13 @@ export default function ProdutosLista({
       )}
 
       {/* Paginação */}
-      {filtered.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Linhas:</span>
-          <select
-            value={pageSize}
-            onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
-            style={{ height: 28, border: `1px solid ${border}`, borderRadius: t.radius.DEFAULT, padding: '0 8px', fontSize: t.font.size.xs, fontFamily: t.font.family.sans, color: colors.textPrimary, background: colors.inputBg, cursor: 'pointer', outline: 'none' }}
-          >
-            {[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginLeft: 4 }}>
-            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} de {filtered.length}
-          </span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
-            <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} colors={colors} border={border}>
-              <ChevronLeft size={13} />
-            </PageBtn>
-            <PageBtn onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} colors={colors} border={border}>
-              <ChevronRight size={13} />
-            </PageBtn>
-          </div>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* Bulk action bar */}
       {selected.size > 0 && (
@@ -447,17 +432,6 @@ function BulkBtn({ onClick, danger, children }: { onClick: () => void; danger?: 
   const [hov, setHov] = useState(false)
   return (
     <button type="button" onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ padding: '4px 12px', borderRadius: t.radius.DEFAULT, border: 'none', cursor: 'pointer', fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, background: hov ? (danger ? t.color.error.text : t.color.brand[600]) : (danger ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.15)'), color: danger ? (hov ? 'white' : '#fca5a5') : 'white', transition: 'background 0.12s, color 0.12s' }}>
-      {children}
-    </button>
-  )
-}
-
-function PageBtn({ onClick, disabled, children, colors, border }: {
-  onClick: () => void; disabled: boolean; children: React.ReactNode
-  colors: ReturnType<typeof useTheme>['colors']; border: string
-}) {
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${border}`, borderRadius: t.radius.DEFAULT, background: colors.surfaceBg, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.4 : 1, color: colors.textMuted }}>
       {children}
     </button>
   )

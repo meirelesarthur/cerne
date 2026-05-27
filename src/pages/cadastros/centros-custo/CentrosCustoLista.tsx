@@ -8,6 +8,7 @@ import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
 import { Badge }         from '../../../components/ui/Badge'
 import { Modal }         from '../../../components/ui/Modal'
+import { Pagination }    from '../../../components/ui/Pagination'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import {
@@ -37,6 +38,7 @@ export default function CentrosCustoLista({
 
   const [search,      setSearch]      = useState('')
   const [page,        setPage]        = useState(1)
+  const [pageSize,    setPageSize]    = useState(PAGE_SIZE)
   const [deleteId,    setDeleteId]    = useState<number | null>(null)
   const [saibaMais,   setSaibaMais]   = useState(false)
   const [openMenuId,  setOpenMenuId]  = useState<number | null>(null)
@@ -66,8 +68,8 @@ export default function CentrosCustoLista({
   // Reset para página 1 ao filtrar
   useEffect(() => { setPage(1) }, [search])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const paginated  = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   // ── Fechar dropdown ao clicar fora ────────────────────────────────────────
   useEffect(() => {
@@ -303,9 +305,13 @@ export default function CentrosCustoLista({
       </div>
 
       {/* ── Paginação ───────────────────────────────────────────────────── */}
-      {totalPages > 1 && (
-        <Pagination page={page} total={totalPages} onChange={setPage} colors={colors} />
-      )}
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
       {deleteId !== null && (
@@ -572,82 +578,6 @@ function DropdownItem({
       }}
     >
       {icon}
-      {label}
-    </button>
-  )
-}
-
-// ─── Paginação ────────────────────────────────────────────────────────────────
-
-function Pagination({
-  page, total, onChange, colors,
-}: {
-  page:     number
-  total:    number
-  onChange: (p: number) => void
-  colors:   ReturnType<typeof useTheme>['colors']
-}) {
-  const pages = Array.from({ length: total }, (_, i) => i + 1)
-
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-      gap: 4, marginTop: 16,
-    }}>
-      <PageBtn
-        label="‹"
-        disabled={page === 1}
-        onClick={() => onChange(page - 1)}
-        colors={colors}
-      />
-      {pages.map(p => (
-        <PageBtn
-          key={p}
-          label={String(p)}
-          active={p === page}
-          onClick={() => onChange(p)}
-          colors={colors}
-        />
-      ))}
-      <PageBtn
-        label="›"
-        disabled={page === total}
-        onClick={() => onChange(page + 1)}
-        colors={colors}
-      />
-    </div>
-  )
-}
-
-function PageBtn({
-  label, active = false, disabled = false, onClick, colors,
-}: {
-  label:     string
-  active?:   boolean
-  disabled?: boolean
-  onClick:   () => void
-  colors:    ReturnType<typeof useTheme>['colors']
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        width: 32, height: 32,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: `1px solid ${active ? colors.brand : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
-        background: active ? colors.brandBg : 'transparent',
-        color: active ? colors.brand : disabled ? colors.textMuted : colors.textSecondary,
-        fontSize: t.font.size.sm,
-        fontFamily: t.font.family.sans,
-        fontWeight: active ? t.font.weight.semibold : t.font.weight.normal,
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.4 : 1,
-        transition: 'background 0.12s, border-color 0.12s',
-      }}
-    >
       {label}
     </button>
   )

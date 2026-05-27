@@ -1,14 +1,17 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Plus, Search, X, Pencil, Trash2, Package,
+  Plus, Pencil, Trash2, Package, X,
   ChevronUp, ChevronDown, ChevronLeft, ChevronRight,
   Download, CheckSquare,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import {
   GRUPOS, CATEGORIAS, CLASSES,
   TIPO_PRODUTO_LABEL, TIPO_PRODUTO_OPTS,
@@ -65,13 +68,14 @@ export default function ProdutosLista({
   const { toasts, show, dismiss } = useToast()
 
   // ── Filtros ──────────────────────────────────────────────────────────────────
-  const [searchRaw,     setSearchRaw]     = useState('')
-  const [search,        setSearch]        = useState('')
-  const [grupoFilter,   setGrupoFilter]   = useState<string>('')
-  const [catFilter,     setCatFilter]     = useState<string>('')
-  const [classeFilter,  setClasseFilter]  = useState<string>('')
-  const [tipoFilter,    setTipoFilter]    = useState<string>('')
-  const [ativoFilter,   setAtivoFilter]   = useState<string>('')
+  const [searchRaw,    setSearchRaw]    = useState('')
+  const [search,       setSearch]       = useState('')
+  const [grupoFilter,  setGrupoFilter]  = useState<string>('')
+  const [catFilter,    setCatFilter]    = useState<string>('')
+  const [classeFilter, setClasseFilter] = useState<string>('')
+  const [tipoFilter,   setTipoFilter]   = useState<string>('')
+  const [ativoFilter,  setAtivoFilter]  = useState<string>('')
+  const [drawerOpen,   setDrawerOpen]   = useState(false)
 
   // Debounce search
   useEffect(() => {
@@ -97,6 +101,11 @@ export default function ProdutosLista({
   // ── Seleção ──────────────────────────────────────────────────────────────────
   const [selected,     setSelected]     = useState(new Set<number>())
   const [deleteTarget, setDeleteTarget] = useState<Produto | null>(null)
+
+  const activeFilterCount = [grupoFilter, catFilter, classeFilter, tipoFilter, ativoFilter].filter(Boolean).length
+  const clearFilters = () => {
+    setGrupoFilter(''); setCatFilter(''); setClasseFilter(''); setTipoFilter(''); setAtivoFilter('')
+  }
 
   // ── Opções filtradas em cascata ──────────────────────────────────────────────
   const catOpts    = useMemo(() => CATEGORIAS.filter(c => !grupoFilter  || c.grupoId    === Number(grupoFilter)), [grupoFilter])
@@ -205,6 +214,11 @@ export default function ProdutosLista({
             <Button variant="secondary" size="md" icon={<Download size={14} />} disabled>
               Exportar
             </Button>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar Produto
             </Button>
@@ -212,41 +226,51 @@ export default function ProdutosLista({
         }
       />
 
-      {/* Toolbar: busca */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-        <SearchInput value={searchRaw} onChange={setSearchRaw} />
+      {/* Toolbar: busca + chips */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <TableSearchInput value={searchRaw} onChange={setSearchRaw} placeholder="Buscar por código ou descrição..." />
+        {grupoFilter && (
+          <FilterChip
+            label={`Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`}
+            onRemove={() => { setGrupoFilter(''); setCatFilter(''); setClasseFilter('') }}
+          />
+        )}
+        {catFilter && (
+          <FilterChip
+            label={`Cat.: ${catOpts.find(c => String(c.id) === catFilter)?.nome ?? catFilter}`}
+            onRemove={() => { setCatFilter(''); setClasseFilter('') }}
+          />
+        )}
+        {classeFilter && (
+          <FilterChip
+            label={`Classe: ${classeOpts.find(c => String(c.id) === classeFilter)?.nome ?? classeFilter}`}
+            onRemove={() => setClasseFilter('')}
+          />
+        )}
+        {tipoFilter && (
+          <FilterChip
+            label={`Tipo: ${TIPO_PRODUTO_LABEL[tipoFilter as TipoProduto] ?? tipoFilter}`}
+            onRemove={() => setTipoFilter('')}
+          />
+        )}
+        {ativoFilter && (
+          <FilterChip
+            label={ativoFilter === 'true' ? 'Ativo' : 'Inativo'}
+            onRemove={() => setAtivoFilter('')}
+          />
+        )}
+        {activeFilterCount > 1 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            style={{ background: 'none', border: 'none', fontSize: t.font.size.xs, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: t.font.family.sans }}
+          >
+            Limpar tudo
+          </button>
+        )}
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
-      </div>
-
-      {/* Filtros */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <FilterSelect
-          value={grupoFilter} onChange={setGrupoFilter}
-          options={[{ value: '', label: 'Todos os Grupos' }, ...GRUPOS.map(g => ({ value: String(g.id), label: g.nome }))]}
-          colors={colors}
-        />
-        <FilterSelect
-          value={catFilter} onChange={setCatFilter}
-          options={[{ value: '', label: 'Todas as Categorias' }, ...catOpts.map(c => ({ value: String(c.id), label: c.nome }))]}
-          colors={colors}
-        />
-        <FilterSelect
-          value={classeFilter} onChange={setClasseFilter}
-          options={[{ value: '', label: 'Todas as Classes' }, ...classeOpts.map(c => ({ value: String(c.id), label: c.nome }))]}
-          colors={colors}
-        />
-        <FilterSelect
-          value={tipoFilter} onChange={setTipoFilter}
-          options={[{ value: '', label: 'Todos os Tipos' }, ...TIPO_PRODUTO_OPTS.map(o => ({ value: o.value, label: o.label }))]}
-          colors={colors}
-        />
-        <FilterSelect
-          value={ativoFilter} onChange={setAtivoFilter}
-          options={[{ value: '', label: 'Ativo / Inativo' }, { value: 'true', label: 'Ativo' }, { value: 'false', label: 'Inativo' }]}
-          colors={colors}
-        />
       </div>
 
       {/* Tabela */}
@@ -367,6 +391,46 @@ export default function ProdutosLista({
       </div>
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
 
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Produtos"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Grupo"
+          options={[{ value: '', label: 'Todos os Grupos' }, ...GRUPOS.map(g => ({ value: String(g.id), label: g.nome }))]}
+          value={grupoFilter}
+          onChange={e => { setGrupoFilter(e.target.value); setCatFilter(''); setClasseFilter('') }}
+        />
+        <FormSelect
+          label="Categoria"
+          options={[{ value: '', label: 'Todas as Categorias' }, ...catOpts.map(c => ({ value: String(c.id), label: c.nome }))]}
+          value={catFilter}
+          onChange={e => { setCatFilter(e.target.value); setClasseFilter('') }}
+        />
+        <FormSelect
+          label="Classe"
+          options={[{ value: '', label: 'Todas as Classes' }, ...classeOpts.map(c => ({ value: String(c.id), label: c.nome }))]}
+          value={classeFilter}
+          onChange={e => setClasseFilter(e.target.value)}
+        />
+        <FormSelect
+          label="Tipo"
+          options={[{ value: '', label: 'Todos os Tipos' }, ...TIPO_PRODUTO_OPTS.map(o => ({ value: o.value, label: o.label }))]}
+          value={tipoFilter}
+          onChange={e => setTipoFilter(e.target.value)}
+        />
+        <FormSelect
+          label="Status"
+          options={[{ value: '', label: 'Todos' }, { value: 'true', label: 'Ativo' }, { value: 'false', label: 'Inativo' }]}
+          value={ativoFilter}
+          onChange={e => setAtivoFilter(e.target.value)}
+        />
+      </FilterDrawer>
+
     </PageContainer>
   )
 }
@@ -444,18 +508,6 @@ function RowCheckbox({ checked, onChange, colors }: {
   )
 }
 
-function FilterSelect({ value, onChange, options, colors }: {
-  value: string; onChange: (v: string) => void
-  options: { value: string; label: string }[]
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  return (
-    <select value={value} onChange={e => onChange(e.target.value)} style={{ height: 32, border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, padding: '0 10px', fontSize: t.font.size.xs, fontFamily: t.font.family.sans, color: value ? colors.textPrimary : colors.textMuted, background: colors.inputBg, cursor: 'pointer', outline: 'none', minWidth: 140 }}>
-      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-    </select>
-  )
-}
-
 function BulkBtn({ onClick, danger, children }: { onClick: () => void; danger?: boolean; children: React.ReactNode }) {
   const [hov, setHov] = useState(false)
   return (
@@ -485,18 +537,6 @@ function ActionBtn({ icon, label, onClick, colors, danger = false }: {
     <button type="button" title={label} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent', border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`, borderRadius: t.radius.DEFAULT, cursor: 'pointer', color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted, transition: 'background 0.12s, border-color 0.12s, color 0.12s' }}>
       {icon}
     </button>
-  )
-}
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, height: 34, border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.DEFAULT, padding: '0 10px', background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 280 }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input type="search" placeholder="Buscar por código ou descrição..." value={value} onChange={e => onChange(e.target.value)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }} />
-      {value && <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}><X size={11} /></button>}
-    </div>
   )
 }
 

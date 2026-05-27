@@ -1,13 +1,16 @@
 import React, { useState, useMemo } from 'react'
 import {
-  Plus, Search, Pencil, Trash2, X, ChevronDown, ChevronUp,
+  Plus, Pencil, Trash2, X, ChevronUp,
   ChevronLeft, ChevronRight, Download, Package,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import type { EstoqueInicial } from './estoques-iniciais.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -145,9 +148,13 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
   const [search,        setSearch]        = useState('')
   const [filterArmazem, setFilterArmazem] = useState('')
+  const [drawerOpen,    setDrawerOpen]    = useState(false)
   const [sortDir,       setSortDir]       = useState<'asc' | 'desc'>('desc')
   const [deleteId,      setDeleteId]      = useState<number | null>(null)
   const [page,          setPage]          = useState(1)
+
+  const activeFilterCount = filterArmazem !== '' ? 1 : 0
+  const clearFilters = () => { setFilterArmazem(''); setPage(1) }
 
   // Armazém options
   const armazemOpts = useMemo(() => {
@@ -173,14 +180,6 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage   = Math.min(page, totalPages)
   const pageSlice  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
-
-  const hasFilters = search !== '' || filterArmazem !== ''
-
-  const handleClearFilters = () => {
-    setSearch('')
-    setFilterArmazem('')
-    setPage(1)
-  }
 
   const handleDeleteConfirm = () => {
     if (deleteId === null) return
@@ -221,6 +220,11 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
             <Button variant="secondary" size="md" icon={<Download size={14} />}>
               Exportar
             </Button>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar
             </Button>
@@ -251,46 +255,13 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
       {/* Filter bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        {/* Search input */}
-        <SearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar produto, código..." />
-
-        {/* Armazém select */}
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <select
-            value={filterArmazem}
-            onChange={e => { setFilterArmazem(e.target.value); setPage(1) }}
-            style={{
-              height: 34,
-              border: `1.5px solid ${filterArmazem ? t.color.brand[600] : colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              background: colors.surfaceBg,
-              color: filterArmazem ? colors.textPrimary : colors.textMuted,
-              fontSize: t.font.size.sm,
-              fontFamily: t.font.family.sans,
-              padding: '0 32px 0 10px',
-              cursor: 'pointer',
-              outline: 'none',
-              appearance: 'none',
-            }}
-          >
-            <option value="">Todos os armazéns</option>
-            {armazemOpts.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          <ChevronDown size={12} color={colors.textMuted} style={{ position: 'absolute', right: 8, pointerEvents: 'none' }} />
-        </div>
-
-        {hasFilters && (
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            style={{ display: 'flex', alignItems: 'center', gap: 4, height: 34, padding: '0 12px', background: 'none', border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, cursor: 'pointer', fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}
-          >
-            <X size={11} /> Limpar
-          </button>
+        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar produto, código..." />
+        {filterArmazem && (
+          <FilterChip
+            label={`Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`}
+            onRemove={() => { setFilterArmazem(''); setPage(1) }}
+          />
         )}
-
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
@@ -401,6 +372,25 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
       <ToastList toasts={toasts} />
 
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Saldo Inicial"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Armazém"
+          options={[
+            { value: '', label: 'Todos os armazéns' },
+            ...armazemOpts,
+          ]}
+          value={filterArmazem}
+          onChange={e => { setFilterArmazem(e.target.value); setPage(1) }}
+        />
+      </FilterDrawer>
+
     </PageContainer>
   )
 }
@@ -483,32 +473,6 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
         <ActionBtn icon={<Pencil size={13} />} label="Editar"  onClick={onEdit}      colors={colors} />
         <ActionBtn icon={<Trash2 size={13} />} label="Excluir" onClick={onDeleteReq} colors={colors} danger />
       </div>
-    </div>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, height: 34, border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.DEFAULT, padding: '0 10px', background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 260 }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
     </div>
   )
 }

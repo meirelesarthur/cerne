@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import {
-  Plus, Search, X, Pencil, Trash2, Warehouse,
+  Plus, Pencil, Trash2, Warehouse, X,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import {
   TIPO_ARMAZEM_LABEL, TIPO_ARMAZEM_OPTS,
   type Armazem, type TipoArmazem,
@@ -56,6 +59,8 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const { toasts, show, dismiss } = useToast()
 
   const [search,       setSearch]      = useState('')
+  const [filters,      setFilters]     = useState({ tipo: '', ativo: '' })
+  const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortField,    setSortField]   = useState<SortField>('sigla')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
@@ -65,20 +70,23 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
     else { setSortField(field); setSortDir('asc') }
   }
 
+  const activeFilterCount = [filters.tipo, filters.ativo].filter(Boolean).length
+  const clearFilters = () => setFilters({ tipo: '', ativo: '' })
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    const base = q
-      ? armazens.filter(a =>
-          a.sigla.toLowerCase().includes(q) ||
-          a.descricao.toLowerCase().includes(q)
-        )
-      : [...armazens]
+    const base = armazens.filter(a => {
+      const matchSearch  = !q || a.sigla.toLowerCase().includes(q) || a.descricao.toLowerCase().includes(q)
+      const matchTipo    = !filters.tipo  || a.tipo === filters.tipo
+      const matchAtivo   = filters.ativo === '' || (filters.ativo === 'true' ? a.ativo : !a.ativo)
+      return matchSearch && matchTipo && matchAtivo
+    })
     base.sort((a, b) => {
       const cmp = a[sortField].localeCompare(b[sortField], 'pt-BR')
       return sortDir === 'asc' ? cmp : -cmp
     })
     return base
-  }, [armazens, search, sortField, sortDir])
+  }, [armazens, search, filters, sortField, sortDir])
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -109,15 +117,43 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
         title="Armazéns"
         count={armazens.length}
         actions={
-          <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-            Adicionar Armazém
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
+            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              Adicionar Armazém
+            </Button>
+          </div>
         }
       />
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <SearchInput value={search} onChange={setSearch} placeholder="Buscar armazém..." />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar armazém..." />
+        {filters.tipo && (
+          <FilterChip
+            label={`Tipo: ${TIPO_ARMAZEM_LABEL[filters.tipo as TipoArmazem]}`}
+            onRemove={() => setFilters(f => ({ ...f, tipo: '' }))}
+          />
+        )}
+        {filters.ativo && (
+          <FilterChip
+            label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
+            onRemove={() => setFilters(f => ({ ...f, ativo: '' }))}
+          />
+        )}
+        {activeFilterCount > 1 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            style={{ background: 'none', border: 'none', fontSize: t.font.size.xs, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: t.font.family.sans }}
+          >
+            Limpar tudo
+          </button>
+        )}
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
@@ -196,6 +232,35 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       </div>
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
 
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Armazéns"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Tipo"
+          options={[
+            { value: '', label: 'Todos os tipos' },
+            ...TIPO_ARMAZEM_OPTS.map(o => ({ value: o.value, label: o.label })),
+          ]}
+          value={filters.tipo}
+          onChange={e => setFilters(f => ({ ...f, tipo: e.target.value }))}
+        />
+        <FormSelect
+          label="Status"
+          options={[
+            { value: '',      label: 'Todos'   },
+            { value: 'true',  label: 'Ativo'   },
+            { value: 'false', label: 'Inativo' },
+          ]}
+          value={filters.ativo}
+          onChange={e => setFilters(f => ({ ...f, ativo: e.target.value }))}
+        />
+      </FilterDrawer>
+
     </PageContainer>
   )
 }
@@ -266,24 +331,6 @@ function ActionBtn({ icon, label, onClick, colors, danger = false }: {
     <button type="button" title={label} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent', border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`, borderRadius: t.radius.DEFAULT, cursor: 'pointer', color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted, transition: 'background 0.12s, border-color 0.12s, color 0.12s' }}>
       {icon}
     </button>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, height: 34, border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.DEFAULT, padding: '0 10px', background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 240 }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input type="search" placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }} />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
-    </div>
   )
 }
 

@@ -1,16 +1,19 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import {
-  Plus, Search, X, MoreVertical, Eye, Pencil, Trash2,
+  Plus, X, MoreVertical, Eye, Pencil, Trash2,
   Info, Calendar, CheckCircle2,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { Badge }         from '../../../components/ui/Badge'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
-import { fmtYMDtoDMY }  from './safras.types'
-import type { Safra }    from './safras.types'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { Badge }           from '../../../components/ui/Badge'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
+import { fmtYMDtoDMY }    from './safras.types'
+import type { Safra }      from './safras.types'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -54,11 +57,15 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const { colors, isGbMode } = useTheme()
   const { toasts, show } = useToast()
 
-  const [search,        setSearch]        = useState('')
-  const [statusFilter,  setStatusFilter]  = useState<StatusFilter>('todas')
-  const [openDropId,    setOpenDropId]    = useState<number | null>(null)
-  const [deleteTarget,  setDeleteTarget]  = useState<Safra | null>(null)
-  const [showInfo,      setShowInfo]      = useState(false)
+  const [search,       setSearch]       = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('todas')
+  const [drawerOpen,   setDrawerOpen]   = useState(false)
+  const [openDropId,   setOpenDropId]   = useState<number | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Safra | null>(null)
+  const [showInfo,     setShowInfo]     = useState(false)
+
+  const activeFilterCount = statusFilter !== 'todas' ? 1 : 0
+  const clearFilters = () => setStatusFilter('todas')
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -105,13 +112,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const cardBg   = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
   const border   = colors.border
 
-  // ── Pills de status ───────────────────────────────────────────────────────
-  const pills: { id: StatusFilter; label: string; dot?: string }[] = [
-    { id: 'todas',    label: 'Todas' },
-    { id: 'ativas',   label: 'Ativas',   dot: '#16a34a' },
-    { id: 'inativas', label: 'Inativas', dot: '#94a3b8' },
-  ]
-
   return (
     <PageContainer>
 
@@ -129,6 +129,11 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             >
               Saiba Mais
             </Button>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Safra
             </Button>
@@ -177,39 +182,13 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
 
       {/* ── Toolbar ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <SearchInput value={search} onChange={setSearch} />
-        <div style={{ width: 1, height: 22, background: border, flexShrink: 0 }} />
-        <div style={{ display: 'flex', gap: 4 }}>
-          {pills.map(p => {
-            const active = statusFilter === p.id
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setStatusFilter(p.id)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  height: 32,
-                  padding: '0 12px',
-                  background: active ? '#f0fdf4' : 'transparent',
-                  border: `1.5px solid ${active ? '#16a34a' : border}`,
-                  borderRadius: t.radius.full,
-                  fontSize: t.font.size.sm,
-                  fontWeight: active ? t.font.weight.semibold : t.font.weight.medium,
-                  color: active ? '#166534' : colors.textSecondary,
-                  cursor: 'pointer',
-                  fontFamily: t.font.family.sans,
-                  transition: 'background 0.15s, border-color 0.15s, color 0.15s',
-                }}
-              >
-                {p.dot && (
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: active ? p.dot : colors.textMuted, flexShrink: 0 }} />
-                )}
-                {p.label}
-              </button>
-            )
-          })}
-        </div>
+        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar safra..." />
+        {statusFilter !== 'todas' && (
+          <FilterChip
+            label={statusFilter === 'ativas' ? 'Ativas' : 'Inativas'}
+            onRemove={clearFilters}
+          />
+        )}
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
@@ -383,6 +362,27 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           to   { opacity: 1; transform: translateX(0); }
         }
       `}</style>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Safras"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Status"
+          options={[
+            { value: 'todas',    label: 'Todas'    },
+            { value: 'ativas',   label: 'Ativas'   },
+            { value: 'inativas', label: 'Inativas' },
+          ]}
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value as StatusFilter)}
+        />
+      </FilterDrawer>
+
     </PageContainer>
   )
 }
@@ -589,40 +589,6 @@ function KpiCard({
         <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
           {sub}
         </span>
-      )}
-    </div>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7, height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT, padding: '0 10px',
-      background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 220,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar safra..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
       )}
     </div>
   )

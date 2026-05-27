@@ -1,14 +1,17 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import {
-  Plus, Pencil, Trash2, Search, X, MoreVertical,
+  Plus, Pencil, Trash2, X, MoreVertical,
   TrendingUp, TrendingDown, HelpCircle, AlertTriangle,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { Badge }         from '../../../components/ui/Badge'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { Badge }           from '../../../components/ui/Badge'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import {
   classeOf, CONDICAO_LABEL, TIPO_LABEL, CLASSE_LABEL,
   type CentroCusto,
@@ -35,32 +38,37 @@ export default function CentrosCustoLista({
   const { colors, isGbMode } = useTheme()
 
   const [search,      setSearch]      = useState('')
+  const [filters,     setFilters]     = useState({ condicao: '', classe: '', ativo: '' })
+  const [drawerOpen,  setDrawerOpen]  = useState(false)
   const [page,        setPage]        = useState(1)
   const [deleteId,    setDeleteId]    = useState<number | null>(null)
   const [saibaMais,   setSaibaMais]   = useState(false)
   const [openMenuId,  setOpenMenuId]  = useState<number | null>(null)
 
+  const activeFilterCount = [filters.condicao, filters.classe, filters.ativo].filter(Boolean).length
+  const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '' })
+
   // ── KPIs ─────────────────────────────────────────────────────────────────
   const kpis = useMemo(() => {
-    const total     = centros.length
+    const total      = centros.length
     const sinteticas = centros.filter(c => c.antecessorId === null).length
     const analiticas = centros.filter(c => c.antecessorId !== null).length
-    const ativas    = centros.filter(c => c.ativo === 'sim').length
-    const ativasPct = total > 0 ? Math.round((ativas / total) * 100) : 0
+    const ativas     = centros.filter(c => c.ativo === 'sim').length
+    const ativasPct  = total > 0 ? Math.round((ativas / total) * 100) : 0
     return { total, sinteticas, analiticas, ativas, ativasPct }
   }, [centros])
 
   // ── Dados filtrados ───────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return centros
-    return centros.filter(c =>
-      c.codigo.toLowerCase().includes(q) ||
-      c.descricao.toLowerCase().includes(q) ||
-      CONDICAO_LABEL[c.condicao].toLowerCase().includes(q) ||
-      TIPO_LABEL[c.tipo].toLowerCase().includes(q)
-    )
-  }, [centros, search])
+    return centros.filter(c => {
+      const matchSearch  = !q || c.codigo.toLowerCase().includes(q) || c.descricao.toLowerCase().includes(q) || CONDICAO_LABEL[c.condicao].toLowerCase().includes(q) || TIPO_LABEL[c.tipo].toLowerCase().includes(q)
+      const matchCondicao = !filters.condicao || c.condicao === filters.condicao
+      const matchClasse   = !filters.classe   || classeOf(c.antecessorId) === filters.classe
+      const matchAtivo    = !filters.ativo    || c.ativo === filters.ativo
+      return matchSearch && matchCondicao && matchClasse && matchAtivo
+    })
+  }, [centros, search, filters])
 
   // Reset para página 1 ao filtrar
   useEffect(() => { setPage(1) }, [search])
@@ -138,6 +146,11 @@ export default function CentrosCustoLista({
               <HelpCircle size={14} />
               Saiba mais
             </button>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Novo Centro
             </Button>
@@ -230,8 +243,35 @@ export default function CentrosCustoLista({
       </div>
 
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <CCSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} colors={colors} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar por código, descrição..." />
+        {filters.condicao && (
+          <FilterChip
+            label={`Condição: ${({ ambos: 'Ambos', receita: 'Receita', despesa: 'Despesa' } as Record<string, string>)[filters.condicao]}`}
+            onRemove={() => setFilters(f => ({ ...f, condicao: '' }))}
+          />
+        )}
+        {filters.classe && (
+          <FilterChip
+            label={`Classe: ${filters.classe === 'sintetica' ? 'Sintética' : 'Analítica'}`}
+            onRemove={() => setFilters(f => ({ ...f, classe: '' }))}
+          />
+        )}
+        {filters.ativo && (
+          <FilterChip
+            label={filters.ativo === 'sim' ? 'Ativo' : 'Inativo'}
+            onRemove={() => setFilters(f => ({ ...f, ativo: '' }))}
+          />
+        )}
+        {activeFilterCount > 1 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            style={{ background: 'none', border: 'none', fontSize: t.font.size.xs, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: t.font.family.sans }}
+          >
+            Limpar tudo
+          </button>
+        )}
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
@@ -394,6 +434,47 @@ export default function CentrosCustoLista({
         </div>
       )}
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Centros de Custo"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Condição"
+          options={[
+            { value: '',        label: 'Todas'   },
+            { value: 'ambos',   label: 'Ambos'   },
+            { value: 'receita', label: 'Receita' },
+            { value: 'despesa', label: 'Despesa' },
+          ]}
+          value={filters.condicao}
+          onChange={e => setFilters(f => ({ ...f, condicao: e.target.value }))}
+        />
+        <FormSelect
+          label="Classe"
+          options={[
+            { value: '',          label: 'Todas'     },
+            { value: 'sintetica', label: 'Sintética' },
+            { value: 'analitica', label: 'Analítica' },
+          ]}
+          value={filters.classe}
+          onChange={e => setFilters(f => ({ ...f, classe: e.target.value }))}
+        />
+        <FormSelect
+          label="Status"
+          options={[
+            { value: '',    label: 'Todos'  },
+            { value: 'sim', label: 'Ativo'  },
+            { value: 'nao', label: 'Inativo'},
+          ]}
+          value={filters.ativo}
+          onChange={e => setFilters(f => ({ ...f, ativo: e.target.value }))}
+        />
+      </FilterDrawer>
 
     </PageContainer>
   )
@@ -649,54 +730,6 @@ function PageBtn({
     >
       {label}
     </button>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function CCSearchInput({
-  value, onChange, colors,
-}: {
-  value:    string
-  onChange: (v: string) => void
-  colors:   ReturnType<typeof useTheme>['colors']
-}) {
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7,
-      height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT,
-      padding: '0 10px',
-      background: colors.surfaceBg,
-      transition: 'border-color 0.15s',
-      minWidth: 240,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar por código, descrição..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent',
-          outline: 'none', fontSize: t.font.size.sm,
-          color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange('')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: colors.textMuted }}
-        >
-          <X size={11} />
-        </button>
-      )}
-    </div>
   )
 }
 

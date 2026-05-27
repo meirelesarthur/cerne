@@ -1,12 +1,15 @@
 import React, { useState, useMemo } from 'react'
 import {
-  Plus, Pencil, Trash2, ChevronRight, MapPin, Search, X,
+  Plus, Pencil, Trash2, ChevronRight, MapPin, X,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import {
   buildTree, TIPO_LABEL, TIPO_COLOR, TIPO_CHILD,
   type Endereco, type EnderecoNode,
@@ -52,6 +55,8 @@ export default function EnderecosList({
   const { items: toasts, show, dismiss } = useToast()
 
   const [search,       setSearch]       = useState('')
+  const [filters,      setFilters]      = useState({ tipo: '' })
+  const [drawerOpen,   setDrawerOpen]   = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Endereco | null>(null)
   const [expandedIds,  setExpandedIds]  = useState<Set<number>>(() => {
     // expandir setores por padrão
@@ -60,18 +65,20 @@ export default function EnderecosList({
     return s
   })
 
+  const activeFilterCount = [filters.tipo].filter(Boolean).length
+  const clearFilters = () => setFilters({ tipo: '' })
+
   const border = colors.border
 
   const tree = useMemo(() => buildTree(enderecos), [enderecos])
 
   // busca flat — filtra nós que batem e mantém ancestrais
   const filteredTree = useMemo(() => {
-    if (!search.trim()) return tree
     const q = search.trim().toLowerCase()
     function filterNodes(nodes: EnderecoNode[]): EnderecoNode[] {
       return nodes.reduce<EnderecoNode[]>((acc, node) => {
         const childMatches = filterNodes(node.children)
-        const selfMatch = node.descricao.toLowerCase().includes(q)
+        const selfMatch = (!q || node.descricao.toLowerCase().includes(q)) && (!filters.tipo || node.tipo === filters.tipo)
         if (selfMatch || childMatches.length > 0) {
           acc.push({ ...node, children: childMatches })
         }
@@ -79,7 +86,7 @@ export default function EnderecosList({
       }, [])
     }
     return filterNodes(tree)
-  }, [tree, search])
+  }, [tree, search, filters])
 
   const toggleExpand = (id: number) => {
     setExpandedIds(prev => {
@@ -106,15 +113,28 @@ export default function EnderecosList({
         title="Endereçamentos"
         count={totalCount}
         actions={
-          <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
-            Adicionar Setor
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
+            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
+              Adicionar Setor
+            </Button>
+          </div>
         }
       />
 
       {/* ── Toolbar ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <SearchInput value={search} onChange={setSearch} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar endereçamento..." />
+        {filters.tipo && (
+          <FilterChip
+            label={`Tipo: ${TIPO_LABEL[filters.tipo as keyof typeof TIPO_LABEL] ?? filters.tipo}`}
+            onRemove={() => setFilters(f => ({ ...f, tipo: '' }))}
+          />
+        )}
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {totalCount} {totalCount === 1 ? 'registro' : 'registros'}
         </span>
@@ -241,6 +261,26 @@ export default function EnderecosList({
         @keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }
         @keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }
       `}</style>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Endereçamentos"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Tipo"
+          options={[
+            { value: '',         label: 'Todos'     },
+            { value: 'setor',    label: 'Setor'     },
+            { value: 'corredor', label: 'Corredor'  },
+          ]}
+          value={filters.tipo}
+          onChange={e => setFilters(f => ({ ...f, tipo: e.target.value }))}
+        />
+      </FilterDrawer>
 
     </PageContainer>
   )
@@ -408,41 +448,6 @@ function ActionBtn({
     >
       {icon}
     </button>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7, height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT, padding: '0 10px',
-      background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 240,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar endereçamento..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary,
-          fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
-    </div>
   )
 }
 

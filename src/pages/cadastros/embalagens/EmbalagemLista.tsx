@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Plus, Search, X, Pencil, Trash2, Package,
+  Plus, Pencil, Trash2, Package, X,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -49,20 +52,28 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const { toasts, show, dismiss } = useToast()
 
   const [search,       setSearch]      = useState('')
+  const [filters,      setFilters]     = useState({ unidade: '' })
+  const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Embalagem | null>(null)
 
   const border  = colors.border
+  const activeFilterCount = [filters.unidade].filter(Boolean).length
+  const clearFilters = () => setFilters({ unidade: '' })
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    const base = q ? embalagens.filter(e => e.descricao.toLowerCase().includes(q)) : [...embalagens]
+    const base = embalagens.filter(e => {
+      const matchSearch  = !q || e.descricao.toLowerCase().includes(q)
+      const matchUnidade = !filters.unidade || e.unidade === filters.unidade
+      return matchSearch && matchUnidade
+    })
     base.sort((a, b) => {
       const cmp = a.descricao.localeCompare(b.descricao, 'pt-BR')
       return sortDir === 'asc' ? cmp : -cmp
     })
     return base
-  }, [embalagens, search, sortDir])
+  }, [embalagens, search, filters, sortDir])
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -82,15 +93,28 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
         title="Embalagens"
         count={embalagens.length}
         actions={
-          <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-            Adicionar Embalagem
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
+            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              Adicionar Embalagem
+            </Button>
+          </div>
         }
       />
 
       {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <SearchInput value={search} onChange={setSearch} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar embalagem..." />
+        {filters.unidade && (
+          <FilterChip
+            label={`Un.: ${UNIDADE_OPTS.find(o => o.value === filters.unidade)?.label.split(' — ')[0] ?? filters.unidade}`}
+            onRemove={() => setFilters(f => ({ ...f, unidade: '' }))}
+          />
+        )}
         <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
@@ -240,6 +264,25 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
       </div>
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
 
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Embalagens"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Unidade de Medida"
+          options={[
+            { value: '', label: 'Todas' },
+            ...UNIDADE_OPTS.map(o => ({ value: o.value, label: o.label })),
+          ]}
+          value={filters.unidade}
+          onChange={e => setFilters(f => ({ ...f, unidade: e.target.value }))}
+        />
+      </FilterDrawer>
+
     </PageContainer>
   )
 }
@@ -330,41 +373,6 @@ function ActionBtn({
     >
       {icon}
     </button>
-  )
-}
-
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7, height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT, padding: '0 10px',
-      background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 240,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar embalagem..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary,
-          fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
-    </div>
   )
 }
 

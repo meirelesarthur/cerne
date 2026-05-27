@@ -1,18 +1,19 @@
 import React, { useState, useMemo } from 'react'
 import {
-  Plus, Pencil, Trash2, SlidersHorizontal, X,
-  List, LayoutGrid, Search, MapPin, Layers, Ruler, Eye,
+  Plus, Pencil, Trash2, X,
+  List, LayoutGrid, MapPin, Layers, Ruler, Eye,
   TrendingUp, TrendingDown,
 } from 'lucide-react'
-import { PageHeader }    from '../../../components/ui/PageHeader'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
-import { DataTable }     from '../../../components/ui/DataTable'
-import { FilterDrawer }  from '../../../components/ui/FilterDrawer'
-import { Badge }         from '../../../components/ui/Badge'
-import { FormSelect }    from '../../../components/ui/FormSelect'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { Button }          from '../../../components/ui/Button'
+import { DataTable }       from '../../../components/ui/DataTable'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { Badge }           from '../../../components/ui/Badge'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
 import { mockFazendas }  from './fazendas.mock'
 import type { FazendaRow } from './fazendas.types'
 import type { Column }     from '../../../components/ui/DataTable'
@@ -202,11 +203,10 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         count={data.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterBtn
+            <FilterButton
               active={activeFilterCount > 0}
               count={activeFilterCount}
               onClick={() => setDrawerOpen(true)}
-              colors={colors}
             />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Fazenda
@@ -222,7 +222,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, marginTop: 4, flexWrap: 'wrap' }}>
 
         {/* Busca — extrema esquerda */}
-        <SearchInput value={search} onChange={setSearch} colors={colors} />
+        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar fazenda..." />
 
         {/* Chips de filtro ativos */}
         {filters.tipoExploracao && (
@@ -500,64 +500,6 @@ function ViewToggle({
   )
 }
 
-// ─── Search Input ─────────────────────────────────────────────────────────────
-
-function SearchInput({
-  value,
-  onChange,
-  colors,
-}: {
-  value: string
-  onChange: (v: string) => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  const [focused, setFocused] = useState(false)
-
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 7,
-      height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT,
-      padding: '0 10px',
-      background: colors.surfaceBg,
-      transition: 'border-color 0.15s',
-      minWidth: 220,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
-      <input
-        type="search"
-        placeholder="Buscar fazenda..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1,
-          border: 'none',
-          background: 'transparent',
-          outline: 'none',
-          fontSize: t.font.size.sm,
-          color: colors.textPrimary,
-          fontFamily: t.font.family.sans,
-          minWidth: 0,
-        }}
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange('')}
-          aria-label="Limpar busca"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: colors.textMuted }}
-        >
-          <X size={11} />
-        </button>
-      )}
-    </div>
-  )
-}
 
 // ─── Cards Grid ───────────────────────────────────────────────────────────────
 
@@ -719,77 +661,3 @@ function InfoRow({
   )
 }
 
-// ─── Filter Chip ──────────────────────────────────────────────────────────────
-
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: t.space[1],
-      height: 34,
-      background: colors.brandBg,
-      border: `1.5px solid ${colors.brand}`,
-      borderRadius: t.radius.DEFAULT,
-      padding: `0 ${t.space[2]}px 0 ${t.space[2] + 2}px`,
-      fontSize: t.font.size.sm,
-      color: colors.brand,
-      fontFamily: t.font.family.sans,
-      fontWeight: t.font.weight.medium,
-    }}>
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.brand, display: 'flex', alignItems: 'center', padding: 0 }}
-      >
-        <X size={11} />
-      </button>
-    </div>
-  )
-}
-
-// ─── Filter Button ────────────────────────────────────────────────────────────
-
-function FilterBtn({
-  active,
-  count,
-  onClick,
-  colors,
-}: {
-  active: boolean
-  count: number
-  onClick: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        height: 36,
-        background: active ? colors.brandBg : hovered ? colors.surfaceSubtle : colors.surfaceBg,
-        border: `1.5px solid ${active ? colors.brand : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
-        padding: '0 14px',
-        fontSize: t.font.size.base,
-        fontWeight: t.font.weight.medium,
-        fontFamily: t.font.family.sans,
-        color: active ? colors.brand : colors.textSecondary,
-        cursor: 'pointer',
-        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
-      }}
-    >
-      <SlidersHorizontal size={13} />
-      Filtros
-      {active && (
-        <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999 }}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}

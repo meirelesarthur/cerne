@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, Warehouse, X,
   ChevronUp, ChevronDown,
@@ -11,6 +11,9 @@ import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import {
@@ -66,6 +69,17 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const [sortField,    setSortField]   = useState<SortField>('sigla')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
+  const [isLoading,    setIsLoading]   = useState(true)
+  const [page,         setPage]        = useState(1)
+  const PAGE_SIZE = 10
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset page quando filtros mudam
+  useEffect(() => { setPage(1) }, [search, filters.tipo, filters.ativo])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -89,6 +103,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
     })
     return base
   }, [armazens, search, filters, sortField, sortDir])
+
+  const totalFiltered = filtered.length
+  const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -162,34 +179,60 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       </div>
 
       {/* Tabela */}
-      {filtered.length === 0 ? (
-        <EmptyState onNew={onNew} hasSearch={search.length > 0} />
-      ) : (
-        <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-          {/* Cabeçalho */}
-          <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
-            <SortBtn label="Sigla" field="sigla" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="sigla" />} />
-            <SortBtn label="Descrição" field="descricao" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="descricao" />} />
-            <span style={colStyle}>Tipo</span>
-            <span style={colStyle}>Status</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-          </div>
-
-          {filtered.map((arm, idx) => (
-            <ArmazemRow
-              key={arm.id}
-              arm={arm}
-              isLast={idx === filtered.length - 1}
-              onEdit={() => onEdit(arm.id)}
-              onDeleteReq={() => setDeleteTarget(arm)}
-              colors={colors}
-              border={border}
-            />
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" width="100%" height={48} />
           ))}
         </div>
+      ) : filtered.length === 0 ? (
+        <EmptyStateUI
+          message="Nenhum armazém encontrado."
+          description="Tente ajustar os filtros ou limpar a busca."
+        />
+      ) : (
+        <>
+          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+            {/* Cabeçalho */}
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
+              <SortBtn label="Sigla" field="sigla" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="sigla" />} />
+              <SortBtn label="Descrição" field="descricao" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="descricao" />} />
+              <span style={colStyle}>Tipo</span>
+              <span style={colStyle}>Status</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+            </div>
+
+            {paginatedData.map((arm, idx) => (
+              <ArmazemRow
+                key={arm.id}
+                arm={arm}
+                isLast={idx === paginatedData.length - 1}
+                onEdit={() => onEdit(arm.id)}
+                onDeleteReq={() => setDeleteTarget(arm)}
+                colors={colors}
+                border={border}
+              />
+            ))}
+          </div>
+
+          {totalFiltered > PAGE_SIZE && (
+            <div style={{
+              marginTop: t.space[4],
+              paddingTop: t.space[4],
+              borderTop: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
-      {filtered.length > 0 && (
+      {!isLoading && filtered.length > 0 && (
         <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
           N. Registros: {filtered.length}
         </div>

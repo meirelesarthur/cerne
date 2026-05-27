@@ -192,14 +192,11 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         </div>
       )}
 
-      <PageHeader
-        title="Nova Fazenda"
-        description="Preencha os dados para cadastrar uma nova fazenda"
-        actions={
-          <Button variant="secondary" size="sm" icon={<ArrowLeft size={14} />} onClick={onBack}>
-            Voltar
-          </Button>
-        }
+      <Stepper
+        steps={STEPS}
+        current={currentStep}
+        completed={completedSteps}
+        onStepClick={handleStepClick}
       />
 
       <div
@@ -211,16 +208,6 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
           transition: 'background 0.2s',
         }}
       >
-        {/* Stepper dentro do card */}
-        <div style={{ padding: '24px 24px 0' }}>
-          <Stepper
-            steps={STEPS}
-            current={currentStep}
-            completed={completedSteps}
-            onStepClick={handleStepClick}
-          />
-        </div>
-
         {/* Conteúdo do step */}
         <div style={{ padding: '40px 24px 80px' }}>
           {renderStep()}

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { Skeleton } from '../../components/ui/Skeleton'
 import type { ThemeColors } from '../../context/ThemeContext'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -519,8 +520,8 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
         }}
       >
         {[
-          { label: 'Receitas', color: '#3b82f6' },
-          { label: 'Despesas', color: '#ef4444' },
+          { label: 'Receitas', color: t.chart.revenue },
+          { label: 'Despesas', color: t.chart.expense },
         ].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
             <div
@@ -598,7 +599,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
                   y={rY}
                   width={barW}
                   height={rH}
-                  fill={isH ? '#2563eb' : '#3b82f6'}
+                  fill={isH ? t.color.info.text : t.chart.revenue}
                   rx={3}
                 />
 
@@ -608,7 +609,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
                   y={dY}
                   width={barW}
                   height={dH}
-                  fill={isH ? '#dc2626' : '#ef4444'}
+                  fill={isH ? t.color.error.solid : t.chart.expense}
                   rx={3}
                 />
 
@@ -640,7 +641,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
                 {/* Tooltip */}
                 {isH && (
                   <g>
-                    <rect x={tipX} y={tipY} width={140} height={56} rx={6} fill="#1c1917" opacity={0.95} />
+                    <rect x={tipX} y={tipY} width={140} height={56} rx={6} fill={t.dashboard.tileDark} opacity={0.95} />
                     <text x={tipX + 70} y={tipY + 14} textAnchor="middle" fontSize={10} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>
                       {d.month}
                     </text>
@@ -665,6 +666,12 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
 
 export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 600)
+    return () => clearTimeout(timer)
+  }, [])
 
   // ── Tile helpers ────────────────────────────────────────────────────────────
 
@@ -846,6 +853,13 @@ export default function OverviewPanel() {
         </div>
 
         {/* 3 KPI chips */}
+        {isLoading ? (
+          <div style={{ display: 'flex', gap: t.space[3] }}>
+            <Skeleton width={210} height={58} />
+            <Skeleton width={210} height={58} />
+            <Skeleton width={160} height={58} />
+          </div>
+        ) : (
         <div
           style={{
             display: 'flex',
@@ -865,7 +879,7 @@ export default function OverviewPanel() {
               background: colors.surfaceBg,
             }}
           >
-            <TrendingUp size={15} color="#059669" />
+            <TrendingUp size={15} color={t.color.brand[600]} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span
                 style={{
@@ -880,7 +894,7 @@ export default function OverviewPanel() {
                 style={{
                   fontSize: t.font.size.lg,
                   fontWeight: t.font.weight.bold,
-                  color: '#059669',
+                  color: t.color.brand[600],
                   fontFamily: t.font.family.sans,
                   lineHeight: 1,
                 }}
@@ -902,7 +916,7 @@ export default function OverviewPanel() {
               background: colors.surfaceBg,
             }}
           >
-            <TrendingDown size={15} color="#dc2626" />
+            <TrendingDown size={15} color={t.color.error.text} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span
                 style={{
@@ -917,7 +931,7 @@ export default function OverviewPanel() {
                 style={{
                   fontSize: t.font.size.lg,
                   fontWeight: t.font.weight.bold,
-                  color: '#dc2626',
+                  color: t.color.error.text,
                   fontFamily: t.font.family.sans,
                   lineHeight: 1,
                 }}
@@ -964,6 +978,7 @@ export default function OverviewPanel() {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -1022,7 +1037,7 @@ export default function OverviewPanel() {
               style={{
                 fontSize: t.font.size.md,
                 fontWeight: t.font.weight.bold,
-                color: '#059669',
+                color: t.color.brand[600],
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -1043,7 +1058,7 @@ export default function OverviewPanel() {
               style={{
                 fontSize: t.font.size.md,
                 fontWeight: t.font.weight.bold,
-                color: '#059669',
+                color: t.color.brand[600],
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -1053,6 +1068,12 @@ export default function OverviewPanel() {
         </div>
 
         {/* 2 Donut charts side by side */}
+        {isLoading ? (
+          <div style={{ display: 'flex', gap: t.space[6], justifyContent: 'center' }}>
+            <Skeleton width={200} height={240} />
+            <Skeleton width={200} height={240} />
+          </div>
+        ) : (
         <div
           style={{
             display: 'flex',
@@ -1072,6 +1093,7 @@ export default function OverviewPanel() {
             colors={colors}
           />
         </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -1103,6 +1125,11 @@ export default function OverviewPanel() {
         </div>
 
         {/* 4x3 grid */}
+        {isLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[2] }}>
+            {Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} height={62} />)}
+          </div>
+        ) : (
         <div
           style={{
             display: 'grid',
@@ -1111,23 +1138,24 @@ export default function OverviewPanel() {
           }}
         >
           {/* Row 1 — Receitas (dark green) */}
-          {renderTile('#1b4332', 'Receitas Realizadas (R$)', 'R$ 4.375.845,93', 'rec-real')}
-          {renderTile('#1b4332', 'Receitas Previstas (R$)', 'R$ 10.000,00', 'rec-prev')}
-          {renderTile('#1b4332', 'Receitas Atrasadas (R$)', 'R$ 12.600,00', 'rec-atras')}
-          {renderTile('#1b4332', 'Receitas Total (R$)', 'R$ 5.254.526,43', 'rec-total')}
+          {renderTile(t.dashboard.tileRevenue, 'Receitas Realizadas (R$)', 'R$ 4.375.845,93', 'rec-real')}
+          {renderTile(t.dashboard.tileRevenue, 'Receitas Previstas (R$)', 'R$ 10.000,00', 'rec-prev')}
+          {renderTile(t.dashboard.tileRevenue, 'Receitas Atrasadas (R$)', 'R$ 12.600,00', 'rec-atras')}
+          {renderTile(t.dashboard.tileRevenue, 'Receitas Total (R$)', 'R$ 5.254.526,43', 'rec-total')}
 
           {/* Row 2 — Despesas (dark red) */}
-          {renderTile('#7f1d1d', 'Despesas Realizadas (R$)', 'R$ 4.375.845,93', 'desp-real')}
-          {renderTile('#7f1d1d', 'Despesas Previstas (R$)', 'R$ 8.531,27', 'desp-prev')}
-          {renderTile('#7f1d1d', 'Despesas Atrasadas (R$)', 'R$ 12.628,00', 'desp-atras')}
-          {renderTile('#7f1d1d', 'Despesas Total (R$)', 'R$ 4.397.005,20', 'desp-total')}
+          {renderTile(t.dashboard.tileExpense, 'Despesas Realizadas (R$)', 'R$ 4.375.845,93', 'desp-real')}
+          {renderTile(t.dashboard.tileExpense, 'Despesas Previstas (R$)', 'R$ 8.531,27', 'desp-prev')}
+          {renderTile(t.dashboard.tileExpense, 'Despesas Atrasadas (R$)', 'R$ 12.628,00', 'desp-atras')}
+          {renderTile(t.dashboard.tileExpense, 'Despesas Total (R$)', 'R$ 4.397.005,20', 'desp-total')}
 
           {/* Row 3 — Saldo (mixed) */}
-          {renderTile('#1b4332', 'Saldo Realizado (R$)', 'R$ 856.080,50', 'saldo-real')}
-          {renderTile('#1b4332', 'Saldo Previsto (R$)', 'R$ 1.468,73', 'saldo-prev')}
-          {renderTile('#7f1d1d', 'Saldo Atrasado (R$)', 'R$ -28,00', 'saldo-atras')}
-          {renderTile('#1b4332', 'Saldo Total (R$)', 'R$ 857.521,23', 'saldo-total')}
+          {renderTile(t.dashboard.tileRevenue, 'Saldo Realizado (R$)', 'R$ 856.080,50', 'saldo-real')}
+          {renderTile(t.dashboard.tileRevenue, 'Saldo Previsto (R$)', 'R$ 1.468,73', 'saldo-prev')}
+          {renderTile(t.dashboard.tileExpense, 'Saldo Atrasado (R$)', 'R$ -28,00', 'saldo-atras')}
+          {renderTile(t.dashboard.tileRevenue, 'Saldo Total (R$)', 'R$ 857.521,23', 'saldo-total')}
         </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -1168,6 +1196,11 @@ export default function OverviewPanel() {
         </div>
 
         {/* Tile grid — 3 columns, gap 4px */}
+        {isLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+            {Array.from({ length: 21 }).map((_, i) => <Skeleton key={i} height={60} />)}
+          </div>
+        ) : (
         <div
           style={{
             display: 'grid',
@@ -1184,7 +1217,7 @@ export default function OverviewPanel() {
             <div
               key={item.label}
               style={{
-                background: '#1e3a5f',
+                background: t.dashboard.tileFinance,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1210,7 +1243,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-g1'}
               style={{
-                background: '#1b4332',
+                background: t.dashboard.tileRevenue,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1227,7 +1260,7 @@ export default function OverviewPanel() {
             </div>
           ))}
 
-          {/* Green (slightly different shade) — produção falcada */}
+          {/* Green alt — produção falcada */}
           {[
             { label: 'Produção Vendida (ton)',  value: '17.079' },
             { label: 'Produção Falcada (ton)',  value: '2.569' },
@@ -1236,7 +1269,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-g2'}
               style={{
-                background: '#14532d',
+                background: t.dashboard.tileProduction,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1262,7 +1295,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-r' + idx}
               style={{
-                background: '#7f1d1d',
+                background: t.dashboard.tileExpense,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1288,7 +1321,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-b' + idx}
               style={{
-                background: '#1e3a5f',
+                background: t.dashboard.tileFinance,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1314,7 +1347,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-n' + idx}
               style={{
-                background: '#1c1917',
+                background: t.dashboard.tileDark,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1331,7 +1364,7 @@ export default function OverviewPanel() {
             </div>
           ))}
 
-          {/* Dark neutral — preço médio (2 tiles spanning) */}
+          {/* Dark neutral — preço médio */}
           {[
             { label: 'Preço Médio (R$/ton)', value: 'R$ 137,85' },
             { label: 'Preço Médio (R$/ton)', value: 'R$ 137,85' },
@@ -1339,7 +1372,7 @@ export default function OverviewPanel() {
             <div
               key={item.label + '-pm' + idx}
               style={{
-                background: '#1c1917',
+                background: t.dashboard.tileDark,
                 borderRadius: t.radius.DEFAULT,
                 padding: t.space[3],
                 display: 'flex',
@@ -1358,6 +1391,7 @@ export default function OverviewPanel() {
           {/* Empty placeholder to fill 3rd column */}
           <div style={{ background: 'transparent' }} />
         </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════

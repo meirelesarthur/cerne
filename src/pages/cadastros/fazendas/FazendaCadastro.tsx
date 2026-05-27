@@ -201,6 +201,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
 
       <div
         style={{
+          marginTop: 32,
           background: colors.surfaceBg,
           borderRadius: 12,
           overflow: 'hidden',

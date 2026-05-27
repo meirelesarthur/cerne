@@ -28,9 +28,9 @@ const recentItems = [
 ]
 
 const farms = [
-  { name: 'Fazenda São João', area: '1.240 ha', status: 'Ativa', statusColor: '#059669', statusBg: '#d1fae5' },
-  { name: 'Fazenda Paraíso', area: '860 ha', status: 'Ativa', statusColor: '#059669', statusBg: '#d1fae5' },
-  { name: 'Fazenda Nova Esperança', area: '530 ha', status: 'Inativa', statusColor: '#9ca3af', statusBg: '#f5f5f5' },
+  { name: 'Fazenda São João', area: '1.240 ha', status: 'Ativa', statusColor: t.color.brand[600], statusBg: t.color.brand[100] },
+  { name: 'Fazenda Paraíso', area: '860 ha', status: 'Ativa', statusColor: t.color.brand[600], statusBg: t.color.brand[100] },
+  { name: 'Fazenda Nova Esperança', area: '530 ha', status: 'Inativa', statusColor: t.color.neutral[400], statusBg: t.color.neutral[100] },
 ]
 
 const favorites = [
@@ -44,12 +44,12 @@ const favorites = [
 function SectionHeader({ title, action }: { title: string; action?: string }) {
   const { colors } = useTheme()
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[3] }}>
+      <h3 style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
       {action && (
         <button
           style={{
-            fontSize: 11,
+            fontSize: t.font.size.xs,
             color: colors.brand,
             background: 'none',
             border: 'none',
@@ -57,7 +57,7 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
             display: 'flex',
             alignItems: 'center',
             gap: 3,
-            fontWeight: 500,
+            fontWeight: t.font.weight.medium,
           }}
         >
           {action} <ArrowRight size={11} />
@@ -72,13 +72,13 @@ export default function Dashboard() {
   const { colors } = useTheme()
 
   return (
-    <div style={{ padding: '28px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ padding: `${t.space[7]}px ${t.space[6]}px`, maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       {/* Welcome + Search */}
-      <div style={{ marginBottom: 28, textAlign: 'center', paddingBottom: 28 }}>
+      <div style={{ marginBottom: t.space[7], textAlign: 'center', paddingBottom: t.space[7] }}>
         <h1
           style={{
-            fontSize: 26,
-            fontWeight: 600,
+            fontSize: t.font.size['3xl'],
+            fontWeight: t.font.weight.semibold,
             color: colors.textPrimary,
             marginBottom: t.space[2],
             letterSpacing: '-0.4px',
@@ -99,9 +99,9 @@ export default function Dashboard() {
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: 12,
+          gap: t.space[3],
           maxWidth: 'calc(6 * 180px + 5 * 12px)',
-          margin: '0 auto 28px',
+          margin: `0 auto ${t.space[7]}px`,
         }}
       >
         {menuModules.map((mod) => {
@@ -119,10 +119,10 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: t.space[3] }}>
 
         {/* Últimos acessos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Últimos acessos" action="Ver todos" />
           {recentItems.map((item) => (
             <div
@@ -138,8 +138,8 @@ export default function Dashboard() {
               }}
             >
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
-                <div style={{ fontSize: 10, color: colors.textMuted, marginTop: 1, transition: 'color 0.2s' }}>{item.module}</div>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 1, transition: 'color 0.2s' }}>{item.module}</div>
               </div>
               <ExternalLink size={12} color={colors.border} />
             </div>
@@ -147,9 +147,9 @@ export default function Dashboard() {
         </div>
 
         {/* Fazendas */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Fazendas" action="Ver todas" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
             {farms.map((farm) => (
               <div
                 key={farm.name}
@@ -158,26 +158,26 @@ export default function Dashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '10px 12px',
+                  padding: `10px ${t.space[3]}px`,
                   background: colors.surfaceSubtle,
-                  borderRadius: 8,
+                  borderRadius: t.radius.DEFAULT,
                   cursor: 'pointer',
                   border: `1px solid ${colors.border}`,
                   transition: 'background 0.2s',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
-                  <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2, transition: 'color 0.2s' }}>{farm.area}</div>
+                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 2, transition: 'color 0.2s' }}>{farm.area}</div>
                 </div>
                 <span
                   style={{
-                    fontSize: 10,
-                    fontWeight: 500,
+                    fontSize: t.font.size.xs,
+                    fontWeight: t.font.weight.medium,
                     color: farm.statusColor,
                     background: farm.statusBg,
-                    padding: '2px 8px',
-                    borderRadius: 9999,
+                    padding: `${t.space[0] + 2}px ${t.space[2]}px`,
+                    borderRadius: t.radius.full,
                   }}
                 >
                   {farm.status}
@@ -192,11 +192,11 @@ export default function Dashboard() {
                 justifyContent: 'center',
                 gap: 6,
                 padding: '9px',
-                borderRadius: 8,
+                borderRadius: t.radius.DEFAULT,
                 border: `1px dashed ${colors.border}`,
                 background: 'transparent',
                 cursor: 'pointer',
-                fontSize: 12,
+                fontSize: t.font.size.sm,
                 color: colors.textMuted,
                 transition: 'color 0.2s',
               }}
@@ -207,7 +207,7 @@ export default function Dashboard() {
         </div>
 
         {/* Favoritos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Favoritos" action="Gerenciar" />
           {favorites.map((fav) => (
             <div
@@ -216,8 +216,8 @@ export default function Dashboard() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                padding: '8px 0',
+                gap: t.space[2] + 2, // ~10px
+                padding: `${t.space[2]}px 0`,
                 borderBottom: `1px solid ${colors.borderSubtle}`,
                 cursor: 'pointer',
               }}
@@ -227,11 +227,11 @@ export default function Dashboard() {
                   width: 26,
                   height: 26,
                   background: colors.surfaceSubtle,
-                  borderRadius: 6,
+                  borderRadius: t.radius.md,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 13,
+                  fontSize: t.font.size.base,
                   flexShrink: 0,
                   transition: 'background 0.2s',
                 }}
@@ -241,8 +241,8 @@ export default function Dashboard() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 12,
-                    fontWeight: 500,
+                    fontSize: t.font.size.sm,
+                    fontWeight: t.font.weight.medium,
                     color: colors.textPrimary,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

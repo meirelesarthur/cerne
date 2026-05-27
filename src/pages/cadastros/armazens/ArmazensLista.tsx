@@ -6,6 +6,8 @@ import {
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
+import { Modal }           from '../../../components/ui/Modal'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
@@ -28,7 +30,7 @@ interface Props {
 // ─── Toast ────────────────────────────────────────────────────────────────────
 
 interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-const TOAST_BG: Record<ToastItem['type'], string> = { ok: '#14532d', err: '#dc2626', neutral: '#374151' }
+const TOAST_BG: Record<ToastItem['type'], string> = { ok: t.color.brand[900], err: t.color.error.solid, neutral: t.color.neutral[700] }
 
 function useToast() {
   const [toasts, setToasts] = useState<ToastItem[]>([])
@@ -194,30 +196,31 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       )}
 
       {/* Modal exclusão */}
-      {deleteTarget && (
-        <Modal onClose={() => setDeleteTarget(null)}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '4px 0' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Trash2 size={22} color="#dc2626" />
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans, marginBottom: 8 }}>
-                Excluir armazém?
-              </div>
-              <p style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0 }}>
-                <strong style={{ color: colors.textPrimary }}>{deleteTarget.sigla} — {deleteTarget.descricao}</strong>{' '}
-                será excluído permanentemente. Esta ação não pode ser desfeita.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
-              <Button variant="secondary" style={{ flex: 1 }} onClick={() => setDeleteTarget(null)}>Cancelar</Button>
-              <Button variant="destructive" style={{ flex: 1 }} onClick={handleDeleteConfirm}>
-                <Trash2 size={13} /> Excluir
-              </Button>
-            </div>
+      <Modal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Excluir armazém"
+        subtitle="Esta ação não pode ser desfeita."
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              <Trash2 size={13} /> Excluir
+            </Button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: t.space[4], padding: `${t.space[1]}px 0` }}>
+          <div style={{ width: 52, height: 52, borderRadius: t.radius.full, background: t.color.error.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Trash2 size={22} color={t.color.error.solid} />
           </div>
-        </Modal>
-      )}
+          <p style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0, textAlign: 'center' }}>
+            <strong style={{ color: colors.textPrimary }}>{deleteTarget?.sigla} — {deleteTarget?.descricao}</strong>{' '}
+            será excluído permanentemente.
+          </p>
+        </div>
+      </Modal>
 
       {/* Toasts */}
       <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
@@ -312,27 +315,15 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
           {arm.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-        <ActionBtn icon={<Pencil size={13} />} label="Editar"  onClick={onEdit}      colors={colors} />
-        <ActionBtn icon={<Trash2 size={13} />} label="Excluir" onClick={onDeleteReq} colors={colors} danger />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }}>
+        <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={onEdit}      />
+        <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={onDeleteReq} danger />
       </div>
     </div>
   )
 }
 
-// ─── ActionBtn ────────────────────────────────────────────────────────────────
-
-function ActionBtn({ icon, label, onClick, colors, danger = false }: {
-  icon: React.ReactNode; label: string; onClick: () => void
-  colors: ReturnType<typeof useTheme>['colors']; danger?: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button type="button" title={label} onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent', border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`, borderRadius: t.radius.DEFAULT, cursor: 'pointer', color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted, transition: 'background 0.12s, border-color 0.12s, color 0.12s' }}>
-      {icon}
-    </button>
-  )
-}
+// ActionBtn foi substituído por IconButton de src/components/ui/IconButton
 
 // ─── EmptyState ───────────────────────────────────────────────────────────────
 
@@ -340,7 +331,7 @@ function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolea
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: 12, textAlign: 'center' }}>
-      <div style={{ width: 56, height: 56, borderRadius: 16, background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 56, height: 56, borderRadius: t.radius['2xl'], background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Warehouse size={24} color={colors.brand} strokeWidth={1.5} />
       </div>
       <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
@@ -358,16 +349,4 @@ function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolea
   )
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: t.zIndex.overlay, padding: 24 }} onClick={onClose}>
-      <div style={{ background: colors.surfaceBg, borderRadius: 24, padding: '28px', maxWidth: 420, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)', animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)' }} onClick={e => e.stopPropagation()}>
-        {children}
-      </div>
-      <style>{`@keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
-    </div>
-  )
-}
+// Modal local substituído por Modal de src/components/ui/Modal

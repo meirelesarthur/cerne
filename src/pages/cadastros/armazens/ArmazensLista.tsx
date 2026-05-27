@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, X, Pencil, Trash2, Warehouse,
   ChevronUp, ChevronDown,
@@ -6,6 +6,7 @@ import {
 import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
+import { Pagination }    from '../../../components/ui/Pagination'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, TOAST_BG } from '../../../hooks/useToast'
@@ -46,6 +47,10 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const [sortField,    setSortField]   = useState<SortField>('sigla')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
+  const [page,         setPage]         = useState(1)
+  const [pageSize,     setPageSize]     = useState(10)
+
+  useEffect(() => { setPage(1) }, [search])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -66,6 +71,11 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
     })
     return base
   }, [armazens, search, sortField, sortDir])
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
+  )
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -124,11 +134,11 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
             <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
           </div>
 
-          {filtered.map((arm, idx) => (
+          {paginated.map((arm, idx) => (
             <ArmazemRow
               key={arm.id}
               arm={arm}
-              isLast={idx === filtered.length - 1}
+              isLast={idx === paginated.length - 1}
               onEdit={() => onEdit(arm.id)}
               onDeleteReq={() => setDeleteTarget(arm)}
               colors={colors}
@@ -137,6 +147,14 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
           ))}
         </div>
       )}
+
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {filtered.length > 0 && (
         <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>

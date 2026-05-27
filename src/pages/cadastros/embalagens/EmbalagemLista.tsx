@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, X, Pencil, Trash2, Package,
   ChevronUp, ChevronDown,
@@ -6,6 +6,7 @@ import {
 import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
+import { Pagination }    from '../../../components/ui/Pagination'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, TOAST_BG } from '../../../hooks/useToast'
@@ -33,6 +34,10 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const [search,       setSearch]      = useState('')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Embalagem | null>(null)
+  const [page,         setPage]         = useState(1)
+  const [pageSize,     setPageSize]     = useState(10)
+
+  useEffect(() => { setPage(1) }, [search])
 
   const border  = colors.border
 
@@ -45,6 +50,11 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
     })
     return base
   }, [embalagens, search, sortDir])
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
+  )
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
@@ -127,11 +137,11 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
           </div>
 
           {/* Linhas */}
-          {filtered.map((emb, idx) => (
+          {paginated.map((emb, idx) => (
             <EmbalagemRow
               key={emb.id}
               emb={emb}
-              isLast={idx === filtered.length - 1}
+              isLast={idx === paginated.length - 1}
               onEdit={() => onEdit(emb.id)}
               onDeleteReq={() => setDeleteTarget(emb)}
               colors={colors}
@@ -140,6 +150,14 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
           ))}
         </div>
       )}
+
+      <Pagination
+        page={page}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+      />
 
       {/* Rodapé */}
       {filtered.length > 0 && (

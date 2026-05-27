@@ -1,10 +1,11 @@
-import { ArrowRight, Plus, ExternalLink } from 'lucide-react'
+import { FileText, CreditCard, RefreshCw, Landmark, ArrowRight, Plus, ExternalLink } from 'lucide-react'
 import t from '../design/tokens'
 import SearchBar from '../components/SearchBar'
 import { ModuleCard, type ModuleCardConfig } from '../components/ModuleCard'
 import { menuModules } from '../data/menuData'
 import { useNavigation } from '../context/NavigationContext'
 import { useTheme } from '../context/ThemeContext'
+import { Badge } from '../components/ui/Badge'
 
 const moduleCardConfig: Record<string, ModuleCardConfig> = {
   painel:         { desc: 'Visão geral e indicadores' },
@@ -28,28 +29,28 @@ const recentItems = [
 ]
 
 const farms = [
-  { name: 'Fazenda São João', area: '1.240 ha', status: 'Ativa', statusColor: '#059669', statusBg: '#d1fae5' },
-  { name: 'Fazenda Paraíso', area: '860 ha', status: 'Ativa', statusColor: '#059669', statusBg: '#d1fae5' },
-  { name: 'Fazenda Nova Esperança', area: '530 ha', status: 'Inativa', statusColor: '#9ca3af', statusBg: '#f5f5f5' },
+  { name: 'Fazenda São João',       area: '1.240 ha', status: 'Ativa'   },
+  { name: 'Fazenda Paraíso',        area: '860 ha',   status: 'Ativa'   },
+  { name: 'Fazenda Nova Esperança', area: '530 ha',   status: 'Inativa' },
 ]
 
 const favorites = [
-  { label: 'DFe Recebidas', module: 'Fiscal', moduleId: 'fiscal', emoji: '📄' },
-  { label: 'C. a Pagar', module: 'Financeiro', moduleId: 'financeiro', emoji: '💰' },
-  { label: 'C. a Receber', module: 'Financeiro', moduleId: 'financeiro', emoji: '💰' },
-  { label: 'Importação OFX', module: 'Financeiro', moduleId: 'financeiro', emoji: '🔄' },
-  { label: 'Mov. Caixa/Bancário', module: 'Financeiro', moduleId: 'financeiro', emoji: '🏦' },
+  { label: 'DFe Recebidas',       module: 'Fiscal',     moduleId: 'fiscal',     icon: FileText   },
+  { label: 'C. a Pagar',          module: 'Financeiro', moduleId: 'financeiro', icon: CreditCard },
+  { label: 'C. a Receber',        module: 'Financeiro', moduleId: 'financeiro', icon: CreditCard },
+  { label: 'Importação OFX',      module: 'Financeiro', moduleId: 'financeiro', icon: RefreshCw  },
+  { label: 'Mov. Caixa/Bancário', module: 'Financeiro', moduleId: 'financeiro', icon: Landmark   },
 ]
 
 function SectionHeader({ title, action }: { title: string; action?: string }) {
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
+      <h3 style={{ fontSize: t.font.size.base, fontWeight: 600, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
       {action && (
         <button
           style={{
-            fontSize: 11,
+            fontSize: t.font.size.xs,
             color: colors.brand,
             background: 'none',
             border: 'none',
@@ -60,7 +61,7 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
             fontWeight: 500,
           }}
         >
-          {action} <ArrowRight size={11} />
+          {action} <ArrowRight size={t.font.size.xs} />
         </button>
       )}
     </div>
@@ -72,17 +73,17 @@ export default function Dashboard() {
   const { colors } = useTheme()
 
   return (
-    <div style={{ padding: '28px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ padding: `${t.space[7]}px ${t.space[6]}px`, maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       {/* Welcome + Search */}
-      <div style={{ marginBottom: 28, textAlign: 'center', paddingBottom: 28 }}>
+      <div style={{ marginBottom: t.space[7], textAlign: 'center', paddingBottom: t.space[7] }}>
         <h1
           style={{
-            fontSize: 26,
+            fontSize: t.font.size['3xl'],
             fontWeight: 600,
             color: colors.textPrimary,
             marginBottom: t.space[2],
             letterSpacing: '-0.4px',
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: t.font.family.sans,
             transition: 'color 0.2s',
           }}
         >
@@ -96,12 +97,11 @@ export default function Dashboard() {
       {/* Module Cards */}
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: 12,
-          maxWidth: 'calc(6 * 180px + 5 * 12px)',
-          margin: '0 auto 28px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gap: t.space[3],
+          maxWidth: 1200,
+          margin: `0 auto ${t.space[7]}px`,
         }}
       >
         {menuModules.map((mod) => {
@@ -119,69 +119,65 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: t.space[3] }}>
 
         {/* Últimos acessos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius['2xl'], padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Últimos acessos" action="Ver todos" />
           {recentItems.map((item) => (
             <div
               key={item.label}
               onClick={() => navigateTo(item.moduleId, item.itemId)}
+              onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '9px 0',
+                padding: '9px 8px',
+                margin: '0 -8px',
                 borderBottom: `1px solid ${colors.borderSubtle}`,
                 cursor: 'pointer',
+                borderRadius: t.radius.md,
+                transition: `background ${t.transition.fast}`,
               }}
             >
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
-                <div style={{ fontSize: 10, color: colors.textMuted, marginTop: 1, transition: 'color 0.2s' }}>{item.module}</div>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 1, transition: 'color 0.2s' }}>{item.module}</div>
               </div>
-              <ExternalLink size={12} color={colors.border} />
+              <ExternalLink size={t.font.size.sm} color={colors.border} />
             </div>
           ))}
         </div>
 
         {/* Fazendas */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius['2xl'], padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Fazendas" action="Ver todas" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {farms.map((farm) => (
               <div
                 key={farm.name}
                 onClick={() => navigateTo('cadastros', 'cad-est-faz')}
+                onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceBg }}
+                onMouseLeave={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 12px',
                   background: colors.surfaceSubtle,
-                  borderRadius: 8,
+                  borderRadius: t.radius.DEFAULT,
                   cursor: 'pointer',
                   border: `1px solid ${colors.border}`,
                   transition: 'background 0.2s',
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
-                  <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2, transition: 'color 0.2s' }}>{farm.area}</div>
+                  <div style={{ fontSize: t.font.size.sm, fontWeight: 500, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 2, transition: 'color 0.2s' }}>{farm.area}</div>
                 </div>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 500,
-                    color: farm.statusColor,
-                    background: farm.statusBg,
-                    padding: '2px 8px',
-                    borderRadius: 9999,
-                  }}
-                >
-                  {farm.status}
-                </span>
+                <Badge label={farm.status} variant={farm.status === 'Ativa' ? 'success' : 'neutral'} />
               </div>
             ))}
             <button
@@ -207,41 +203,45 @@ export default function Dashboard() {
         </div>
 
         {/* Favoritos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: 12, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius['2xl'], padding: 18, transition: 'background 0.2s' }}>
           <SectionHeader title="Favoritos" action="Gerenciar" />
           {favorites.map((fav) => (
             <div
               key={fav.label}
               onClick={() => navigateTo(fav.moduleId)}
+              onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '8px 0',
+                padding: '8px 8px',
+                margin: '0 -8px',
                 borderBottom: `1px solid ${colors.borderSubtle}`,
                 cursor: 'pointer',
+                borderRadius: t.radius.md,
+                transition: `background ${t.transition.fast}`,
               }}
             >
               <div
                 style={{
-                  width: 26,
-                  height: 26,
-                  background: colors.surfaceSubtle,
-                  borderRadius: 6,
+                  width: 28,
+                  height: 28,
+                  background: colors.brandBg,
+                  borderRadius: t.radius.md,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 13,
                   flexShrink: 0,
                   transition: 'background 0.2s',
                 }}
               >
-                {fav.emoji}
+                <fav.icon size={t.font.size.base} color={colors.brand} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 12,
+                    fontSize: t.font.size.sm,
                     fontWeight: 500,
                     color: colors.textPrimary,
                     overflow: 'hidden',
@@ -253,7 +253,7 @@ export default function Dashboard() {
                   {fav.label}
                 </div>
               </div>
-              <ArrowRight size={12} color={colors.border} style={{ flexShrink: 0 }} />
+              <ArrowRight size={t.font.size.sm} color={colors.border} style={{ flexShrink: 0 }} />
             </div>
           ))}
         </div>

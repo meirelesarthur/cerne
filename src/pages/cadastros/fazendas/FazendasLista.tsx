@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import {
   Plus, Pencil, Trash2, SlidersHorizontal, X,
-  List, LayoutGrid, Search, MapPin, Layers, Ruler, Eye,
-  TrendingUp, TrendingDown,
+  List, LayoutGrid, MapPin, Layers, Ruler, Eye,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
@@ -11,8 +10,12 @@ import { DataTable }     from '../../../components/ui/DataTable'
 import { FilterDrawer }  from '../../../components/ui/FilterDrawer'
 import { Badge }         from '../../../components/ui/Badge'
 import { FormSelect }    from '../../../components/ui/FormSelect'
+import { SearchInput }   from '../../../components/ui/SearchInput'
+import { Modal }         from '../../../components/ui/Modal'
+import { KpiBar }        from '../../../components/ui/KpiBar'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
+import { useToast, TOAST_BG } from '../../../hooks/useToast'
 import { mockFazendas }  from './fazendas.mock'
 import type { FazendaRow } from './fazendas.types'
 import type { Column }     from '../../../components/ui/DataTable'
@@ -47,23 +50,25 @@ const ativoOptions = [
 // ─── Tipo paleta por exploração ───────────────────────────────────────────────
 
 const TIPO_COLOR: Record<string, { bg: string; text: string }> = {
-  'Agrícola':     { bg: '#f0fdf4', text: '#059669' },
-  'Pecuário':     { bg: '#eff6ff', text: '#2563eb' },
-  'Misto':        { bg: '#fefce8', text: '#d97706' },
-  'Silvicultura': { bg: '#f5f3ff', text: '#7c3aed' },
-  'Piscicultura': { bg: '#ecfeff', text: '#0891b2' },
+  'Agrícola':     { bg: t.color.brand[50],     text: t.color.brand[600]    },
+  'Pecuário':     { bg: t.color.info.bg,        text: t.color.info.text     },
+  'Misto':        { bg: t.color.warning.bg,     text: t.color.warning.text  },
+  'Silvicultura': { bg: '#f5f3ff',              text: '#7c3aed'             },
+  'Piscicultura': { bg: '#ecfeff',              text: '#0891b2'             },
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaProps) {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
 
   const [data]       = useState<FazendaRow[]>(mockFazendas)
   const [viewMode,   setViewMode]   = useState<ViewMode>('list')
   const [search,     setSearch]     = useState('')
   const [filters,    setFilters]    = useState({ tipoExploracao: '', ativo: '' })
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<FazendaRow | null>(null)
+  const { toasts, show } = useToast()
 
   // ── KPIs derivados dos dados brutos (não filtrados) ───────────────────────
   const kpis = useMemo(() => {
@@ -96,6 +101,13 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 
   const activeFilterCount = [filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipoExploracao: '', ativo: '' })
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return
+    // TODO: chamar API de deleção
+    setDeleteTarget(null)
+    show(`Fazenda "${deleteTarget.nome}" excluída.`, 'success')
+  }
 
   // ── Colunas da tabela ─────────────────────────────────────────────────────
   const columns: Column<FazendaRow>[] = [
@@ -181,9 +193,11 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             <Pencil size={13} />
           </Button>
           <Button
-            variant="destructive" size="sm"
-            style={{ width: 30, height: 30, padding: 0, border: 'none' }}
-            onClick={(e) => e.stopPropagation()}
+            variant="ghost" size="sm"
+            style={{ width: 30, height: 30, padding: 0, color: t.color.neutral[400] }}
+            onMouseEnter={e => { e.currentTarget.style.color = t.color.error.text }}
+            onMouseLeave={e => { e.currentTarget.style.color = t.color.neutral[400] }}
+            onClick={(e) => { e.stopPropagation(); setDeleteTarget(row) }}
             title="Excluir" aria-label="Excluir fazenda"
           >
             <Trash2 size={13} />
@@ -202,12 +216,26 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         count={data.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterBtn
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
+            <Button
+              variant={activeFilterCount > 0 ? 'primary' : 'secondary'}
+              size="md"
+              icon={<SlidersHorizontal size={13} />}
               onClick={() => setDrawerOpen(true)}
-              colors={colors}
-            />
+            >
+              Filtros
+              {activeFilterCount > 0 && (
+                <span style={{
+                  background: 'rgba(255,255,255,0.25)',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: '1px 6px',
+                  borderRadius: t.radius.full,
+                  marginLeft: 2,
+                }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Fazenda
             </Button>
@@ -216,13 +244,24 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       />
 
       {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-      <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
+      <KpiBar items={[
+        { label: 'Total de Fazendas', value: String(kpis.total), sub: 'cadastradas', trend: 'neutral' },
+        { label: 'Ativas', value: String(kpis.ativas), trendValue: `${kpis.ativasPct}%`, trend: 'up', trendLabel: 'percentual do total' },
+        { label: 'Inativas', value: String(kpis.inativas), trendValue: kpis.total > 0 ? `${100 - kpis.ativasPct}%` : '0%', trend: kpis.inativas > 0 ? 'down' : 'neutral', trendLabel: 'percentual do total' },
+        { label: 'Área Total', value: kpis.areaTotalHa.toLocaleString('pt-BR'), sub: 'hectares', trend: 'up' },
+      ]} />
 
       {/* ── Toolbar: search (esq.) → chips → [spacer] → toggle (dir.) ────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, marginTop: 4, flexWrap: 'wrap' }}>
 
         {/* Busca — extrema esquerda */}
-        <SearchInput value={search} onChange={setSearch} colors={colors} />
+        <SearchInput value={search} onChange={setSearch} placeholder="Buscar fazenda..." />
+
+        {search.trim() && (
+          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+            {filtered.length} {filtered.length === 1 ? 'resultado' : 'resultados'}
+          </span>
+        )}
 
         {/* Chips de filtro ativos */}
         {filters.tipoExploracao && (
@@ -238,17 +277,9 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           />
         )}
         {activeFilterCount > 1 && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              background: 'none', border: 'none', fontSize: t.font.size.xs,
-              color: colors.textMuted, cursor: 'pointer', padding: '0 4px',
-              fontFamily: t.font.family.sans,
-            }}
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
             Limpar tudo
-          </button>
+          </Button>
         )}
 
         {/* Espaçador */}
@@ -301,144 +332,78 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         />
       </FilterDrawer>
 
-    </PageContainer>
-  )
-}
-
-// ─── KPI Bar ──────────────────────────────────────────────────────────────────
-
-interface KpiItem {
-  label: string
-  value: string
-  sub?: string
-  trend?: 'up' | 'down' | 'neutral'
-  trendValue?: string
-}
-
-function KpiBar({
-  kpis,
-  colors,
-  isGbMode,
-}: {
-  kpis: { total: number; ativas: number; inativas: number; areaTotalHa: number; ativasPct: number }
-  colors: ReturnType<typeof useTheme>['colors']
-  isGbMode: boolean
-}) {
-  const items: KpiItem[] = [
-    {
-      label: 'Total de Fazendas',
-      value: String(kpis.total),
-      sub: 'cadastradas',
-      trend: 'neutral',
-    },
-    {
-      label: 'Ativas',
-      value: String(kpis.ativas),
-      trendValue: `${kpis.ativasPct}%`,
-      trend: 'up',
-    },
-    {
-      label: 'Inativas',
-      value: String(kpis.inativas),
-      trendValue: kpis.total > 0 ? `${100 - kpis.ativasPct}%` : '0%',
-      trend: kpis.inativas > 0 ? 'down' : 'neutral',
-    },
-    {
-      label: 'Área Total',
-      value: kpis.areaTotalHa.toLocaleString('pt-BR'),
-      sub: 'hectares',
-      trend: 'up',
-    },
-  ]
-
-  const cardBg    = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
-  const border    = colors.border
-
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 1,
-        border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
-        overflow: 'hidden',
-        marginBottom: 16,
-      }}
-    >
-      {items.map((item, idx) => (
-        <div
-          key={item.label}
-          style={{
-            padding: `${t.space[4]}px ${t.space[5]}px`,
-            background: cardBg,
-            borderRight: idx < items.length - 1 ? `1px solid ${border}` : undefined,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-          }}
-        >
-          <span style={{
-            fontSize: t.font.size.xs,
-            fontWeight: t.font.weight.medium,
-            color: colors.textMuted,
-            fontFamily: t.font.family.sans,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-          }}>
-            {item.label}
-          </span>
-
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{
-              fontSize: t.font.size['3xl'],
-              fontWeight: t.font.weight.bold,
-              color: colors.textPrimary,
-              fontFamily: t.font.family.sans,
-              lineHeight: 1,
+      {/* Modal de confirmação de exclusão */}
+      {deleteTarget && (
+        <Modal onClose={() => setDeleteTarget(null)}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: '50%',
+              background: t.color.error.bg,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 16px',
             }}>
-              {item.value}
-            </span>
-
-            {item.trendValue && (
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                fontSize: t.font.size.xs,
-                fontWeight: t.font.weight.semibold,
-                color: item.trend === 'up'
-                  ? t.color.success.text
-                  : item.trend === 'down'
-                    ? t.color.error.text
-                    : colors.textMuted,
-                background: item.trend === 'up'
-                  ? t.color.success.bg
-                  : item.trend === 'down'
-                    ? t.color.error.bg
-                    : colors.surfaceSubtle,
-                padding: '2px 6px',
-                borderRadius: t.radius.full,
-              }}>
-                {item.trend === 'up'   && <TrendingUp  size={10} />}
-                {item.trend === 'down' && <TrendingDown size={10} />}
-                {item.trendValue}
-              </span>
-            )}
-
-            {item.sub && (
-              <span style={{
-                fontSize: t.font.size.sm,
-                color: colors.textMuted,
-                fontFamily: t.font.family.sans,
-              }}>
-                {item.sub}
-              </span>
-            )}
+              <Trash2 size={22} color={t.color.error.text} />
+            </div>
+            <div style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.semibold, color: colors.textPrimary, marginBottom: 8, fontFamily: t.font.family.sans }}>
+              Excluir Fazenda
+            </div>
+            <p style={{ fontSize: t.font.size.base, color: colors.textMuted, lineHeight: 1.6, fontFamily: t.font.family.sans, margin: '0 0 24px' }}>
+              Tem certeza que deseja excluir{' '}
+              <strong style={{ color: colors.textPrimary }}>{deleteTarget.nome}</strong>?{' '}
+              Esta ação não pode ser desfeita.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                style={{ background: t.color.error.solid, color: 'white', border: 'none' }}
+                onClick={handleDeleteConfirm}
+              >
+                <Trash2 size={13} />
+                Excluir
+              </Button>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        </Modal>
+      )}
+
+      {/* Toasts */}
+      <div style={{
+        position: 'fixed', bottom: 24, right: 24,
+        display: 'flex', flexDirection: 'column', gap: 8,
+        zIndex: t.zIndex.toast, pointerEvents: 'none',
+      }}>
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            role="status"
+            aria-live="polite"
+            style={{
+              background: TOAST_BG[toast.type],
+              color: 'white',
+              padding: '11px 18px',
+              borderRadius: t.radius.lg,
+              fontSize: t.font.size.base,
+              fontWeight: t.font.weight.medium,
+              fontFamily: t.font.family.sans,
+              boxShadow: t.shadow.lg,
+              animation: 'toastIn 0.22s ease',
+            }}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateX(16px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
+
+    </PageContainer>
   )
 }
 
@@ -496,65 +461,6 @@ function ViewToggle({
           </button>
         )
       })}
-    </div>
-  )
-}
-
-// ─── Search Input ─────────────────────────────────────────────────────────────
-
-function SearchInput({
-  value,
-  onChange,
-  colors,
-}: {
-  value: string
-  onChange: (v: string) => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  const [focused, setFocused] = useState(false)
-
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 7,
-      height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT,
-      padding: '0 10px',
-      background: colors.surfaceBg,
-      transition: 'border-color 0.15s',
-      minWidth: 220,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
-      <input
-        type="search"
-        placeholder="Buscar fazenda..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1,
-          border: 'none',
-          background: 'transparent',
-          outline: 'none',
-          fontSize: t.font.size.sm,
-          color: colors.textPrimary,
-          fontFamily: t.font.family.sans,
-          minWidth: 0,
-        }}
-      />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange('')}
-          aria-label="Limpar busca"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: colors.textMuted }}
-        >
-          <X size={11} />
-        </button>
-      )}
     </div>
   )
 }
@@ -748,48 +654,3 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   )
 }
 
-// ─── Filter Button ────────────────────────────────────────────────────────────
-
-function FilterBtn({
-  active,
-  count,
-  onClick,
-  colors,
-}: {
-  active: boolean
-  count: number
-  onClick: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        height: 36,
-        background: active ? colors.brandBg : hovered ? colors.surfaceSubtle : colors.surfaceBg,
-        border: `1.5px solid ${active ? colors.brand : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
-        padding: '0 14px',
-        fontSize: t.font.size.base,
-        fontWeight: t.font.weight.medium,
-        fontFamily: t.font.family.sans,
-        color: active ? colors.brand : colors.textSecondary,
-        cursor: 'pointer',
-        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
-      }}
-    >
-      <SlidersHorizontal size={13} />
-      Filtros
-      {active && (
-        <span style={{ background: colors.brand, color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 9999 }}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}

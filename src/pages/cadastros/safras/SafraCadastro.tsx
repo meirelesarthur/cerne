@@ -12,6 +12,7 @@ import {
   generateWeeks, fmtYMDtoDMY, MES_OPTS,
   type Safra, type Week, type Mes,
 } from './safras.types'
+import { useToast, TOAST_BG } from '../../../hooks/useToast'
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -59,24 +60,11 @@ interface SafraCadastroProps {
   onSave: (safra: Safra) => void
 }
 
-// ─── Toast interno ────────────────────────────────────────────────────────────
-
-function useToast() {
-  const [visible, setVisible] = useState(false)
-  const [msg, setMsg] = useState('')
-  const show = (message: string) => {
-    setMsg(message)
-    setVisible(true)
-    setTimeout(() => setVisible(false), 3400)
-  }
-  return { visible, msg, show }
-}
-
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function SafraCadastro({ initialData, onBack, onSave }: SafraCadastroProps) {
   const { colors } = useTheme()
-  const toast = useToast()
+  const { toasts, show } = useToast()
 
   const isEdit = !!initialData
 
@@ -155,7 +143,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
       s2:    form.s2,
       weeks,
     }
-    toast.show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!')
+    show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!', 'success')
     setTimeout(() => onSave(safra), 800)
   }
 
@@ -244,20 +232,38 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
         )}
       </div>
 
-      {/* ── Toast ─────────────────────────────────────────────────────────── */}
-      {toast.visible && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24,
-          background: '#14532d', color: 'white',
-          padding: '11px 20px', borderRadius: t.radius.lg,
-          fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          animation: 'toastIn 0.22s ease',
-        }}>
-          {toast.msg}
-        </div>
-      )}
+      {/* ── Toasts ────────────────────────────────────────────────────────── */}
+      <div style={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        zIndex: t.zIndex.toast,
+        pointerEvents: 'none',
+      }}>
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            role="status"
+            aria-live="polite"
+            style={{
+              background: TOAST_BG[toast.type],
+              color: 'white',
+              padding: '11px 20px',
+              borderRadius: t.radius.lg,
+              fontSize: t.font.size.base,
+              fontWeight: t.font.weight.medium,
+              fontFamily: t.font.family.sans,
+              boxShadow: t.shadow.lg,
+              animation: 'toastIn 0.22s ease',
+            }}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
     </PageContainer>
   )

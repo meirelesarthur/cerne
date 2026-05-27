@@ -7,6 +7,7 @@ import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
 import { Badge }         from '../../../components/ui/Badge'
+import { Modal }         from '../../../components/ui/Modal'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import {
@@ -344,7 +345,7 @@ export default function CentrosCustoLista({
 
       {/* ── Modal: Saiba mais ────────────────────────────────────────────── */}
       {saibaMais && (
-        <Modal onClose={() => setSaibaMais(false)} width={560}>
+        <Modal onClose={() => setSaibaMais(false)} maxWidth={560}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
@@ -700,43 +701,3 @@ function CCSearchInput({
   )
 }
 
-// ─── Modal genérico ───────────────────────────────────────────────────────────
-
-function Modal({
-  children,
-  onClose,
-  width = 440,
-}: {
-  children: React.ReactNode
-  onClose:  () => void
-  width?:   number
-}) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay,
-        padding: 24,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: colors.surfaceBg,
-          borderRadius: t.radius['2xl'],
-          padding: 28,
-          width: '100%',
-          maxWidth: width,
-          boxShadow: t.shadow.lg,
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}

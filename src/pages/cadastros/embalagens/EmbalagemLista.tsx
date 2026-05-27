@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
-  Plus, Search, X, Pencil, Trash2, Package,
+  Plus, X, Pencil, Trash2, Package,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
@@ -8,6 +8,9 @@ import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
+import { useToast, TOAST_BG } from '../../../hooks/useToast'
+import { SearchInput }         from '../../../components/ui/SearchInput'
+import { Modal }               from '../../../components/ui/Modal'
 import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -17,27 +20,6 @@ interface Props {
   onNew:      () => void
   onEdit:     (id: number) => void
   onDelete:   (id: number) => void
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-
-const TOAST_BG: Record<ToastItem['type'], string> = {
-  ok:      '#14532d',
-  err:     '#dc2626',
-  neutral: '#374151',
-}
-
-function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const show = useCallback((message: string, type: ToastItem['type'] = 'ok') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
-  }, [])
-  const dismiss = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), [])
-  return { toasts, show, dismiss }
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -333,41 +315,6 @@ function ActionBtn({
   )
 }
 
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7, height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT, padding: '0 10px',
-      background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 240,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar embalagem..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary,
-          fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
-    </div>
-  )
-}
-
 // ─── EmptyState ───────────────────────────────────────────────────────────────
 
 function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolean }) {
@@ -398,34 +345,3 @@ function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolea
   )
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay, padding: 24,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: colors.surfaceBg, borderRadius: 24, padding: '28px',
-          maxWidth: 420, width: '100%',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-          animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-      <style>{`
-        @keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }
-      `}</style>
-    </div>
-  )
-}

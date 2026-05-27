@@ -1,12 +1,15 @@
 import React, { useState, useMemo } from 'react'
 import {
-  Plus, Pencil, Trash2, ChevronRight, MapPin, Search, X,
+  Plus, Pencil, Trash2, ChevronRight, MapPin, X,
 } from 'lucide-react'
 import { PageHeader }    from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { Button }        from '../../../components/ui/Button'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
+import { useToast, TOAST_BG } from '../../../hooks/useToast'
+import { SearchInput }         from '../../../components/ui/SearchInput'
+import { Modal }               from '../../../components/ui/Modal'
 import {
   buildTree, TIPO_LABEL, TIPO_COLOR, TIPO_CHILD,
   type Endereco, type EnderecoNode,
@@ -22,34 +25,13 @@ interface Props {
   onDelete:     (id: number) => void
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface ToastMsg { id: number; text: string; type: 'ok' | 'neutral' | 'err' }
-
-const TOAST_BG: Record<ToastMsg['type'], string> = {
-  ok:      '#14532d',
-  neutral: '#374151',
-  err:     '#dc2626',
-}
-
-function useToast() {
-  const [items, setItems] = useState<ToastMsg[]>([])
-  const show = (text: string, type: ToastMsg['type'] = 'ok') => {
-    const id = Date.now()
-    setItems(p => [...p, { id, text, type }])
-    setTimeout(() => setItems(p => p.filter(i => i.id !== id)), 4000)
-  }
-  const dismiss = (id: number) => setItems(p => p.filter(i => i.id !== id))
-  return { items, show, dismiss }
-}
-
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function EnderecosList({
   enderecos, onAddRoot, onAddChild, onEdit, onDelete,
 }: Props) {
   const { colors } = useTheme()
-  const { items: toasts, show, dismiss } = useToast()
+  const { toasts, show, dismiss } = useToast()
 
   const [search,       setSearch]       = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Endereco | null>(null)
@@ -230,17 +212,14 @@ export default function EnderecosList({
               pointerEvents: 'auto', animation: 'toastIn 0.22s ease',
             }}
           >
-            <span style={{ flex: 1 }}>{toast.text}</span>
+            <span style={{ flex: 1 }}>{toast.message}</span>
             <button onClick={() => dismiss(toast.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 0, display: 'flex' }}>
               <X size={14} />
             </button>
           </div>
         ))}
       </div>
-      <style>{`
-        @keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }
-        @keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }
-      `}</style>
+      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
 
     </PageContainer>
   )
@@ -411,41 +390,6 @@ function ActionBtn({
   )
 }
 
-// ─── SearchInput ──────────────────────────────────────────────────────────────
-
-function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { colors } = useTheme()
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7, height: 34,
-      border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-      borderRadius: t.radius.DEFAULT, padding: '0 10px',
-      background: colors.surfaceBg, transition: 'border-color 0.15s', minWidth: 240,
-    }}>
-      <Search size={13} color={focused ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-      <input
-        type="search"
-        placeholder="Buscar endereçamento..."
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary,
-          fontFamily: t.font.family.sans, minWidth: 0,
-        }}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}>
-          <X size={11} />
-        </button>
-      )}
-    </div>
-  )
-}
-
 // ─── EmptyState ───────────────────────────────────────────────────────────────
 
 function EmptyState({ onAddRoot, hasSearch }: { onAddRoot: () => void; hasSearch: boolean }) {
@@ -476,31 +420,3 @@ function EmptyState({ onAddRoot, hasSearch }: { onAddRoot: () => void; hasSearch
   )
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay, padding: 24,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: colors.surfaceBg, borderRadius: 24, padding: 28,
-          maxWidth: 420, width: '100%',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-          animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}

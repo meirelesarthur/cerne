@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Web Guide — CERNE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── base ───────────────────────────────────────────────── */
+body {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #111827;
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── page shell ─────────────────────────────────────────── */
+.page { max-width: 860px; margin: 0 auto; padding: 0 32px 120px; }
+
+/* ─── header ─────────────────────────────────────────────── */
+.site-header {
+  padding: 64px 0 56px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0;
+}
+.header-label {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #059669;
+  margin-bottom: 20px;
+}
+.header-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #059669;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.site-header h1 {
+  font-size: 42px; font-weight: 800;
+  letter-spacing: -.03em; line-height: 1.1;
+  color: #111827; margin-bottom: 14px;
+}
+.site-header h1 span { color: #059669; }
+.site-header p {
+  font-size: 17px; line-height: 1.6;
+  color: #6b7280; max-width: 560px;
+}
+.header-meta {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 24px;
+}
+.meta-tag {
+  font-size: 12px; color: #9ca3af; font-weight: 500;
+}
+.meta-sep { color: #e5e7eb; }
+
+/* ─── sections ───────────────────────────────────────────── */
+.section {
+  padding: 56px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.section:last-of-type { border-bottom: none; }
+
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #9ca3af;
+  margin-bottom: 8px;
+}
+.section > h2 {
+  font-size: 26px; font-weight: 700;
+  letter-spacing: -.02em; color: #111827;
+  margin-bottom: 20px; line-height: 1.2;
+}
+
+/* ─── subheadings ────────────────────────────────────────── */
+h3 {
+  font-size: 14px; font-weight: 700;
+  color: #374151; margin: 36px 0 10px;
+  letter-spacing: -.01em;
+}
+h3:first-child { margin-top: 0; }
+h4 {
+  font-size: 14px; font-weight: 600; color: #374151;
+  margin: 20px 0 8px;
+}
+
+/* ─── prose ──────────────────────────────────────────────── */
+p { color: #4b5563; margin-bottom: 12px; }
+p:last-child { margin-bottom: 0; }
+ul, ol { padding-left: 22px; margin-bottom: 12px; }
+li { color: #4b5563; margin-bottom: 5px; line-height: 1.65; }
+strong { font-weight: 600; color: #111827; }
+em { font-style: italic; }
+
+/* ─── inline code ────────────────────────────────────────── */
+code {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f4f6;
+  color: #047857;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+/* ─── code blocks ────────────────────────────────────────── */
+pre {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 20px 22px;
+  overflow-x: auto;
+  margin: 14px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 12.5px; line-height: 1.8;
+  color: #e2e8f0;
+  background: none; border: none; padding: 0;
+  white-space: pre;
+}
+.ok   { color: #34d399; }
+.err  { color: #f87171; }
+.dim  { color: #64748b; font-style: italic; }
+.key  { color: #93c5fd; }
+.str  { color: #fcd34d; }
+
+/* ─── do / don't ─────────────────────────────────────────── */
+.dd { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.dd-col { border-radius: 8px; overflow: hidden; }
+.dd-head {
+  padding: 9px 16px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.dd-col.do   .dd-head { background: #052e16; color: #34d399; }
+.dd-col.dont .dd-head { background: #450a0a; color: #f87171; }
+.dd-body { background: #0f172a; padding: 14px 16px; }
+.dd-body code {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 12.5px; line-height: 1.8;
+  background: none; border: none; padding: 0;
+  white-space: pre; display: block;
+}
+.dd-col.do   .dd-body code { color: #34d399; }
+.dd-col.dont .dd-body code { color: #f87171; }
+@media (max-width: 600px) { .dd { grid-template-columns: 1fr; } }
+
+/* ─── tables ─────────────────────────────────────────────── */
+.tbl { overflow-x: auto; margin: 14px 0; border-radius: 8px; border: 1px solid #e5e7eb; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead tr { background: #059669; }
+thead th {
+  padding: 10px 16px; text-align: left;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid #f3f4f6; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: #f9fafb; }
+tbody td { padding: 10px 16px; color: #4b5563; vertical-align: top; line-height: 1.55; }
+td strong { color: #111827; }
+td code { font-size: 11.5px; }
+
+/* ─── lei cards ──────────────────────────────────────────── */
+.lei {
+  border: 1px solid #a7f3d0;
+  border-left: 3px solid #059669;
+  border-radius: 8px;
+  background: #f0fdf9;
+  padding: 20px 22px;
+  margin: 20px 0;
+}
+.lei-tag {
+  display: inline-flex; align-items: center;
+  background: #059669; color: #fff;
+  padding: 2px 10px; border-radius: 9999px;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .07em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lei h4 { color: #065f46; font-size: 14px; margin: 0 0 8px; }
+.lei p, .lei li { font-size: 13.5px; color: #064e3b; }
+.lei li { margin-bottom: 4px; }
+.lei ul { padding-left: 18px; margin: 8px 0; }
+.lei code {
+  background: rgba(5,150,105,.1);
+  color: #065f46; border-color: rgba(5,150,105,.2);
+}
+.forbid {
+  background: rgba(220,38,38,.05);
+  border: 1px solid rgba(220,38,38,.12);
+  border-radius: 6px;
+  padding: 10px 14px; margin: 10px 0;
+}
+.forbid p { color: #dc2626; font-weight: 700; font-size: 12.5px; margin-bottom: 5px; }
+.forbid ul { list-style: none; padding: 0; margin: 0; }
+.forbid li { color: #7f1d1d; font-size: 12.5px; }
+.forbid li::before { content: '✕  '; color: #dc2626; font-weight: 700; }
+
+/* ─── callouts ───────────────────────────────────────────── */
+.note {
+  display: flex; gap: 12px; align-items: flex-start;
+  border-radius: 8px; padding: 14px 16px; margin: 14px 0;
+}
+.note-icon { font-size: 15px; flex-shrink: 0; padding-top: 2px; }
+.note p { font-size: 13.5px; line-height: 1.6; margin: 0; }
+.note.info  { background: #eff6ff; border: 1px solid #bfdbfe; }
+.note.info  p { color: #1e3a5f; }
+.note.warn  { background: #fffbeb; border: 1px solid #fde68a; }
+.note.warn  p { color: #78350f; }
+.note.brand { background: #f0fdf9; border: 1px solid #a7f3d0; }
+.note.brand p { color: #065f46; }
+
+/* ─── token pill ─────────────────────────────────────────── */
+.tok {
+  display: inline-flex; align-items: center;
+  background: #0f172a; color: #34d399;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11.5px; padding: 2px 8px;
+  border-radius: 4px; white-space: nowrap;
+}
+.swatch {
+  display: inline-block; width: 11px; height: 11px;
+  border-radius: 3px; border: 1px solid rgba(0,0,0,.1);
+  vertical-align: middle; margin-right: 5px;
+}
+.comp {
+  display: inline-flex; align-items: center;
+  background: #f3f4f6; color: #374151;
+  border: 1px solid #e5e7eb; border-radius: 9999px;
+  padding: 2px 10px; font-size: 12px; font-weight: 500;
+  white-space: nowrap;
+}
+.commit {
+  display: inline-flex;
+  background: #0f172a; color: #34d399;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11.5px; font-weight: 600;
+  padding: 4px 10px; border-radius: 4px; margin: 2px;
+}
+
+/* ─── checklist ──────────────────────────────────────────── */
+.checklist { list-style: none; padding: 0; margin: 14px 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 14px; margin-bottom: 5px;
+  border-radius: 6px; border: 1px solid #e5e7eb;
+  font-size: 13.5px; color: #4b5563;
+  background: #f9fafb;
+}
+.checklist li:hover { background: #f0fdf9; border-color: #a7f3d0; }
+.cb {
+  width: 15px; height: 15px; flex-shrink: 0;
+  border: 1.5px solid #d1d5db; border-radius: 4px; margin-top: 2px;
+}
+.commit-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+
+/* ─── rule divider ───────────────────────────────────────── */
+.rule { height: 1px; background: #f3f4f6; margin: 28px 0; }
+
+/* ─── footer ─────────────────────────────────────────────── */
+.site-footer {
+  padding: 48px 0 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 0;
+}
+.footer-inner {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 24px;
+  flex-wrap: wrap;
+}
+.footer-brand { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+.footer-meta  { font-size: 12px; color: #9ca3af; line-height: 1.8; }
+.footer-meta a { color: #059669; text-decoration: none; }
+.footer-meta a:hover { text-decoration: underline; }
+.footer-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: #d1d5db;
+  background: #f9fafb; border: 1px solid #e5e7eb;
+  padding: 4px 12px; border-radius: 9999px;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-label">
+    <span class="header-dot"></span>
+    AGRO365 · GB CERNE
+  </div>
+  <h1>UI Web <span>Guide</span></h1>
+  <p>Padrões de interface para o painel AGRO365. Toda geração de código deve seguir estas regras.</p>
+  <div class="header-meta">
+    <span class="meta-tag">v2.0</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-tag">27 mai 2026</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-tag">13 seções</span>
+  </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     1 — AS QUATRO LEIS
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">01</div>
+  <h2>As Quatro Leis</h2>
+  <p>Invioláveis. Aplicam-se a toda geração de código, revisão de PR e modificação de componente. Em caso de conflito entre qualquer outra seção deste guia, as Leis prevalecem.</p>
+
+  <div class="lei">
+    <div class="lei-tag">Lei 1</div>
+    <h4>Component-First — Componentização Obrigatória</h4>
+    <p>Todo elemento visível na tela é um componente de <code>src/components/ui/</code>.</p>
+    <div class="forbid">
+      <p>Proibido usar diretamente em páginas/telas:</p>
+      <ul>
+        <li><code>&lt;button&gt;</code> &nbsp;<code>&lt;input&gt;</code> &nbsp;<code>&lt;select&gt;</code> &nbsp;<code>&lt;table&gt;</code> &nbsp;<code>&lt;thead&gt;</code> &nbsp;<code>&lt;tr&gt;</code> &nbsp;<code>&lt;td&gt;</code> &nbsp;<code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code></li>
+      </ul>
+    </div>
+    <ul>
+      <li>Ao criar uma nova tela, apenas <strong>importar e chamar</strong> componentes do catálogo</li>
+      <li>Se o componente necessário não existe, criá-lo em <code>src/components/ui/</code> <strong>antes</strong> de usá-lo</li>
+    </ul>
+  </div>
+
+  <div class="lei">
+    <div class="lei-tag">Lei 2</div>
+    <h4>Fonte Única de Verdade — Propagação Global</h4>
+    <p>Alterações em <code>src/components/ui/</code> refletem em todas as telas automaticamente — esse é o objetivo.</p>
+    <div class="forbid">
+      <p>Proibido em páginas/telas:</p>
+      <ul>
+        <li>Sobrescrever estilos com <code>style={}</code> inline sobre um componente existente</li>
+        <li>Duplicar lógica de estilo que o componente já oferece via prop</li>
+        <li>Clonar/reimplementar um componente UI dentro de uma página</li>
+      </ul>
+    </div>
+    <p>Extensões de comportamento são feitas <strong>adicionando props ao componente</strong>, nunca por patch local.</p>
+  </div>
+
+  <div class="lei">
+    <div class="lei-tag">Lei 3</div>
+    <h4>Fonte &amp; Tokenização Acima de Tudo</h4>
+    <p><strong>Tipografia:</strong> única fonte permitida é <strong>Outfit</strong>. Qualquer outra é violação.</p>
+    <p><strong>Tokens:</strong> todo valor de design vem de <code>src/design/tokens.ts</code> via <code>t.*</code>.</p>
+    <div class="dd" style="margin-top:14px;">
+      <div class="dd-col do">
+        <div class="dd-head">✓ Correto</div>
+        <div class="dd-body"><code>color: t.color.brand[600]
+fontSize: t.font.size.sm
+padding: t.space[4]
+borderRadius: t.radius.DEFAULT</code></div>
+      </div>
+      <div class="dd-col dont">
+        <div class="dd-head">✕ Violação — hardcoded</div>
+        <div class="dd-body"><code>color: '#059669'
+fontSize: '0.875rem'
+padding: '16px'
+borderRadius: '8px'</code></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lei">
+    <div class="lei-tag">Lei 4</div>
+    <h4>Commits Obrigatórios, Push sob Demanda</h4>
+    <p>Após toda mudança concluída, um commit <strong>deve ser criado imediatamente</strong> — sem aguardar solicitação.</p>
+    <ul>
+      <li>Push <strong>nunca é automático</strong> — somente quando o usuário solicitar explicitamente</li>
+      <li>Mensagens seguem <strong>Conventional Commits</strong>: <code>feat:</code> <code>fix:</code> <code>style:</code> <code>refactor:</code> <code>docs:</code></li>
+      <li>Um commit por unidade lógica — não acumular alterações não relacionadas</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     2 — SISTEMA DE TOKENS
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">02</div>
+  <h2>Sistema de Tokens</h2>
+  <p>Arquivo de referência: <code>src/design/tokens.ts</code> — exportado como objeto <code>t</code>. Nenhum valor de design deve existir fora dele.</p>
+
+  <h3>Cores</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tok">t.color.brand[600]</span></td><td><span class="swatch" style="background:#059669"></span><code>#059669</code></td><td>Cor primária, botões, foco</td></tr>
+        <tr><td><span class="tok">t.color.brand[700]</span></td><td><span class="swatch" style="background:#047857"></span><code>#047857</code></td><td>Hover de botões primários</td></tr>
+        <tr><td><span class="tok">t.color.brand[500]</span></td><td><span class="swatch" style="background:#10b981"></span><code>#10b981</code></td><td>GBMode — cor primária escura</td></tr>
+        <tr><td><span class="tok">t.color.neutral[0]</span></td><td><span class="swatch" style="background:#fff;border-color:#e5e7eb"></span><code>#ffffff</code></td><td>Superfície máxima (cards light)</td></tr>
+        <tr><td><span class="tok">t.color.neutral[50]</span></td><td><span class="swatch" style="background:#f9fafb"></span><code>#f9fafb</code></td><td>Background de página (light)</td></tr>
+        <tr><td><span class="tok">t.color.neutral[200]</span></td><td><span class="swatch" style="background:#e5e7eb"></span><code>#e5e7eb</code></td><td>Border padrão</td></tr>
+        <tr><td><span class="tok">t.color.neutral[900]</span></td><td><span class="swatch" style="background:#111827"></span><code>#111827</code></td><td>Texto primário</td></tr>
+        <tr><td><span class="tok">t.color.success.*</span></td><td>—</td><td>bg / border / text / solid</td></tr>
+        <tr><td><span class="tok">t.color.error.*</span></td><td>—</td><td>bg / border / text / solid</td></tr>
+        <tr><td><span class="tok">t.color.warning.*</span></td><td>—</td><td>bg / border / text / solid</td></tr>
+        <tr><td><span class="tok">t.color.info.*</span></td><td>—</td><td>bg / border / text / solid</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note brand">
+    <span class="note-icon">💡</span>
+    <p><strong>Hue consistency:</strong> em superfícies com background de cor (GBMode, card brand), bordas, sombras e texto de suporte devem ser tingidos ao mesmo hue — nunca cinza neutro sobre fundo colorido.</p>
+  </div>
+
+  <h3>Espaçamento</h3>
+  <p>Grid base de 4 px: <code>t.space[1]</code> = 4 px → <code>t.space[20]</code> = 80 px. Não usar valores fora da grade sem justificativa.</p>
+
+  <h3>Border Radius</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>t.radius.sm</code></td><td>4 px</td><td>Badges, chips</td></tr>
+        <tr><td><code>t.radius.DEFAULT</code></td><td>8 px</td><td>Inputs, botões</td></tr>
+        <tr><td><code>t.radius.lg</code></td><td>10 px</td><td>Cards internos</td></tr>
+        <tr><td><code>t.radius.xl</code></td><td>12 px</td><td>Cards de formulário</td></tr>
+        <tr><td><code>t.radius.modal</code></td><td>20 px</td><td>Modals, drawers</td></tr>
+        <tr><td><code>t.radius.full</code></td><td>9999 px</td><td>Pills, avatares</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note warn">
+    <span class="note-icon">⚠️</span>
+    <p><strong>Radii aninhados:</strong> radius filho ≤ radius pai. Alinhamento perfeito de curvas: <code>r_filho = r_pai − padding</code>. Nunca <code>radius.xl</code> dentro de container com <code>radius.sm</code>.</p>
+  </div>
+
+  <h3>Sombras</h3>
+  <p>Mínimo 2 camadas (ambient + direct). Nunca simular profundidade com 1 única shadow.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>t.shadow.sm</code></td><td>Cards leves, elementos flutuantes sutis</td></tr>
+        <tr><td><code>t.shadow.DEFAULT</code></td><td>Cards padrão</td></tr>
+        <tr><td><code>t.shadow.brand</code></td><td>Glow verde — hover especial, focus ring brand</td></tr>
+        <tr><td><code>t.shadow.modal</code></td><td>Overlay de modals e drawers</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Z-Index</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>t.zIndex.base</code></td><td>1</td><td>Elementos padrão</td></tr>
+        <tr><td><code>t.zIndex.dropdown</code></td><td>100</td><td>Menus, selects</td></tr>
+        <tr><td><code>t.zIndex.overlay</code></td><td>200</td><td>Overlays de fundo</td></tr>
+        <tr><td><code>t.zIndex.drawer</code></td><td>201</td><td>FilterDrawer, sidebars</td></tr>
+        <tr><td><code>t.zIndex.toast</code></td><td>9999</td><td>Notificações globais</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Transições</h3>
+  <p>Usar <code>t.transition.*</code>. Nunca <code>transition: all</code> — listar propriedades explicitamente.</p>
+  <div class="dd">
+    <div class="dd-col do">
+      <div class="dd-head">✓ Correto</div>
+      <div class="dd-body"><code>transition: `opacity ${t.transition.DEFAULT},
+  transform ${t.transition.DEFAULT}`</code></div>
+    </div>
+    <div class="dd-col dont">
+      <div class="dd-head">✕ Evitar</div>
+      <div class="dd-body"><code>transition: 'all 0.2s ease'</code></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     3 — CATÁLOGO DE COMPONENTES
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">03</div>
+  <h2>Catálogo de Componentes</h2>
+  <p>Todos os 25 componentes disponíveis em <code>src/components/ui/</code>. Criar novos antes de usar elementos HTML brutos em páginas.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Componente</th><th>Arquivo</th><th>Casos de uso</th></tr></thead>
+      <tbody>
+        <tr><td><span class="comp">Badge</span></td><td><code>Badge.tsx</code></td><td>Status: success, danger, warning, neutral</td></tr>
+        <tr><td><span class="comp">Button</span></td><td><code>Button.tsx</code></td><td>Ações primárias, secundárias, destrutivas, ghost. Props: <code>loading</code>, <code>icon</code></td></tr>
+        <tr><td><span class="comp">Card</span></td><td><code>Card.tsx</code></td><td>Container de superfície genérico (padding, shadow, border, radius)</td></tr>
+        <tr><td><span class="comp">Checkbox</span></td><td><code>Checkbox.tsx</code></td><td>Seleção booleana acessível. Brand color quando checked</td></tr>
+        <tr><td><span class="comp">CollapsibleSection</span></td><td><code>CollapsibleSection.tsx</code></td><td>Acordeão com contagem de campos quando colapsado</td></tr>
+        <tr><td><span class="comp">DataTable</span></td><td><code>DataTable.tsx</code></td><td>Tabela genérica <code>Column&lt;T&gt;</code> com sort, loading e empty state</td></tr>
+        <tr><td><span class="comp">Divider</span></td><td><code>Divider.tsx</code></td><td>Separador horizontal com label opcional</td></tr>
+        <tr><td><span class="comp">EmptyState</span></td><td><code>EmptyState.tsx</code></td><td>Estado de lista vazia com mensagem, ícone e CTA</td></tr>
+        <tr><td><span class="comp">FilterDrawer</span></td><td><code>FilterDrawer.tsx</code></td><td>Painel lateral de filtros avançados (320 px, slide-in)</td></tr>
+        <tr><td><span class="comp">FormField</span></td><td><code>FormField.tsx</code></td><td>Input com label, erro, hint, ícones laterais. Focus com brand glow</td></tr>
+        <tr><td><span class="comp">FormSection</span></td><td><code>FormSection.tsx</code></td><td>Grupo de campos em grid 1 / 2 / 3 colunas</td></tr>
+        <tr><td><span class="comp">FormSelect</span></td><td><code>FormSelect.tsx</code></td><td>Select estilizado com ChevronDown. Mesma API do FormField</td></tr>
+        <tr><td><span class="comp">IconButton</span></td><td><code>IconButton.tsx</code></td><td>Botão apenas-ícone (xs / sm / md). Variantes: ghost, outline, subtle</td></tr>
+        <tr><td><span class="comp">Modal</span></td><td><code>Modal.tsx</code></td><td>Diálogo com overlay. ESC fecha, focus trap, scroll lock. Sizes: sm/md/lg</td></tr>
+        <tr><td><span class="comp">PageContainer</span></td><td><code>PageContainer.tsx</code></td><td>Wrapper padrão de página com padding</td></tr>
+        <tr><td><span class="comp">PageHeader</span></td><td><code>PageHeader.tsx</code></td><td>Cabeçalho de página: título, slot de ações, count badge</td></tr>
+        <tr><td><span class="comp">Pagination</span></td><td><code>Pagination.tsx</code></td><td>Barra de paginação com ellipsis inteligente</td></tr>
+        <tr><td><span class="comp">ProgressBar</span></td><td><code>ProgressBar.tsx</code></td><td>idle / loading (indeterminado) / success / error</td></tr>
+        <tr><td><span class="comp">Skeleton</span></td><td><code>Skeleton.tsx</code></td><td>Placeholder de carregamento: text / rect / circle</td></tr>
+        <tr><td><span class="comp">SSOButton</span></td><td><code>SSOButton.tsx</code></td><td>Login social Google e Microsoft com SVG icons embutidos</td></tr>
+        <tr><td><span class="comp">StepFooter</span></td><td><code>StepFooter.tsx</code></td><td>Rodapé de wizard com "Etapa X de Y" + Back/Next</td></tr>
+        <tr><td><span class="comp">StepHeader</span></td><td><code>StepHeader.tsx</code></td><td>Cabeçalho de etapa de wizard (título + subtítulo)</td></tr>
+        <tr><td><span class="comp">Stepper</span></td><td><code>Stepper.tsx</code></td><td>Indicador de progresso horizontal com dots conectados</td></tr>
+        <tr><td><span class="comp">TableToolbar</span></td><td><code>TableToolbar.tsx</code></td><td>SearchInput + FilterChip + FilterButton</td></tr>
+        <tr><td><span class="comp">ToggleSwitch</span></td><td><code>ToggleSwitch.tsx</code></td><td>On/off toggle (<code>role="switch"</code>). Brand verde quando on</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Criando Novos Componentes</h3>
+  <ol>
+    <li>Criar em <code>src/components/ui/NomeComponente.tsx</code> como named export</li>
+    <li>Todas as props tipadas com interface TypeScript explícita</li>
+    <li>Zero valores hardcoded — usar apenas <code>t.*</code></li>
+    <li>Suportar ambos os temas via <code>useTheme()</code></li>
+    <li>Incluir <code>aria-*</code> adequados para acessibilidade</li>
+  </ol>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     4 — TIPOGRAFIA
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">04</div>
+  <h2>Tipografia e Conteúdo</h2>
+
+  <h3>Fonte</h3>
+  <p><strong>Outfit</strong> é a única fonte do projeto. Pesos disponíveis: 400, 500, 600, 700, 800. Qualquer outra fonte é violação da Lei 3.</p>
+
+  <h3>Escala de Tamanhos</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>px</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>t.font.size.xs</code></td><td>11</td><td>Metadados, rodapés, labels de eixo em charts</td></tr>
+        <tr><td><code>t.font.size.sm</code></td><td>12</td><td>Labels de campos, badges</td></tr>
+        <tr><td><code>t.font.size.base</code></td><td>13</td><td>Texto de tabela, listas</td></tr>
+        <tr><td><code>t.font.size.md</code></td><td>14</td><td>Corpo padrão de formulários</td></tr>
+        <tr><td><code>t.font.size.lg</code></td><td>15</td><td>Títulos de cards, seções</td></tr>
+        <tr><td><code>t.font.size.xl</code></td><td>16</td><td>Títulos de página secundários</td></tr>
+        <tr><td><code>t.font.size.2xl</code></td><td>22</td><td>PageHeader titles</td></tr>
+        <tr><td><code>t.font.size.3xl</code></td><td>26</td><td>KPIs, números de destaque</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Regras de Conteúdo</h3>
+  <ul>
+    <li><strong>Números tabulares:</strong> colunas numéricas usam <code>font-variant-numeric: tabular-nums</code></li>
+    <li><strong>Reticências:</strong> caractere <code>…</code> (U+2026), nunca três pontos <code>...</code></li>
+    <li><strong>Aspas curvas:</strong> <code>"texto"</code> em conteúdo editorial — nunca aspas retas</li>
+    <li><strong>Non-breaking space:</strong> entre número e unidade — <code>10&amp;nbsp;ha</code>, <code>R$&amp;nbsp;100,00</code></li>
+    <li><strong>Todos os estados desenhados:</strong> toda tela tem layout para vazio, esparso, denso e erro</li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     5 — LAYOUT E RESPONSIVIDADE
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">05</div>
+  <h2>Layout e Responsividade</h2>
+
+  <h3>Alinhamento</h3>
+  <ul>
+    <li>Usar CSS Grid e Flexbox — evitar dimensionamento via JavaScript</li>
+    <li><strong>Alinhamento óptico:</strong> ajustar ±1–2 px quando percepção supera geometria (ícones ao lado de texto)</li>
+    <li><strong>Alinhamento deliberado:</strong> cada elemento alinha com algo — grid, baseline, borda ou centro óptico</li>
+  </ul>
+
+  <h3>Breakpoints de Teste</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Viewport</th><th>Largura</th><th>Verificação</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Mobile</strong></td><td>360 px</td><td>Nenhum elemento vaza ou sobrepõe</td></tr>
+        <tr><td><strong>Laptop</strong></td><td>1280 px</td><td>Layout padrão de desenvolvimento</td></tr>
+        <tr><td><strong>Wide</strong></td><td>1920 px</td><td>Layouts não ficam excessivamente esticados</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Scroll e Overflow</h3>
+  <ul>
+    <li>Corrigir <code>overflow</code> para evitar scrollbars indesejados</li>
+    <li>macOS: testar com <em>Show Scroll Bars: Always</em> em System Preferences</li>
+    <li>Modals e drawers: aplicar <code>overscroll-behavior: contain</code></li>
+  </ul>
+
+  <h3>Links e Navegação</h3>
+  <ul>
+    <li><strong>Links verdadeiros:</strong> usar <code>&lt;a&gt;</code> ou <code>&lt;Link&gt;</code> — nunca <code>&lt;button&gt;</code> para URLs</li>
+    <li><strong>Deep-link tudo:</strong> filtros, aba, página atual e painéis expandidos persistem na URL</li>
+    <li>Back/Forward restaura estado e posição de scroll</li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     6 — INTERAÇÕES E ACESSIBILIDADE
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">06</div>
+  <h2>Interações e Acessibilidade</h2>
+
+  <h3>Teclado e Foco</h3>
+  <ul>
+    <li><strong>100% operável por teclado</strong> — todos os fluxos críticos sem mouse</li>
+    <li>Usar <code>:focus-visible</code> em vez de <code>:focus</code> — não mostra ring em cliques de mouse</li>
+    <li>Focus ring padrão: <code>t.glow.brand</code> (box-shadow verde)</li>
+    <li>Modals e drawers prendem o foco enquanto abertos (<strong>focus trap</strong>)</li>
+  </ul>
+  <div class="dd">
+    <div class="dd-col do">
+      <div class="dd-head">✓ Correto</div>
+      <div class="dd-body"><code>:focus-visible {
+  box-shadow: t.glow.brand;
+}</code></div>
+    </div>
+    <div class="dd-col dont">
+      <div class="dd-head">✕ Ativa no click também</div>
+      <div class="dd-body"><code>:focus {
+  outline: 2px solid green;
+}</code></div>
+    </div>
+  </div>
+
+  <h3>Hit Targets</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Contexto</th><th>Tamanho mínimo</th></tr></thead>
+      <tbody>
+        <tr><td>Desktop</td><td>24 × 24 px</td></tr>
+        <tr><td>Mobile / touch</td><td>44 × 44 px</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Sem dead zones: se a área visual é interativa, <em>toda ela</em> é clicável.</p>
+
+  <h3>Estados de Loading</h3>
+  <ul>
+    <li>Delay inicial antes de mostrar loading: <strong>150–300 ms</strong> (evitar flash)</li>
+    <li>Tempo mínimo visível: <strong>300–500 ms</strong> (evitar flicker)</li>
+    <li>Botões mantêm o rótulo original + spinner via prop <code>loading</code></li>
+  </ul>
+
+  <h3>Atualizações Otimistas</h3>
+  <ul>
+    <li>UI responde imediatamente; reconcilia com resposta do servidor</li>
+    <li>Erro oferece <strong>Undo</strong> ou notificação clara com ação de correção</li>
+  </ul>
+
+  <h3>Ações Destrutivas</h3>
+  <p>Sempre confirmação explícita (modal ou janela de Undo). Usar <code>Button</code> variant <code>destructive</code> — nunca estilizar exclusão como ação primária.</p>
+
+  <h3>Semântica e ARIA</h3>
+  <ul>
+    <li>Semântica nativa antes de ARIA: preferir <code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;label&gt;</code>, <code>&lt;table&gt;</code></li>
+    <li>Estrutura de headings h1 → h2 → h3 nunca deve pular níveis</li>
+    <li><code>IconButton</code> sempre com <code>aria-label</code> descritivo</li>
+    <li>Decoração: <code>aria-hidden="true"</code></li>
+    <li>Toasts e validação inline: <code>aria-live="polite"</code></li>
+  </ul>
+
+  <h3>Mobile</h3>
+  <ul>
+    <li>Inputs com <code>font-size ≥ 16 px</code> — evitar auto-zoom no iOS Safari</li>
+    <li><code>touch-action: manipulation</code> em controles — elimina delay de double-tap</li>
+    <li>Nunca desabilitar zoom nem bloquear <code>paste</code></li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     7 — FORMULÁRIOS
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">07</div>
+  <h2>Formulários</h2>
+
+  <h3>Submissão</h3>
+  <ul>
+    <li><code>Enter</code> submete com um único campo focado; no último campo em formulários multi-campo</li>
+    <li><code>&lt;textarea&gt;</code>: <code>Ctrl/⌘ + Enter</code> submete; <code>Enter</code> insere nova linha</li>
+    <li>Submit habilitado até o início da submissão; desabilitar <strong>durante</strong> o request com spinner</li>
+    <li>Nunca pré-desabilitar submit — permitir submissão incompleta para exibir feedback</li>
+  </ul>
+
+  <h3>Labels e Validação</h3>
+  <ul>
+    <li>Todo campo com <code>&lt;label&gt;</code> associado — <code>FormField</code> e <code>FormSelect</code> já implementam</li>
+    <li>Erros exibidos <strong>próximos ao campo</strong>, nunca apenas no topo</li>
+    <li>Ao submeter com erros: focar o <strong>primeiro campo com erro</strong></li>
+    <li>Mensagens guiam a correção: não "campo inválido" — mas "CPF deve ter 11 dígitos"</li>
+    <li><code>spellcheck="false"</code> em e-mails, códigos, usernames, tokens</li>
+  </ul>
+
+  <h3>Tipos de Input</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Dado</th><th>type</th><th>inputMode</th></tr></thead>
+      <tbody>
+        <tr><td>Numérico (não calculado)</td><td><code>text</code></td><td><code>numeric</code></td></tr>
+        <tr><td>Telefone</td><td><code>tel</code></td><td>—</td></tr>
+        <tr><td>E-mail</td><td><code>email</code></td><td>—</td></tr>
+        <tr><td>Decimal</td><td><code>text</code></td><td><code>decimal</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Preenchimento Automático</h3>
+  <ul>
+    <li>Definir <code>autocomplete</code> e <code>name</code> significativos para habilitar autofill</li>
+    <li>Campos não-auth: <code>autocomplete="off"</code> para não disparar gerenciadores de senha</li>
+    <li>Fazer <code>trim()</code> antes de validar — evitar erros confusos por espaços</li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     8 — ANIMAÇÕES
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">08</div>
+  <h2>Animações e Transições</h2>
+
+  <h3>Princípios</h3>
+  <ul>
+    <li>Animar apenas quando <strong>clarifica causa/efeito</strong> ou adiciona <strong>delícia deliberada</strong></li>
+    <li>Respeitar <code>prefers-reduced-motion</code> — fornecer variante reduzida</li>
+    <li>Animações são canceláveis por input do usuário</li>
+    <li>Nunca autoplay — animar em resposta a ações</li>
+  </ul>
+  <pre><code><span class="dim">/* prefers-reduced-motion obrigatório */</span>
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: <span class="ok">0.01ms</span> !important;
+    transition-duration: <span class="ok">0.01ms</span> !important;
+  }
+}</code></pre>
+
+  <h3>Propriedades Seguras (GPU)</h3>
+  <div class="dd">
+    <div class="dd-col do">
+      <div class="dd-head">✓ GPU accelerated</div>
+      <div class="dd-body"><code>transform: translateY(-4px)
+opacity: 0
+filter: blur(4px)</code></div>
+    </div>
+    <div class="dd-col dont">
+      <div class="dd-head">✕ Causa reflow</div>
+      <div class="dd-body"><code>width / height
+top / left
+margin / padding</code></div>
+    </div>
+  </div>
+
+  <h3>Durações</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>t.animation.duration.fast</code></td><td>150 ms</td><td>Hover, foco</td></tr>
+        <tr><td><code>t.animation.duration.normal</code></td><td>200 ms</td><td>Mostrar/ocultar pequenos elementos</td></tr>
+        <tr><td><code>t.animation.duration.slow</code></td><td>300 ms</td><td>Modals, drawers</td></tr>
+        <tr><td><code>t.animation.duration.slower</code></td><td>400 ms</td><td>Page transitions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Easing</h3>
+  <ul>
+    <li><code>t.animation.easing.easeOut</code> — elementos que entram na tela</li>
+    <li><code>t.animation.easing.easeIn</code> — elementos que saem da tela</li>
+    <li><code>t.animation.easing.standard</code> — mudanças de tamanho</li>
+    <li><code>t.animation.easing.spring</code> — drag, hover com "mola"</li>
+  </ul>
+
+  <h3>Transform Origin</h3>
+  <ul>
+    <li>Dropdown que abre abaixo → <code>transformOrigin: 'top center'</code></li>
+    <li>Modal do centro → <code>transformOrigin: 'center center'</code></li>
+    <li>Drawer lateral → <code>transformOrigin: 'right center'</code></li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     9 — ESTADOS DA UI
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">09</div>
+  <h2>Estados da UI</h2>
+  <p>Todo componente e toda tela deve ter <strong>todos os estados desenhados</strong> antes de ir para produção.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Estado</th><th>Implementação</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Loading</strong></td><td><code>Skeleton</code> (listas/cards) ou prop <code>loading</code> do <code>Button</code></td></tr>
+        <tr><td><strong>Vazio</strong></td><td><code>EmptyState</code> com mensagem e ação de recuperação</td></tr>
+        <tr><td><strong>Erro</strong></td><td>Mensagem orientada à solução + ação de retry</td></tr>
+        <tr><td><strong>Sucesso</strong></td><td>Feedback positivo via toast ou <code>Badge</code> success</td></tr>
+        <tr><td><strong>Esparso</strong> (1–3 itens)</td><td>Layout bonito — não quebrado</td></tr>
+        <tr><td><strong>Denso</strong> (+500 itens)</td><td>Paginação + virtualização</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Skeletons</h3>
+  <ul>
+    <li>Devem <strong>refletir a estrutura real</strong> do conteúdo final — evitar placeholders genéricos que causam layout shift</li>
+    <li>Usar variant <code>text</code>, <code>rect</code> ou <code>circle</code> conforme o tipo</li>
+    <li>Delay de ~150 ms antes de exibir — operações rápidas não devem piscar</li>
+  </ul>
+
+  <h3>Sem Dead Ends</h3>
+  <p>Toda tela oferece um próximo passo ou caminho de recuperação:</p>
+  <ul>
+    <li>Lista vazia → "Cadastrar primeiro item"</li>
+    <li>Erro de rede → "Tentar novamente"</li>
+    <li>Sem permissão → link para solicitar acesso</li>
+  </ul>
+
+  <h3>ProgressBar</h3>
+  <p>No topo de cards/seções com operação em andamento: <code>idle</code> (invisível) → <code>loading</code> (brand indeterminado) → <code>success</code> → <code>error</code>.</p>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     10 — TEMAS
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">10</div>
+  <h2>Temas — Light e GBMode</h2>
+  <p>Gerenciado por <code>src/context/ThemeContext.tsx</code> via <code>useTheme()</code>.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Propriedade</th><th>Light</th><th>GBMode</th></tr></thead>
+      <tbody>
+        <tr><td>Background de página</td><td><span class="swatch" style="background:#f5f5f5"></span><code>#f5f5f5</code></td><td><span class="swatch" style="background:#051008"></span><code>#051008</code></td></tr>
+        <tr><td>Superfície (cards)</td><td><span class="swatch" style="background:#fff;border-color:#e5e7eb"></span><code>#ffffff</code></td><td><span class="swatch" style="background:#0e2a1d"></span><code>#0e2a1d</code></td></tr>
+        <tr><td>Brand principal</td><td><span class="swatch" style="background:#059669"></span><code>#059669</code></td><td><span class="swatch" style="background:#10b981"></span><code>#10b981</code></td></tr>
+        <tr><td>Toggle</td><td colspan="2" style="text-align:center"><code>useTheme().toggle()</code></td></tr>
+        <tr><td>Atributo no DOM</td><td><code>data-theme="light"</code></td><td><code>data-theme="gb"</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Regras</h3>
+  <ul>
+    <li>Todo componente em <code>src/components/ui/</code> suporta <strong>ambos os temas</strong></li>
+    <li>Usar <code>useTheme().colors</code> para superfícies; <code>isGbMode</code> para valores específicos</li>
+    <li>Nunca hardcodar cores que dependem do tema</li>
+    <li>GBMode: bordas, sombras e textos de suporte usam hues verdes — nunca cinza neutro</li>
+    <li>Definir <code>color-scheme: dark</code> no <code>&lt;html&gt;</code> quando GBMode ativo — alinha scrollbars e controles nativos</li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     11 — PERFORMANCE
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">11</div>
+  <h2>Performance</h2>
+
+  <h3>Renderização</h3>
+  <ul>
+    <li>Monitorar re-renders com React DevTools — minimizar re-renders desnecessários</li>
+    <li><code>useMemo</code> e <code>useCallback</code> apenas onde profiling confirmar necessidade</li>
+    <li>Listas com +100 itens visíveis: considerar virtualização</li>
+  </ul>
+
+  <h3>Rede</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Operação</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST</code> / <code>PATCH</code> / <code>DELETE</code></td><td>&lt; <strong>500 ms</strong></td></tr>
+        <tr><td>Inputs de busca</td><td>Debounce de ~<strong>300 ms</strong></td></tr>
+        <tr><td>Indicador de loading</td><td>Exibir após <strong>150–300 ms</strong> sem resposta</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Assets</h3>
+  <ul>
+    <li>Dimensões explícitas em imagens — evitar CLS (Cumulative Layout Shift)</li>
+    <li>Lazy-load abaixo do fold</li>
+    <li>Fontes críticas com <code>preload</code> para evitar FOUT</li>
+  </ul>
+
+  <h3>Main Thread</h3>
+  <p>Operações pesadas (parsing de grandes datasets, cálculos de relatório) fora do main thread. Web Workers para processamentos &gt; 50 ms.</p>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     12 — COPY
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">12</div>
+  <h2>Copy e Mensagens de Interface</h2>
+
+  <h3>Voz e Tom</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Princípio</th><th>Correto</th><th>Evitar</th></tr></thead>
+      <tbody>
+        <tr><td>Voz ativa</td><td>"Cadastre uma fazenda"</td><td>"Uma fazenda deve ser cadastrada"</td></tr>
+        <tr><td>Segunda pessoa</td><td>"Sua safra foi salva"</td><td>"A safra do usuário foi salva"</td></tr>
+        <tr><td>Orientado à ação</td><td>"Adicionar produtor"</td><td>"É necessário adicionar um produtor"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Labels e Botões</h3>
+  <ul>
+    <li>Específicos: <strong>"Salvar Safra"</strong> em vez de "Continuar" ou "OK"</li>
+    <li>Ações com consequência futura terminam com reticências: <em>"Excluir safra…"</em></li>
+    <li>Estados de processamento: <em>"Salvando…"</em>, <em>"Carregando…"</em></li>
+    <li>Loading mantém o texto + spinner — nunca substituir por "Aguarde"</li>
+  </ul>
+
+  <h3>Erros</h3>
+  <div class="note warn">
+    <span class="note-icon">⚠️</span>
+    <p>Erros sempre guiam a saída. Não apenas <em>"Erro ao salvar"</em> — mas <em>"Erro ao salvar: verifique sua conexão e tente novamente."</em></p>
+  </div>
+  <ul>
+    <li>Linguagem positiva por padrão: problem-solving mesmo em estados de erro</li>
+    <li>Evitar linguagem técnica: "Timeout" → "A operação demorou mais que o esperado"</li>
+  </ul>
+
+  <h3>Números e Formatação</h3>
+  <ul>
+    <li>Numerais para contagens: "8 safras" em vez de "oito safras"</li>
+    <li>Moeda: 0 ou 2 decimais — nunca misturar no mesmo contexto</li>
+    <li>Datas e horas: locale-aware (<code>pt-BR</code> como padrão)</li>
+  </ul>
+
+  <h3>Terminologia</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Usar</th><th>Evitar</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fazenda</strong></td><td>Propriedade, Campo, Terra</td></tr>
+        <tr><td><strong>Safra</strong></td><td>Ciclo, Temporada</td></tr>
+        <tr><td><strong>Produtor</strong></td><td>Agricultor (salvo contexto específico)</td></tr>
+        <tr><td><strong>Cadastrar</strong></td><td>Inserir, Adicionar (escolher um e manter)</td></tr>
+        <tr><td><strong>Excluir</strong></td><td>Deletar, Remover (em contextos destrutivos)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     13 — GOVERNANÇA
+═══════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-label">13</div>
+  <h2>Governança e Commits</h2>
+
+  <h3>Conventional Commits</h3>
+  <div class="commit-row">
+    <span class="commit">feat(modulo):</span>
+    <span class="commit">fix(componente):</span>
+    <span class="commit">style(ui):</span>
+    <span class="commit">refactor(hook):</span>
+    <span class="commit">docs(guidelines):</span>
+    <span class="commit">chore(deps):</span>
+  </div>
+  <p style="font-size:13px; color:#9ca3af; margin-top:8px;">Formato: <code>tipo(escopo): descrição imperativa em minúsculas</code></p>
+
+  <div class="rule"></div>
+
+  <h3>Checklist de PR</h3>
+  <ul class="checklist">
+    <li><span class="cb"></span>Todos os valores de design usam <code>t.*</code> — sem hardcode</li>
+    <li><span class="cb"></span>Todos os componentes vêm de <code>src/components/ui/</code></li>
+    <li><span class="cb"></span>Suporte a ambos os temas (light e GBMode)</li>
+    <li><span class="cb"></span>Estados da UI implementados (loading, vazio, erro)</li>
+    <li><span class="cb"></span>Inputs com <code>aria-label</code> ou <code>&lt;label&gt;</code> associado</li>
+    <li><span class="cb"></span>Botões apenas-ícone com <code>aria-label</code></li>
+    <li><span class="cb"></span>Animações com <code>prefers-reduced-motion</code> respeitado</li>
+    <li><span class="cb"></span>Nenhum <code>transition: all</code> no código</li>
+    <li><span class="cb"></span>Fonte Outfit em toda tipografia</li>
+    <li><span class="cb"></span>Commit criado com mensagem Conventional Commits</li>
+  </ul>
+
+  <div class="rule"></div>
+
+  <h3>Atualizando Este Documento</h3>
+  <p>Atualizar sempre que:</p>
+  <ul>
+    <li>Um novo componente for adicionado ao catálogo</li>
+    <li>Um novo token for criado em <code>tokens.ts</code></li>
+    <li>Uma nova Lei ou regra for aprovada pela equipe</li>
+    <li>Um padrão recorrente for definido</li>
+  </ul>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">UI Web Guide — CERNE</div>
+      <div class="footer-meta">
+        AGRO365 / GB Greenbelt · 27 mai 2026<br>
+        Baseado nas Leis internas do projeto e nas <a href="https://vercel.com/design/guidelines">Vercel Design Guidelines</a>
+      </div>
+    </div>
+    <span class="footer-badge">v2.0</span>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

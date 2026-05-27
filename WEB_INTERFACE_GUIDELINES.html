@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<!--
+  CERNE — Web Interface Guidelines v2
+  Para Azure Wiki: cole o conteúdo a partir da tag <style> até o final do </body>.
+  Standalone: abrir diretamente no browser.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CERNE — Web Interface Guidelines v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CERNE DESIGN TOKENS (mirrored from src/design/tokens.ts)
+   ============================================================ */
+:root {
+  --brand-50:  #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --brand-800: #065f46;
+  --brand-900: #064e3b;
+  --neutral-0:   #ffffff;
+  --neutral-50:  #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+  --neutral-800: #1f2937;
+  --neutral-900: #111827;
+  --error-50:   #fef2f2;
+  --error-200:  #fecaca;
+  --error-600:  #dc2626;
+  --warning-50: #fffbeb;
+  --warning-200:#fde68a;
+  --warning-700:#b45309;
+  --info-50:    #eff6ff;
+  --info-200:   #bfdbfe;
+  --info-800:   #1e40af;
+  --code-bg:    #0f172a;
+  --code-text:  #e2e8f0;
+  --code-green: #34d399;
+  --code-red:   #f87171;
+  --code-comment:#64748b;
+  --font-sans:  'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  8px;
+  --radius-xl:  12px;
+  --radius-2xl: 16px;
+  --radius-full:9999px;
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.04);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.05);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--neutral-900);
+  background: var(--neutral-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.pg-header {
+  background: linear-gradient(135deg, #071d11 0%, #0c2e1b 55%, var(--brand-800) 100%);
+  padding: 44px 48px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.pg-header::before {
+  content: '';
+  position: absolute; top: -80px; right: -40px;
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(16,185,129,.18) 0%, transparent 68%);
+  pointer-events: none;
+}
+.pg-header::after {
+  content: '';
+  position: absolute; bottom: -40px; left: 30%;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(5,150,105,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pg-header-inner { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(16,185,129,.12);
+  border: 1px solid rgba(16,185,129,.25);
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase;
+  color: var(--brand-300);
+  margin-bottom: 18px;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand-500);
+  animation: blink 2.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.pg-header h1 {
+  font-size: 34px; font-weight: 800;
+  color: #fff; letter-spacing: -.025em;
+  line-height: 1.15; margin-bottom: 10px;
+}
+.pg-header h1 em { color: var(--brand-500); font-style: normal; }
+.pg-header p {
+  font-size: 15px; line-height: 1.55;
+  color: rgba(255,255,255,.58);
+  max-width: 540px; margin-bottom: 24px;
+}
+.header-pills { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hpill {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: var(--radius-full);
+  font-size: 11px; font-weight: 600;
+}
+.hpill-v { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.75); }
+.hpill-d { background: transparent; color: rgba(255,255,255,.35); font-weight: 400; font-size: 12px; }
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+.layout {
+  display: flex; max-width: 1200px;
+  margin: 0 auto; padding: 0 24px;
+  gap: 28px; align-items: flex-start;
+}
+
+/* ---- SIDEBAR ---- */
+.sidebar { width: 248px; flex-shrink: 0; padding-top: 28px; }
+
+.toc {
+  position: sticky; top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 4px 0 12px;
+}
+.toc::-webkit-scrollbar { width: 4px; }
+.toc::-webkit-scrollbar-track { background: transparent; }
+.toc::-webkit-scrollbar-thumb { background: var(--neutral-200); border-radius: 2px; }
+
+.toc-head {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--neutral-400);
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--neutral-100);
+  margin-bottom: 4px;
+}
+.toc a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 18px;
+  font-size: 12px; font-weight: 500; line-height: 1.35;
+  color: var(--neutral-600);
+  text-decoration: none;
+  transition: color .12s, background .12s;
+  border-left: 2px solid transparent;
+}
+.toc a:hover {
+  color: var(--brand-700);
+  background: var(--brand-50);
+  border-left-color: var(--brand-400);
+}
+.toc-n {
+  min-width: 18px;
+  font-size: 10px; font-weight: 700;
+  color: var(--neutral-400);
+  font-family: var(--font-mono);
+}
+.toc a:hover .toc-n { color: var(--brand-600); }
+
+/* ---- CONTENT ---- */
+.content { flex: 1; min-width: 0; padding: 28px 0 80px; }
+
+/* ============================================================
+   INTRO BANNER
+   ============================================================ */
+.intro-banner {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--info-50);
+  border: 1px solid var(--info-200);
+  border-left: 4px solid #3b82f6;
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+}
+.intro-banner-icon { font-size: 16px; flex-shrink: 0; padding-top: 1px; }
+.intro-banner p { font-size: 13px; color: #1e3a5f; line-height: 1.55; margin: 0; }
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.section {
+  background: var(--neutral-0);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  scroll-margin-top: 24px;
+}
+.sec-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 26px;
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-100);
+}
+.sec-num {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: var(--brand-600); color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 12px; font-weight: 700;
+  font-family: var(--font-mono);
+}
+.sec-head h2 {
+  font-size: 15px; font-weight: 700;
+  color: var(--neutral-900); letter-spacing: -.01em;
+}
+.sec-body { padding: 22px 26px; }
+
+/* ============================================================
+   TYPOGRAPHY INSIDE SECTIONS
+   ============================================================ */
+.sec-body h3 {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--neutral-400);
+  padding-bottom: 8px; margin: 24px 0 12px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+.sec-body h3:first-child { margin-top: 0; }
+.sec-body h4 {
+  font-size: 13px; font-weight: 600;
+  color: var(--neutral-800);
+  margin: 14px 0 8px;
+}
+.sec-body p {
+  font-size: 13px; color: var(--neutral-700);
+  line-height: 1.65; margin-bottom: 10px;
+}
+.sec-body p:last-child { margin-bottom: 0; }
+.sec-body ul, .sec-body ol { padding-left: 20px; margin-bottom: 12px; }
+.sec-body li { font-size: 13px; color: var(--neutral-700); line-height: 1.6; margin-bottom: 5px; }
+.sec-body strong { font-weight: 600; color: var(--neutral-800); }
+.sec-body em { font-style: italic; color: var(--neutral-600); }
+
+/* ============================================================
+   INLINE CODE & CODE BLOCKS
+   ============================================================ */
+code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background: var(--neutral-100);
+  color: var(--brand-700);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--neutral-200);
+  white-space: nowrap;
+}
+pre {
+  background: var(--code-bg);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px; line-height: 1.75;
+  color: var(--code-text);
+  background: none; border: none; padding: 0;
+  white-space: pre;
+}
+.c-ok    { color: var(--code-green); }
+.c-err   { color: var(--code-red); }
+.c-dim   { color: var(--code-comment); font-style: italic; }
+.c-key   { color: #93c5fd; }
+.c-str   { color: #fcd34d; }
+
+/* ============================================================
+   DO / DON'T BLOCKS
+   ============================================================ */
+.dd-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 12px 0;
+}
+.dd-block { border-radius: var(--radius-lg); overflow: hidden; }
+.dd-head {
+  padding: 8px 16px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.dd-do   .dd-head { background: #052e16; color: var(--code-green); }
+.dd-dont .dd-head { background: #450a0a; color: var(--code-red); }
+.dd-body { background: var(--code-bg); padding: 14px 16px; }
+.dd-body code {
+  font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.75; background: none; border: none; padding: 0;
+  white-space: pre; display: block;
+}
+.dd-do   .dd-body code { color: var(--code-green); }
+.dd-dont .dd-body code { color: var(--code-red); }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.tbl-wrap {
+  overflow-x: auto; margin: 12px 0;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: var(--brand-600); }
+thead th {
+  padding: 9px 16px; text-align: left;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--neutral-100); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--neutral-50); }
+tbody td { padding: 9px 16px; color: var(--neutral-700); vertical-align: top; line-height: 1.5; }
+td code { font-size: 11px; }
+
+/* ============================================================
+   CALLOUT BOXES
+   ============================================================ */
+.callout {
+  display: flex; align-items: flex-start; gap: 12px;
+  border-radius: var(--radius-lg); padding: 14px 16px; margin: 12px 0;
+}
+.callout-icon { font-size: 15px; flex-shrink: 0; padding-top: 1px; }
+.callout p { font-size: 13px; line-height: 1.55; margin: 0; }
+.callout-info { background: var(--info-50); border: 1px solid var(--info-200); }
+.callout-info p { color: #1e3a5f; }
+.callout-warn { background: var(--warning-50); border: 1px solid var(--warning-200); }
+.callout-warn p { color: #78350f; }
+.callout-brand { background: var(--brand-50); border: 1px solid var(--brand-200); }
+.callout-brand p { color: var(--brand-800); }
+
+/* ============================================================
+   LEI CARDS
+   ============================================================ */
+.lei-card {
+  border: 1px solid var(--brand-200);
+  border-left: 4px solid var(--brand-600);
+  border-radius: var(--radius-lg);
+  background: var(--brand-50);
+  padding: 18px 20px;
+  margin: 14px 0;
+}
+.lei-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--brand-600); color: #fff;
+  padding: 3px 10px; border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .07em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lei-card h4 {
+  font-size: 14px; font-weight: 700;
+  color: var(--brand-800); margin: 0 0 8px;
+}
+.lei-card p, .lei-card li {
+  font-size: 13px; color: var(--brand-900); line-height: 1.6;
+}
+.lei-card li { margin-bottom: 4px; }
+.lei-card ul { padding-left: 18px; margin: 8px 0; }
+.lei-card code {
+  background: rgba(5,150,105,.12);
+  color: var(--brand-700);
+  border-color: rgba(5,150,105,.2);
+}
+.forbidden {
+  background: rgba(220,38,38,.06);
+  border: 1px solid rgba(220,38,38,.15);
+  border-radius: var(--radius-md);
+  padding: 10px 14px; margin: 10px 0;
+}
+.forbidden p {
+  color: var(--error-600); font-weight: 700;
+  font-size: 12px; margin-bottom: 6px;
+}
+.forbidden li { color: #7f1d1d; font-size: 12px; list-style: none; padding-left: 0; }
+.forbidden li::before { content: '✕  '; color: var(--error-600); font-weight: 700; }
+.forbidden ul { list-style: none; padding: 0; margin: 0; }
+
+/* ============================================================
+   TOKEN PILLS / SWATCHES / BADGES
+   ============================================================ */
+.token {
+  display: inline-flex; align-items: center;
+  background: var(--code-bg); color: var(--code-green);
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 2px 8px; border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.swatch {
+  display: inline-block; width: 12px; height: 12px;
+  border-radius: 3px; border: 1px solid rgba(0,0,0,.12);
+  vertical-align: middle; margin-right: 5px;
+}
+.comp {
+  display: inline-flex; align-items: center;
+  background: var(--neutral-100); color: var(--neutral-700);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-full);
+  padding: 2px 10px; font-size: 11px; font-weight: 500;
+}
+.commit {
+  display: inline-flex;
+  background: var(--code-bg); color: var(--code-green);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: var(--radius-sm); margin: 2px;
+}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.checklist { list-style: none; padding: 0; margin: 12px 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 5px;
+  background: var(--neutral-50);
+  border: 1px solid var(--neutral-200);
+  font-size: 13px; color: var(--neutral-700);
+  transition: background .12s, border-color .12s;
+}
+.checklist li:hover { background: var(--brand-50); border-color: var(--brand-200); }
+.checkbox {
+  width: 16px; height: 16px; flex-shrink: 0;
+  border: 1.5px solid var(--neutral-300);
+  border-radius: 4px; margin-top: 1px;
+}
+
+/* ============================================================
+   SECTION DIVIDER
+   ============================================================ */
+.divider { height: 1px; background: var(--neutral-100); margin: 18px 0; }
+
+/* ============================================================
+   COMMIT SECTION
+   ============================================================ */
+.commit-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.commit-note { font-size: 12px; color: var(--neutral-500); margin-top: 6px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.pg-footer {
+  background: var(--code-bg);
+  color: rgba(255,255,255,.35);
+  text-align: center;
+  padding: 28px 24px;
+  font-size: 12px; line-height: 1.8;
+}
+.pg-footer a { color: var(--code-green); text-decoration: none; }
+.pg-footer a:hover { text-decoration: underline; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .layout { flex-direction: column; padding: 0 16px; }
+  .sidebar { width: 100%; padding-top: 20px; }
+  .toc { position: static; max-height: none; }
+  .pg-header { padding: 28px 24px; }
+  .pg-header h1 { font-size: 26px; }
+}
+@media (max-width: 640px) {
+  .dd-grid { grid-template-columns: 1fr; }
+  .sec-body { padding: 16px; }
+  .sec-head { padding: 14px 16px; }
+}
+</style>
+
+<!-- ================================================================
+     PAGE HEADER
+     ================================================================ -->
+<header class="pg-header">
+  <div class="pg-header-inner">
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      AGRO365 &nbsp;·&nbsp; GB CERNE
+    </div>
+    <h1>Web Interface <em>Guidelines</em></h1>
+    <p>Padrões de interface para o painel AGRO365. Combina as Leis internas do projeto com melhores práticas derivadas de design systems de referência.</p>
+    <div class="header-pills">
+      <span class="hpill hpill-v">v2.0</span>
+      <span class="hpill hpill-d">Atualizado em 27 de maio de 2026</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================================================================
+     MAIN LAYOUT
+     ================================================================ -->
+<div class="layout">
+
+  <!-- ==================== SIDEBAR TOC ==================== -->
+  <aside class="sidebar">
+    <nav class="toc" aria-label="Índice">
+      <div class="toc-head">Neste documento</div>
+      <a href="#sec-1"><span class="toc-n">01</span>As Quatro Leis</a>
+      <a href="#sec-2"><span class="toc-n">02</span>Sistema de Tokens</a>
+      <a href="#sec-3"><span class="toc-n">03</span>Catálogo de Componentes</a>
+      <a href="#sec-4"><span class="toc-n">04</span>Tipografia e Conteúdo</a>
+      <a href="#sec-5"><span class="toc-n">05</span>Layout e Responsividade</a>
+      <a href="#sec-6"><span class="toc-n">06</span>Interações e Acessibilidade</a>
+      <a href="#sec-7"><span class="toc-n">07</span>Formulários</a>
+      <a href="#sec-8"><span class="toc-n">08</span>Animações e Transições</a>
+      <a href="#sec-9"><span class="toc-n">09</span>Estados da UI</a>
+      <a href="#sec-10"><span class="toc-n">10</span>Temas</a>
+      <a href="#sec-11"><span class="toc-n">11</span>Performance</a>
+      <a href="#sec-12"><span class="toc-n">12</span>Copy e Mensagens</a>
+      <a href="#sec-13"><span class="toc-n">13</span>Governança e Commits</a>
+    </nav>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="content">
+
+    <div class="intro-banner">
+      <span class="intro-banner-icon">ℹ️</span>
+      <p>Documento vivo de padrões de interface. Toda geração de código deve seguir estas regras. Em caso de conflito entre seções, as <strong>Leis (Seção 1)</strong> sempre prevalecem.</p>
+    </div>
+
+    <!-- ============================================================
+         SECTION 1 — AS QUATRO LEIS
+         ============================================================ -->
+    <section class="section" id="sec-1">
+      <div class="sec-head">
+        <span class="sec-num">1</span>
+        <h2>As Quatro Leis do Projeto</h2>
+      </div>
+      <div class="sec-body">
+        <p>As Leis são <strong>invioláveis</strong>. Aplicam-se a toda geração de código, revisão de PR e modificação de componente.</p>
+
+        <div class="lei-card">
+          <div class="lei-badge">Lei 1</div>
+          <h4>Component-First — Componentização Obrigatória</h4>
+          <p>Todo elemento visível na tela é um componente de <code>src/components/ui/</code>.</p>
+          <div class="forbidden">
+            <p>Proibido usar diretamente em páginas/telas:</p>
+            <ul>
+              <li><code>&lt;button&gt;</code> &nbsp;<code>&lt;input&gt;</code> &nbsp;<code>&lt;select&gt;</code> &nbsp;<code>&lt;table&gt;</code> &nbsp;<code>&lt;thead&gt;</code> &nbsp;<code>&lt;tr&gt;</code> &nbsp;<code>&lt;td&gt;</code> &nbsp;<code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code></li>
+            </ul>
+          </div>
+          <ul>
+            <li>Ao criar uma nova tela, apenas <strong>importar e chamar</strong> componentes do catálogo</li>
+            <li>Se o componente necessário não existe, criá-lo em <code>src/components/ui/</code> <strong>antes</strong> de usá-lo na tela</li>
+            <li>Catálogo atual → ver <a href="#sec-3" style="color:var(--brand-700);font-weight:600;">Seção 3</a></li>
+          </ul>
+        </div>
+
+        <div class="lei-card">
+          <div class="lei-badge">Lei 2</div>
+          <h4>Fonte Única de Verdade — Propagação Global</h4>
+          <p>Alterações em <code>src/components/ui/</code> refletem em todas as telas automaticamente — esse é o objetivo.</p>
+          <div class="forbidden">
+            <p>Proibido em páginas/telas:</p>
+            <ul>
+              <li>Sobrescrever estilos com <code>style={}</code> inline sobre um componente existente</li>
+              <li>Duplicar lógica de estilo que o componente já oferece via prop</li>
+              <li>Clonar/reimplementar um componente UI dentro de uma página</li>
+            </ul>
+          </div>
+          <p>Extensões de comportamento são feitas <strong>adicionando props ao componente</strong>, nunca por patch local.</p>
+        </div>
+
+        <div class="lei-card">
+          <div class="lei-badge">Lei 3</div>
+          <h4>Fonte &amp; Tokenização Acima de Tudo</h4>
+          <p><strong>Tipografia:</strong> única fonte permitida é <strong>Outfit</strong>. Qualquer outra é violação.</p>
+          <p><strong>Tokens:</strong> todo valor de design vem de <code>src/design/tokens.ts</code> via <code>t.*</code>.</p>
+          <div class="dd-grid" style="margin-top:12px;">
+            <div class="dd-block dd-do">
+              <div class="dd-head">✓ Correto</div>
+              <div class="dd-body"><code>color: t.color.brand[600]
+fontSize: t.font.size.sm
+padding: t.space[4]
+borderRadius: t.radius.DEFAULT</code></div>
+            </div>
+            <div class="dd-block dd-dont">
+              <div class="dd-head">✕ Violação — hardcoded</div>
+              <div class="dd-body"><code>color: '#059669'
+fontSize: '0.875rem'
+padding: '16px'
+borderRadius: '8px'</code></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lei-card">
+          <div class="lei-badge">Lei 4</div>
+          <h4>Commits Obrigatórios, Push sob Demanda</h4>
+          <p>Após toda mudança concluída, um commit <strong>deve ser criado imediatamente</strong> — sem aguardar solicitação.</p>
+          <ul>
+            <li>Push <strong>nunca é automático</strong> — somente quando o usuário solicitar explicitamente</li>
+            <li>Mensagens seguem <strong>Conventional Commits</strong>: <code>feat:</code> <code>fix:</code> <code>style:</code> <code>refactor:</code> <code>docs:</code></li>
+            <li>Um commit por unidade lógica — não acumular alterações não relacionadas</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2 — SISTEMA DE TOKENS
+         ============================================================ -->
+    <section class="section" id="sec-2">
+      <div class="sec-head">
+        <span class="sec-num">2</span>
+        <h2>Sistema de Tokens</h2>
+      </div>
+      <div class="sec-body">
+        <p>Arquivo de referência: <code>src/design/tokens.ts</code> — exportado como objeto <code>t</code>.</p>
+
+        <h3>Paleta de Cores</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><span class="token">t.color.brand[600]</span></td><td><span class="swatch" style="background:#059669"></span><code>#059669</code></td><td>Cor primária de ação, botões, foco</td></tr>
+              <tr><td><span class="token">t.color.brand[700]</span></td><td><span class="swatch" style="background:#047857"></span><code>#047857</code></td><td>Hover de botões primários</td></tr>
+              <tr><td><span class="token">t.color.brand[500]</span></td><td><span class="swatch" style="background:#10b981"></span><code>#10b981</code></td><td>GBMode — cor primária no tema escuro</td></tr>
+              <tr><td><span class="token">t.color.neutral[0]</span></td><td><span class="swatch" style="background:#fff;border:1px solid #e5e7eb"></span><code>#ffffff</code></td><td>Superfície máxima (cards light)</td></tr>
+              <tr><td><span class="token">t.color.neutral[50]</span></td><td><span class="swatch" style="background:#f9fafb"></span><code>#f9fafb</code></td><td>Background de página (light)</td></tr>
+              <tr><td><span class="token">t.color.neutral[200]</span></td><td><span class="swatch" style="background:#e5e7eb"></span><code>#e5e7eb</code></td><td>Border padrão</td></tr>
+              <tr><td><span class="token">t.color.neutral[900]</span></td><td><span class="swatch" style="background:#111827"></span><code>#111827</code></td><td>Texto primário</td></tr>
+              <tr><td><span class="token">t.color.success.*</span></td><td>—</td><td>bg, border, text, solid — estados de sucesso</td></tr>
+              <tr><td><span class="token">t.color.error.*</span></td><td>—</td><td>bg, border, text, solid — estados de erro</td></tr>
+              <tr><td><span class="token">t.color.warning.*</span></td><td>—</td><td>bg, border, text, solid — alertas e avisos</td></tr>
+              <tr><td><span class="token">t.color.info.*</span></td><td>—</td><td>bg, border, text, solid — informação contextual</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+          <span class="callout-icon">💡</span>
+          <p><strong>Regra de hue consistency:</strong> em superfícies com background de cor (ex: card brand, GBMode), bordas, sombras e texto de suporte devem ser tingidos ao mesmo hue — nunca usar cinza neutro puro sobre fundo colorido.</p>
+        </div>
+
+        <h3>Escala de Espaçamento</h3>
+        <p>Grid base de 4 px: <code>t.space[1]</code> = 4 px → <code>t.space[20]</code> = 80 px. Não usar valores fora da grade sem justificativa explícita.</p>
+
+        <h3>Border Radius</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Valor</th><th>Uso recomendado</th></tr></thead>
+            <tbody>
+              <tr><td><code>t.radius.sm</code></td><td>4 px</td><td>Badges, chips pequenos</td></tr>
+              <tr><td><code>t.radius.DEFAULT</code></td><td>8 px</td><td>Inputs, botões</td></tr>
+              <tr><td><code>t.radius.lg</code></td><td>10 px</td><td>Cards internos</td></tr>
+              <tr><td><code>t.radius.xl</code></td><td>12 px</td><td>Cards de formulário</td></tr>
+              <tr><td><code>t.radius.modal</code></td><td>20 px</td><td>Modals, drawers</td></tr>
+              <tr><td><code>t.radius.full</code></td><td>9999 px</td><td>Pills, avatares circulares</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <p><strong>Radii aninhados:</strong> o radius de um filho deve ser ≤ radius do pai. Para alinhamento perfeito de curvas: <code>r_filho = r_pai − padding</code>. Nunca usar <code>radius.xl</code> dentro de container com <code>radius.sm</code>.</p>
+        </div>
+
+        <h3>Sombras</h3>
+        <p>Mínimo 2 camadas para sombras realistas (ambient + direct). Já implementado nos tokens <code>t.shadow.*</code>:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>t.shadow.sm</code></td><td>Cards leves, elementos flutuantes sutis</td></tr>
+              <tr><td><code>t.shadow.DEFAULT</code></td><td>Cards padrão</td></tr>
+              <tr><td><code>t.shadow.brand</code></td><td>Glow verde — hover de card fazenda, focus especial</td></tr>
+              <tr><td><code>t.shadow.modal</code></td><td>Overlay de modals e drawers</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Z-Index</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>t.zIndex.base</code></td><td>1</td><td>Elementos padrão</td></tr>
+              <tr><td><code>t.zIndex.dropdown</code></td><td>100</td><td>Menus, selects</td></tr>
+              <tr><td><code>t.zIndex.overlay</code></td><td>200</td><td>Overlays de fundo</td></tr>
+              <tr><td><code>t.zIndex.drawer</code></td><td>201</td><td>FilterDrawer, sidebars</td></tr>
+              <tr><td><code>t.zIndex.toast</code></td><td>9999</td><td>Notificações globais</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Transições</h3>
+        <p>Usar <code>t.transition.*</code> para consistência. <strong>Nunca usar <code>transition: all</code></strong> — listar propriedades explicitamente.</p>
+        <div class="dd-grid">
+          <div class="dd-block dd-do">
+            <div class="dd-head">✓ Correto</div>
+            <div class="dd-body"><code>transition: `opacity ${t.transition.DEFAULT},
+  transform ${t.transition.DEFAULT}`</code></div>
+          </div>
+          <div class="dd-block dd-dont">
+            <div class="dd-head">✕ Evitar</div>
+            <div class="dd-body"><code>transition: 'all 0.2s ease'</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3 — CATÁLOGO DE COMPONENTES
+         ============================================================ -->
+    <section class="section" id="sec-3">
+      <div class="sec-head">
+        <span class="sec-num">3</span>
+        <h2>Catálogo de Componentes</h2>
+      </div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Componente</th><th>Arquivo</th><th>Casos de uso</th></tr></thead>
+            <tbody>
+              <tr><td><span class="comp">Badge</span></td><td><code>Badge.tsx</code></td><td>Status: success, danger, warning, neutral</td></tr>
+              <tr><td><span class="comp">Button</span></td><td><code>Button.tsx</code></td><td>Ações primárias, secundárias, destrutivas, ghost. Props: <code>loading</code>, <code>icon</code></td></tr>
+              <tr><td><span class="comp">Card</span></td><td><code>Card.tsx</code></td><td>Container de superfície genérico (padding, shadow, border, radius)</td></tr>
+              <tr><td><span class="comp">Checkbox</span></td><td><code>Checkbox.tsx</code></td><td>Seleção booleana acessível. Brand color quando checked</td></tr>
+              <tr><td><span class="comp">CollapsibleSection</span></td><td><code>CollapsibleSection.tsx</code></td><td>Acordeão com contagem de campos quando colapsado</td></tr>
+              <tr><td><span class="comp">DataTable</span></td><td><code>DataTable.tsx</code></td><td>Tabela genérica <code>Column&lt;T&gt;</code> com sort, loading e empty state</td></tr>
+              <tr><td><span class="comp">Divider</span></td><td><code>Divider.tsx</code></td><td>Separador horizontal com label opcional</td></tr>
+              <tr><td><span class="comp">EmptyState</span></td><td><code>EmptyState.tsx</code></td><td>Estado de lista vazia com mensagem, ícone e CTA</td></tr>
+              <tr><td><span class="comp">FilterDrawer</span></td><td><code>FilterDrawer.tsx</code></td><td>Painel lateral (320 px) de filtros avançados com slide-in</td></tr>
+              <tr><td><span class="comp">FormField</span></td><td><code>FormField.tsx</code></td><td>Input com label, erro, hint, ícones laterais. Focus com brand glow</td></tr>
+              <tr><td><span class="comp">FormSection</span></td><td><code>FormSection.tsx</code></td><td>Grupo de campos em grid 1 / 2 / 3 colunas</td></tr>
+              <tr><td><span class="comp">FormSelect</span></td><td><code>FormSelect.tsx</code></td><td>Select estilizado com ChevronDown. Mesma API do FormField</td></tr>
+              <tr><td><span class="comp">IconButton</span></td><td><code>IconButton.tsx</code></td><td>Botão apenas-ícone (xs / sm / md). Variantes: ghost, outline, subtle</td></tr>
+              <tr><td><span class="comp">Modal</span></td><td><code>Modal.tsx</code></td><td>Diálogo com overlay. ESC fecha, focus trap, scroll lock. Sizes: sm/md/lg</td></tr>
+              <tr><td><span class="comp">PageContainer</span></td><td><code>PageContainer.tsx</code></td><td>Wrapper padrão de página com padding</td></tr>
+              <tr><td><span class="comp">PageHeader</span></td><td><code>PageHeader.tsx</code></td><td>Cabeçalho de página: título, slot de ações e count badge</td></tr>
+              <tr><td><span class="comp">Pagination</span></td><td><code>Pagination.tsx</code></td><td>Barra de paginação com ellipsis inteligente</td></tr>
+              <tr><td><span class="comp">ProgressBar</span></td><td><code>ProgressBar.tsx</code></td><td>Barra de progresso: idle / loading / success / error</td></tr>
+              <tr><td><span class="comp">Skeleton</span></td><td><code>Skeleton.tsx</code></td><td>Placeholder de carregamento: text / rect / circle</td></tr>
+              <tr><td><span class="comp">SSOButton</span></td><td><code>SSOButton.tsx</code></td><td>Login social (Google, Microsoft) com SVG icons embutidos</td></tr>
+              <tr><td><span class="comp">StepFooter</span></td><td><code>StepFooter.tsx</code></td><td>Rodapé de wizard com contador "Etapa X de Y" + Back/Next</td></tr>
+              <tr><td><span class="comp">StepHeader</span></td><td><code>StepHeader.tsx</code></td><td>Cabeçalho de etapa de wizard (título + subtítulo)</td></tr>
+              <tr><td><span class="comp">Stepper</span></td><td><code>Stepper.tsx</code></td><td>Indicador de progresso horizontal com dots conectados</td></tr>
+              <tr><td><span class="comp">TableToolbar</span></td><td><code>TableToolbar.tsx</code></td><td>SearchInput + FilterChip + FilterButton em um arquivo</td></tr>
+              <tr><td><span class="comp">ToggleSwitch</span></td><td><code>ToggleSwitch.tsx</code></td><td>On/off toggle (<code>role="switch"</code>). Brand verde quando on</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Criando Novos Componentes</h3>
+        <ol>
+          <li>Criar em <code>src/components/ui/NomeComponente.tsx</code></li>
+          <li>Exportar como named export</li>
+          <li>Todas as props tipadas com interface explícita</li>
+          <li>Zero valores hardcoded — usar apenas <code>t.*</code></li>
+          <li>Suportar ambos os temas (<code>light</code> e <code>gbMode</code>) via <code>useTheme()</code></li>
+          <li>Incluir <code>aria-*</code> adequados para acessibilidade</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4 — TIPOGRAFIA E CONTEÚDO
+         ============================================================ -->
+    <section class="section" id="sec-4">
+      <div class="sec-head">
+        <span class="sec-num">4</span>
+        <h2>Tipografia e Conteúdo</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Fonte</h3>
+        <p><strong>Outfit</strong> é a única fonte do projeto. Pesos disponíveis: 400, 500, 600, 700, 800. Qualquer outra fonte é violação da Lei 3.</p>
+        <pre><code><span class="c-dim">// src/design/tokens.ts</span>
+<span class="c-key">fontFamily:</span> <span class="c-str">t.font.family</span>  <span class="c-dim">// 'Outfit, sans-serif'</span></code></pre>
+
+        <h3>Hierarquia de Tamanhos</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>px</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>t.font.size.xs</code></td><td>11</td><td>Metadados, rodapés, labels de eixo em charts</td></tr>
+              <tr><td><code>t.font.size.sm</code></td><td>12</td><td>Labels de campos, badges</td></tr>
+              <tr><td><code>t.font.size.base</code></td><td>13</td><td>Texto de tabela, listas</td></tr>
+              <tr><td><code>t.font.size.md</code></td><td>14</td><td>Corpo padrão de formulários</td></tr>
+              <tr><td><code>t.font.size.lg</code></td><td>15</td><td>Títulos de cards, seções</td></tr>
+              <tr><td><code>t.font.size.xl</code></td><td>16</td><td>Títulos de página secundários</td></tr>
+              <tr><td><code>t.font.size.2xl</code></td><td>22</td><td>PageHeader titles</td></tr>
+              <tr><td><code>t.font.size.3xl</code></td><td>26</td><td>KPIs, números de destaque</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Regras de Conteúdo</h3>
+        <ul>
+          <li><strong>Números tabulares:</strong> em tabelas e comparações, usar <code>font-variant-numeric: tabular-nums</code></li>
+          <li><strong>Reticências tipográficas:</strong> usar o caractere <code>…</code> (U+2026), nunca três pontos <code>...</code></li>
+          <li><strong>Aspas curvas:</strong> <code>"texto"</code> em conteúdo editorial — nunca aspas retas</li>
+          <li><strong>Espaço non-breaking:</strong> <code>10&amp;nbsp;kg</code>, <code>R$&amp;nbsp;10,00</code>, <code>5&amp;nbsp;ha</code> — evitar quebra entre número e unidade</li>
+          <li><strong>Todos os estados desenhados:</strong> toda tela deve ter layout para vazio, esparso, denso e com erro</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5 — LAYOUT E RESPONSIVIDADE
+         ============================================================ -->
+    <section class="section" id="sec-5">
+      <div class="sec-head">
+        <span class="sec-num">5</span>
+        <h2>Layout e Responsividade</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Grid e Alinhamento</h3>
+        <ul>
+          <li>Usar CSS Grid e Flexbox nativos — evitar dimensionamento via JavaScript</li>
+          <li><strong>Alinhamento óptico:</strong> ajustar ±1–2 px quando percepção supera geometria (ex: ícones ao lado de texto)</li>
+          <li><strong>Alinhamento deliberado:</strong> cada elemento deve alinhar com algo — grid, baseline, borda ou centro óptico</li>
+        </ul>
+
+        <h3>Breakpoints de Teste</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Viewport</th><th>Largura</th><th>Objetivo</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Mobile</strong></td><td>360 px</td><td>Verificar que nenhum elemento vaza ou sobrepõe</td></tr>
+              <tr><td><strong>Laptop</strong></td><td>1280 px</td><td>Layout padrão de desenvolvimento</td></tr>
+              <tr><td><strong>Wide</strong></td><td>1920 px</td><td>Verificar que layouts não ficam excessivamente esticados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Barras de Scroll</h3>
+        <ul>
+          <li>Corrigir <code>overflow</code> para evitar scrollbars indesejados</li>
+          <li>Em macOS: testar com <em>"Show Scroll Bars: Always"</em> em System Preferences</li>
+          <li>Em modals e drawers: aplicar <code>overscroll-behavior: contain</code></li>
+        </ul>
+
+        <h3>Links e Navegação</h3>
+        <ul>
+          <li><strong>Links verdadeiros:</strong> usar <code>&lt;a&gt;</code> ou <code>&lt;Link&gt;</code> — nunca <code>&lt;button&gt;</code> ou <code>&lt;div onClick&gt;</code> para URLs</li>
+          <li><strong>Deep-link tudo:</strong> filtros ativos, aba selecionada, página atual, painéis expandidos persistem na URL</li>
+          <li>Back/Forward do browser deve restaurar estado, incluindo posição de scroll</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6 — INTERAÇÕES E ACESSIBILIDADE
+         ============================================================ -->
+    <section class="section" id="sec-6">
+      <div class="sec-head">
+        <span class="sec-num">6</span>
+        <h2>Interações e Acessibilidade</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Teclado e Foco</h3>
+        <ul>
+          <li><strong>100% operável por teclado</strong> — todos os fluxos críticos sem mouse</li>
+          <li>Usar <code>:focus-visible</code> em vez de <code>:focus</code> — não mostra ring em cliques via mouse</li>
+          <li>Focus ring padrão: <code>t.glow.brand</code> (box-shadow verde)</li>
+          <li><strong>Focus traps:</strong> modals e drawers prendem o foco enquanto abertos</li>
+        </ul>
+        <div class="dd-grid">
+          <div class="dd-block dd-do">
+            <div class="dd-head">✓ Correto</div>
+            <div class="dd-body"><code>:focus-visible {
+  box-shadow: t.glow.brand;
+}</code></div>
+          </div>
+          <div class="dd-block dd-dont">
+            <div class="dd-head">✕ Evitar — ativa no click</div>
+            <div class="dd-body"><code>:focus {
+  outline: 2px solid green;
+}</code></div>
+          </div>
+        </div>
+
+        <h3>Alvos de Clique (Hit Targets)</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Contexto</th><th>Tamanho mínimo</th></tr></thead>
+            <tbody>
+              <tr><td>Desktop</td><td>24 × 24 px por elemento interativo</td></tr>
+              <tr><td>Mobile / touch</td><td>44 × 44 px</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Sem dead zones: se a área visual é interativa, <em>toda ela</em> deve ser clicável.</p>
+
+        <h3>Estados de Loading</h3>
+        <ul>
+          <li>Delay inicial antes de mostrar loading: <strong>~150–300 ms</strong> (evitar flash para operações rápidas)</li>
+          <li>Tempo mínimo visível do indicador: <strong>~300–500 ms</strong> (evitar flicker)</li>
+          <li>Botões em loading mantêm o rótulo original + indicador — usar prop <code>loading</code> do <code>Button</code></li>
+        </ul>
+
+        <h3>Atualizações Otimistas</h3>
+        <ul>
+          <li>UI responde imediatamente à ação do usuário</li>
+          <li>Reconciliar com resposta do servidor ao receber</li>
+          <li>Em caso de erro: mostrar opção de <strong>Undo</strong> ou notificação clara</li>
+        </ul>
+
+        <h3>Ações Destrutivas</h3>
+        <p>Sempre exigir confirmação explícita (modal ou janela de Undo). Usar <code>Button</code> variant <code>destructive</code> — nunca estilizar exclusão como ação primária.</p>
+
+        <h3>Acessibilidade Semântica</h3>
+        <ul>
+          <li><strong>Semântica antes de ARIA:</strong> preferir <code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;label&gt;</code>, <code>&lt;table&gt;</code> nativos</li>
+          <li>Headings hierárquicos: estrutura h1→h2→h3 não deve pular níveis</li>
+          <li><code>IconButton</code> sempre tem <code>aria-label</code> descritivo</li>
+          <li>Elementos decorativos recebem <code>aria-hidden="true"</code></li>
+          <li>Atualizações assíncronas (toasts) anunciadas com <code>aria-live="polite"</code></li>
+        </ul>
+
+        <h3>Mobile</h3>
+        <ul>
+          <li>Inputs com <code>font-size ≥ 16 px</code> — evitar auto-zoom no iOS Safari</li>
+          <li>Usar <code>touch-action: manipulation</code> em controles — elimina delay de double-tap</li>
+          <li>Nunca desabilitar zoom do browser nem bloquear <code>paste</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 7 — FORMULÁRIOS
+         ============================================================ -->
+    <section class="section" id="sec-7">
+      <div class="sec-head">
+        <span class="sec-num">7</span>
+        <h2>Formulários</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Comportamento de Submissão</h3>
+        <ul>
+          <li><code>Enter</code> submete quando há um único campo focado</li>
+          <li>Em formulários multi-campo: <code>Enter</code> no <strong>último campo</strong> submete</li>
+          <li><code>&lt;textarea&gt;</code>: <code>Ctrl/⌘ + Enter</code> submete; <code>Enter</code> insere nova linha</li>
+          <li>Submit fica <strong>habilitado</strong> até o início da submissão; desabilitar <strong>durante</strong> o request + spinner</li>
+          <li>Nunca pré-desabilitar o submit — permitir submissão incompleta para surfar feedback</li>
+        </ul>
+
+        <h3>Labels e Campos</h3>
+        <ul>
+          <li>Todo campo deve ter <code>&lt;label&gt;</code> associado — <code>FormField</code> e <code>FormSelect</code> já implementam</li>
+          <li>Erros exibidos <strong>próximos ao campo</strong>, nunca apenas no topo do formulário</li>
+          <li>Ao submeter com erros: focar o <strong>primeiro campo com erro</strong></li>
+        </ul>
+
+        <h3>Validação</h3>
+        <ul>
+          <li>Não bloquear digitação — mostrar feedback após blur ou submit</li>
+          <li>Mensagens de erro guiam a correção: não "campo inválido", mas <em>"CPF deve ter 11 dígitos"</em></li>
+          <li><code>spellcheck="false"</code> em: e-mails, códigos, usernames, tokens de API</li>
+        </ul>
+
+        <h3>Tipos de Input Corretos</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Dado</th><th>type</th><th>inputMode</th></tr></thead>
+            <tbody>
+              <tr><td>Numérico (não calculado)</td><td><code>text</code></td><td><code>numeric</code></td></tr>
+              <tr><td>Telefone</td><td><code>tel</code></td><td>—</td></tr>
+              <tr><td>E-mail</td><td><code>email</code></td><td>—</td></tr>
+              <tr><td>Decimal</td><td><code>text</code></td><td><code>decimal</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Preenchimento Automático</h3>
+        <ul>
+          <li>Sempre definir <code>autocomplete</code> e <code>name</code> significativos para habilitar autofill</li>
+          <li>Não disparar gerenciadores de senha em campos não-auth: usar <code>autocomplete="off"</code></li>
+          <li>Fazer <code>trim()</code> no valor antes de validar — evitar erros confusos por espaço</li>
+        </ul>
+
+        <h3><code>&lt;select&gt;</code> no Windows</h3>
+        <p>Definir explicitamente <code>backgroundColor</code> e <code>color</code> no <code>FormSelect</code> para evitar inconsistências visuais no Windows.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 8 — ANIMAÇÕES E TRANSIÇÕES
+         ============================================================ -->
+    <section class="section" id="sec-8">
+      <div class="sec-head">
+        <span class="sec-num">8</span>
+        <h2>Animações e Transições</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Princípios</h3>
+        <ul>
+          <li>Animar apenas quando <strong>clarifica causa/efeito</strong> ou adiciona <strong>delícia deliberada</strong> — nunca decorativo sem propósito</li>
+          <li>Respeitar <code>prefers-reduced-motion</code> — fornecer variante reduzida</li>
+        </ul>
+        <pre><code><span class="c-dim">/* Respeito a prefers-reduced-motion */</span>
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: <span class="c-ok">0.01ms</span> !important;
+    transition-duration: <span class="c-ok">0.01ms</span> !important;
+  }
+}</code></pre>
+
+        <h3>Propriedades Seguras (GPU-accelerated)</h3>
+        <p>Animar <strong>apenas</strong> estas para evitar reflow/repaint:</p>
+        <div class="dd-grid">
+          <div class="dd-block dd-do">
+            <div class="dd-head">✓ GPU Accelerated</div>
+            <div class="dd-body"><code>transform: translateY(-4px)
+opacity: 0
+filter: blur(4px)</code></div>
+          </div>
+          <div class="dd-block dd-dont">
+            <div class="dd-head">✕ Causa Reflow</div>
+            <div class="dd-body"><code>width
+height
+top / left
+margin / padding</code></div>
+          </div>
+        </div>
+
+        <h3>Durações</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>t.animation.duration.fast</code></td><td>150 ms</td><td>Hover, foco</td></tr>
+              <tr><td><code>t.animation.duration.normal</code></td><td>200 ms</td><td>Mostrar/ocultar pequenos elementos</td></tr>
+              <tr><td><code>t.animation.duration.slow</code></td><td>300 ms</td><td>Modals, drawers</td></tr>
+              <tr><td><code>t.animation.duration.slower</code></td><td>400 ms</td><td>Page transitions</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Easing</h3>
+        <ul>
+          <li><code>t.animation.easing.standard</code> — mudanças de tamanho</li>
+          <li><code>t.animation.easing.easeOut</code> — elementos que <em>entram</em> na tela</li>
+          <li><code>t.animation.easing.easeIn</code> — elementos que <em>saem</em> da tela</li>
+          <li><code>t.animation.easing.spring</code> — interações de drag, hover com "mola"</li>
+        </ul>
+
+        <h3>Transform Origin</h3>
+        <ul>
+          <li>Dropdown que abre abaixo: <code>transformOrigin: 'top center'</code></li>
+          <li>Modal que cresce do centro: <code>transformOrigin: 'center center'</code></li>
+          <li>Drawer lateral: <code>transformOrigin: 'right center'</code></li>
+        </ul>
+
+        <h3>Regras Adicionais</h3>
+        <ul>
+          <li>Animações devem ser <strong>canceláveis</strong> por input do usuário</li>
+          <li><strong>Nunca usar <code>transition: all</code></strong> — listar propriedades explicitamente</li>
+          <li>Evitar autoplay — animar apenas em resposta a ações</li>
+          <li>SVG transforms: aplicar em wrappers <code>&lt;g&gt;</code> + <code>transform-box: fill-box; transform-origin: center</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 9 — ESTADOS DA UI
+         ============================================================ -->
+    <section class="section" id="sec-9">
+      <div class="sec-head">
+        <span class="sec-num">9</span>
+        <h2>Estados da UI</h2>
+      </div>
+      <div class="sec-body">
+        <p>Todo componente e toda tela deve ter <strong>todos os estados desenhados</strong> antes de ir para produção.</p>
+
+        <h3>Estados Obrigatórios</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Estado</th><th>Implementação</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Loading</strong></td><td><code>Skeleton</code> (listas/cards) ou prop <code>loading</code> do <code>Button</code></td></tr>
+              <tr><td><strong>Vazio</strong></td><td><code>EmptyState</code> com mensagem + ação de recuperação</td></tr>
+              <tr><td><strong>Erro</strong></td><td>Mensagem orientada à solução + ação de retry</td></tr>
+              <tr><td><strong>Sucesso</strong></td><td>Feedback positivo (toast ou <code>Badge</code> success)</td></tr>
+              <tr><td><strong>Esparso</strong> (1–3 itens)</td><td>Layout bonito, não quebrado</td></tr>
+              <tr><td><strong>Denso</strong> (+500 itens)</td><td>Paginação + virtualização</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Skeletons</h3>
+        <ul>
+          <li>Devem <strong>refletir a estrutura real</strong> do conteúdo final — evitar placeholders genéricos que causam layout shift</li>
+          <li>Usar <code>Skeleton</code> variant <code>text</code>, <code>rect</code> ou <code>circle</code> conforme o tipo</li>
+          <li>Delay de ~150 ms antes de exibir — operações rápidas não devem piscar</li>
+        </ul>
+
+        <h3>Sem Dead Ends</h3>
+        <p>Toda tela deve oferecer um próximo passo ou caminho de recuperação:</p>
+        <ul>
+          <li>Lista vazia → botão "Cadastrar primeiro item"</li>
+          <li>Erro de rede → botão "Tentar novamente"</li>
+          <li>Sem permissão → link para solicitar acesso</li>
+        </ul>
+
+        <h3>ProgressBar</h3>
+        <p>Usar <code>ProgressBar</code> no topo de cards/seções com operação em andamento: <code>idle</code> (invisível) → <code>loading</code> (indeterminado brand) → <code>success</code> → <code>error</code>.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 10 — TEMAS
+         ============================================================ -->
+    <section class="section" id="sec-10">
+      <div class="sec-head">
+        <span class="sec-num">10</span>
+        <h2>Temas — Light e GBMode</h2>
+      </div>
+      <div class="sec-body">
+        <p>Gerenciado por <code>src/context/ThemeContext.tsx</code>. Acessado via <code>useTheme()</code>.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Propriedade</th><th>Light</th><th>GBMode</th></tr></thead>
+            <tbody>
+              <tr><td>Background de página</td><td><span class="swatch" style="background:#f5f5f5"></span><code>#f5f5f5</code></td><td><span class="swatch" style="background:#051008"></span><code>#051008</code></td></tr>
+              <tr><td>Superfície (cards)</td><td><span class="swatch" style="background:#fff;border:1px solid #e5e7eb"></span><code>#ffffff</code></td><td><span class="swatch" style="background:#0e2a1d"></span><code>#0e2a1d</code></td></tr>
+              <tr><td>Brand principal</td><td><span class="swatch" style="background:#059669"></span><code>#059669</code></td><td><span class="swatch" style="background:#10b981"></span><code>#10b981</code></td></tr>
+              <tr><td>Toggle</td><td colspan="2" style="text-align:center"><code>useTheme().toggle()</code></td></tr>
+              <tr><td>Aplicação no DOM</td><td><code>data-theme="light"</code></td><td><code>data-theme="gb"</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Regras de Tema</h3>
+        <ul>
+          <li>Todo componente em <code>src/components/ui/</code> deve suportar <strong>ambos os temas</strong></li>
+          <li>Usar <code>useTheme().colors</code> para superfícies e <code>isGbMode</code> para valores específicos</li>
+          <li>Nunca hardcodar cores que dependem do tema</li>
+          <li>Em GBMode: bordas, sombras e textos de suporte devem usar hues verdes (não cinza neutro)</li>
+          <li>Definir <code>color-scheme: dark</code> no <code>&lt;html&gt;</code> quando GBMode ativo — alinha scrollbars e controles nativos do OS</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 11 — PERFORMANCE
+         ============================================================ -->
+    <section class="section" id="sec-11">
+      <div class="sec-head">
+        <span class="sec-num">11</span>
+        <h2>Performance</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Renderização</h3>
+        <ul>
+          <li>Monitorar re-renders com React DevTools — minimizar re-renders desnecessários</li>
+          <li><code>useMemo</code> e <code>useCallback</code> apenas onde profiling confirmar necessidade</li>
+          <li>Listas com <strong>+100 itens visíveis</strong>: considerar virtualização</li>
+        </ul>
+
+        <h3>Latência de Rede</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Target</th></tr></thead>
+            <tbody>
+              <tr><td><code>POST</code> / <code>PATCH</code> / <code>DELETE</code></td><td>Resposta &lt; <strong>500 ms</strong></td></tr>
+              <tr><td>Inputs de busca</td><td>Debounce de ~<strong>300 ms</strong> antes do request</td></tr>
+              <tr><td>Indicador de loading</td><td>Exibir após <strong>150–300 ms</strong> sem resposta</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Imagens e Assets</h3>
+        <ul>
+          <li>Sempre definir <code>width</code> e <code>height</code> explícitos em imagens — evitar CLS</li>
+          <li>Lazy-load imagens abaixo do fold</li>
+          <li>Fontes críticas com <code>preload</code> para evitar FOUT</li>
+        </ul>
+
+        <h3>Main Thread</h3>
+        <p>Operações pesadas (parsing de grandes datasets, cálculos de relatório) fora do main thread. Considerar Web Workers para processamentos &gt; 50 ms.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 12 — COPY E MENSAGENS
+         ============================================================ -->
+    <section class="section" id="sec-12">
+      <div class="sec-head">
+        <span class="sec-num">12</span>
+        <h2>Copy e Mensagens de Interface</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Voz e Tom</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Princípio</th><th>Correto</th><th>Evitar</th></tr></thead>
+            <tbody>
+              <tr><td>Voz ativa</td><td>"Cadastre uma fazenda"</td><td>"Uma fazenda deve ser cadastrada"</td></tr>
+              <tr><td>Segunda pessoa</td><td>"Sua safra foi salva"</td><td>"A safra do usuário foi salva"</td></tr>
+              <tr><td>Orientado à ação</td><td>"Adicionar produtor"</td><td>"É necessário adicionar um produtor"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Labels e Botões</h3>
+        <ul>
+          <li>Labels claros e específicos: <strong>"Salvar Safra"</strong> em vez de <em>"Continuar"</em> ou <em>"OK"</em></li>
+          <li>Ações com consequência futura terminam com reticências: <em>"Excluir safra…"</em>, <em>"Arquivar fazenda…"</em></li>
+          <li>Ações em processamento: <em>"Salvando…"</em>, <em>"Carregando…"</em></li>
+          <li>Botões em loading mantêm o texto + spinner — não substituir por <em>"Aguarde"</em></li>
+        </ul>
+
+        <h3>Mensagens de Erro</h3>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <p>Erros sempre guiam a saída. Não apenas <em>"Erro ao salvar"</em> — mas <em>"Erro ao salvar: verifique sua conexão e tente novamente."</em></p>
+        </div>
+        <ul>
+          <li>Linguagem positiva por padrão: problem-solving mesmo em estados de erro</li>
+          <li>Evitar linguagem técnica: <em>"Timeout"</em> → <em>"A operação demorou mais que o esperado"</em></li>
+        </ul>
+
+        <h3>Números e Formatação</h3>
+        <ul>
+          <li>Numerais para contagens: <em>"8 safras"</em> em vez de <em>"oito safras"</em></li>
+          <li>Moeda: 0 ou 2 decimais — nunca misturar no mesmo contexto</li>
+          <li>Datas e horas: formato locale-aware (<code>pt-BR</code> como padrão)</li>
+          <li>Colunas numéricas de tabelas: <code>font-variant-numeric: tabular-nums</code></li>
+        </ul>
+
+        <h3>Terminologia Consistente</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Usar</th><th>Evitar</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Fazenda</strong></td><td>Propriedade, Campo, Terra</td></tr>
+              <tr><td><strong>Safra</strong></td><td>Ciclo, Temporada</td></tr>
+              <tr><td><strong>Produtor</strong></td><td>Agricultor (salvo contexto específico)</td></tr>
+              <tr><td><strong>Cadastrar</strong></td><td>Inserir, Adicionar (escolher um e manter)</td></tr>
+              <tr><td><strong>Excluir</strong></td><td>Deletar, Remover (em contextos destrutivos)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 13 — GOVERNANÇA E COMMITS
+         ============================================================ -->
+    <section class="section" id="sec-13">
+      <div class="sec-head">
+        <span class="sec-num">13</span>
+        <h2>Governança e Commits</h2>
+      </div>
+      <div class="sec-body">
+        <h3>Conventional Commits</h3>
+        <div class="commit-row">
+          <span class="commit">feat(modulo):</span>
+          <span class="commit">fix(componente):</span>
+          <span class="commit">style(ui):</span>
+          <span class="commit">refactor(hook):</span>
+          <span class="commit">docs(guidelines):</span>
+          <span class="commit">chore(deps):</span>
+        </div>
+        <p class="commit-note">Formato: <code>tipo(escopo): descrição imperativa em minúsculas</code></p>
+
+        <div class="divider"></div>
+
+        <h3>Checklist de PR</h3>
+        <ul class="checklist">
+          <li><span class="checkbox"></span>Todos os valores de design usam <code>t.*</code> — sem valores hardcoded</li>
+          <li><span class="checkbox"></span>Todos os componentes vêm de <code>src/components/ui/</code></li>
+          <li><span class="checkbox"></span>Suporte a ambos os temas (light e GBMode)</li>
+          <li><span class="checkbox"></span>Todos os estados da UI implementados (loading, vazio, erro)</li>
+          <li><span class="checkbox"></span>Inputs com <code>aria-label</code> ou <code>&lt;label&gt;</code> associado</li>
+          <li><span class="checkbox"></span>Botões apenas-ícone com <code>aria-label</code> descritivo</li>
+          <li><span class="checkbox"></span>Animações com <code>prefers-reduced-motion</code> respeitado</li>
+          <li><span class="checkbox"></span>Nenhum <code>transition: all</code> no código</li>
+          <li><span class="checkbox"></span>Fonte Outfit em toda tipografia</li>
+          <li><span class="checkbox"></span>Commit criado com mensagem Conventional Commits</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <h3>Atualizando Este Documento</h3>
+        <p>Este documento deve ser atualizado sempre que:</p>
+        <ul>
+          <li>Um novo componente é adicionado ao catálogo (<code>src/components/ui/</code>)</li>
+          <li>Um novo token é criado em <code>tokens.ts</code></li>
+          <li>Uma nova Lei ou regra é aprovada pela equipe</li>
+          <li>Um padrão de interação é definido para casos recorrentes</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer class="pg-footer">
+  <p>CERNE Web Interface Guidelines v2.0 &nbsp;·&nbsp; AGRO365 / GB Greenbelt &nbsp;·&nbsp; 27 mai 2026</p>
+  <p>Baseado nas Leis internas do projeto CERNE e nas <a href="https://vercel.com/design/guidelines">Vercel Design Guidelines</a></p>
+</footer>
+
+</body>
+</html>

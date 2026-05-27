@@ -1,15 +1,17 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, X,
+  Plus, Pencil, Trash2,
   List, LayoutGrid, MapPin, Layers, Ruler, Eye,
   TrendingUp, TrendingDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { DataTable }       from '../../../components/ui/DataTable'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { Badge }           from '../../../components/ui/Badge'
+import type { BadgeVariant } from '../../../components/ui/Badge'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
@@ -48,14 +50,14 @@ const ativoOptions = [
   { value: 'false', label: 'Inativo' },
 ]
 
-// ─── Tipo paleta por exploração ───────────────────────────────────────────────
+// ─── Variante de badge por tipo de exploração ─────────────────────────────────
 
-const TIPO_COLOR: Record<string, { bg: string; text: string }> = {
-  'Agrícola':     { bg: '#f0fdf4', text: '#059669' },
-  'Pecuário':     { bg: '#eff6ff', text: '#2563eb' },
-  'Misto':        { bg: '#fefce8', text: '#d97706' },
-  'Silvicultura': { bg: '#f5f3ff', text: '#7c3aed' },
-  'Piscicultura': { bg: '#ecfeff', text: '#0891b2' },
+const TIPO_VARIANT: Record<string, BadgeVariant> = {
+  'Agrícola':     'success',
+  'Pecuário':     'info',
+  'Misto':        'warning',
+  'Silvicultura': 'purple',
+  'Piscicultura': 'cyan',
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -141,19 +143,12 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
     {
       key: 'tipoExploracao',
       label: 'Tipo Exploração',
-      render: (row) => {
-        const c = TIPO_COLOR[row.tipoExploracao] ?? { bg: colors.surfaceSubtle, text: colors.textSecondary }
-        return (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center',
-            background: c.bg, color: c.text,
-            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-            padding: '2px 8px', borderRadius: t.radius.full,
-          }}>
-            {row.tipoExploracao}
-          </span>
-        )
-      },
+      render: (row) => (
+        <Badge
+          label={row.tipoExploracao}
+          variant={TIPO_VARIANT[row.tipoExploracao] ?? 'neutral'}
+        />
+      ),
     },
     {
       key: 'areaTotal',
@@ -181,31 +176,28 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       sortable: false,
       width: 80,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-          <Button
-            variant="ghost" size="sm"
-            style={{ width: 30, height: 30, padding: 0 }}
-            onClick={(e) => { e.stopPropagation(); onView(row.id) }}
-            title="Visualizar" aria-label="Visualizar fazenda"
-          >
-            <Eye size={13} />
-          </Button>
-          <Button
-            variant="ghost" size="sm"
-            style={{ width: 30, height: 30, padding: 0 }}
-            onClick={(e) => { e.stopPropagation(); onEdit(row.id) }}
-            title="Editar" aria-label="Editar fazenda"
-          >
-            <Pencil size={13} />
-          </Button>
-          <Button
-            variant="destructive" size="sm"
-            style={{ width: 30, height: 30, padding: 0, border: 'none' }}
-            onClick={(e) => e.stopPropagation()}
-            title="Excluir" aria-label="Excluir fazenda"
-          >
-            <Trash2 size={13} />
-          </Button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] }}>
+          <IconButton
+            icon={<Eye size={13} />}
+            aria-label="Visualizar fazenda"
+            tooltip="Visualizar"
+            size="sm"
+            onClick={() => onView(row.id)}
+          />
+          <IconButton
+            icon={<Pencil size={13} />}
+            aria-label="Editar fazenda"
+            tooltip="Editar"
+            size="sm"
+            onClick={() => onEdit(row.id)}
+          />
+          <IconButton
+            icon={<Trash2 size={13} />}
+            aria-label="Excluir fazenda"
+            tooltip="Excluir"
+            size="sm"
+            danger
+          />
         </div>
       ),
     },
@@ -263,17 +255,9 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           />
         )}
         {activeFilterCount > 1 && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              background: 'none', border: 'none', fontSize: t.font.size.xs,
-              color: colors.textMuted, cursor: 'pointer', padding: '0 4px',
-              fontFamily: t.font.family.sans,
-            }}
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
             Limpar tudo
-          </button>
+          </Button>
         )}
 
         {/* Espaçador */}
@@ -537,31 +521,25 @@ function ViewToggle({
       {items.map((item, idx) => {
         const active = value === item.mode
         return (
-          <button
+          <Button
             key={item.mode}
-            type="button"
+            variant="ghost"
+            size="sm"
+            icon={item.icon}
             onClick={() => onChange(item.mode)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              height: 34,
-              padding: '0 12px',
-              border: 'none',
-              borderRight: idx < items.length - 1 ? `1.5px solid ${colors.border}` : undefined,
-              background: active ? colors.brandBg : colors.surfaceBg,
-              color: active ? colors.brand : colors.textSecondary,
-              fontSize: t.font.size.sm,
-              fontWeight: active ? t.font.weight.semibold : t.font.weight.medium,
-              fontFamily: t.font.family.sans,
-              cursor: 'pointer',
-              transition: 'background 0.15s, color 0.15s',
-            }}
             aria-pressed={active}
+            style={{
+              borderRight:  idx < items.length - 1 ? `1.5px solid ${colors.border}` : undefined,
+              borderRadius: 0,
+              background:   active ? colors.brandBg   : colors.surfaceBg,
+              color:        active ? colors.brand      : colors.textSecondary,
+              fontWeight:   active ? t.font.weight.semibold : t.font.weight.medium,
+              height:       34,
+              padding:      `0 ${t.space[3]}px`,
+            }}
           >
-            {item.icon}
             {item.label}
-          </button>
+          </Button>
         )
       })}
     </div>
@@ -613,7 +591,7 @@ function FazendaCard({
   colors: ReturnType<typeof useTheme>['colors']
 }) {
   const [hovered, setHovered] = useState(false)
-  const tipoColor = TIPO_COLOR[row.tipoExploracao] ?? { bg: colors.surfaceSubtle, text: colors.textSecondary }
+  const tipoVariant = TIPO_VARIANT[row.tipoExploracao] ?? 'neutral'
 
   return (
     <div
@@ -654,13 +632,7 @@ function FazendaCard({
           {row.cidade} — {row.uf}
         </InfoRow>
         <InfoRow icon={<Layers size={12} />} color={colors.textMuted}>
-          <span style={{
-            background: tipoColor.bg, color: tipoColor.text,
-            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-            padding: '1px 7px', borderRadius: t.radius.full,
-          }}>
-            {row.tipoExploracao}
-          </span>
+          <Badge label={row.tipoExploracao} variant={tipoVariant} />
         </InfoRow>
         <InfoRow icon={<Ruler size={12} />} color={colors.textMuted}>
           <strong style={{ color: colors.textPrimary, fontWeight: t.font.weight.semibold }}>

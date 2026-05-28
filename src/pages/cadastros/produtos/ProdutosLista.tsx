@@ -12,6 +12,7 @@ import { FormSelect }      from '../../../components/ui/FormSelect'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
   GRUPOS, CATEGORIAS, CLASSES,
   TIPO_PRODUTO_LABEL, TIPO_PRODUTO_OPTS,
@@ -28,22 +29,6 @@ interface Props {
   onBulkActivate:   (ids: number[]) => void
   onBulkDeactivate: (ids: number[]) => void
   onBulkDelete:     (ids: number[]) => void
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-const TOAST_BG: Record<ToastItem['type'], string> = { ok: '#14532d', err: '#dc2626', neutral: '#374151' }
-
-function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const show = useCallback((message: string, type: ToastItem['type'] = 'ok') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
-  }, [])
-  const dismiss = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), [])
-  return { toasts, show, dismiss }
 }
 
 // ─── Badge helpers ────────────────────────────────────────────────────────────
@@ -115,7 +100,12 @@ export default function ProdutosLista({
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     let list = [...produtos]
-    if (q)           list = list.filter(p => p.descricao.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q))
+    if (q)           list = list.filter(p => {
+      const grupoNome = GRUPOS.find(g => g.id === p.grupoId)?.nome ?? ''
+      const tipoLabel = TIPO_PRODUTO_LABEL[p.tipo] ?? ''
+      const status    = p.ativo ? 'ativo' : 'inativo'
+      return p.descricao.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || grupoNome.toLowerCase().includes(q) || tipoLabel.toLowerCase().includes(q) || status.includes(q)
+    })
     if (grupoFilter) list = list.filter(p => p.grupoId === Number(grupoFilter))
     if (catFilter)   list = list.filter(p => p.categoriaId === Number(catFilter))
     if (classeFilter)list = list.filter(p => p.classeId === Number(classeFilter))
@@ -160,28 +150,28 @@ export default function ProdutosLista({
     if (!deleteTarget) return
     onDelete(deleteTarget.id)
     setSelected(prev => { const n = new Set(prev); n.delete(deleteTarget.id); return n })
-    show(`"${deleteTarget.descricao}" excluído.`, 'neutral')
+    show(`"${deleteTarget.descricao}" excluído.`, 'info')
     setDeleteTarget(null)
   }
 
   const handleBulkActivate = () => {
     const ids = [...selected]
     onBulkActivate(ids)
-    show(`${ids.length} produto(s) ativado(s).`)
+    show(`${ids.length} produto(s) ativado(s).`, 'success')
     setSelected(new Set())
   }
 
   const handleBulkDeactivate = () => {
     const ids = [...selected]
     onBulkDeactivate(ids)
-    show(`${ids.length} produto(s) inativado(s).`, 'neutral')
+    show(`${ids.length} produto(s) inativado(s).`, 'info')
     setSelected(new Set())
   }
 
   const handleBulkDelete = () => {
     const ids = [...selected]
     onBulkDelete(ids)
-    show(`${ids.length} produto(s) excluído(s).`, 'neutral')
+    show(`${ids.length} produto(s) excluído(s).`, 'info')
     setSelected(new Set())
   }
 
@@ -214,11 +204,6 @@ export default function ProdutosLista({
             <Button variant="secondary" size="md" icon={<Download size={14} />} disabled>
               Exportar
             </Button>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar Produto
             </Button>
@@ -228,7 +213,7 @@ export default function ProdutosLista({
 
       {/* Toolbar: busca + chips */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={searchRaw} onChange={setSearchRaw} placeholder="Buscar por código ou descrição..." />
+        <TableSearchInput value={searchRaw} onChange={setSearchRaw} placeholder="Buscar produto..." />
         {grupoFilter && (
           <FilterChip
             label={`Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`}
@@ -268,7 +253,13 @@ export default function ProdutosLista({
             Limpar tudo
           </button>
         )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1 }} />
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>
@@ -378,18 +369,7 @@ export default function ProdutosLista({
         </Modal>
       )}
 
-      {/* Toasts */}
-      <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
-        {toasts.map(toast => (
-          <div key={toast.id} style={{ background: TOAST_BG[toast.type], color: 'white', padding: '11px 18px', borderRadius: t.radius.lg, fontSize: t.font.size.base, fontWeight: t.font.weight.medium, fontFamily: t.font.family.sans, boxShadow: t.shadow.lg, display: 'flex', alignItems: 'center', gap: 10, pointerEvents: 'auto', animation: 'toastIn 0.22s ease' }}>
-            <span style={{ flex: 1 }}>{toast.message}</span>
-            <button onClick={() => dismiss(toast.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 0, display: 'flex' }}>
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

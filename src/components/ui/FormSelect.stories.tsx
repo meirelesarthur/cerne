@@ -11,7 +11,7 @@ const estadoOptions = [
 ]
 
 const meta: Meta<typeof FormSelect> = {
-  title: 'UI/FormSelect',
+  title: 'GB CERNE/FormSelect',
   component: FormSelect,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

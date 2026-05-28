@@ -4,7 +4,7 @@ import { ProgressBar } from './ProgressBar'
 import type { ProgressState } from './ProgressBar'
 
 const meta: Meta<typeof ProgressBar> = {
-  title: 'UI/ProgressBar',
+  title: 'GB CERNE/ProgressBar',
   component: ProgressBar,
   parameters: {
     layout: 'padded',

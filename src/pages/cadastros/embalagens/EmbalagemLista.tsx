@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Package, X,
+  Plus, Pencil, Trash2, Package,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -14,6 +14,7 @@ import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -23,27 +24,6 @@ interface Props {
   onNew:      () => void
   onEdit:     (id: number) => void
   onDelete:   (id: number) => void
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-
-const TOAST_BG: Record<ToastItem['type'], string> = {
-  ok:      '#14532d',
-  err:     '#dc2626',
-  neutral: '#374151',
-}
-
-function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const show = useCallback((message: string, type: ToastItem['type'] = 'ok') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
-  }, [])
-  const dismiss = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), [])
-  return { toasts, show, dismiss }
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -78,7 +58,8 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     const base = embalagens.filter(e => {
-      const matchSearch  = !q || e.descricao.toLowerCase().includes(q)
+      const unidadeLabel = UNIDADE_OPTS.find(o => o.value === e.unidade)?.label ?? ''
+      const matchSearch  = !q || e.descricao.toLowerCase().includes(q) || unidadeLabel.toLowerCase().includes(q)
       const matchUnidade = !filters.unidade || e.unidade === filters.unidade
       return matchSearch && matchUnidade
     })
@@ -95,7 +76,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
     onDelete(deleteTarget.id)
-    show(`Embalagem "${deleteTarget.descricao}" excluída.`, 'neutral')
+    show(`Embalagem "${deleteTarget.descricao}" excluída.`, 'info')
     setDeleteTarget(null)
   }
 
@@ -111,11 +92,6 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
         count={embalagens.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar Embalagem
             </Button>
@@ -132,7 +108,13 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
             onRemove={() => setFilters(f => ({ ...f, unidade: '' }))}
           />
         )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1 }} />
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>
@@ -276,36 +258,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
         </Modal>
       )}
 
-      {/* ── Toasts ──────────────────────────────────────────────────────────── */}
-      <div style={{
-        position: 'fixed', top: 72, right: 24,
-        display: 'flex', flexDirection: 'column', gap: 8,
-        zIndex: t.zIndex.toast, pointerEvents: 'none',
-      }}>
-        {toasts.map(toast => (
-          <div
-            key={toast.id}
-            style={{
-              background: TOAST_BG[toast.type], color: 'white',
-              padding: '11px 18px', borderRadius: t.radius.lg,
-              fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-              fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-              display: 'flex', alignItems: 'center', gap: 10,
-              pointerEvents: 'auto',
-              animation: 'toastIn 0.22s ease',
-            }}
-          >
-            <span style={{ flex: 1 }}>{toast.message}</span>
-            <button
-              onClick={() => dismiss(toast.id)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 0, display: 'flex' }}
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

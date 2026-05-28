@@ -212,11 +212,6 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         count={data.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Fazenda
             </Button>
@@ -262,6 +257,12 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 
         {/* Espaçador */}
         <div style={{ flex: 1 }} />
+
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
 
         {/* Separador vertical */}
         <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />

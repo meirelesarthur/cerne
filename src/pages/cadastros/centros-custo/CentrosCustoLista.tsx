@@ -15,6 +15,7 @@ import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
   classeOf, CONDICAO_LABEL, TIPO_LABEL, CLASSE_LABEL,
   type CentroCusto,
@@ -48,6 +49,7 @@ export default function CentrosCustoLista({
   const [saibaMais,   setSaibaMais]   = useState(false)
   const [openMenuId,  setOpenMenuId]  = useState<number | null>(null)
   const [isLoading,   setIsLoading]   = useState(true)
+  const { toasts, show, dismiss }     = useToast()
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -101,17 +103,8 @@ export default function CentrosCustoLista({
     if (deleteId !== null) {
       onDelete(deleteId)
       setDeleteId(null)
-      showToast('Centro de custo excluído com sucesso.')
+      show('Centro de custo excluído com sucesso.', 'info')
     }
-  }
-
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  const [toastMsg, setToastMsg] = useState('')
-  const [toastVisible, setToastVisible] = useState(false)
-  const showToast = (msg: string) => {
-    setToastMsg(msg)
-    setToastVisible(true)
-    setTimeout(() => setToastVisible(false), 3400)
   }
 
   const deleteTarget = centros.find(c => c.id === deleteId)
@@ -155,11 +148,6 @@ export default function CentrosCustoLista({
               <HelpCircle size={14} />
               Saiba mais
             </button>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Novo Centro
             </Button>
@@ -289,7 +277,12 @@ export default function CentrosCustoLista({
           </button>
         )}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>
@@ -449,21 +442,7 @@ export default function CentrosCustoLista({
         </Modal>
       )}
 
-      {/* ── Toast ───────────────────────────────────────────────────────── */}
-      {toastVisible && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24,
-          background: '#14532d', color: 'white',
-          padding: '11px 20px', borderRadius: t.radius.lg,
-          fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          animation: 'toastIn 0.22s ease',
-        }}>
-          {toastMsg}
-        </div>
-      )}
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

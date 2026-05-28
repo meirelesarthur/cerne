@@ -3,7 +3,7 @@ import { Plus, Download } from 'lucide-react'
 import { PageHeader } from './PageHeader'
 
 const meta: Meta<typeof PageHeader> = {
-  title: 'UI/PageHeader',
+  title: 'GB CERNE/PageHeader',
   component: PageHeader,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

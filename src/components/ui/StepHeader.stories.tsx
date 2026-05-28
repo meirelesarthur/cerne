@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { StepHeader } from './StepHeader'
 
 const meta: Meta<typeof StepHeader> = {
-  title: 'UI/StepHeader',
+  title: 'GB CERNE/StepHeader',
   component: StepHeader,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

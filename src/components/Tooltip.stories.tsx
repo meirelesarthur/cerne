@@ -3,7 +3,7 @@ import { HelpCircle, Info, AlertCircle } from 'lucide-react'
 import { Tooltip } from './Tooltip'
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'UI/Tooltip',
+  title: 'GB CERNE/Tooltip',
   component: Tooltip,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

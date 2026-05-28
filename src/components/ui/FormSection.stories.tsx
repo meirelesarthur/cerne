@@ -4,7 +4,7 @@ import { FormField } from './FormField'
 import { FormSelect } from './FormSelect'
 
 const meta: Meta<typeof FormSection> = {
-  title: 'UI/FormSection',
+  title: 'GB CERNE/FormSection',
   component: FormSection,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

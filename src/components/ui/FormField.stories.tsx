@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormField } from './FormField'
 
 const meta: Meta<typeof FormField> = {
-  title: 'UI/FormField',
+  title: 'GB CERNE/FormField',
   component: FormField,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

@@ -81,7 +81,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return safras.filter(s => {
-      const matchSearch = !q || s.desc.toLowerCase().includes(q)
+      const statusLabel = s.ativo === 'sim' ? 'ativa' : 'inativa'
+      const matchSearch = !q || s.desc.toLowerCase().includes(q) || s.ini.includes(q) || s.fim.includes(q) || statusLabel.includes(q) || String(s.weeks.length).includes(q)
       const matchStatus =
         statusFilter === 'todas'   ? true :
         statusFilter === 'ativas'  ? s.ativo === 'sim' :
@@ -120,11 +121,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             >
               Saiba Mais
             </Button>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Nova Safra
             </Button>
@@ -188,7 +184,13 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             onRemove={clearFilters}
           />
         )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1 }} />
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>

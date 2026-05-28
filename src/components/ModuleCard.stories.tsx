@@ -7,7 +7,7 @@ import { ModuleCard, type ModuleCardConfig } from './ModuleCard'
 import type { NavModule } from '../data/menuData'
 
 const meta: Meta<typeof ModuleCard> = {
-  title: 'UI/ModuleCard',
+  title: 'GB CERNE/ModuleCard',
   component: ModuleCard,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

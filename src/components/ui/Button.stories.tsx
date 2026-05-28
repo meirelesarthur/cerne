@@ -3,7 +3,7 @@ import { Plus, Download, Trash2, ArrowRight, Loader2 } from 'lucide-react'
 import { Button } from './Button'
 
 const meta: Meta<typeof Button> = {
-  title: 'UI/Button',
+  title: 'GB CERNE/Button',
   component: Button,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

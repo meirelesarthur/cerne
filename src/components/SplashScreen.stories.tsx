@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SplashScreen } from './SplashScreen'
 
 const meta: Meta<typeof SplashScreen> = {
-  title: 'UI/SplashScreen',
+  title: 'GB CERNE/SplashScreen',
   component: SplashScreen,
   parameters: {
     layout: 'fullscreen',

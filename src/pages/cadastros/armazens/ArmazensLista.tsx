@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Warehouse, X,
+  Plus, Pencil, Trash2, Warehouse,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -16,6 +16,7 @@ import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
   TIPO_ARMAZEM_LABEL, TIPO_ARMAZEM_OPTS,
   type Armazem, type TipoArmazem,
@@ -28,22 +29,6 @@ interface Props {
   onNew:    () => void
   onEdit:   (id: number) => void
   onDelete: (id: number) => void
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface ToastItem { id: number; message: string; type: 'ok' | 'err' | 'neutral' }
-const TOAST_BG: Record<ToastItem['type'], string> = { ok: t.color.brand[900], err: t.color.error.solid, neutral: t.color.neutral[700] }
-
-function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const show = useCallback((message: string, type: ToastItem['type'] = 'ok') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
-  }, [])
-  const dismiss = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), [])
-  return { toasts, show, dismiss }
 }
 
 // ─── Badges ───────────────────────────────────────────────────────────────────
@@ -92,7 +77,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     const base = armazens.filter(a => {
-      const matchSearch  = !q || a.sigla.toLowerCase().includes(q) || a.descricao.toLowerCase().includes(q)
+      const tipoLabel   = TIPO_ARMAZEM_LABEL[a.tipo] ?? ''
+      const statusLabel = a.ativo ? 'ativo' : 'inativo'
+      const matchSearch  = !q || a.sigla.toLowerCase().includes(q) || a.descricao.toLowerCase().includes(q) || tipoLabel.toLowerCase().includes(q) || statusLabel.includes(q)
       const matchTipo    = !filters.tipo  || a.tipo === filters.tipo
       const matchAtivo   = filters.ativo === '' || (filters.ativo === 'true' ? a.ativo : !a.ativo)
       return matchSearch && matchTipo && matchAtivo
@@ -110,7 +97,7 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
     onDelete(deleteTarget.id)
-    show(`Armazém "${deleteTarget.sigla}" excluído.`, 'neutral')
+    show(`Armazém "${deleteTarget.sigla}" excluído.`, 'info')
     setDeleteTarget(null)
   }
 
@@ -137,11 +124,6 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
         count={armazens.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar Armazém
             </Button>
@@ -173,7 +155,13 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
             Limpar tudo
           </button>
         )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1 }} />
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>
@@ -265,18 +253,7 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
         </div>
       </Modal>
 
-      {/* Toasts */}
-      <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
-        {toasts.map(toast => (
-          <div key={toast.id} style={{ background: TOAST_BG[toast.type], color: 'white', padding: '11px 18px', borderRadius: t.radius.lg, fontSize: t.font.size.base, fontWeight: t.font.weight.medium, fontFamily: t.font.family.sans, boxShadow: t.shadow.lg, display: 'flex', alignItems: 'center', gap: 10, pointerEvents: 'auto', animation: 'toastIn 0.22s ease' }}>
-            <span style={{ flex: 1 }}>{toast.message}</span>
-            <button onClick={() => dismiss(toast.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 0, display: 'flex' }}>
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

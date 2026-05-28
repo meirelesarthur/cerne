@@ -11,7 +11,7 @@ const steps = [
 ]
 
 const meta: Meta<typeof Stepper> = {
-  title: 'UI/Stepper',
+  title: 'GB CERNE/Stepper',
   component: Stepper,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

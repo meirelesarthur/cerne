@@ -5,7 +5,7 @@ import { StepHeader } from './StepHeader'
 import { Stepper } from './Stepper'
 
 const meta: Meta<typeof StepFooter> = {
-  title: 'UI/StepFooter',
+  title: 'GB CERNE/StepFooter',
   component: StepFooter,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

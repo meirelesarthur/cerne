@@ -46,7 +46,7 @@ const mockData: Fazenda[] = [
 ]
 
 const meta: Meta<typeof DataTable> = {
-  title: 'UI/DataTable',
+  title: 'GB CERNE/DataTable',
   component: DataTable,
   parameters: { layout: 'padded', backgrounds: { default: 'white' } },
   tags: ['autodocs'],

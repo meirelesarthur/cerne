@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SSOButton } from './SSOButton'
 
 const meta: Meta<typeof SSOButton> = {
-  title: 'UI/SSOButton',
+  title: 'GB CERNE/SSOButton',
   component: SSOButton,
   parameters: {
     layout: 'centered',

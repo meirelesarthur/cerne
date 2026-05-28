@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import SearchBar from './SearchBar'
 
 const meta: Meta<typeof SearchBar> = {
-  title: 'UI/SearchBar',
+  title: 'GB CERNE/SearchBar',
   component: SearchBar,
   parameters: {
     layout: 'padded',

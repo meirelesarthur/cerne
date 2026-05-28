@@ -187,11 +187,6 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
             <Button variant="secondary" size="md" icon={<Download size={14} />}>
               Exportar
             </Button>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Adicionar
             </Button>
@@ -222,14 +217,20 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
       {/* Filter bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar produto, código..." />
+        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar produto, código ou armazém..." />
         {filterArmazem && (
           <FilterChip
             label={`Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`}
             onRemove={() => { setFilterArmazem(''); setPage(1) }}
           />
         )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1 }} />
+        <FilterButton
+          active={activeFilterCount > 0}
+          count={activeFilterCount}
+          onClick={() => setDrawerOpen(true)}
+        />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
           {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
         </span>
       </div>

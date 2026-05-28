@@ -7,7 +7,7 @@ import { Button } from './Button'
 import { SlidersHorizontal } from 'lucide-react'
 
 const meta: Meta<typeof FilterDrawer> = {
-  title: 'UI/FilterDrawer',
+  title: 'GB CERNE/FilterDrawer',
   component: FilterDrawer,
   parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],

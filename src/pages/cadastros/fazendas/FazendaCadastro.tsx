@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
@@ -14,6 +14,7 @@ import { Step4Financeiro } from './steps/Step4Financeiro'
 import { Step5Configuracoes } from './steps/Step5Configuracoes'
 import { emptyFazendaForm } from './fazendas.types'
 import type { FazendaFormData } from './fazendas.types'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 
 interface FazendaCadastroProps {
   onBack: () => void
@@ -72,17 +73,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [formData, setFormData] = useState<FazendaFormData>(emptyFazendaForm)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [showSuccess, setShowSuccess] = useState(false)
-
-  useEffect(() => {
-    if (showSuccess) {
-      const timer = setTimeout(() => {
-        setShowSuccess(false)
-        onBack()
-      }, 3000)
-      return () => clearTimeout(timer)
-    }
-  }, [showSuccess, onBack])
+  const { toasts, show, dismiss } = useToast()
 
   const handleChange = (field: keyof FazendaFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -116,7 +107,8 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1)
     } else {
-      setShowSuccess(true)
+      show('Fazenda cadastrada com sucesso!', 'success', 3000)
+      setTimeout(onBack, 3200)
     }
   }
 
@@ -169,28 +161,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
 
   return (
     <PageContainer>
-      {/* Success Toast */}
-      {showSuccess && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 20,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9999,
-            background: '#059669',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: 10,
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: "'Outfit', sans-serif",
-            boxShadow: '0 4px 16px rgba(5,150,105,0.3)',
-          }}
-        >
-          Fazenda cadastrada com sucesso!
-        </div>
-      )}
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       <Stepper
         steps={STEPS}

@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import EnderecosList from './EnderecosList'
 import EnderecoForm  from './EnderecoForm'
-import { mockEnderecos }           from './enderecos.mock'
-import { getAllDescendantIds }      from './enderecos.types'
-import { t }                        from '../../../design/tokens'
-import type { Endereco }            from './enderecos.types'
+import { mockEnderecos }             from './enderecos.mock'
+import { getAllDescendantIds }        from './enderecos.types'
+import { useToast, ToastContainer }  from '../../../components/ui/Toast'
+import type { Endereco }             from './enderecos.types'
 
 type View =
   | { type: 'list' }
@@ -15,13 +15,7 @@ type View =
 export default function EnderecosPage() {
   const [view,      setView]      = useState<View>({ type: 'list' })
   const [enderecos, setEnderecos] = useState<Endereco[]>(mockEnderecos)
-  const [toast,     setToast]     = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!toast) return
-    const id = setTimeout(() => setToast(null), 4000)
-    return () => clearTimeout(id)
-  }, [toast])
+  const { toasts, show, dismiss } = useToast()
 
   const handleSave = useCallback((e: Endereco) => {
     const isNew = e.id === 0
@@ -32,9 +26,12 @@ export default function EnderecosPage() {
       }
       return prev.map(x => x.id === e.id ? e : x)
     })
-    setToast(isNew ? `${e.tipo === 'setor' ? 'Setor' : 'Endereçamento'} criado com sucesso.` : 'Endereçamento atualizado com sucesso.')
+    show(isNew
+      ? `${e.tipo === 'setor' ? 'Setor' : 'Endereçamento'} criado com sucesso.`
+      : 'Endereçamento atualizado com sucesso.',
+    )
     setView({ type: 'list' })
-  }, [])
+  }, [show])
 
   const handleDelete = useCallback((id: number) => {
     setEnderecos(prev => {
@@ -88,20 +85,7 @@ export default function EnderecosPage() {
         onEdit={id => setView({ type: 'edit', id })}
         onDelete={handleDelete}
       />
-      {toast && (
-        <div style={{
-          position: 'fixed', top: 72, right: 24,
-          background: '#14532d', color: 'white',
-          padding: '11px 18px', borderRadius: t.radius.lg,
-          fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          animation: 'toastIn 0.22s ease',
-        }}>
-          {toast}
-        </div>
-      )}
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }

@@ -17,6 +17,7 @@ import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { fmtYMDtoDMY }    from './safras.types'
 import type { Safra }      from './safras.types'
 
@@ -30,37 +31,13 @@ interface SafrasListaProps {
   onDelete: (id: number) => void
 }
 
-// ─── Toast ───────────────────────────────────────────────────────────────────
-
-interface ToastItem {
-  id:      number
-  message: string
-  type:    'ok' | 'inf' | 'error'
-}
-
-function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const show = useCallback((message: string, type: ToastItem['type'] = 'ok') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3400)
-  }, [])
-  return { toasts, show }
-}
-
-const TOAST_BG: Record<ToastItem['type'], string> = {
-  ok:    t.color.success.solid,
-  inf:   t.color.info.solid,
-  error: t.color.error.solid,
-}
-
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 type StatusFilter = 'todas' | 'ativas' | 'inativas'
 
 export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }: SafrasListaProps) {
   const { colors, isGbMode } = useTheme()
-  const { toasts, show } = useToast()
+  const { toasts, show, dismiss } = useToast()
 
   const [search,       setSearch]       = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todas')
@@ -120,7 +97,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     if (!deleteTarget) return
     onDelete(deleteTarget.id)
     setDeleteTarget(null)
-    show(`Safra "${deleteTarget.desc}" excluída.`, 'inf')
+    show(`Safra "${deleteTarget.desc}" excluída.`, 'info')
   }
 
   const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
@@ -380,51 +357,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         </div>
       </Modal>
 
-      {/* ── Toasts ──────────────────────────────────────────────────────── */}
-      <div style={{
-        position:      'fixed',
-        bottom:        t.space[6],
-        right:         t.space[6],
-        display:       'flex',
-        flexDirection: 'column',
-        gap:           t.space[2],
-        zIndex:        t.zIndex.toast,
-        pointerEvents: 'none',
-      }}>
-        {toasts.map(toast => (
-          <div
-            key={toast.id}
-            role="status"
-            aria-live="polite"
-            style={{
-              background:  TOAST_BG[toast.type],
-              color:       t.color.neutral[0],
-              padding:     `${t.space[2] + 3}px ${t.space[4] + 2}px`,
-              borderRadius: t.radius.lg,
-              fontSize:    t.font.size.base,
-              fontWeight:  t.font.weight.medium,
-              fontFamily:  t.font.family.sans,
-              boxShadow:   t.shadow.lg,
-              animation:   'toastIn 0.22s ease',
-            }}
-          >
-            {toast.message}
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        @keyframes toastIn {
-          from { opacity: 0; transform: translateX(16px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          @keyframes toastIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-          }
-        }
-      `}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

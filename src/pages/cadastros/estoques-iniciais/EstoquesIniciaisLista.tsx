@@ -14,6 +14,7 @@ import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import type { EstoqueInicial } from './estoques-iniciais.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -23,52 +24,6 @@ interface Props {
   onNew:    () => void
   onEdit:   (id: number) => void
   onDelete: (id: number) => void
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-interface Toast { id: number; message: string; type: 'success' | 'error' }
-
-function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const show = (message: string, type: Toast['type'] = 'success') => {
-    const id = Date.now()
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500)
-  }
-  return { toasts, show }
-}
-
-// ─── ToastList ────────────────────────────────────────────────────────────────
-
-function ToastList({ toasts }: { toasts: Toast[] }) {
-  return (
-    <div style={{ position: 'fixed', top: 72, right: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: t.zIndex.toast, pointerEvents: 'none' }}>
-      {toasts.map(toast => (
-        <div
-          key={toast.id}
-          style={{
-            background: toast.type === 'success' ? '#14532d' : '#dc2626',
-            color: 'white',
-            padding: '11px 18px',
-            borderRadius: t.radius.lg,
-            fontSize: t.font.size.base,
-            fontWeight: t.font.weight.medium,
-            fontFamily: t.font.family.sans,
-            boxShadow: t.shadow.lg,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            pointerEvents: 'auto',
-            animation: 'toastIn 0.22s ease',
-          }}
-        >
-          {toast.message}
-        </div>
-      ))}
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
-    </div>
-  )
 }
 
 // ─── Modal (delete confirmation) ──────────────────────────────────────────────
@@ -147,7 +102,7 @@ const PAGE_SIZE = 10
 
 export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDelete }: Props) {
   const { colors } = useTheme()
-  const { toasts, show } = useToast()
+  const { toasts, show, dismiss } = useToast()
 
   const [search,        setSearch]        = useState('')
   const [filterArmazem, setFilterArmazem] = useState('')
@@ -381,7 +336,7 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
         </Modal>
       )}
 
-      <ToastList toasts={toasts} />
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
       {/* Filter Drawer */}
       <FilterDrawer

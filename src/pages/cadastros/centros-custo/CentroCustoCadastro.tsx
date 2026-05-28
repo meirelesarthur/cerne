@@ -6,6 +6,7 @@ import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
   gerarCodigo, classeOf, CLASSE_LABEL, antecessorLabel,
   CONDICAO_OPTS, TIPO_OPTS, ATIVO_OPTS, CATEGORIAS_TREE,
@@ -64,7 +65,7 @@ export default function CentroCustoCadastro({
   )
 
   const [errors, setErrors]   = useState<Record<string, string>>({})
-  const [toast,  setToast]    = useState({ visible: false, msg: '' })
+  const { toasts, show, dismiss } = useToast()
 
   const set = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -108,7 +109,7 @@ export default function CentroCustoCadastro({
       antecessorId: form.antecessorId,
       categorias:   form.categorias,
     }
-    setToast({ visible: true, msg: isEdit ? 'Centro atualizado com sucesso!' : 'Centro cadastrado com sucesso!' })
+    show(isEdit ? 'Centro atualizado com sucesso!' : 'Centro cadastrado com sucesso!')
     setTimeout(() => onSave(cc), 800)
   }
 
@@ -262,22 +263,7 @@ export default function CentroCustoCadastro({
         </Button>
       </div>
 
-      {/* Toast */}
-      {toast.visible && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24,
-          background: '#14532d', color: 'white',
-          padding: '11px 20px', borderRadius: t.radius.lg,
-          fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          animation: 'toastIn 0.22s ease',
-        }}>
-          {toast.msg}
-        </div>
-      )}
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
-
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
   )
 }

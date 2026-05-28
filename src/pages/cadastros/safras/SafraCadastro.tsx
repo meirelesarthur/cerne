@@ -8,6 +8,7 @@ import { Stepper }       from '../../../components/ui/Stepper'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { WeekCanvas }    from './WeekCanvas'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
   generateWeeks, fmtYMDtoDMY, MES_OPTS,
   type Safra, type Week, type Mes,
@@ -59,24 +60,11 @@ interface SafraCadastroProps {
   onSave: (safra: Safra) => void
 }
 
-// ─── Toast interno ────────────────────────────────────────────────────────────
-
-function useToast() {
-  const [visible, setVisible] = useState(false)
-  const [msg, setMsg] = useState('')
-  const show = (message: string) => {
-    setMsg(message)
-    setVisible(true)
-    setTimeout(() => setVisible(false), 3400)
-  }
-  return { visible, msg, show }
-}
-
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function SafraCadastro({ initialData, onBack, onSave }: SafraCadastroProps) {
   const { colors } = useTheme()
-  const toast = useToast()
+  const { toasts, show, dismiss } = useToast()
 
   const isEdit = !!initialData
 
@@ -155,7 +143,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
       s2:    form.s2,
       weeks,
     }
-    toast.show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!')
+    show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!')
     setTimeout(() => onSave(safra), 800)
   }
 
@@ -244,21 +232,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
         )}
       </div>
 
-      {/* ── Toast ─────────────────────────────────────────────────────────── */}
-      {toast.visible && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24,
-          background: '#14532d', color: 'white',
-          padding: '11px 20px', borderRadius: t.radius.lg,
-          fontSize: t.font.size.base, fontWeight: t.font.weight.medium,
-          fontFamily: t.font.family.sans, boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          animation: 'toastIn 0.22s ease',
-        }}>
-          {toast.msg}
-        </div>
-      )}
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(16px) } to { opacity:1; transform:translateX(0) } }`}</style>
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
   )
 }

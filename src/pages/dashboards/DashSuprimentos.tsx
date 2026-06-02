@@ -13,6 +13,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -181,7 +182,7 @@ export default function DashSuprimentos() {
     return () => clearTimeout(timer)
   }, [])
 
-  const sectionBorder = `1px solid ${colors.border}`
+  const bc = colors.border as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
@@ -189,7 +190,7 @@ export default function DashSuprimentos() {
     flexDirection: 'column',
     background: colors.surfaceBg,
     borderRadius: t.radius['2xl'],
-    border: `1px solid ${colors.border}`,
+    border: `1px solid ${bc}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -206,10 +207,10 @@ export default function DashSuprimentos() {
   }
 
   const kpis = [
-    { icon: ClipboardList, label: 'Solicitações',     value: '284', trend: '8,3% vs mês ant.', up: true  },
-    { icon: FileText,      label: 'Cotações Abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
-    { icon: ShoppingCart,  label: 'Pedidos de Compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
-    { icon: PackageCheck,  label: 'Recebimentos',     value: '38',  trend: '1,2% vs mês ant.', up: false },
+    { label: 'Solicitações',     value: '284', trend: '8,3% vs mês ant.', up: true  },
+    { label: 'Cotações Abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
+    { label: 'Pedidos de Compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
+    { label: 'Recebimentos',     value: '38',  trend: '1,2% vs mês ant.', up: false },
   ]
 
   return (
@@ -219,7 +220,6 @@ export default function DashSuprimentos() {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: `${t.space[4]}px ${t.space[5]}px`,
-        borderBottom: sectionBorder,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <BarChart2 size={13} color={colors.textMuted as string} />
@@ -229,7 +229,7 @@ export default function DashSuprimentos() {
         </div>
         <button style={{
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: sectionBorder, borderRadius: t.radius.DEFAULT,
+          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
           padding: `5px ${t.space[3]}px`, background: 'transparent',
           cursor: 'pointer', fontSize: t.font.size.xs,
           color: colors.textSecondary as string, fontFamily: t.font.family.sans,
@@ -238,37 +238,31 @@ export default function DashSuprimentos() {
         </button>
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── KPI row com sparklines ──────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', borderBottom: sectionBorder }}>
-        {kpis.map((kpi, i) => (
-          <div key={kpi.label} style={{
-            flex: 1,
-            padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px`,
-            borderRight: i < kpis.length - 1 ? sectionBorder : undefined,
-          }}>
+      <div style={{ display: 'flex' }}>
+        {kpis.flatMap((kpi, i) => [
+          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2],
-            }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             <Trend value={kpi.trend} up={kpi.up} />
             <div style={{ marginTop: t.space[3], height: 40 }}>
-              <SparklineArea
-                data={kpiSparklines[kpi.label]}
-                color={kpi.up ? t.color.brand[600] : t.color.error.solid}
-                height={40}
-              />
+              <SparklineArea data={kpiSparklines[kpi.label]} color={kpi.up ? t.color.brand[600] : t.color.error.solid} height={40} />
             </div>
-          </div>
-        ))}
+          </div>,
+        ])}
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── Sankey Funnel ──────────────────────────────────────────────────────── */}
-      <div style={{ padding: `${t.space[5]}px`, borderBottom: sectionBorder }}>
+      <div style={{ padding: `${t.space[5]}px` }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
           <div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1 }}>
@@ -287,12 +281,7 @@ export default function DashSuprimentos() {
           </div>
         </div>
 
-        <SankeyFunnel
-          stages={funnelStages}
-          colors={colors}
-          isGbMode={isGbMode}
-          chartHeight={160}
-        />
+        <SankeyFunnel stages={funnelStages} colors={colors} isGbMode={isGbMode} chartHeight={160} />
 
         {/* Meta table */}
         <div style={{
@@ -300,7 +289,6 @@ export default function DashSuprimentos() {
           gridTemplateColumns: `repeat(${funnelStages.length}, 1fr)`,
           gap: t.space[2],
           marginTop: t.space[4],
-          borderTop: sectionBorder,
           paddingTop: t.space[3],
         }}>
           {funnelStages.map((stage, i) => (
@@ -320,10 +308,12 @@ export default function DashSuprimentos() {
         </div>
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── Bottom row: HBar (1/2) + Fornecedores (1/2) ──────────────────────── */}
       <div style={{ display: 'flex' }}>
 
-        <div style={{ flex: 1, padding: `${t.space[5]}px`, borderRight: sectionBorder }}>
+        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
             <BarChart2 size={12} color={colors.textMuted as string} />
             <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
@@ -332,6 +322,8 @@ export default function DashSuprimentos() {
           </div>
           <HBarChart colors={colors} isGbMode={isGbMode} />
         </div>
+
+        <VDivider color={bc} />
 
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>

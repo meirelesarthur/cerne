@@ -12,6 +12,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -362,7 +363,7 @@ export default function DashFinanceiro() {
     return () => clearTimeout(timer)
   }, [])
 
-  const sectionBorder = `1px solid ${colors.border}`
+  const bc = colors.border as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
@@ -370,7 +371,7 @@ export default function DashFinanceiro() {
     flexDirection: 'column',
     background: colors.surfaceBg,
     borderRadius: t.radius['2xl'],
-    border: `1px solid ${colors.border}`,
+    border: `1px solid ${bc}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -387,10 +388,10 @@ export default function DashFinanceiro() {
   }
 
   const kpis = [
-    { icon: TrendingUp,   label: 'Receitas do Mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true },
-    { icon: TrendingDown, label: 'Despesas do Mês',   value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
-    { icon: DollarSign,   label: 'Saldo Disponível',  value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true },
-    { icon: AlertCircle,  label: 'Inadimplência',     value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
+    { label: 'Receitas do Mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true  },
+    { label: 'Despesas do Mês',  value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
+    { label: 'Saldo Disponível', value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true  },
+    { label: 'Inadimplência',    value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
   ]
 
   return (
@@ -400,7 +401,6 @@ export default function DashFinanceiro() {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: `${t.space[4]}px ${t.space[5]}px`,
-        borderBottom: sectionBorder,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <BarChart2 size={13} color={colors.textMuted as string} />
@@ -410,7 +410,7 @@ export default function DashFinanceiro() {
         </div>
         <button style={{
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: sectionBorder, borderRadius: t.radius.DEFAULT,
+          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
           padding: `5px ${t.space[3]}px`, background: 'transparent',
           cursor: 'pointer', fontSize: t.font.size.xs,
           color: colors.textSecondary as string, fontFamily: t.font.family.sans,
@@ -419,33 +419,31 @@ export default function DashFinanceiro() {
         </button>
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── KPI row ────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', borderBottom: sectionBorder }}>
-        {kpis.map((kpi, i) => (
-          <div key={kpi.label} style={{
-            flex: 1,
-            padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px`,
-            borderRight: i < kpis.length - 1 ? sectionBorder : undefined,
-          }}>
+      <div style={{ display: 'flex' }}>
+        {kpis.flatMap((kpi, i) => [
+          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2],
-            }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             <Trend value={kpi.trend} up={kpi.up} />
-          </div>
-        ))}
+          </div>,
+        ])}
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── Chart row: Area (2/3) + Donut (1/3) ──────────────────────────────── */}
-      <div style={{ display: 'flex', borderBottom: sectionBorder }}>
+      <div style={{ display: 'flex' }}>
 
         {/* Area chart */}
-        <div style={{ flex: 2, padding: `${t.space[5]}px`, borderRight: sectionBorder }}>
+        <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[3] }}>
             <div>
               <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1 }}>
@@ -467,14 +465,17 @@ export default function DashFinanceiro() {
           <AreaChartRD colors={colors} isGbMode={isGbMode} />
         </div>
 
+        <VDivider color={bc} />
+
         {/* Donut + Gauge stacked */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: `${t.space[5]}px`, borderBottom: sectionBorder }}>
+          <div style={{ padding: `${t.space[5]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[3] }}>
               Despesas por Categoria
             </div>
             <DonutChart colors={colors} />
           </div>
+          <HDivider color={bc} />
           <div style={{ padding: `${t.space[5]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[2] }}>
               Orçamento Anual
@@ -484,11 +485,13 @@ export default function DashFinanceiro() {
         </div>
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── Bottom row: Heatmap (1/2) + Vencimentos (1/2) ────────────────────── */}
       <div style={{ display: 'flex' }}>
 
         {/* Heatmap */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px`, borderRight: sectionBorder }}>
+        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
             <BarChart2 size={12} color={colors.textMuted as string} />
             <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
@@ -503,6 +506,8 @@ export default function DashFinanceiro() {
             isGbMode={isGbMode}
           />
         </div>
+
+        <VDivider color={bc} />
 
         {/* Vencimentos */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>

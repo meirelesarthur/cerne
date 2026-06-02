@@ -9,6 +9,7 @@ import {
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -306,14 +307,14 @@ export default function OverviewPanel() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
-  const sectionBorder = `1px solid ${colors.border}`
+  const bc = colors.border as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
     background: colors.surfaceBg,
     borderRadius: t.radius['2xl'],
-    border: `1px solid ${colors.border}`,
+    border: `1px solid ${bc}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -325,7 +326,7 @@ export default function OverviewPanel() {
     <div style={cardStyle}>
 
       {/* ── Map strip ────────────────────────────────────────────────────────── */}
-      <div style={{ height: 260, position: 'relative', borderBottom: sectionBorder, overflow: 'hidden' }}>
+      <div style={{ height: 260, position: 'relative', overflow: 'hidden' }}>
         <div style={{
           position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
           display: 'flex', alignItems: 'center', gap: t.space[1],
@@ -348,26 +349,26 @@ export default function OverviewPanel() {
         <TalhoesMap />
       </div>
 
+      <HDivider color={bc} />
+
       {/* ── Content grid ──────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
 
         {/* ── Main column ────────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, minWidth: 0, borderRight: sectionBorder, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
 
           {/* Greeting + filter bar */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px`,
-            borderBottom: sectionBorder,
           }}>
             <span style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary }}>
               {greeting}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              {/* Period picker */}
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -375,7 +376,7 @@ export default function OverviewPanel() {
               </button>
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -383,7 +384,7 @@ export default function OverviewPanel() {
               </button>
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -395,21 +396,26 @@ export default function OverviewPanel() {
             </div>
           </div>
 
+          <HDivider color={bc} />
+
           {/* KPI top row */}
-          <div style={{ display: 'flex', borderBottom: sectionBorder }}>
+          <div style={{ display: 'flex' }}>
             {[
-              { label: 'Margem bruta',         value: '12,5%',          trend: '2,7% vs 30 dias',   up: true  },
-              { label: 'Receitas realizadas',   value: 'R$ 18,9M',       trend: '4,1% vs 30 dias',   up: true  },
-              { label: 'Saldo operacional',     value: 'R$ 14,5M',       trend: '1,3% vs 30 dias',   up: false },
-            ].map((kpi, i, arr) => (
-              <div key={kpi.label} style={{ flex: 1, borderRight: i < arr.length - 1 ? sectionBorder : undefined }}>
+              { label: 'Margem bruta',         value: '12,5%',    trend: '2,7% vs 30 dias', up: true  },
+              { label: 'Receitas realizadas',   value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true  },
+              { label: 'Saldo operacional',     value: 'R$ 14,5M', trend: '1,3% vs 30 dias', up: false },
+            ].flatMap((kpi, i) => [
+              i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+              <div key={kpi.label} style={{ flex: 1 }}>
                 <KpiTop label={kpi.label} value={kpi.value} trend={kpi.trend} up={kpi.up} colors={colors} />
-              </div>
-            ))}
+              </div>,
+            ])}
           </div>
 
+          <HDivider color={bc} />
+
           {/* Area chart — Receitas mensais */}
-          <div style={{ padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px`, borderBottom: sectionBorder }}>
+          <div style={{ padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
             {/* MRR header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
               <div>
@@ -437,17 +443,19 @@ export default function OverviewPanel() {
             <AreaChart colors={colors} isGbMode={isGbMode} />
           </div>
 
+          <HDivider color={bc} />
+
           {/* Bottom row: Insight + Budget */}
           <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
 
             {/* AI Insight */}
-            <div style={{ flex: 1, borderRight: sectionBorder, padding: t.space[5] }}>
+            <div style={{ flex: 1, padding: t.space[5] }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                   <BarChart2 size={13} color={colors.textMuted as string} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Insights</span>
                 </div>
-                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: sectionBorder, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
                   <MessageCircle size={11} /> Perguntar
                 </button>
               </div>
@@ -457,6 +465,8 @@ export default function OverviewPanel() {
                 em relação ao burn dos últimos 30 dias.
               </p>
             </div>
+
+            <VDivider color={bc} />
 
             {/* Budget / COE usage */}
             <div style={{ flex: 1, padding: t.space[5] }}>
@@ -481,7 +491,7 @@ export default function OverviewPanel() {
 
           </div>
 
-          <Div colors={colors} />
+          <HDivider color={bc} />
 
           {/* Bottom metric */}
           <div style={{ padding: `${t.space[4]}px ${t.space[5]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -503,11 +513,13 @@ export default function OverviewPanel() {
 
         </div>
 
+        <VDivider color={bc} />
+
         {/* ── Right aside ────────────────────────────────────────────────────── */}
         <div style={{ width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
 
           {/* Radial gauge */}
-          <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, borderBottom: sectionBorder, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <RadialGauge
               value="R$ 19,0M"
               label="Receitas Total"
@@ -518,7 +530,7 @@ export default function OverviewPanel() {
             />
             <button style={{
               width: '100%', marginTop: t.space[3],
-              border: sectionBorder, borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
               padding: `8px 0`, background: 'transparent',
               cursor: 'pointer', fontSize: t.font.size.xs,
               color: colors.textSecondary, fontFamily: t.font.family.sans,
@@ -528,8 +540,10 @@ export default function OverviewPanel() {
             </button>
           </div>
 
+          <HDivider color={bc} />
+
           {/* Realizado progress */}
-          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, borderBottom: sectionBorder }}>
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
               <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Receitas realizadas</span>
               <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>78%</span>
@@ -561,8 +575,10 @@ export default function OverviewPanel() {
             </div>
           </div>
 
+          <HDivider color={bc} />
+
           {/* Cost summary card */}
-          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, borderBottom: sectionBorder, flex: 1 }}>
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
               <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
                 <TrendingUp size={11} color={t.color.brand[600]} style={{ marginRight: 4 }} />
@@ -587,7 +603,7 @@ export default function OverviewPanel() {
             ))}
             <button style={{
               width: '100%', marginTop: t.space[1],
-              border: sectionBorder, borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
               padding: `8px 0`, background: 'transparent',
               cursor: 'pointer', fontSize: t.font.size.xs,
               color: colors.textSecondary, fontFamily: t.font.family.sans,

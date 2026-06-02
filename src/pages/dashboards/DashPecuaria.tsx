@@ -422,16 +422,14 @@ export default function DashPecuaria() {
 
       {/* KPI row */}
       <div style={{ display: 'flex' }}>
-        {PEC_KPIS.map((kpi, i) => (
-          <>
-            {i > 0 && <VDivider key={`d${i}`} color={bc} />}
-            <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
-            </div>
-          </>
-        ))}
+        {PEC_KPIS.flatMap((kpi, i) => [
+          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+            <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+          </div>,
+        ])}
       </div>
       <HDivider color={bc} />
 

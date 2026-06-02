@@ -308,12 +308,21 @@ export default function OverviewPanel() {
 
   const sectionBorder = `1px solid ${colors.border}`
 
+  const cardStyle: React.CSSProperties = {
+    margin: `${t.space[5]}px ${t.space[6]}px`,
+    display: 'flex', flexDirection: 'column',
+    background: colors.surfaceBg,
+    borderRadius: t.radius['2xl'],
+    border: `1px solid ${colors.border}`,
+    boxShadow: isGbMode
+      ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+      : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    fontFamily: t.font.family.sans,
+  }
+
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column',
-      minHeight: '100%', fontFamily: t.font.family.sans,
-      background: colors.pageBg,
-    }}>
+    <div style={cardStyle}>
 
       {/* ── Map strip ────────────────────────────────────────────────────────── */}
       <div style={{ height: 200, position: 'relative', borderBottom: sectionBorder, overflow: 'hidden' }}>

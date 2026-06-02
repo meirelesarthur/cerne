@@ -325,7 +325,7 @@ export default function OverviewPanel() {
     <div style={cardStyle}>
 
       {/* ── Map strip ────────────────────────────────────────────────────────── */}
-      <div style={{ height: 200, position: 'relative', borderBottom: sectionBorder, overflow: 'hidden' }}>
+      <div style={{ height: 260, position: 'relative', borderBottom: sectionBorder, overflow: 'hidden' }}>
         <div style={{
           position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
           display: 'flex', alignItems: 'center', gap: t.space[1],

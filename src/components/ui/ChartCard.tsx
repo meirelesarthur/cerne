@@ -1,0 +1,110 @@
+import { useState } from 'react'
+import { ArrowUpRight } from 'lucide-react'
+import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
+
+// ─── ChartCard ─────────────────────────────────────────────────────────────────
+// Wrapper com tab-chip header (ícone + título), expand icon e hover shadow lift.
+// Inspirado no estilo efferd.com/blocks/dashboard.
+
+interface ChartCardProps {
+  icon: React.ElementType
+  title: string
+  action?: React.ReactNode
+  children: React.ReactNode
+  /** Adiciona padding vertical extra (útil para seções densas). */
+  compact?: boolean
+}
+
+export function ChartCard({ icon: Icon, title, action, children, compact }: ChartCardProps) {
+  const { colors, isGbMode } = useTheme()
+  const [hov, setHov] = useState(false)
+  const [btnHov, setBtnHov] = useState(false)
+
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: isGbMode ? 'rgba(14,42,29,0.55)' : colors.surfaceBg,
+        backdropFilter: isGbMode ? 'blur(20px)' : undefined,
+        WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
+        borderRadius: t.radius['2xl'],
+        border: `1px solid ${colors.border}`,
+        boxShadow: hov
+          ? (isGbMode
+              ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)'
+              : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
+          : (isGbMode
+              ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+              : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
+        transition: 'box-shadow 0.22s ease',
+        padding: compact ? `${t.space[3]}px ${t.space[4]}px` : t.space[4],
+        boxSizing: 'border-box' as const,
+      }}
+    >
+      {/* Tab-chip header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: compact ? t.space[3] : t.space[4],
+        }}
+      >
+        {/* Left: icon + title chip */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: t.space[2],
+            background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100],
+            borderRadius: t.radius.DEFAULT,
+            padding: `${t.space[1]}px ${t.space[2] + 2}px`,
+          }}
+        >
+          <Icon size={12} color={colors.textMuted as string} />
+          <span
+            style={{
+              fontSize: t.font.size.xs,
+              fontWeight: t.font.weight.medium,
+              color: colors.textSecondary,
+              fontFamily: t.font.family.sans,
+              letterSpacing: '0.01em',
+            }}
+          >
+            {title}
+          </span>
+        </div>
+
+        {/* Right: action slot + expand icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+          {action}
+          <div
+            onMouseEnter={() => setBtnHov(true)}
+            onMouseLeave={() => setBtnHov(false)}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              background: btnHov
+                ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100])
+                : 'transparent',
+              transition: 'background 0.15s ease',
+              opacity: hov ? 1 : 0.5,
+            }}
+          >
+            <ArrowUpRight size={13} color={colors.textMuted as string} />
+          </div>
+        </div>
+      </div>
+
+      {children}
+    </div>
+  )
+}

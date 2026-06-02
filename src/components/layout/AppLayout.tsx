@@ -12,8 +12,15 @@ import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
 import ArmazensPage      from '../../pages/cadastros/armazens/ArmazensPage'
 import ProdutosPage      from '../../pages/cadastros/produtos/ProdutosPage'
 import EstoquesIniciaisPage from '../../pages/cadastros/estoques-iniciais/EstoquesIniciaisPage'
-import Pluviometria from '../../pages/dashboards/Pluviometria'
-import OverviewPanel from '../../pages/dashboards/OverviewPanel'
+import Pluviometria      from '../../pages/dashboards/Pluviometria'
+import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
+import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
+import DashSuprimentos   from '../../pages/dashboards/DashSuprimentos'
+import DashPecuaria      from '../../pages/dashboards/DashPecuaria'
+import DashDepreciacoes  from '../../pages/dashboards/DashDepreciacoes'
+import DashAtivos        from '../../pages/dashboards/DashAtivos'
+import DashUsuarios      from '../../pages/dashboards/DashUsuarios'
+import DashLivroCaixa   from '../../pages/dashboards/DashLivroCaixa'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
 import { NavigationContext } from '../../context/NavigationContext'
@@ -81,6 +88,13 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-est-sal-ini')  return <EstoquesIniciaisPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
+  if (itemId === 'dash-fin')  return <DashFinanceiro />
+  if (itemId === 'dash-sup')  return <DashSuprimentos />
+  if (itemId === 'dash-pec')  return <DashPecuaria />
+  if (itemId === 'dash-dep')  return <DashDepreciacoes />
+  if (itemId === 'dash-ati')  return <DashAtivos />
+  if (itemId === 'dash-usr')  return <DashUsuarios />
+  if (itemId === 'dash-lcx')  return <DashLivroCaixa />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 

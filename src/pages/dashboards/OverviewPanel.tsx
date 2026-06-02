@@ -2,17 +2,15 @@ import { useRef, useEffect, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
-  Layers, ArrowRight, ChevronDown,
-  TrendingUp, DollarSign, TrendingDown,
-  BarChart2, PieChart, BarChart3, ArrowUpRight,
-  Wheat, Package, Activity,
+  Layers, ArrowRight, ChevronDown, TrendingUp, TrendingDown,
+  DollarSign, Wheat, BarChart2, MessageCircle, Settings2,
+  MoreHorizontal,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import type { ThemeColors } from '../../context/ThemeContext'
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── Talhões ──────────────────────────────────────────────────────────────────
 
 interface Talhao {
   id: string; name: string; area: string; crop: string
@@ -30,207 +28,26 @@ const TALHAOES: Talhao[] = [
   { id: 'T7', name: 'Talhão Água Limpa', area: '410 ha', crop: 'Soja', yieldForecast: '58 sc/ha', status: 'Enchimento de grãos', moisture: '76%', ndvi: '0.78', coords: [[-18.799,-52.630],[-18.799,-52.610],[-18.814,-52.610],[-18.814,-52.630]], color: '#059669', fillColor: '#059669', fillOpacity: 0.30 },
 ]
 
-// ─── Bar chart data ────────────────────────────────────────────────────────────
+// ─── Chart data ───────────────────────────────────────────────────────────────
 
-interface BarMonthData { month: string; receitas: number; despesas: number }
-
-const REALIZADO_DATA: BarMonthData[] = [
-  { month: 'Ago/24', receitas: 320000,  despesas: 280000 },
-  { month: 'Set/24', receitas: 3800000, despesas: 3600000 },
-  { month: 'Out/24', receitas: 180000,  despesas: 120000 },
-  { month: 'Nov/24', receitas: 240000,  despesas: 160000 },
-  { month: 'Dez/24', receitas: 160000,  despesas: 80000 },
-  { month: 'Jan/25', receitas: 320000,  despesas: 200000 },
-  { month: 'Fev/25', receitas: 260000,  despesas: 220000 },
-  { month: 'Mar/25', receitas: 180000,  despesas: 100000 },
+const AREA_DATA = [
+  { month: 'Ago', receitas: 320,  despesas: 280 },
+  { month: 'Set', receitas: 3800, despesas: 3600 },
+  { month: 'Out', receitas: 600,  despesas: 380 },
+  { month: 'Nov', receitas: 820,  despesas: 540 },
+  { month: 'Dez', receitas: 740,  despesas: 340 },
+  { month: 'Jan', receitas: 960,  despesas: 560 },
+  { month: 'Fev', receitas: 1100, despesas: 720 },
+  { month: 'Mar', receitas: 940,  despesas: 500 },
+  { month: 'Abr', receitas: 1320, despesas: 840 },
+  { month: 'Mai', receitas: 1180, despesas: 660 },
 ]
-
-const PREVISTO_DATA: BarMonthData[] = [
-  { month: 'Ago/24', receitas: 2200000, despesas: 180000 },
-  { month: 'Set/24', receitas: 160000,  despesas: 120000 },
-  { month: 'Out/24', receitas: 140000,  despesas: 100000 },
-  { month: 'Nov/24', receitas: 120000,  despesas: 80000 },
-  { month: 'Dez/24', receitas: 100000,  despesas: 60000 },
-  { month: 'Jan/25', receitas: 80000,   despesas: 40000 },
-  { month: 'Fev/25', receitas: 60000,   despesas: 30000 },
-  { month: 'Mar/25', receitas: 40000,   despesas: 20000 },
-]
-
-// ─── Resultado Operacional data ────────────────────────────────────────────────
-
-interface ResultadoGroup { label: string; realizado: number; previsto: number; atrasado: number }
-
-const RESULTADO_DATA: ResultadoGroup[] = [
-  { label: 'Receitas',  realizado: 18993220.76, previsto: 27860,    atrasado: 22600 },
-  { label: 'Despesas',  realizado:  4395001.10, previsto: 82339.92, atrasado: 20658.27 },
-  { label: 'Saldo',     realizado: 14598219.66, previsto: -54479.92, atrasado: 1941.73 },
-]
-
-// ─── Style helpers ────────────────────────────────────────────────────────────
-
-function card(colors: ThemeColors, isGbMode: boolean, extra?: React.CSSProperties): React.CSSProperties {
-  return {
-    background: colors.surfaceBg,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${colors.border}`,
-    boxShadow: isGbMode
-      ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-      : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
-    ...extra,
-  }
-}
-
-// ─── ChartCard ────────────────────────────────────────────────────────────────
-
-interface ChartCardProps {
-  icon: React.ElementType; title: string; action?: React.ReactNode
-  children: React.ReactNode; colors: ThemeColors; isGbMode: boolean; noPadding?: boolean
-}
-
-function ChartCard({ icon: Icon, title, action, children, colors, isGbMode, noPadding }: ChartCardProps) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        background: colors.surfaceBg,
-        borderRadius: t.radius['2xl'],
-        border: `1px solid ${colors.border}`,
-        boxShadow: hov
-          ? (isGbMode ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
-          : (isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
-        transition: 'box-shadow 0.22s ease',
-        padding: noPadding ? 0 : t.space[4],
-      }}
-    >
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: noPadding ? 0 : t.space[4],
-        padding: noPadding ? `${t.space[3]}px ${t.space[4]}px` : 0,
-        borderBottom: noPadding ? `1px solid ${colors.border}` : undefined,
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: t.space[2],
-          background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100],
-          borderRadius: t.radius.DEFAULT,
-          padding: `${t.space[1]}px ${t.space[2] + 2}px`,
-        }}>
-          <Icon size={12} color={colors.textMuted as string} />
-          <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.textSecondary, fontFamily: t.font.family.sans, letterSpacing: '0.01em' }}>
-            {title}
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          {action}
-          <ExpandBtn colors={colors} isGbMode={isGbMode} hovered={hov} />
-        </div>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function ExpandBtn({ colors, isGbMode, hovered }: { colors: ThemeColors; isGbMode: boolean; hovered: boolean }) {
-  const [btnHov, setBtnHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setBtnHov(true)}
-      onMouseLeave={() => setBtnHov(false)}
-      style={{
-        width: 28, height: 28, borderRadius: t.radius.DEFAULT,
-        border: `1px solid ${colors.border}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer',
-        background: btnHov ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100]) : 'transparent',
-        transition: 'background 0.15s ease',
-        opacity: hovered ? 1 : 0.5,
-      }}
-    >
-      <ArrowUpRight size={13} color={colors.textMuted as string} />
-    </div>
-  )
-}
-
-// ─── KPI Stat Chip ────────────────────────────────────────────────────────────
-
-interface KpiStatChipProps {
-  icon: React.ElementType; label: string; value: string
-  trend?: string; trendUp?: boolean; accentColor: string
-  colors: ThemeColors; isGbMode: boolean
-}
-
-function KpiStatChip({ icon: Icon, label, value, trend, trendUp, accentColor, colors, isGbMode }: KpiStatChipProps) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', flexDirection: 'column', gap: t.space[1],
-        border: `1px solid ${hov ? accentColor + '55' : colors.border}`,
-        borderRadius: t.radius.lg,
-        padding: `${t.space[3]}px ${t.space[4]}px`,
-        background: hov ? (isGbMode ? `${accentColor}0d` : `${accentColor}08`) : colors.surfaceBg,
-        transition: 'border-color 0.18s ease, background 0.18s ease',
-        minWidth: 180, cursor: 'default',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-        <Icon size={13} color={accentColor} />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>{label}</span>
-      </div>
-      <span style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.bold, color: accentColor, fontFamily: t.font.family.sans, lineHeight: 1.1 }}>
-        {value}
-      </span>
-      {trend && (
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', gap: 3,
-          fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-          color: trendUp ? t.color.success.text : t.color.error.text,
-          background: trendUp ? t.color.success.bg : t.color.error.bg,
-          borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`, width: 'fit-content',
-        }}>
-          {trendUp ? '▲' : '▼'} {trend}
-        </span>
-      )}
-    </div>
-  )
-}
-
-// ─── Filter helpers ───────────────────────────────────────────────────────────
-
-function FilterInput({ value, colors }: { value: string; colors: ThemeColors }) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: t.space[1],
-      border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT,
-      padding: `5px ${t.space[2]}px`, background: colors.surfaceBg, cursor: 'default',
-    }}>
-      <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>{value}</span>
-    </div>
-  )
-}
-
-function FilterSelect({ value, colors }: { value: string; colors: ThemeColors }) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: t.space[1],
-      border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT,
-      padding: `5px ${t.space[2]}px`, background: colors.surfaceBg, cursor: 'pointer', minWidth: 100,
-    }}>
-      <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans, flex: 1 }}>{value}</span>
-      <ChevronDown size={11} color={colors.textMuted} />
-    </div>
-  )
-}
 
 // ─── Talhões Map ──────────────────────────────────────────────────────────────
 
 function TalhoesMap() {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
-
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -241,13 +58,11 @@ function TalhoesMap() {
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     })
     const map = L.map(containerRef.current, { zoomControl: false, attributionControl: false }).setView([-18.787,-52.625], 13)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(map)
-    L.control.attribution({ position: 'bottomleft', prefix: '' }).addTo(map)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map)
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     TALHAOES.forEach(talhao => {
       const poly = L.polygon(talhao.coords, { color: talhao.color, fillColor: talhao.fillColor, fillOpacity: talhao.fillOpacity, weight: 2.5 })
-      const statusBg = talhao.color + '22'
-      poly.bindTooltip(`<div class="talh-tip"><div class="talh-tip-title">${talhao.name}</div><div class="talh-tip-row"><span>🌾 ${talhao.crop}</span><span>📐 ${talhao.area}</span></div><div class="talh-tip-row"><span>Prev. colheita:</span><b style="color:${talhao.color}">${talhao.yieldForecast}</b></div><div class="talh-tip-row"><span>Umidade: ${talhao.moisture}</span><span>NDVI: ${talhao.ndvi}</span></div><div class="talh-tip-badge" style="color:${talhao.color};background:${statusBg}">${talhao.status}</div></div>`, { sticky: true, opacity: 1, className: 'talh-tooltip-wrap', offset: [12,0] })
+      poly.bindTooltip(`<div style="font-family:Outfit,sans-serif;font-size:12px;padding:4px 8px"><b>${talhao.name}</b><br/>${talhao.crop} · ${talhao.area}</div>`, { sticky: true, opacity: 1, offset: [10,0] })
       poly.on('mouseover', () => poly.setStyle({ weight: 3.5, fillOpacity: Math.min(talhao.fillOpacity + 0.18, 0.65) }))
       poly.on('mouseout', () => poly.setStyle({ weight: 2.5, fillOpacity: talhao.fillOpacity }))
       poly.addTo(map)
@@ -255,164 +70,140 @@ function TalhoesMap() {
     mapRef.current = map
     return () => { map.remove(); mapRef.current = null }
   }, [])
-
-  return <div ref={containerRef} style={{ height: '100%', width: '100%', borderRadius: t.radius['2xl'] }} />
+  return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
 }
 
-// ─── Donut Chart ──────────────────────────────────────────────────────────────
+// ─── Trend badge ──────────────────────────────────────────────────────────────
 
-interface DonutSegment { label: string; pct: number; color: string }
-
-function DonutChart({ title, segments, colors }: { title: string; segments: DonutSegment[]; colors: ThemeColors }) {
-  const R = 55; const cx = 80; const cy = 75; const sw = 22
-  const circ = 2 * Math.PI * R; const quarterTurn = circ / 4
-  let cumulativePct = 0
-
+function Trend({ value, up }: { value: string; up: boolean }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0 }}>
-      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans, marginBottom: t.space[2], textAlign: 'center', lineHeight: t.font.lineHeight.snug }}>{title}</span>
-      <svg width={160} height={150} viewBox="0 0 160 150">
-        <circle cx={cx} cy={cy} r={R} fill="none" stroke={colors.border} strokeWidth={sw} />
-        {segments.map((seg, i) => {
-          const segLen = (seg.pct / 100) * circ
-          const offset = -(cumulativePct / 100) * circ + quarterTurn
-          cumulativePct += seg.pct
-          return <circle key={i} cx={cx} cy={cy} r={R} fill="none" stroke={seg.color} strokeWidth={sw} strokeDasharray={`${segLen} ${circ - segLen}`} strokeDashoffset={offset} />
-        })}
-      </svg>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1], width: '100%', paddingTop: t.space[1] }}>
-        {segments.map((seg, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-            <div style={{ width: 8, height: 8, borderRadius: t.radius.sm, background: seg.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans, flex: 1 }}>{seg.label}</span>
-            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>{seg.pct}%</span>
-          </div>
-        ))}
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+      fontFamily: t.font.family.sans,
+      color: up ? t.color.success.text : t.color.error.text,
+    }}>
+      <span style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        width: 14, height: 14, borderRadius: t.radius.full,
+        background: up ? t.color.success.bg : t.color.error.bg,
+        fontSize: 9, lineHeight: 1,
+      }}>
+        {up ? '▲' : '▼'}
+      </span>
+      {value}
+    </span>
+  )
+}
+
+// ─── KPI stat (top row, efferd style) ────────────────────────────────────────
+
+function KpiTop({ label, value, trend, up, colors }: { label: string; value: string; trend: string; up: boolean; colors: ThemeColors }) {
+  return (
+    <div style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+      <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[1] }}>
+        {label}
       </div>
+      <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, lineHeight: 1.1, marginBottom: t.space[2] }}>
+        {value}
+      </div>
+      <Trend value={trend} up={up} />
     </div>
   )
 }
 
-// ─── Resultado Operacional Chart ──────────────────────────────────────────────
-// Grouped horizontal bar chart: compares Realizado / Previsto / Atrasado
-// for each of Receitas, Despesas, Saldo.
+// ─── Area chart (smooth SVG) ──────────────────────────────────────────────────
 
-function ResultadoChart({ data, colors, isGbMode }: { data: ResultadoGroup[]; colors: ThemeColors; isGbMode: boolean }) {
-  const [hovered, setHovered] = useState<string | null>(null)
+function smoothPath(pts: [number, number][]): string {
+  if (pts.length < 2) return ''
+  let d = `M ${pts[0][0]} ${pts[0][1]}`
+  for (let i = 1; i < pts.length; i++) {
+    const p = pts[i - 1]; const c = pts[i]
+    const cx = (p[0] + c[0]) / 2
+    d += ` C ${cx} ${p[1]}, ${cx} ${c[1]}, ${c[0]} ${c[1]}`
+  }
+  return d
+}
 
-  const W = 860; const H = 220
-  const PL = 80; const PT = 20; const PR = 20; const PB = 36
+function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
+  const [hov, setHov] = useState<number | null>(null)
+  const W = 700; const H = 200; const PL = 40; const PT = 16; const PR = 8; const PB = 32
   const cW = W - PL - PR; const cH = H - PT - PB
+  const maxV = Math.max(...AREA_DATA.map(d => d.receitas)) * 1.12
+  const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
+    AREA_DATA.map((d, i) => [PL + (i / (AREA_DATA.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
 
-  // Find absolute max for scaling (ignore negatives for now, use abs)
-  const allVals = data.flatMap(d => [Math.abs(d.realizado), Math.abs(d.previsto), Math.abs(d.atrasado)])
-  const maxVal = Math.max(...allVals) * 1.1
+  const recPts = pts('receitas')
+  const dspPts = pts('despesas')
 
-  const seriesColors = {
-    realizado: t.chart.revenue,
-    previsto:  isGbMode ? '#a78bfa' : '#7c3aed',
-    atrasado:  t.chart.expense,
-  }
+  const recPath = smoothPath(recPts)
+  const dspPath = smoothPath(dspPts)
 
-  const groupCount = data.length
-  const groupH = cH / groupCount
-  const barH = 14
-  const barGap = 5
-  const groupPad = (groupH - 3 * barH - 2 * barGap) / 2
+  const areaClose = (path: string, baseY: number) =>
+    `${path} L ${PL + cW} ${baseY} L ${PL} ${baseY} Z`
 
-  const toX = (v: number) => PL + Math.max(0, (Math.abs(v) / maxVal) * cW)
+  const yVals = [0, maxV * 0.25, maxV * 0.5, maxV * 0.75, maxV].map(v => ({
+    v, y: PT + cH - (v / maxV) * cH,
+    label: v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${Math.round(v)}`,
+  }))
 
-  const fmt = (v: number) => {
-    const abs = Math.abs(v)
-    if (abs >= 1000000) return `${v < 0 ? '-' : ''}R$ ${(abs / 1000000).toFixed(2).replace('.', ',')}M`
-    if (abs >= 1000) return `${v < 0 ? '-' : ''}R$ ${(abs / 1000).toFixed(0)}K`
-    return `R$ ${v.toFixed(2).replace('.', ',')}`
-  }
-
-  const xLabels = [0, 0.25, 0.5, 0.75, 1].map(f => ({ val: f * maxVal, x: PL + f * cW }))
+  const recGradId = isGbMode ? 'recGbGrad' : 'recGrad'
+  const dspGradId = isGbMode ? 'dspGbGrad' : 'dspGrad'
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      {/* Legend */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], marginBottom: t.space[3] }}>
-        {([
-          { key: 'realizado', label: 'Realizado', color: seriesColors.realizado },
-          { key: 'previsto',  label: 'Previsto',  color: seriesColors.previsto },
-          { key: 'atrasado',  label: 'Atrasado',  color: seriesColors.atrasado },
-        ] as const).map(s => (
-          <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-            <div style={{ width: 10, height: 10, borderRadius: t.radius.sm, background: s.color }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>{s.label}</span>
-          </div>
-        ))}
-      </div>
+    <div style={{ position: 'relative' }}>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
+        <defs>
+          <linearGradient id={recGradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={t.color.brand[600]} stopOpacity={isGbMode ? 0.35 : 0.18} />
+            <stop offset="100%" stopColor={t.color.brand[600]} stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id={dspGradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={t.color.error.solid} stopOpacity={isGbMode ? 0.25 : 0.10} />
+            <stop offset="100%" stopColor={t.color.error.solid} stopOpacity={0} />
+          </linearGradient>
+        </defs>
 
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
-        {/* X-axis grid */}
-        {xLabels.map((xl, i) => (
+        {/* Y grid */}
+        {yVals.map((yl, i) => (
           <g key={i}>
-            <line x1={xl.x} y1={PT} x2={xl.x} y2={PT + cH}
-              stroke={colors.border}
-              strokeWidth={i === 0 ? 1.5 : 0.5}
-              strokeDasharray={i === 0 ? undefined : '4 3'} />
-            <text x={xl.x} y={PT + cH + 16} textAnchor="middle" fontSize={9}
-              fill={colors.textMuted as string} fontFamily="Outfit, sans-serif">
-              {xl.val === 0 ? '0' : `${(xl.val / 1000000).toFixed(0)}M`}
-            </text>
+            <line x1={PL} y1={yl.y} x2={W - PR} y2={yl.y}
+              stroke={colors.border} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
+            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={9}
+              fill={colors.textMuted as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
           </g>
         ))}
 
-        {/* Groups */}
-        {data.map((group, gi) => {
-          const gy = PT + gi * groupH
-          const series = [
-            { key: 'realizado', val: group.realizado, color: seriesColors.realizado },
-            { key: 'previsto',  val: group.previsto,  color: seriesColors.previsto },
-            { key: 'atrasado',  val: group.atrasado,  color: seriesColors.atrasado },
-          ]
+        {/* Area fills */}
+        <path d={areaClose(recPath, PT + cH)} fill={`url(#${recGradId})`} />
+        <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />
 
+        {/* Lines */}
+        <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={dspPath} fill="none" stroke={t.color.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
+
+        {/* X labels */}
+        {AREA_DATA.map((d, i) => {
+          const x = PL + (i / (AREA_DATA.length - 1)) * cW
+          const isH = hov === i
           return (
-            <g key={gi}>
-              {/* Row label */}
-              <text x={PL - 8} y={gy + groupPad + groupH / 2 - 4} textAnchor="end"
-                fontSize={10} fontWeight={600} fill={colors.textPrimary as string}
-                fontFamily="Outfit, sans-serif">
-                {group.label}
+            <g key={i}>
+              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={9}
+                fill={isH ? (colors.textPrimary as string) : (colors.textMuted as string)}
+                fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
+                {d.month}
               </text>
-
-              {/* Horizontal divider */}
-              {gi > 0 && (
-                <line x1={PL} y1={gy} x2={W - PR} y2={gy}
-                  stroke={colors.border} strokeWidth={0.5} strokeDasharray="4 3" />
+              {/* Hover zone */}
+              <rect x={x - 20} y={PT} width={40} height={cH} fill="transparent"
+                onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ cursor: 'crosshair' }} />
+              {/* Hover dot + line */}
+              {isH && (
+                <g>
+                  <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border} strokeWidth={1} strokeDasharray="3 2" />
+                  <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.surfaceBg} strokeWidth={2} />
+                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.error.solid} stroke={colors.surfaceBg} strokeWidth={2} />
+                </g>
               )}
-
-              {/* Bars */}
-              {series.map((s, si) => {
-                const barY = gy + groupPad + si * (barH + barGap)
-                const barX = toX(s.val)
-                const w = Math.max(2, barX - PL)
-                const hoverKey = `${gi}-${si}`
-                const isH = hovered === hoverKey
-                return (
-                  <g key={si}
-                    onMouseEnter={() => setHovered(hoverKey)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{ cursor: 'default' }}>
-                    {/* Bar */}
-                    <rect x={PL} y={barY} width={w} height={barH} rx={3}
-                      fill={s.color}
-                      opacity={hovered !== null && !isH ? 0.3 : 1}
-                      style={{ transition: 'opacity 0.15s ease' }} />
-                    {/* Value label */}
-                    <text x={PL + w + 6} y={barY + barH - 3} fontSize={9}
-                      fill={isH ? (colors.textPrimary as string) : (colors.textMuted as string)}
-                      fontFamily="Outfit, sans-serif" fontWeight={isH ? 700 : 400}
-                      style={{ transition: 'fill 0.12s ease' }}>
-                      {fmt(s.val)}
-                    </text>
-                  </g>
-                )
-              })}
             </g>
           )
         })}
@@ -421,399 +212,401 @@ function ResultadoChart({ data, colors, isGbMode }: { data: ResultadoGroup[]; co
   )
 }
 
-// ─── Análise de Resultados — stat row layout ──────────────────────────────────
-// Replaces the 7×3 colored tile grid with clean borderLeft-accent stat rows.
+// ─── Radial gauge (dashed circle, efferd style) ───────────────────────────────
 
-interface StatRowItem { label: string; realizado: string; aReceber: string; total: string }
-interface StatGroup {
-  title: string; icon: React.ElementType; accentColor: string
-  items: StatRowItem[]
-}
+function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
+  value: string; label: string; sub: string; pct: number; colors: ThemeColors; isGbMode: boolean
+}) {
+  const cx = 110; const cy = 110; const R = 88
+  const DASHES = 60; const dashLen = 8; const dashGap = 3.5
+  const filled = Math.round(pct * DASHES)
 
-function AnaliseStat({ label, value, colors }: { label: string; value: string; colors: ThemeColors }) {
+  const dashes = Array.from({ length: DASHES }, (_, i) => {
+    const angleDeg = -90 + (360 / DASHES) * i
+    const rad = (angleDeg * Math.PI) / 180
+    const x1 = cx + (R - dashLen / 2) * Math.cos(rad)
+    const y1 = cy + (R - dashLen / 2) * Math.sin(rad)
+    const x2 = cx + (R + dashLen / 2) * Math.cos(rad)
+    const y2 = cy + (R + dashLen / 2) * Math.sin(rad)
+    return { x1, y1, x2, y2, active: i < filled }
+  })
+
+  const activeColor = isGbMode ? t.color.brand[400] : t.color.neutral[800]
+  const inactiveColor = isGbMode ? 'rgba(255,255,255,0.10)' : t.color.neutral[200]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-      <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {label}
-      </span>
-      <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, lineHeight: 1.2 }}>
-        {value}
-      </span>
-    </div>
-  )
-}
-
-function AnaliseStatGroup({ group, colors, isGbMode }: { group: StatGroup; colors: ThemeColors; isGbMode: boolean }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        borderLeft: `3px solid ${hov ? group.accentColor : group.accentColor + '55'}`,
-        borderRadius: `0 ${t.radius.DEFAULT}px ${t.radius.DEFAULT}px 0`,
-        background: hov
-          ? (isGbMode ? `${group.accentColor}0d` : `${group.accentColor}07`)
-          : (isGbMode ? 'rgba(255,255,255,0.02)' : t.color.neutral[50]),
-        padding: `${t.space[3]}px ${t.space[4]}px`,
-        transition: 'border-color 0.18s ease, background 0.18s ease',
-      }}
-    >
-      {/* Group header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[3] }}>
-        <group.icon size={12} color={group.accentColor} />
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: group.accentColor, fontFamily: t.font.family.sans, letterSpacing: '0.03em', textTransform: 'uppercase' as const }}>
-          {group.title}
-        </span>
-      </div>
-
-      {/* Column headers */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: t.space[3], marginBottom: t.space[1] }}>
-        {['Realizado', 'A receber / Estocado', 'Total'].map(h => (
-          <span key={h} style={{ fontSize: 10, color: colors.textMuted, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
-            {h}
-          </span>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <svg width={220} height={220} viewBox="0 0 220 220" style={{ display: 'block' }}>
+        {dashes.map((d, i) => (
+          <line key={i} x1={d.x1} y1={d.y1} x2={d.x2} y2={d.y2}
+            stroke={d.active ? activeColor : inactiveColor}
+            strokeWidth={3.5} strokeLinecap="round" />
         ))}
-      </div>
-
-      {/* Rows */}
-      {group.items.map((item, i) => (
-        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: t.space[3], paddingTop: i > 0 ? t.space[2] : 0, borderTop: i > 0 ? `1px solid ${colors.border}` : undefined, marginTop: i > 0 ? t.space[2] : 0 }}>
-          <AnaliseStat label={item.label} value={item.realizado} colors={colors} />
-          <AnaliseStat label="—" value={item.aReceber} colors={colors} />
-          <AnaliseStat label="—" value={item.total} colors={colors} />
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Grouped Bar Chart (monthly) ──────────────────────────────────────────────
-
-interface BarChartProps { data: BarMonthData[]; maxY: number; title: string; dtInicio: string; dtFim: string; colors: ThemeColors; isGbMode: boolean }
-
-function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode }: BarChartProps) {
-  const [hovered, setHovered] = useState<number | null>(null)
-  const W = 900; const H = 200; const PL = 60; const PT = 16; const PR = 16; const PB = 40
-  const cW = W - PL - PR; const cH = H - PT - PB
-  const barW = 18; const barGap = 4; const groupW = barW * 2 + barGap
-  const groupSpacing = cW / data.length; const groupOffset = groupSpacing / 2
-  const toY = (v: number) => PT + cH - (v / maxY) * cH
-  const yLabels = [
-    { val: maxY,        label: `${Math.round(maxY / 1000000)}M` },
-    { val: maxY * 0.75, label: `${Math.round(maxY * 0.75 / 1000000)}M` },
-    { val: maxY * 0.5,  label: `${Math.round(maxY * 0.5 / 1000000)}M` },
-    { val: maxY * 0.25, label: `${Math.round(maxY * 0.25 / 1000000)}M` },
-    { val: 0,           label: '0' },
-  ]
-  const fmt = (v: number) => v >= 1000000 ? `R$ ${(v/1000000).toFixed(2).replace('.', ',')}M` : v >= 1000 ? `R$ ${(v/1000).toFixed(0)}K` : `R$ ${v}`
-  const filters = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-      <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Início</span>
-      <FilterInput value={dtInicio} colors={colors} />
-      <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Fim</span>
-      <FilterInput value={dtFim} colors={colors} />
-    </div>
-  )
-  return (
-    <ChartCard icon={BarChart2} title={title} action={filters} colors={colors} isGbMode={isGbMode}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], marginBottom: t.space[3] }}>
-        {[{ label: 'Receitas', color: t.chart.revenue }, { label: 'Despesas', color: t.chart.expense }].map(item => (
-          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-            <div style={{ width: 10, height: 10, borderRadius: t.radius.sm, background: item.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>{item.label}</span>
+        {/* Center icon + text */}
+        <foreignObject x={cx - 56} y={cy - 42} width={112} height={84}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontFamily: t.font.family.sans }}>
+            <BarChart2 size={18} color={colors.textMuted as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+            <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.bold, color: colors.textPrimary }}>{value}</span>
+          </div>
+        </foreignObject>
+      </svg>
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: t.space[3], marginTop: -t.space[3] }}>
+        {[
+          { dot: activeColor,   label: 'Receitas' },
+          { dot: inactiveColor === t.color.neutral[200] ? t.color.neutral[400] : inactiveColor, label: sub },
+        ].map(item => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: item.dot, flexShrink: 0, display: 'inline-block' }} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>{item.label}</span>
           </div>
         ))}
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
-          {yLabels.map((yl, i) => {
-            const y = toY(yl.val)
-            return (
-              <g key={i}>
-                <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border} strokeWidth={yl.val === 0 ? 1.5 : 0.5} strokeDasharray={yl.val === 0 ? undefined : '4 3'} />
-                <text x={PL - 6} y={y + 3} textAnchor="end" fontSize={9} fill={colors.textMuted as string} fontFamily="Outfit, sans-serif">{yl.label}</text>
-              </g>
-            )
-          })}
-          {data.map((d, i) => {
-            const gx = PL + i * groupSpacing + groupOffset
-            const rx = gx - groupW / 2; const isH = hovered === i; const dim = hovered !== null && !isH
-            const rH = Math.max(0, (d.receitas / maxY) * cH); const dH = Math.max(0, (d.despesas / maxY) * cH)
-            const rY = PT + cH - rH; const dY = PT + cH - dH
-            const tipX = Math.min(Math.max(rx - 50, PL), W - PR - 150)
-            const tipY = Math.max(PT + 2, Math.min(rY, dY) - 72)
-            return (
-              <g key={i}>
-                <rect x={rx} y={rY} width={barW} height={rH} rx={4} fill={t.chart.revenue} opacity={dim ? 0.3 : 1} style={{ transition: 'opacity 0.18s ease' }} />
-                <rect x={rx + barW + barGap} y={dY} width={barW} height={dH} rx={4} fill={t.chart.expense} opacity={dim ? 0.3 : 1} style={{ transition: 'opacity 0.18s ease' }} />
-                <text x={gx} y={PT + cH + 16} textAnchor="middle" fontSize={9} fill={isH ? (colors.textPrimary as string) : (colors.textMuted as string)} fontFamily="Outfit, sans-serif" fontWeight={isH ? 600 : 400} style={{ transition: 'fill 0.15s ease' }}>{d.month}</text>
-                <rect x={rx - 4} y={PT} width={groupW + 8} height={cH} fill="transparent" onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} style={{ cursor: 'crosshair' }} />
-                {isH && (
-                  <g>
-                    <rect x={tipX} y={tipY} width={150} height={64} rx={8} fill={colors.surfaceBg} stroke={colors.border} strokeWidth={1} />
-                    <text x={tipX + 75} y={tipY + 16} textAnchor="middle" fontSize={10} fill={colors.textPrimary as string} fontFamily="Outfit, sans-serif" fontWeight={700}>{d.month}</text>
-                    <rect x={tipX + 10} y={tipY + 26} width={8} height={8} rx={2} fill={t.chart.revenue} />
-                    <text x={tipX + 24} y={tipY + 34} textAnchor="start" fontSize={9} fill={colors.textSecondary as string} fontFamily="Outfit, sans-serif">Rec: {fmt(d.receitas)}</text>
-                    <rect x={tipX + 10} y={tipY + 44} width={8} height={8} rx={2} fill={t.chart.expense} />
-                    <text x={tipX + 24} y={tipY + 52} textAnchor="start" fontSize={9} fill={colors.textSecondary as string} fontFamily="Outfit, sans-serif">Desp: {fmt(d.despesas)}</text>
-                  </g>
-                )}
-              </g>
-            )
-          })}
-        </svg>
-      </div>
-    </ChartCard>
+    </div>
   )
+}
+
+// ─── Segmented bar (efferd active customers style) ────────────────────────────
+
+function SegmentedBar({ segments, colors }: {
+  segments: { color: string; pct: number; label: string }[]
+  colors: ThemeColors
+}) {
+  return (
+    <div>
+      <div style={{ display: 'flex', height: 10, borderRadius: 2, overflow: 'hidden', gap: 2, marginBottom: t.space[2] }}>
+        {segments.map((s, i) => (
+          <div key={i} style={{ flex: s.pct, background: s.color, borderRadius: 2 }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: t.space[3] }}>
+        {segments.map((s, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, flexShrink: 0, display: 'inline-block' }} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────────
+
+function Div({ colors }: { colors: ThemeColors }) {
+  return <div style={{ height: 1, background: colors.border }} />
 }
 
 // ─── Overview Panel ───────────────────────────────────────────────────────────
 
 export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
-  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
-  const coeSegments: DonutSegment[] = [
-    { label: 'Alimentação', pct: 45, color: '#92400e' },
-    { label: 'Sanidade',    pct: 20, color: '#b45309' },
-    { label: 'Mão de obra', pct: 18, color: '#a16207' },
-    { label: 'Outros',      pct: 17, color: '#d97706' },
-  ]
-
-  const cotSegments: DonutSegment[] = [
-    { label: 'Alimentação', pct: 38, color: '#c2410c' },
-    { label: 'Sanidade',    pct: 22, color: '#ea580c' },
-    { label: 'Depreciação', pct: 20, color: '#f97316' },
-    { label: 'Outros',      pct: 20, color: '#fb923c' },
-  ]
-
-  const analiseGroups: StatGroup[] = [
-    {
-      title: 'Receitas',
-      icon: DollarSign,
-      accentColor: t.chart.revenue,
-      items: [
-        { label: 'Receitas (R$)', realizado: 'R$ 2.708.458,09', aReceber: 'R$ 0,00', total: 'R$ 2.708.458,09' },
-      ],
-    },
-    {
-      title: 'Produção',
-      icon: Wheat,
-      accentColor: t.color.brand[600],
-      items: [
-        { label: 'Produção Vendida', realizado: '17.079 ton', aReceber: '2.569 ton', total: '19.648 ton' },
-        { label: 'Produção Falcada', realizado: '17.079 ton', aReceber: '2.569 ton', total: '19.648 ton' },
-      ],
-    },
-    {
-      title: 'Custo',
-      icon: TrendingDown,
-      accentColor: t.chart.expense,
-      items: [
-        { label: 'Custo (R$)',           realizado: 'R$ 0,00', aReceber: 'R$ 0,00', total: 'R$ 0,00' },
-        { label: 'Custo Médio (R$/ton)', realizado: 'R$ 0,00', aReceber: 'R$ 0,00', total: 'R$ 0,00' },
-      ],
-    },
-    {
-      title: 'Margem',
-      icon: TrendingUp,
-      accentColor: t.color.brand[700],
-      items: [
-        { label: 'Margem Bruta (R$)',     realizado: 'R$ 2.708.458,09', aReceber: 'R$ 137,85', total: 'R$ 137,85' },
-        { label: 'Margem Bruta (R$/ha)',  realizado: 'R$ 2.985,98',     aReceber: '—',          total: '—' },
-      ],
-    },
-    {
-      title: 'Produtividade & Preço',
-      icon: Package,
-      accentColor: isGbMode ? t.color.neutral[400] : t.color.neutral[600],
-      items: [
-        { label: 'Produtividade (ton/ha)', realizado: '21,73', aReceber: '21,73', total: '—' },
-        { label: 'Preço Médio (R$/ton)',   realizado: 'R$ 137,85', aReceber: 'R$ 137,85', total: '—' },
-      ],
-    },
-  ]
+  const sectionBorder = `1px solid ${colors.border}`
 
   return (
     <div style={{
-      padding: `${t.space[5]}px ${t.space[6]}px`,
-      display: 'flex', flexDirection: 'column', gap: t.space[4],
-      minHeight: '100%', boxSizing: 'border-box', fontFamily: t.font.family.sans,
+      display: 'flex', flexDirection: 'column',
+      minHeight: '100%', fontFamily: t.font.family.sans,
+      background: colors.pageBg,
     }}>
 
-      {/* ── Section 1 — Talhões Map ─────────────────────────────────────────── */}
-      <div style={{ ...card(colors, isGbMode), overflow: 'hidden', minHeight: 300, position: 'relative' }}>
+      {/* ── Map strip ────────────────────────────────────────────────────────── */}
+      <div style={{ height: 200, position: 'relative', borderBottom: sectionBorder, overflow: 'hidden' }}>
         <div style={{
-          position: 'absolute', top: t.space[3], left: t.space[3], zIndex: 1000,
+          position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          background: 'rgba(255,255,255,0.94)', borderRadius: t.radius.DEFAULT,
-          padding: `5px ${t.space[2]}px`, boxShadow: t.shadow.md, cursor: 'pointer', backdropFilter: 'blur(4px)',
+          background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.DEFAULT,
+          padding: `5px ${t.space[2]}px`, backdropFilter: 'blur(4px)',
+          boxShadow: t.shadow.sm, cursor: 'pointer',
         }}>
-          <Layers size={11} color={t.color.neutral[600]} />
-          <span style={{ fontSize: t.font.size.xs, fontFamily: t.font.family.sans, color: t.color.neutral[700], fontWeight: t.font.weight.medium }}>Talhões</span>
+          <Layers size={11} color={t.color.neutral[500]} />
+          <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[700], fontWeight: t.font.weight.medium }}>Talhões</span>
           <ChevronDown size={11} color={t.color.neutral[400]} />
         </div>
         <div style={{
-          position: 'absolute', top: t.space[3], right: t.space[3], zIndex: 1000,
+          position: 'absolute', top: t.space[3], right: t.space[4], zIndex: 1000,
           background: t.color.brand[600], borderRadius: t.radius.full,
-          padding: `4px ${t.space[2]}px`, display: 'flex', alignItems: 'center', gap: t.space[1], boxShadow: t.shadow.brand,
+          padding: `4px ${t.space[2]}px`, display: 'flex', alignItems: 'center', gap: t.space[1],
         }}>
-          <span style={{ fontSize: t.font.size.xs, color: '#fff', fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
+          <span style={{ fontSize: t.font.size.xs, color: '#fff', fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
           <ArrowRight size={10} color="#fff" />
         </div>
         <TalhoesMap />
       </div>
 
-      {/* ── Section 2 — Previsão de Receitas x Despesas ─────────────────────── */}
-      <ChartCard
-        icon={TrendingUp}
-        title="Previsão de Receitas x Despesas"
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <FilterSelect value="Mensal" colors={colors} />
-            <FilterInput value="01/01/2025" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
-            <FilterInput value="31/12/2025" colors={colors} />
-          </div>
-        }
-        colors={colors} isGbMode={isGbMode}
-      >
-        {isLoading ? (
-          <div style={{ display: 'flex', gap: t.space[3] }}>
-            <Skeleton width={210} height={72} /><Skeleton width={210} height={72} /><Skeleton width={160} height={72} />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap' }}>
-            <KpiStatChip icon={TrendingUp}   label="Valores a Receber (R$)" value="R$ 27.860,00"   trend="+8,4%"  trendUp accentColor={t.color.brand[600]}         colors={colors} isGbMode={isGbMode} />
-            <KpiStatChip icon={TrendingDown} label="Valores a Pagar (R$)"   value="R$ 82.339,92"   trend="+2,1%"  trendUp={false} accentColor={t.color.error.text} colors={colors} isGbMode={isGbMode} />
-            <KpiStatChip icon={DollarSign}   label="Saldo (R$)"             value="-R$ 54.479,92"  trend="-6,3%"  trendUp={false} accentColor={colors.textPrimary as string} colors={colors} isGbMode={isGbMode} />
-          </div>
-        )}
-      </ChartCard>
+      {/* ── Content grid ──────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
 
-      {/* ── Section 3 — Custo de Produção ───────────────────────────────────── */}
-      <ChartCard
-        icon={PieChart}
-        title="Custo de Produção por período — Realizado"
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Tipo</span>
-            <FilterSelect value="Animais" colors={colors} />
-            <FilterInput value="02/09/2024" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
-            <FilterInput value="15/04/2025" colors={colors} />
-          </div>
-        }
-        colors={colors} isGbMode={isGbMode}
-      >
-        <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[4], flexWrap: 'wrap' }}>
-          <KpiStatChip icon={TrendingUp} label="Margem Bruta (R$)"   value="R$ 1.218.669,28" trend="+12,5%" trendUp accentColor={t.color.brand[600]}  colors={colors} isGbMode={isGbMode} />
-          <KpiStatChip icon={DollarSign} label="Margem Líquida (R$)" value="R$ 790.978,50"   trend="+9,2%"  trendUp accentColor={t.color.brand[700]}  colors={colors} isGbMode={isGbMode} />
-        </div>
-        {isLoading ? (
-          <div style={{ display: 'flex', gap: t.space[6], justifyContent: 'center' }}>
-            <Skeleton width={200} height={240} /><Skeleton width={200} height={240} />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: t.space[6], justifyContent: 'center', flexWrap: 'wrap' }}>
-            <DonutChart title="Custo Operacional Efetivo — COE" segments={coeSegments} colors={colors} />
-            <DonutChart title="Custo Operacional Total — COT"   segments={cotSegments}  colors={colors} />
-          </div>
-        )}
-      </ChartCard>
+        {/* ── Main column ────────────────────────────────────────────────────── */}
+        <div style={{ flex: 1, minWidth: 0, borderRight: sectionBorder, display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Section 4 — Resultado Operacional ───────────────────────────────── */}
-      <ChartCard
-        icon={BarChart2}
-        title="Resultado Operacional (R$)"
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <FilterInput value="02/09/2024" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
-            <FilterInput value="15/04/2025" colors={colors} />
-          </div>
-        }
-        colors={colors} isGbMode={isGbMode}
-      >
-        {/* Summary KPI chips */}
-        {isLoading ? (
-          <div style={{ display: 'flex', gap: t.space[3], marginBottom: t.space[4] }}>
-            <Skeleton width={200} height={72} /><Skeleton width={200} height={72} /><Skeleton width={200} height={72} />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: t.space[3], marginBottom: t.space[5], flexWrap: 'wrap' }}>
-            <KpiStatChip icon={TrendingUp}   label="Receitas Total (R$)"  value="R$ 19.043.680,76" trend="+14,2%" trendUp        accentColor={t.chart.revenue}   colors={colors} isGbMode={isGbMode} />
-            <KpiStatChip icon={TrendingDown} label="Despesas Total (R$)"  value="R$ 4.498.000,29"  trend="+3,1%"  trendUp={false} accentColor={t.chart.expense}   colors={colors} isGbMode={isGbMode} />
-            <KpiStatChip icon={DollarSign}   label="Saldo Total (R$)"     value="R$ 14.545.680,47" trend="+18,7%" trendUp        accentColor={t.color.brand[600]} colors={colors} isGbMode={isGbMode} />
-          </div>
-        )}
-
-        {/* Horizontal grouped bar chart — Realizado / Previsto / Atrasado */}
-        {isLoading ? (
-          <Skeleton height={220} />
-        ) : (
-          <>
-            <div style={{ marginBottom: t.space[2] }}>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-                Comparativo por status — Realizado · Previsto · Atrasado
-              </span>
+          {/* Greeting + filter bar */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px`,
+            borderBottom: sectionBorder,
+          }}>
+            <span style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary }}>
+              {greeting}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+              {/* Period picker */}
+              <button style={{
+                display: 'flex', alignItems: 'center', gap: t.space[1],
+                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                padding: `6px ${t.space[3]}px`, background: 'transparent',
+                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
+              }}>
+                Últimos 30 dias <ChevronDown size={11} />
+              </button>
+              <button style={{
+                display: 'flex', alignItems: 'center', gap: t.space[1],
+                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                padding: `6px ${t.space[3]}px`, background: 'transparent',
+                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
+              }}>
+                <span style={{ fontSize: 11 }}>📅</span> 03/05 – 01/06/2026
+              </button>
+              <button style={{
+                display: 'flex', alignItems: 'center', gap: t.space[1],
+                border: sectionBorder, borderRadius: t.radius.DEFAULT,
+                padding: `6px ${t.space[3]}px`, background: 'transparent',
+                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
+              }}>
+                <Settings2 size={12} /> Personalizar
+              </button>
+              <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: `6px ${t.space[2]}px`, color: colors.textMuted }}>
+                <MoreHorizontal size={16} />
+              </button>
             </div>
-            <ResultadoChart data={RESULTADO_DATA} colors={colors} isGbMode={isGbMode} />
-          </>
-        )}
-      </ChartCard>
+          </div>
 
-      {/* ── Section 5 — Análise de Resultados Apurados ──────────────────────── */}
-      <ChartCard
-        icon={BarChart3}
-        title="Análise de Resultados Apurados"
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap' }}>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Zona</span>
-            <FilterSelect value="Todas" colors={colors} />
-            <FilterInput value="01/01/2025" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
-            <FilterInput value="31/01/2026" colors={colors} />
-            <FilterSelect value="Todas as Culturas" colors={colors} />
-          </div>
-        }
-        colors={colors} isGbMode={isGbMode}
-      >
-        {isLoading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
-            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} height={80} />)}
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
-            {analiseGroups.map((group, i) => (
-              <AnaliseStatGroup key={i} group={group} colors={colors} isGbMode={isGbMode} />
+          {/* KPI top row */}
+          <div style={{ display: 'flex', borderBottom: sectionBorder }}>
+            {[
+              { label: 'Margem bruta',         value: '12,5%',          trend: '2,7% vs 30 dias',   up: true  },
+              { label: 'Receitas realizadas',   value: 'R$ 18,9M',       trend: '4,1% vs 30 dias',   up: true  },
+              { label: 'Saldo operacional',     value: 'R$ 14,5M',       trend: '1,3% vs 30 dias',   up: false },
+            ].map((kpi, i, arr) => (
+              <div key={kpi.label} style={{ flex: 1, borderRight: i < arr.length - 1 ? sectionBorder : undefined }}>
+                <KpiTop label={kpi.label} value={kpi.value} trend={kpi.trend} up={kpi.up} colors={colors} />
+              </div>
             ))}
           </div>
-        )}
-      </ChartCard>
 
-      {/* ── Section 6 — Realizado — Receitas x Despesas ─────────────────────── */}
-      <GroupedBarChart
-        data={REALIZADO_DATA} maxY={4000000}
-        title="Realizado – Receitas x Despesas"
-        dtInicio="01/08/2024" dtFim="31/03/2025"
-        colors={colors} isGbMode={isGbMode}
-      />
+          {/* Area chart — Receitas mensais */}
+          <div style={{ padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px`, borderBottom: sectionBorder }}>
+            {/* MRR header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+              <div>
+                <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1 }}>
+                  R$ 18,9M
+                </div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[1] }}>
+                  Receitas mensais realizadas
+                </div>
+              </div>
+              <Trend value="27,4% nos últimos 30 dias" up />
+            </div>
+            {/* Legend */}
+            <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[3] }}>
+              {[
+                { color: t.color.brand[600], label: 'Receitas' },
+                { color: t.color.error.solid, label: 'Despesas' },
+              ].map(s => (
+                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
+                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+            <AreaChart colors={colors} isGbMode={isGbMode} />
+          </div>
 
-      {/* ── Section 7 — Previsto — Receitas x Despesas ──────────────────────── */}
-      <GroupedBarChart
-        data={PREVISTO_DATA} maxY={2500000}
-        title="Previsto – Receitas x Despesas"
-        dtInicio="20/09/2026" dtFim="20/07/2027"
-        colors={colors} isGbMode={isGbMode}
-      />
+          {/* Bottom row: Insight + Budget */}
+          <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
 
+            {/* AI Insight */}
+            <div style={{ flex: 1, borderRight: sectionBorder, padding: t.space[5] }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
+                  <BarChart2 size={13} color={colors.textMuted as string} />
+                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Insights</span>
+                </div>
+                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: sectionBorder, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+                  <MessageCircle size={11} /> Perguntar
+                </button>
+              </div>
+              <p style={{ fontSize: t.font.size.lg, color: colors.textMuted, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
+                A margem bruta melhorou{' '}
+                <strong style={{ color: colors.textPrimary, fontWeight: t.font.weight.bold }}>3,5% neste mês</strong>{' '}
+                em relação ao burn dos últimos 30 dias.
+              </p>
+            </div>
+
+            {/* Budget / COE usage */}
+            <div style={{ flex: 1, padding: t.space[5] }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Custo de produção</span>
+                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: 'none', background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+                  <Wheat size={11} /> Detalhes
+                </button>
+              </div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, marginBottom: t.space[3] }}>
+                R$ 3,6M
+              </div>
+              <SegmentedBar
+                colors={colors}
+                segments={[
+                  { color: isGbMode ? t.color.brand[700] : t.color.neutral[700], pct: 50, label: 'COE — 50%' },
+                  { color: isGbMode ? t.color.brand[500] : t.color.neutral[500], pct: 25, label: 'COT — 25%' },
+                  { color: isGbMode ? t.color.brand[300] : t.color.neutral[300], pct: 25, label: 'Outros — 25%' },
+                ]}
+              />
+            </div>
+
+          </div>
+
+          <Div colors={colors} />
+
+          {/* Bottom metric */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[5]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1 }}>
+                19.648
+              </div>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 3 }}>
+                Produção total (ton)
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <Trend value="9,8% nos últimos 30 dias" up />
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 3 }}>
+                Pico <strong style={{ color: colors.textPrimary }}>21,73 ton/ha</strong> em Mai
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Right aside ────────────────────────────────────────────────────── */}
+        <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+
+          {/* Radial gauge */}
+          <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, borderBottom: sectionBorder, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <RadialGauge
+              value="R$ 19,0M"
+              label="Receitas Total"
+              sub="Despesas"
+              pct={0.78}
+              colors={colors}
+              isGbMode={isGbMode}
+            />
+            <button style={{
+              width: '100%', marginTop: t.space[3],
+              border: sectionBorder, borderRadius: t.radius.DEFAULT,
+              padding: `8px 0`, background: 'transparent',
+              cursor: 'pointer', fontSize: t.font.size.xs,
+              color: colors.textSecondary, fontFamily: t.font.family.sans,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1],
+            }}>
+              Ver detalhe <ArrowRight size={11} />
+            </button>
+          </div>
+
+          {/* Realizado progress */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, borderBottom: sectionBorder }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Receitas realizadas</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>78%</span>
+            </div>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1, marginBottom: t.space[3] }}>
+              18.993
+            </div>
+            {/* Segmented ticks */}
+            <div style={{ display: 'flex', gap: 2, marginBottom: t.space[2] }}>
+              {Array.from({ length: 40 }, (_, i) => (
+                <div key={i} style={{
+                  flex: 1, height: 10, borderRadius: 1,
+                  background: i < 31
+                    ? (isGbMode ? t.color.brand[500] : t.color.neutral[700])
+                    : (isGbMode ? 'rgba(255,255,255,0.10)' : t.color.neutral[200]),
+                }} />
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: t.space[3] }}>
+              {[
+                { color: isGbMode ? t.color.brand[500] : t.color.neutral[700], label: 'Realizado' },
+                { color: isGbMode ? 'rgba(255,255,255,0.15)' : t.color.neutral[200], label: 'Previsto' },
+              ].map(s => (
+                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
+                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Cost summary card */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, borderBottom: sectionBorder, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
+                <TrendingUp size={11} color={t.color.brand[600]} style={{ marginRight: 4 }} />
+                Margem — última apuração
+              </span>
+            </div>
+            {[
+              { label: 'Período',        value: 'Set/24 – Mai/25' },
+              { label: 'Margem bruta',   value: 'R$ 1.218.669' },
+              { label: 'Margem líquida', value: 'R$ 790.978' },
+              { label: 'Status',         value: 'Concluído', green: true },
+            ].map(row => (
+              <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: t.space[2], marginBottom: t.space[2], borderBottom: `1px solid ${colors.border}` }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{row.label}:</span>
+                <span style={{
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+                  color: row.green ? t.color.success.text : colors.textPrimary,
+                }}>
+                  {row.value}
+                </span>
+              </div>
+            ))}
+            <button style={{
+              width: '100%', marginTop: t.space[1],
+              border: sectionBorder, borderRadius: t.radius.DEFAULT,
+              padding: `8px 0`, background: 'transparent',
+              cursor: 'pointer', fontSize: t.font.size.xs,
+              color: colors.textSecondary, fontFamily: t.font.family.sans,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1],
+            }}>
+              Ver detalhes <ArrowRight size={11} />
+            </button>
+          </div>
+
+          {/* Needs attention */}
+          <div style={{ padding: `${t.space[3]}px ${t.space[4]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[2] }}>
+              <TrendingDown size={11} color={t.color.error.text} />
+              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Requer atenção</span>
+            </div>
+            {[
+              { label: 'Saldo atrasado', value: 'R$ 1.940,73', color: t.color.error.text },
+              { label: 'Desp. previstas', value: 'R$ 82.339,92', color: t.color.warning.text },
+            ].map(item => (
+              <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[1] }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{item.label}</span>
+                <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: item.color }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
     </div>
   )
 }

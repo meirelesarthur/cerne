@@ -5,6 +5,7 @@ import type { ThemeColors } from '../../context/ThemeContext'
 import {
   CloudRain, Droplets, CalendarDays, AlertTriangle,
   Filter, X, Sun, Cloud, CloudSun, TrendingUp,
+  BarChart2, Activity, ArrowUpRight,
 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { FormField } from '../../components/ui/FormField'
@@ -62,11 +63,91 @@ function glassCard(
     backdropFilter: isGbMode ? 'blur(20px)' : undefined,
     WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
     borderRadius: t.radius['2xl'],
+    border: `1px solid ${colors.border}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
     ...extra,
   } as React.CSSProperties
+}
+
+// ─── ChartCard (tab-chip header + hover elevation) ────────────────────────────
+
+interface ChartCardProps {
+  icon: React.ElementType
+  title: string
+  action?: React.ReactNode
+  children: React.ReactNode
+  colors: ThemeColors
+  isGbMode: boolean
+}
+
+function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: ChartCardProps) {
+  const [hov, setHov] = useState(false)
+  const [btnHov, setBtnHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.surfaceBg,
+        backdropFilter: isGbMode ? 'blur(20px)' : undefined,
+        WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
+        borderRadius: t.radius['2xl'],
+        border: `1px solid ${colors.border}`,
+        boxShadow: hov
+          ? (isGbMode
+              ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)'
+              : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
+          : (isGbMode
+              ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+              : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
+        transition: 'box-shadow 0.22s ease',
+        padding: t.space[4],
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* Tab-chip header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: t.space[2],
+          background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100],
+          borderRadius: t.radius.DEFAULT,
+          padding: `${t.space[1]}px ${t.space[2] + 2}px`,
+        }}>
+          <Icon size={12} color={colors.textMuted as string} />
+          <span style={{
+            fontSize: t.font.size.xs,
+            fontWeight: t.font.weight.medium,
+            color: colors.textSecondary,
+            fontFamily: t.font.family.sans,
+          }}>
+            {title}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+          {action}
+          <div
+            onMouseEnter={() => setBtnHov(true)}
+            onMouseLeave={() => setBtnHov(false)}
+            style={{
+              width: 28, height: 28,
+              borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${colors.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+              background: btnHov ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100]) : 'transparent',
+              transition: 'background 0.15s ease',
+              opacity: hov ? 1 : 0.5,
+            }}
+          >
+            <ArrowUpRight size={13} color={colors.textMuted as string} />
+          </div>
+        </div>
+      </div>
+      {children}
+    </div>
+  )
 }
 
 // ─── Weather icon ─────────────────────────────────────────────────────────────
@@ -87,12 +168,15 @@ interface KpiCardProps {
   label: string
   value: string
   sub?: string
+  trend?: string
+  trendUp?: boolean
   accent?: KpiAccent
   colors: ThemeColors
   isGbMode: boolean
 }
 
-function KpiCard({ icon: Icon, label, value, sub, accent = 'green', colors, isGbMode }: KpiCardProps) {
+function KpiCard({ icon: Icon, label, value, sub, trend, trendUp, accent = 'green', colors, isGbMode }: KpiCardProps) {
+  const [hov, setHov] = useState(false)
   const accentColors: Record<KpiAccent, string> = {
     green: isGbMode ? '#10b981' : '#059669',
     amber: '#f59e0b',
@@ -109,8 +193,14 @@ function KpiCard({ icon: Icon, label, value, sub, accent = 'green', colors, isGb
 
   return (
     <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
         ...glassCard(colors, isGbMode),
+        boxShadow: hov
+          ? (isGbMode ? '0 4px 24px rgba(0,0,0,0.55)' : '0 8px 32px rgba(0,0,0,0.10)')
+          : (isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
+        transition: 'box-shadow 0.22s ease',
         padding: t.space[4],
         display: 'flex',
         flexDirection: 'column',
@@ -184,6 +274,19 @@ function KpiCard({ icon: Icon, label, value, sub, accent = 'green', colors, isGb
             {sub}
           </div>
         )}
+        {trend && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 3,
+            fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+            color: trendUp ? '#059669' : '#dc2626',
+            background: trendUp ? '#f0fdf4' : '#fee2e2',
+            borderRadius: t.radius.full,
+            padding: `2px ${t.space[2]}px`,
+            marginTop: t.space[1],
+          }}>
+            {trendUp ? '▲' : '▼'} {trend}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -207,25 +310,22 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
   const axis    = isGbMode ? 'rgba(125,168,147,0.6)' : '#9ca3af'
   const baseY   = PT + cH
 
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-        <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-          Pluviometria (dias)
-        </span>
-        <div style={{ display: 'flex', gap: t.space[4] }}>
-          {[
-            { label: 'Dias com chuva', bg: green, border: undefined },
-            { label: 'Dias sem chuva', bg: gray,  border: isGbMode ? 'rgba(28,63,44,0.9)' : '#d1d5db' },
-          ].map(({ label, bg, border }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-              <div style={{ width: 10, height: 10, borderRadius: 3, background: bg, border: border ? `1px solid ${border}` : undefined }} />
-              <span style={{ fontSize: t.font.size.xs, color: axis, fontFamily: t.font.family.sans }}>{label}</span>
-            </div>
-          ))}
+  const legend = (
+    <div style={{ display: 'flex', gap: t.space[4] }}>
+      {[
+        { label: 'Dias com chuva', bg: green, border: undefined },
+        { label: 'Dias sem chuva', bg: gray,  border: isGbMode ? 'rgba(28,63,44,0.9)' : '#d1d5db' },
+      ].map(({ label, bg, border }) => (
+        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
+          <div style={{ width: 10, height: 10, borderRadius: 3, background: bg, border: border ? `1px solid ${border}` : undefined }} />
+          <span style={{ fontSize: t.font.size.xs, color: axis, fontFamily: t.font.family.sans }}>{label}</span>
         </div>
-      </div>
+      ))}
+    </div>
+  )
 
+  return (
+    <ChartCard icon={BarChart2} title="Pluviometria (dias)" action={legend} colors={colors} isGbMode={isGbMode}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
         <defs>
           <linearGradient id="gbBar" x1="0" y1="0" x2="0" y2="1">
@@ -258,26 +358,41 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
           const sH   = Math.max(d.semChuva * scaleY, d.semChuva > 0 ? 3 : 0)
           const isH  = hovered === i
           const dim  = hovered !== null && !isH
-          const tip  = baseY - Math.max(gH, sH) - 58
+          const tip  = baseY - Math.max(gH, sH) - 60
 
           return (
             <g key={i} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} style={{ cursor: 'default' }}>
               <rect x={cx - barW - barGap / 2} y={baseY - gH} width={barW} height={gH} rx={4}
                 fill={isGbMode ? 'url(#gbBar)' : green} opacity={dim ? 0.3 : 1}
-                filter={isGbMode && isH ? 'url(#barGlow)' : undefined} />
+                filter={isGbMode && isH ? 'url(#barGlow)' : undefined}
+                style={{ transition: 'opacity 0.18s ease' }} />
               <rect x={cx + barGap / 2} y={baseY - sH} width={barW} height={sH} rx={4}
-                fill={gray} opacity={dim ? 0.3 : 1} />
+                fill={gray} opacity={dim ? 0.3 : 1}
+                style={{ transition: 'opacity 0.18s ease' }} />
               <text x={cx} y={baseY + 16} textAnchor="middle" fontSize={9}
                 fill={isH ? colors.brand : axis} fontFamily="Outfit, sans-serif"
-                fontWeight={isH ? 600 : 400}>{d.month}</text>
+                fontWeight={isH ? 600 : 400}
+                style={{ transition: 'fill 0.15s ease' }}>{d.month}</text>
 
+              {/* Tooltip — light style */}
               {isH && (
                 <g>
-                  <rect x={cx - 50} y={tip} width={100} height={46} rx={7}
-                    fill={isGbMode ? '#0b1e14' : t.dashboard.tileDark} opacity={0.95} />
-                  <text x={cx} y={tip + 16} textAnchor="middle" fontSize={10} fill={green} fontFamily="Outfit, sans-serif" fontWeight={700}>{d.month} 2025/26</text>
-                  <text x={cx - 5} y={tip + 31} textAnchor="end" fontSize={9} fill="#4ade80" fontFamily="Outfit, sans-serif">● {d.comChuva}d chuva</text>
-                  <text x={cx + 5} y={tip + 31} textAnchor="start" fontSize={9} fill="#6b7280" fontFamily="Outfit, sans-serif">● {d.semChuva}d seco</text>
+                  <rect x={cx - 52} y={tip} width={104} height={50} rx={8}
+                    fill={isGbMode ? '#0b1e14' : '#ffffff'}
+                    stroke={isGbMode ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}
+                    strokeWidth={1} />
+                  <text x={cx} y={tip + 16} textAnchor="middle" fontSize={10}
+                    fill={isGbMode ? green : '#111827'} fontFamily="Outfit, sans-serif" fontWeight={700}>
+                    {d.month} 2025/26
+                  </text>
+                  <text x={cx - 5} y={tip + 32} textAnchor="end" fontSize={9}
+                    fill={isGbMode ? '#4ade80' : t.color.brand[600]} fontFamily="Outfit, sans-serif">
+                    ● {d.comChuva}d chuva
+                  </text>
+                  <text x={cx + 5} y={tip + 32} textAnchor="start" fontSize={9}
+                    fill={isGbMode ? '#6b7280' : '#9ca3af'} fontFamily="Outfit, sans-serif">
+                    ● {d.semChuva}d seco
+                  </text>
                 </g>
               )}
             </g>
@@ -288,7 +403,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
         <text x={PL + 2.5 * groupW} y={H - 4} textAnchor="middle" fontSize={8} fill={`${axis}88`} fontFamily="Outfit, sans-serif">◀ Jun–Dez 2025</text>
         <text x={PL + 9 * groupW}   y={H - 4} textAnchor="middle" fontSize={8} fill={`${axis}88`} fontFamily="Outfit, sans-serif">Jan–Mai 2026 ▶</text>
       </svg>
-    </div>
+    </ChartCard>
   )
 }
 
@@ -320,19 +435,16 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
   const grid   = isGbMode ? 'rgba(28,63,44,0.5)'    : '#f0f0f0'
   const axis   = isGbMode ? 'rgba(125,168,147,0.6)'  : '#9ca3af'
 
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-        <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-          Volume Pluviométrico (mm)
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <TrendingUp size={14} color={line} />
-          <div style={{ width: 24, height: 2.5, background: line, borderRadius: 2 }} />
-          <span style={{ fontSize: t.font.size.xs, color: axis, fontFamily: t.font.family.sans }}>Realizado</span>
-        </div>
-      </div>
+  const areaLegend = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+      <TrendingUp size={14} color={line} />
+      <div style={{ width: 24, height: 2.5, background: line, borderRadius: 2 }} />
+      <span style={{ fontSize: t.font.size.xs, color: axis, fontFamily: t.font.family.sans }}>Realizado</span>
+    </div>
+  )
 
+  return (
+    <ChartCard icon={Activity} title="Volume Pluviométrico (mm)" action={areaLegend} colors={colors} isGbMode={isGbMode}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
         <defs>
           <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
@@ -385,17 +497,20 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
 
               {isH && (
                 <g>
-                  <rect x={p.x - 40} y={tipY} width={80} height={36} rx={7}
-                    fill={isGbMode ? '#0b1e14' : t.dashboard.tileDark} opacity={0.95} />
-                  <text x={p.x} y={tipY + 14} textAnchor="middle" fontSize={9} fill={line} fontFamily="Outfit, sans-serif" fontWeight={600}>{VOLUME_LABELS[i]}</text>
-                  <text x={p.x} y={tipY + 28} textAnchor="middle" fontSize={11} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>{p.v}mm</text>
+                  <rect x={p.x - 42} y={tipY} width={84} height={40} rx={8}
+                    fill={isGbMode ? '#0b1e14' : '#ffffff'}
+                    stroke={isGbMode ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}
+                    strokeWidth={1} />
+                  <text x={p.x} y={tipY + 15} textAnchor="middle" fontSize={9} fill={line} fontFamily="Outfit, sans-serif" fontWeight={600}>{VOLUME_LABELS[i]}</text>
+                  <text x={p.x} y={tipY + 31} textAnchor="middle" fontSize={12}
+                    fill={isGbMode ? '#ffffff' : '#111827'} fontFamily="Outfit, sans-serif" fontWeight={700}>{p.v}mm</text>
                 </g>
               )}
             </g>
           )
         })}
       </svg>
-    </div>
+    </ChartCard>
   )
 }
 
@@ -571,6 +686,8 @@ export default function Pluviometria() {
           label="Acumulado (7 dias)"
           value="19.2mm"
           sub="Open-Meteo · Prata (MG)"
+          trend="+3.4mm vs mês ant."
+          trendUp
           accent="green"
           colors={colors}
           isGbMode={isGbMode}
@@ -580,6 +697,8 @@ export default function Pluviometria() {
           label="Umidade do Solo"
           value="17%"
           sub="Open-Meteo · Prata (MG)"
+          trend="-5% vs mês ant."
+          trendUp={false}
           accent="green"
           colors={colors}
           isGbMode={isGbMode}
@@ -608,10 +727,8 @@ export default function Pluviometria() {
         <Skeleton height={300} />
       ) : (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[3], alignItems: 'stretch' }}>
-        {/* Bar chart */}
-        <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
-          <PluvioBarChart colors={colors} isGbMode={isGbMode} />
-        </div>
+        {/* Bar chart — ChartCard self-contained */}
+        <PluvioBarChart colors={colors} isGbMode={isGbMode} />
 
         {/* Right panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], height: '100%' }}>
@@ -760,9 +877,7 @@ export default function Pluviometria() {
       {isLoading ? (
         <Skeleton height={220} />
       ) : (
-      <div style={{ ...glassCard(colors, isGbMode), padding: t.space[4], boxSizing: 'border-box' }}>
         <VolumeAreaChart colors={colors} isGbMode={isGbMode} />
-      </div>
       )}
     </div>
   )

@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import {
   Layers, ArrowRight, ChevronDown,
   TrendingUp, DollarSign, TrendingDown,
+  BarChart2, PieChart, BarChart3, ArrowUpRight,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -115,11 +116,186 @@ function card(colors: ThemeColors, isGbMode: boolean, extra?: React.CSSPropertie
   return {
     background: colors.surfaceBg,
     borderRadius: t.radius['2xl'],
+    border: `1px solid ${colors.border}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
     ...extra,
   }
+}
+
+// ─── ChartCard (tab-chip header + hover elevation) ────────────────────────────
+
+interface ChartCardProps {
+  icon: React.ElementType
+  title: string
+  action?: React.ReactNode
+  children: React.ReactNode
+  colors: ThemeColors
+  isGbMode: boolean
+  noPadding?: boolean
+}
+
+function ChartCard({ icon: Icon, title, action, children, colors, isGbMode, noPadding }: ChartCardProps) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: colors.surfaceBg,
+        borderRadius: t.radius['2xl'],
+        border: `1px solid ${colors.border}`,
+        boxShadow: hov
+          ? (isGbMode
+              ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)'
+              : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
+          : (isGbMode
+              ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+              : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
+        transition: 'box-shadow 0.22s ease',
+        padding: noPadding ? 0 : t.space[4],
+      }}
+    >
+      {/* Tab-chip header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: noPadding ? 0 : t.space[4],
+          padding: noPadding ? `${t.space[3]}px ${t.space[4]}px` : 0,
+          borderBottom: noPadding ? `1px solid ${colors.border}` : undefined,
+        }}
+      >
+        {/* Left: icon chip + title */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: t.space[2],
+            background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100],
+            borderRadius: t.radius.DEFAULT,
+            padding: `${t.space[1]}px ${t.space[2] + 2}px`,
+          }}
+        >
+          <Icon size={12} color={colors.textMuted as string} />
+          <span
+            style={{
+              fontSize: t.font.size.xs,
+              fontWeight: t.font.weight.medium,
+              color: colors.textSecondary,
+              fontFamily: t.font.family.sans,
+              letterSpacing: '0.01em',
+            }}
+          >
+            {title}
+          </span>
+        </div>
+
+        {/* Right: action slot + expand icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+          {action}
+          <ExpandBtn colors={colors} isGbMode={isGbMode} hovered={hov} />
+        </div>
+      </div>
+
+      {children}
+    </div>
+  )
+}
+
+function ExpandBtn({ colors, isGbMode, hovered }: { colors: ThemeColors; isGbMode: boolean; hovered: boolean }) {
+  const [btnHov, setBtnHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setBtnHov(true)}
+      onMouseLeave={() => setBtnHov(false)}
+      style={{
+        width: 28, height: 28,
+        borderRadius: t.radius.DEFAULT,
+        border: `1px solid ${colors.border}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        background: btnHov
+          ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100])
+          : 'transparent',
+        transition: 'background 0.15s ease',
+        opacity: hovered ? 1 : 0.5,
+      }}
+    >
+      <ArrowUpRight size={13} color={colors.textMuted as string} />
+    </div>
+  )
+}
+
+// ─── KPI Stat Chip (efferd-style) ─────────────────────────────────────────────
+
+interface KpiStatChipProps {
+  icon: React.ElementType
+  label: string
+  value: string
+  trend?: string
+  trendUp?: boolean
+  accentColor: string
+  colors: ThemeColors
+  isGbMode: boolean
+}
+
+function KpiStatChip({ icon: Icon, label, value, trend, trendUp, accentColor, colors, isGbMode }: KpiStatChipProps) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: t.space[1],
+        border: `1px solid ${hov ? accentColor + '55' : colors.border}`,
+        borderRadius: t.radius.lg,
+        padding: `${t.space[3]}px ${t.space[4]}px`,
+        background: hov
+          ? (isGbMode ? `${accentColor}0d` : `${accentColor}08`)
+          : colors.surfaceBg,
+        transition: 'border-color 0.18s ease, background 0.18s ease',
+        minWidth: 180,
+        cursor: 'default',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
+        <Icon size={13} color={accentColor} />
+        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          {label}
+        </span>
+      </div>
+      <span style={{
+        fontSize: t.font.size.xl,
+        fontWeight: t.font.weight.bold,
+        color: accentColor,
+        fontFamily: t.font.family.sans,
+        lineHeight: 1.1,
+      }}>
+        {value}
+      </span>
+      {trend && (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 3,
+          fontSize: t.font.size.xs,
+          fontWeight: t.font.weight.semibold,
+          color: trendUp ? t.color.success.text : t.color.error.text,
+          background: trendUp ? t.color.success.bg : t.color.error.bg,
+          borderRadius: t.radius.full,
+          padding: `2px ${t.space[2]}px`,
+          width: 'fit-content',
+        }}>
+          {trendUp ? '▲' : '▼'} {trend}
+        </span>
+      )}
+    </div>
+  )
 }
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
@@ -464,8 +640,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
   const barW = 18
   const barGap = 4
   const groupW = barW * 2 + barGap
-  const numGroups = data.length
-  const groupSpacing = cW / numGroups
+  const groupSpacing = cW / data.length
   const groupOffset = groupSpacing / 2
 
   const toY = (v: number) => PT + cH - (v / maxY) * cH
@@ -484,62 +659,26 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
     return `R$ ${v}`
   }
 
-  return (
-    <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: t.space[3],
-          flexWrap: 'wrap',
-          gap: t.space[2],
-        }}
-      >
-        <SectionTitle colors={colors}>{title}</SectionTitle>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Dt Início
-          </span>
-          <FilterInput value={dtInicio} colors={colors} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Dt Fim
-          </span>
-          <FilterInput value={dtFim} colors={colors} />
-        </div>
-      </div>
+  const filters = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+      <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Início</span>
+      <FilterInput value={dtInicio} colors={colors} />
+      <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Fim</span>
+      <FilterInput value={dtFim} colors={colors} />
+    </div>
+  )
 
+  return (
+    <ChartCard icon={BarChart2} title={title} action={filters} colors={colors} isGbMode={isGbMode}>
       {/* Legend */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: t.space[4],
-          marginBottom: t.space[2],
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], marginBottom: t.space[3] }}>
         {[
           { label: 'Receitas', color: t.chart.revenue },
           { label: 'Despesas', color: t.chart.expense },
         ].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: t.radius.sm,
-                background: item.color,
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: t.font.size.xs,
-                color: colors.textSecondary,
-                fontFamily: t.font.family.sans,
-              }}
-            >
+            <div style={{ width: 10, height: 10, borderRadius: t.radius.sm, background: item.color, flexShrink: 0 }} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
               {item.label}
             </span>
           </div>
@@ -549,28 +688,17 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
       {/* Chart */}
       <div style={{ overflowX: 'auto' }}>
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ maxHeight: H, display: 'block' }}>
-          {/* Y axis grid lines and labels */}
+          {/* Grid lines */}
           {yLabels.map((yl, i) => {
             const y = toY(yl.val)
             return (
               <g key={i}>
-                <line
-                  x1={PL}
-                  y1={y}
-                  x2={W - PR}
-                  y2={y}
+                <line x1={PL} y1={y} x2={W - PR} y2={y}
                   stroke={colors.border}
                   strokeWidth={yl.val === 0 ? 1.5 : 0.5}
-                  strokeDasharray={yl.val === 0 ? undefined : '4 3'}
-                />
-                <text
-                  x={PL - 6}
-                  y={y + 3}
-                  textAnchor="end"
-                  fontSize={9}
-                  fill={colors.textMuted as string}
-                  fontFamily="Outfit, sans-serif"
-                >
+                  strokeDasharray={yl.val === 0 ? undefined : '4 3'} />
+                <text x={PL - 6} y={y + 3} textAnchor="end" fontSize={9}
+                  fill={colors.textMuted as string} fontFamily="Outfit, sans-serif">
                   {yl.label}
                 </text>
               </g>
@@ -582,73 +710,62 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
             const gx = PL + i * groupSpacing + groupOffset
             const rx = gx - groupW / 2
             const isH = hovered === i
+            const dim = hovered !== null && !isH
 
-            const rH = Math.max(0, ((d.receitas / maxY) * cH))
-            const dH = Math.max(0, ((d.despesas / maxY) * cH))
+            const rH = Math.max(0, (d.receitas / maxY) * cH)
+            const dH = Math.max(0, (d.despesas / maxY) * cH)
             const rY = PT + cH - rH
             const dY = PT + cH - dH
 
-            const tipX = Math.min(Math.max(rx - 50, PL), W - PR - 140)
-            const tipY = Math.max(PT + 2, Math.min(rY, dY) - 64)
+            const tipX = Math.min(Math.max(rx - 50, PL), W - PR - 150)
+            const tipY = Math.max(PT + 2, Math.min(rY, dY) - 72)
 
             return (
               <g key={i}>
                 {/* Receitas bar */}
-                <rect
-                  x={rx}
-                  y={rY}
-                  width={barW}
-                  height={rH}
-                  fill={isH ? t.color.info.text : t.chart.revenue}
-                  rx={3}
-                />
+                <rect x={rx} y={rY} width={barW} height={rH} rx={4}
+                  fill={t.chart.revenue}
+                  opacity={dim ? 0.3 : 1}
+                  style={{ transition: 'opacity 0.18s ease' }} />
 
                 {/* Despesas bar */}
-                <rect
-                  x={rx + barW + barGap}
-                  y={dY}
-                  width={barW}
-                  height={dH}
-                  fill={isH ? t.color.error.solid : t.chart.expense}
-                  rx={3}
-                />
+                <rect x={rx + barW + barGap} y={dY} width={barW} height={dH} rx={4}
+                  fill={t.chart.expense}
+                  opacity={dim ? 0.3 : 1}
+                  style={{ transition: 'opacity 0.18s ease' }} />
 
                 {/* Month label */}
-                <text
-                  x={gx}
-                  y={PT + cH + 16}
-                  textAnchor="middle"
-                  fontSize={9}
+                <text x={gx} y={PT + cH + 16} textAnchor="middle" fontSize={9}
                   fill={isH ? (colors.textPrimary as string) : (colors.textMuted as string)}
-                  fontFamily="Outfit, sans-serif"
-                  fontWeight={isH ? 600 : 400}
-                >
+                  fontFamily="Outfit, sans-serif" fontWeight={isH ? 600 : 400}
+                  style={{ transition: 'fill 0.15s ease' }}>
                   {d.month}
                 </text>
 
-                {/* Invisible hover zone */}
-                <rect
-                  x={rx - 4}
-                  y={PT}
-                  width={groupW + 8}
-                  height={cH}
+                {/* Hover zone */}
+                <rect x={rx - 4} y={PT} width={groupW + 8} height={cH}
                   fill="transparent"
                   onMouseEnter={() => setHovered(i)}
                   onMouseLeave={() => setHovered(null)}
-                  style={{ cursor: 'crosshair' }}
-                />
+                  style={{ cursor: 'crosshair' }} />
 
-                {/* Tooltip */}
+                {/* Tooltip — light style */}
                 {isH && (
                   <g>
-                    <rect x={tipX} y={tipY} width={140} height={56} rx={6} fill={t.dashboard.tileDark} opacity={0.95} />
-                    <text x={tipX + 70} y={tipY + 14} textAnchor="middle" fontSize={10} fill="#fff" fontFamily="Outfit, sans-serif" fontWeight={700}>
+                    <rect x={tipX} y={tipY} width={150} height={64} rx={8}
+                      fill={colors.surfaceBg} stroke={colors.border} strokeWidth={1} />
+                    <text x={tipX + 75} y={tipY + 16} textAnchor="middle" fontSize={10}
+                      fill={colors.textPrimary as string} fontFamily="Outfit, sans-serif" fontWeight={700}>
                       {d.month}
                     </text>
-                    <text x={tipX + 8} y={tipY + 30} textAnchor="start" fontSize={9} fill="#93c5fd" fontFamily="Outfit, sans-serif">
+                    <rect x={tipX + 10} y={tipY + 26} width={8} height={8} rx={2} fill={t.chart.revenue} />
+                    <text x={tipX + 24} y={tipY + 34} textAnchor="start" fontSize={9}
+                      fill={colors.textSecondary as string} fontFamily="Outfit, sans-serif">
                       Rec: {formatValue(d.receitas)}
                     </text>
-                    <text x={tipX + 8} y={tipY + 46} textAnchor="start" fontSize={9} fill="#fca5a5" fontFamily="Outfit, sans-serif">
+                    <rect x={tipX + 10} y={tipY + 44} width={8} height={8} rx={2} fill={t.chart.expense} />
+                    <text x={tipX + 24} y={tipY + 52} textAnchor="start" fontSize={9}
+                      fill={colors.textSecondary as string} fontFamily="Outfit, sans-serif">
                       Desp: {formatValue(d.despesas)}
                     </text>
                   </g>
@@ -658,7 +775,7 @@ function GroupedBarChart({ data, maxY, title, dtInicio, dtFim, colors, isGbMode 
           })}
         </svg>
       </div>
-    </div>
+    </ChartCard>
   )
 }
 
@@ -829,301 +946,121 @@ export default function OverviewPanel() {
       {/* ══════════════════════════════════════════════════════════════════
           Section 2 — Previsão de Receitas x Despesas
       ══════════════════════════════════════════════════════════════════ */}
-      <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
-        {/* Header row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: t.space[4],
-            flexWrap: 'wrap',
-            gap: t.space[2],
-          }}
-        >
-          <SectionTitle colors={colors}>Previsão de Receitas x Despesas</SectionTitle>
+      <ChartCard
+        icon={TrendingUp}
+        title="Previsão de Receitas x Despesas"
+        action={
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
             <FilterSelect value="Mensal" colors={colors} />
             <FilterInput value="01/01/2025" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              a
-            </span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
             <FilterInput value="31/12/2025" colors={colors} />
           </div>
-        </div>
-
-        {/* 3 KPI chips */}
+        }
+        colors={colors}
+        isGbMode={isGbMode}
+      >
         {isLoading ? (
           <div style={{ display: 'flex', gap: t.space[3] }}>
-            <Skeleton width={210} height={58} />
-            <Skeleton width={210} height={58} />
-            <Skeleton width={160} height={58} />
+            <Skeleton width={210} height={72} />
+            <Skeleton width={210} height={72} />
+            <Skeleton width={160} height={72} />
           </div>
         ) : (
-        <div
-          style={{
-            display: 'flex',
-            gap: t.space[3],
-            flexWrap: 'wrap',
-          }}
-        >
-          {/* Valores a Receber */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: t.space[2],
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              padding: `${t.space[2]}px ${t.space[3]}px`,
-              background: colors.surfaceBg,
-            }}
-          >
-            <TrendingUp size={15} color={t.color.brand[600]} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span
-                style={{
-                  fontSize: t.font.size.xs,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                Valores a Receber (R$)
-              </span>
-              <span
-                style={{
-                  fontSize: t.font.size.lg,
-                  fontWeight: t.font.weight.bold,
-                  color: t.color.brand[600],
-                  fontFamily: t.font.family.sans,
-                  lineHeight: 1,
-                }}
-              >
-                R$ 22.600,00
-              </span>
-            </div>
+          <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap' }}>
+            {/* Valores a Receber */}
+            <KpiStatChip
+              icon={TrendingUp}
+              label="Valores a Receber (R$)"
+              value="R$ 22.600,00"
+              trend="+8,4%"
+              trendUp
+              accentColor={t.color.brand[600]}
+              colors={colors}
+              isGbMode={isGbMode}
+            />
+            {/* Valores a Pagar */}
+            <KpiStatChip
+              icon={TrendingDown}
+              label="Valores a Pagar (R$)"
+              value="R$ 21.159,27"
+              trend="+2,1%"
+              trendUp={false}
+              accentColor={t.color.error.text}
+              colors={colors}
+              isGbMode={isGbMode}
+            />
+            {/* Saldo */}
+            <KpiStatChip
+              icon={DollarSign}
+              label="Saldo (R$)"
+              value="R$ 1.440,73"
+              trend="+6,3%"
+              trendUp
+              accentColor={colors.textPrimary as string}
+              colors={colors}
+              isGbMode={isGbMode}
+            />
           </div>
-
-          {/* Valores a Pagar */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: t.space[2],
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              padding: `${t.space[2]}px ${t.space[3]}px`,
-              background: colors.surfaceBg,
-            }}
-          >
-            <TrendingDown size={15} color={t.color.error.text} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span
-                style={{
-                  fontSize: t.font.size.xs,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                Valores a Pagar (R$)
-              </span>
-              <span
-                style={{
-                  fontSize: t.font.size.lg,
-                  fontWeight: t.font.weight.bold,
-                  color: t.color.error.text,
-                  fontFamily: t.font.family.sans,
-                  lineHeight: 1,
-                }}
-              >
-                R$ 21.159,27
-              </span>
-            </div>
-          </div>
-
-          {/* Saldo */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: t.space[2],
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              padding: `${t.space[2]}px ${t.space[3]}px`,
-              background: colors.surfaceBg,
-            }}
-          >
-            <DollarSign size={15} color={colors.textPrimary as string} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span
-                style={{
-                  fontSize: t.font.size.xs,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                Saldo (R$)
-              </span>
-              <span
-                style={{
-                  fontSize: t.font.size.lg,
-                  fontWeight: t.font.weight.bold,
-                  color: colors.textPrimary,
-                  fontFamily: t.font.family.sans,
-                  lineHeight: 1,
-                }}
-              >
-                R$ 1.440,73
-              </span>
-            </div>
-          </div>
-        </div>
         )}
-      </div>
+      </ChartCard>
 
       {/* ══════════════════════════════════════════════════════════════════
           Section 3 — Custo de Produção por período - Realizado
       ══════════════════════════════════════════════════════════════════ */}
-      <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
-        {/* Header row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: t.space[3],
-            flexWrap: 'wrap',
-            gap: t.space[2],
-          }}
-        >
-          <SectionTitle colors={colors}>Custo de Produção por período - Realizado</SectionTitle>
+      <ChartCard
+        icon={PieChart}
+        title="Custo de Produção por período — Realizado"
+        action={
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              Tipo
-            </span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Tipo</span>
             <FilterSelect value="Animais" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              Dt Início
-            </span>
             <FilterInput value="02/09/2024" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              Dt Fim
-            </span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
             <FilterInput value="15/04/2025" colors={colors} />
           </div>
+        }
+        colors={colors}
+        isGbMode={isGbMode}
+      >
+        {/* KPI inline */}
+        <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[4], flexWrap: 'wrap' }}>
+          <KpiStatChip icon={TrendingUp} label="Margem Bruta (R$)" value="R$ 1.237.824,45"
+            trend="+12,5%" trendUp accentColor={t.color.brand[600]} colors={colors} isGbMode={isGbMode} />
+          <KpiStatChip icon={DollarSign} label="Margem Líquida (R$)" value="R$ 794.143,08"
+            trend="+9,2%" trendUp accentColor={t.color.brand[700]} colors={colors} isGbMode={isGbMode} />
         </div>
 
-        {/* KPI inline values */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: t.space[5],
-            marginBottom: t.space[4],
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <span
-              style={{
-                fontSize: t.font.size.sm,
-                color: colors.textSecondary,
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              Margem Bruta (R$):
-            </span>
-            <span
-              style={{
-                fontSize: t.font.size.md,
-                fontWeight: t.font.weight.bold,
-                color: t.color.brand[600],
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              R$ 1.237.824,45
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <span
-              style={{
-                fontSize: t.font.size.sm,
-                color: colors.textSecondary,
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              Margem Líquida (R$):
-            </span>
-            <span
-              style={{
-                fontSize: t.font.size.md,
-                fontWeight: t.font.weight.bold,
-                color: t.color.brand[600],
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              R$ 794.143,08
-            </span>
-          </div>
-        </div>
-
-        {/* 2 Donut charts side by side */}
+        {/* Donuts */}
         {isLoading ? (
           <div style={{ display: 'flex', gap: t.space[6], justifyContent: 'center' }}>
             <Skeleton width={200} height={240} />
             <Skeleton width={200} height={240} />
           </div>
         ) : (
-        <div
-          style={{
-            display: 'flex',
-            gap: t.space[6],
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          <DonutChart
-            title="Custo Operacional Efetivo - COE"
-            segments={coeSegments}
-            colors={colors}
-          />
-          <DonutChart
-            title="Custo Operacional Total - COT"
-            segments={cotSegments}
-            colors={colors}
-          />
-        </div>
+          <div style={{ display: 'flex', gap: t.space[6], justifyContent: 'center', flexWrap: 'wrap' }}>
+            <DonutChart title="Custo Operacional Efetivo — COE" segments={coeSegments} colors={colors} />
+            <DonutChart title="Custo Operacional Total — COT" segments={cotSegments} colors={colors} />
+          </div>
         )}
-      </div>
+      </ChartCard>
 
       {/* ══════════════════════════════════════════════════════════════════
           Section 4 — Resultado Operacional (R$)
       ══════════════════════════════════════════════════════════════════ */}
-      <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
-        {/* Header row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: t.space[4],
-            flexWrap: 'wrap',
-            gap: t.space[2],
-          }}
-        >
-          <SectionTitle colors={colors}>Resultado Operacional (R$)</SectionTitle>
+      <ChartCard
+        icon={BarChart2}
+        title="Resultado Operacional (R$)"
+        action={
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              Dt Início
-            </span>
             <FilterInput value="02/09/2024" colors={colors} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              Dt Fim
-            </span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
             <FilterInput value="15/04/2025" colors={colors} />
           </div>
-        </div>
-
+        }
+        colors={colors}
+        isGbMode={isGbMode}
+      >
         {/* 4x3 grid */}
         {isLoading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[2] }}>
@@ -1156,45 +1093,27 @@ export default function OverviewPanel() {
           {renderTile(t.dashboard.tileRevenue, 'Saldo Total (R$)', 'R$ 857.521,23', 'saldo-total')}
         </div>
         )}
-      </div>
+      </ChartCard>
 
       {/* ══════════════════════════════════════════════════════════════════
           Section 5 — Análise de Resultados Apurados
       ══════════════════════════════════════════════════════════════════ */}
-      <div style={{ ...card(colors, isGbMode), padding: t.space[4] }}>
-        {/* Header */}
-        <div style={{ marginBottom: t.space[3] }}>
-          <SectionTitle colors={colors}>Análise de Resultados Apurados</SectionTitle>
-        </div>
-
-        {/* Filter row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: t.space[2],
-            marginBottom: t.space[4],
-            flexWrap: 'wrap',
-          }}
-        >
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Zona
-          </span>
-          <FilterSelect value="Todas" colors={colors} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Dt Início
-          </span>
-          <FilterInput value="01/01/2025" colors={colors} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Dt Fim
-          </span>
-          <FilterInput value="31/01/2026" colors={colors} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            Produtos
-          </span>
-          <FilterSelect value="Todas as Culturas" colors={colors} />
-        </div>
-
+      <ChartCard
+        icon={BarChart3}
+        title="Análise de Resultados Apurados"
+        action={
+          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap' }}>
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>Zona</span>
+            <FilterSelect value="Todas" colors={colors} />
+            <FilterInput value="01/01/2025" colors={colors} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>a</span>
+            <FilterInput value="31/01/2026" colors={colors} />
+            <FilterSelect value="Todas as Culturas" colors={colors} />
+          </div>
+        }
+        colors={colors}
+        isGbMode={isGbMode}
+      >
         {/* Tile grid — 3 columns, gap 4px */}
         {isLoading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
@@ -1392,7 +1311,7 @@ export default function OverviewPanel() {
           <div style={{ background: 'transparent' }} />
         </div>
         )}
-      </div>
+      </ChartCard>
 
       {/* ══════════════════════════════════════════════════════════════════
           Section 6 — Realizado – Receitas x Despesas (bar chart)

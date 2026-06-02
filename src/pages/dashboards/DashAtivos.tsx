@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { Package, CheckCircle, Wrench, Building2, BarChart2, Activity, Calendar } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { ChartCard } from '../../components/ui/ChartCard'
-import { KpiStatCard } from '../../components/ui/KpiStatCard'
 import { Skeleton } from '../../components/ui/Skeleton'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Horizontal Grouped Bar Chart ─────────────────────────────────────────────
 
@@ -363,7 +362,15 @@ function ManutChart() {
 
 // ─── DashAtivos ───────────────────────────────────────────────────────────────
 
+const ATIVOS_KPIS = [
+  { label: 'Total de Ativos',   value: '342',     trend: '5,4%',  up: true  },
+  { label: 'Em Operação',       value: '298',     trend: '3,2%',  up: true  },
+  { label: 'Em Manutenção',     value: '31',      trend: '12,4%', up: false },
+  { label: 'Valor Patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
+]
+
 export default function DashAtivos() {
+  const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -371,83 +378,68 @@ export default function DashAtivos() {
     return () => clearTimeout(id)
   }, [])
 
+  const bc = colors.border as string
+
+  const cardStyle: React.CSSProperties = {
+    margin: `${t.space[5]}px ${t.space[6]}px`,
+    display: 'flex', flexDirection: 'column',
+    background: colors.surfaceBg,
+    borderRadius: t.radius['2xl'],
+    border: `1px solid ${bc}`,
+    boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    fontFamily: t.font.family.sans,
+  }
+
   if (loading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-          {Array.from({ length: 4 }, (_, i) => <Skeleton key={i} height={110} />)}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: t.space[4] }}>
-          <Skeleton height={320} />
-          <Skeleton height={320} />
-        </div>
-        <Skeleton height={260} />
-      </div>
-    )
+    return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
   return (
-    <div style={{
-      margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.surfaceBg,
-      borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border}`,
-      boxShadow: isGbMode
-        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
-    }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
-      {/* Row 1 — KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-        <KpiStatCard
-          icon={Package}
-          label="Total de Ativos"
-          value="342"
-          trend="5,4%"
-          trendUp
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={CheckCircle}
-          label="Em Operação"
-          value="298"
-          trend="3,2%"
-          trendUp
-          accentColor={t.color.success.text}
-        />
-        <KpiStatCard
-          icon={Wrench}
-          label="Em Manutenção"
-          value="31"
-          trend="12,4%"
-          trendUp={false}
-          accentColor={t.color.notification}
-        />
-        <KpiStatCard
-          icon={Building2}
-          label="Valor Patrimonial"
-          value="R$ 8,4M"
-          trend="2,1%"
-          trendUp
-          accentColor={t.color.brand[700]}
-        />
+    <div style={cardStyle}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Ativos</span>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+          Últimos 30 dias <ChevronDown size={11} />
+        </button>
       </div>
+      <HDivider color={bc} />
 
-      {/* Row 2 — Grouped H-bar + Status cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: t.space[4] }}>
-        <ChartCard icon={BarChart2} title="Ativos por Categoria">
+      {/* KPI row */}
+      <div style={{ display: 'flex' }}>
+        {ATIVOS_KPIS.map((kpi, i) => (
+          <>
+            {i > 0 && <VDivider key={`d${i}`} color={bc} />}
+            <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+            </div>
+          </>
+        ))}
+      </div>
+      <HDivider color={bc} />
+
+      {/* Row 2 — Grouped H-bar + Status */}
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 3, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
           <HorizontalGroupedBar />
-        </ChartCard>
-        <ChartCard icon={Activity} title="Status dos Ativos">
+        </div>
+        <VDivider color={bc} />
+        <div style={{ flex: 2, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
           <StatusCards />
-        </ChartCard>
+        </div>
       </div>
+      <HDivider color={bc} />
 
-      {/* Row 3 — Manutenções por mês */}
-      <ChartCard icon={Calendar} title="Manutenções por Mês">
+      {/* Row 3 — Manutenções */}
+      <div style={{ padding: t.space[5] }}>
+        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
         <ManutChart />
-      </ChartCard>
-    </div>
+      </div>
     </div>
   )
 }

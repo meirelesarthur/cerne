@@ -1,18 +1,9 @@
 import { useEffect, useState } from 'react'
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Wallet,
-  History,
-  TrendingUp,
-  List,
-  Building2,
-} from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { KpiStatCard } from '../../components/ui/KpiStatCard'
-import { ChartCard } from '../../components/ui/ChartCard'
 import { Skeleton } from '../../components/ui/Skeleton'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -327,6 +318,13 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
 
 // ─── DashLivroCaixa ───────────────────────────────────────────────────────────
 
+const LC_KPIS = [
+  { label: 'Total Entradas', value: 'R$ 1.247.830', trend: '18,3%', up: true  },
+  { label: 'Total Saídas',   value: 'R$ 984.220',   trend: '7,4%',  up: false },
+  { label: 'Saldo Período',  value: 'R$ 263.610',   trend: '22,1%', up: true  },
+  { label: 'Saldo Anterior', value: 'R$ 412.800',   trend: null,    up: true  },
+]
+
 export default function DashLivroCaixa() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
@@ -336,99 +334,86 @@ export default function DashLivroCaixa() {
     return () => clearTimeout(timer)
   }, [])
 
+  const bc = colors.border as string
+
+  const cardStyle: React.CSSProperties = {
+    margin: `${t.space[5]}px ${t.space[6]}px`,
+    display: 'flex', flexDirection: 'column',
+    background: colors.surfaceBg,
+    borderRadius: t.radius['2xl'],
+    border: `1px solid ${bc}`,
+    boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    fontFamily: t.font.family.sans,
+  }
+
   if (isLoading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[6], padding: t.space[6] }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height={120} />)}
-        </div>
-        <Skeleton height={280} />
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: t.space[4] }}>
-          <Skeleton height={300} />
-          <Skeleton height={300} />
-        </div>
-      </div>
-    )
+    return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
   return (
-    <div style={{
-      margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.surfaceBg,
-      borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border}`,
-      boxShadow: isGbMode
-        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
-    }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[6], padding: t.space[6], fontFamily: t.font.family.sans }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-        <KpiStatCard
-          icon={ArrowDownLeft}
-          label="Total Entradas"
-          value="R$ 1.247.830"
-          trend="18,3% vs mês ant."
-          trendUp
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={ArrowUpRight}
-          label="Total Saídas"
-          value="R$ 984.220"
-          trend="7,4% vs mês ant."
-          trendUp={false}
-          accentColor={t.color.error.text}
-        />
-        <KpiStatCard
-          icon={Wallet}
-          label="Saldo Período"
-          value="R$ 263.610"
-          trend="22,1% vs mês ant."
-          trendUp
-          accentColor={t.color.brand[700]}
-        />
-        <KpiStatCard
-          icon={History}
-          label="Saldo Anterior"
-          value="R$ 412.800"
-          accentColor={t.color.neutral[500]}
-        />
+    <div style={cardStyle}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Livro Caixa</span>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+          Últimos 30 dias <ChevronDown size={11} />
+        </button>
       </div>
+      <HDivider color={bc} />
 
-      <ChartCard icon={TrendingUp} title="Fluxo de Caixa — Realizado">
-        <div style={{ display: 'flex', gap: t.space[5], marginBottom: t.space[3] }}>
-          {[
-            { label: 'Entradas', color: t.color.brand[600], dashed: false },
-            { label: 'Saídas', color: t.color.error.solid, dashed: false },
-            { label: 'Saldo', color: t.color.neutral[500], dashed: true },
-          ].map(item => (
-            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-              <svg width={16} height={4} style={{ display: 'block' }}>
-                <line
-                  x1={0} y1={2} x2={16} y2={2}
-                  stroke={item.color}
-                  strokeWidth={2}
-                  strokeDasharray={item.dashed ? '4,3' : undefined}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>{item.label}</span>
+      {/* KPI row */}
+      <div style={{ display: 'flex' }}>
+        {LC_KPIS.map((kpi, i) => (
+          <>
+            {i > 0 && <VDivider key={`d${i}`} color={bc} />}
+            <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+              {kpi.trend && (
+                <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+              )}
             </div>
-          ))}
+          </>
+        ))}
+      </div>
+      <HDivider color={bc} />
+
+      {/* Row 2 — Fluxo area chart full width */}
+      <div style={{ padding: t.space[5] }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Fluxo de Caixa — Realizado</div>
+          <div style={{ display: 'flex', gap: t.space[5] }}>
+            {[
+              { label: 'Entradas', color: t.color.brand[600], dashed: false },
+              { label: 'Saídas',   color: t.color.error.solid, dashed: false },
+              { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
+            ].map(item => (
+              <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
+                <svg width={16} height={4} style={{ display: 'block' }}>
+                  <line x1={0} y1={2} x2={16} y2={2} stroke={item.color} strokeWidth={2} strokeDasharray={item.dashed ? '4,3' : undefined} strokeLinecap="round" />
+                </svg>
+                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
         <FluxoAreaChart colors={colors} isGbMode={isGbMode} />
-      </ChartCard>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: t.space[4] }}>
-        <ChartCard icon={List} title="Últimas Movimentações">
-          <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
-        </ChartCard>
-
-        <ChartCard icon={Building2} title="Saldo por Conta">
-          <SaldoPorConta colors={colors} isGbMode={isGbMode} />
-        </ChartCard>
       </div>
-    </div>
+      <HDivider color={bc} />
+
+      {/* Row 3 — Movimentações + Saldo por Conta */}
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 3, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
+          <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
+        </div>
+        <VDivider color={bc} />
+        <div style={{ flex: 2, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
+          <SaldoPorConta colors={colors} isGbMode={isGbMode} />
+        </div>
+      </div>
     </div>
   )
 }

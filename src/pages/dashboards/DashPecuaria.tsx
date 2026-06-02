@@ -1,17 +1,9 @@
 import { useEffect, useState } from 'react'
-import {
-  Beef,
-  Scale,
-  TrendingUp,
-  Activity,
-  PieChart,
-  Calendar,
-} from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { KpiStatCard } from '../../components/ui/KpiStatCard'
-import { ChartCard } from '../../components/ui/ChartCard'
 import { Skeleton } from '../../components/ui/Skeleton'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -384,6 +376,13 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
 
 // ─── DashPecuaria ─────────────────────────────────────────────────────────────
 
+const PEC_KPIS = [
+  { label: 'Total Cabeças',  value: '4.280',      trend: '3,2%', up: true  },
+  { label: 'Peso Médio',     value: '384 kg',     trend: '1,8%', up: true  },
+  { label: 'Arrobas/mês',   value: '2.156 @',    trend: '7,4%', up: true  },
+  { label: 'GMD',            value: '0,82 kg/dia', trend: '0,4%', up: false },
+]
+
 export default function DashPecuaria() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
@@ -393,84 +392,68 @@ export default function DashPecuaria() {
     return () => clearTimeout(timer)
   }, [])
 
+  const bc = colors.border as string
+
+  const cardStyle: React.CSSProperties = {
+    margin: `${t.space[5]}px ${t.space[6]}px`,
+    display: 'flex', flexDirection: 'column',
+    background: colors.surfaceBg,
+    borderRadius: t.radius['2xl'],
+    border: `1px solid ${bc}`,
+    boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    fontFamily: t.font.family.sans,
+  }
+
   if (isLoading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[6], padding: t.space[6] }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height={120} />)}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: t.space[4] }}>
-          <Skeleton height={280} />
-          <Skeleton height={280} />
-        </div>
-        <Skeleton height={240} />
-      </div>
-    )
+    return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
   return (
-    <div style={{
-      margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.surfaceBg,
-      borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border}`,
-      boxShadow: isGbMode
-        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
-    }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[6], padding: t.space[6], fontFamily: t.font.family.sans }}>
-      {/* Row 1 — KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-        <KpiStatCard
-          icon={Beef}
-          label="Total Cabeças"
-          value="4.280"
-          trend="▲ 3,2% vs mês ant."
-          trendUp
-          accentColor="#d97706"
-        />
-        <KpiStatCard
-          icon={Scale}
-          label="Peso Médio"
-          value="384 kg"
-          trend="▲ 1,8% vs mês ant."
-          trendUp
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={TrendingUp}
-          label="Arrobas/mês"
-          value="2.156 @"
-          trend="▲ 7,4% vs mês ant."
-          trendUp
-          accentColor={t.color.brand[700]}
-        />
-        <KpiStatCard
-          icon={Activity}
-          label="GMD"
-          value="0,82 kg/dia"
-          trend="▼ 0,4% vs mês ant."
-          trendUp={false}
-          accentColor={t.color.notification}
-        />
+    <div style={cardStyle}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Pecuária de Corte</span>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+          Últimos 30 dias <ChevronDown size={11} />
+        </button>
       </div>
+      <HDivider color={bc} />
 
-      {/* Row 2 — Area Chart + Donut */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: t.space[4] }}>
-        <ChartCard icon={TrendingUp} title="Evolução do Rebanho">
+      {/* KPI row */}
+      <div style={{ display: 'flex' }}>
+        {PEC_KPIS.map((kpi, i) => (
+          <>
+            {i > 0 && <VDivider key={`d${i}`} color={bc} />}
+            <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+            </div>
+          </>
+        ))}
+      </div>
+      <HDivider color={bc} />
+
+      {/* Row 2 — Area chart + Donut */}
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 2, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Evolução do Rebanho</div>
           <AreaChartRebanho colors={colors} isGbMode={isGbMode} />
-        </ChartCard>
-
-        <ChartCard icon={PieChart} title="Composição do Rebanho">
+        </div>
+        <VDivider color={bc} />
+        <div style={{ flex: 1, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Composição do Rebanho</div>
           <DonutRebanho colors={colors} />
-        </ChartCard>
+        </div>
       </div>
+      <HDivider color={bc} />
 
-      {/* Row 3 — Manejos grouped bar */}
-      <ChartCard icon={Calendar} title="Manejos por Mês">
+      {/* Row 3 — Manejos */}
+      <div style={{ padding: t.space[5] }}>
+        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Manejos por Mês</div>
         <ManejosBars colors={colors} isGbMode={isGbMode} />
-      </ChartCard>
-    </div>
+      </div>
     </div>
   )
 }

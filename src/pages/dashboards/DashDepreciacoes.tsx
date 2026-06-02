@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { Building2, TrendingDown, Archive, DollarSign, BarChart3, PieChart } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { ChartCard } from '../../components/ui/ChartCard'
-import { KpiStatCard } from '../../components/ui/KpiStatCard'
 import { Skeleton } from '../../components/ui/Skeleton'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Stacked Bar Chart ────────────────────────────────────────────────────────
 
@@ -437,91 +436,87 @@ function ProjectionChart() {
 
 // ─── DashDepreciacoes ─────────────────────────────────────────────────────────
 
+const DEP_KPIS = [
+  { label: 'Valor Total Bens',    value: 'R$ 8,4M',   trend: '2,1%', up: true  },
+  { label: 'Depreciação Mensal',  value: 'R$ 42.380',  trend: null,   up: true  },
+  { label: 'Dep. Acumulada',      value: 'R$ 2,1M',   trend: '6,3%', up: true  },
+  { label: 'Valor Residual',      value: 'R$ 6,3M',   trend: '0,8%', up: false },
+]
+
 export default function DashDepreciacoes() {
   const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setLoading(false), 600)
+    return () => clearTimeout(timer)
   }, [])
 
+  const bc = colors.border as string
+
+  const cardStyle: React.CSSProperties = {
+    margin: `${t.space[5]}px ${t.space[6]}px`,
+    display: 'flex', flexDirection: 'column',
+    background: colors.surfaceBg,
+    borderRadius: t.radius['2xl'],
+    border: `1px solid ${bc}`,
+    boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    overflow: 'hidden',
+    fontFamily: t.font.family.sans,
+  }
+
   if (loading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-          {Array.from({ length: 4 }, (_, i) => <Skeleton key={i} height={110} />)}
-        </div>
-        <Skeleton height={260} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
-          <Skeleton height={260} />
-          <Skeleton height={260} />
-        </div>
-      </div>
-    )
+    return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
   return (
-    <div style={{
-      margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.surfaceBg,
-      borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border}`,
-      boxShadow: isGbMode
-        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
-    }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
-      {/* Row 1 — KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
-        <KpiStatCard
-          icon={Building2}
-          label="Valor Total Bens"
-          value="R$ 8,4M"
-          trend="2,1%"
-          trendUp
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={TrendingDown}
-          label="Depreciação Mensal"
-          value="R$ 42.380"
-          accentColor={t.color.error.text}
-        />
-        <KpiStatCard
-          icon={Archive}
-          label="Dep. Acumulada"
-          value="R$ 2,1M"
-          trend="6,3%"
-          trendUp
-          accentColor={t.color.neutral[500]}
-        />
-        <KpiStatCard
-          icon={DollarSign}
-          label="Valor Residual"
-          value="R$ 6,3M"
-          trend="0,8%"
-          trendUp={false}
-          accentColor={t.color.brand[700]}
-        />
+    <div style={cardStyle}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Depreciações</span>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+          Últimos 30 dias <ChevronDown size={11} />
+        </button>
       </div>
+      <HDivider color={bc} />
 
-      {/* Row 2 — Stacked bar */}
-      <ChartCard
-        icon={BarChart3}
-        title="Depreciação por Categoria — Últimos 12 Meses"
-        action={<StackedLegend />}
-      >
+      {/* KPI row */}
+      <div style={{ display: 'flex' }}>
+        {DEP_KPIS.map((kpi, i) => (
+          <>
+            {i > 0 && <VDivider key={`d${i}`} color={bc} />}
+            <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+              {kpi.trend && (
+                <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+              )}
+            </div>
+          </>
+        ))}
+      </div>
+      <HDivider color={bc} />
+
+      {/* Row 2 — Stacked bar full width */}
+      <div style={{ padding: t.space[5] }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Depreciação por Categoria — 12 Meses</div>
+          <StackedLegend />
+        </div>
         <StackedBarChart />
-      </ChartCard>
+      </div>
+      <HDivider color={bc} />
 
       {/* Row 3 — Donut + Projection */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
-        <ChartCard icon={PieChart} title="Composição por Tipo de Bem">
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 1, padding: t.space[5] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Composição por Tipo de Bem</div>
           <DonutChart />
-        </ChartCard>
-        <ChartCard icon={TrendingDown} title="Projeção Próximos 24 Meses">
-          <div style={{ marginBottom: t.space[2] }}>
+        </div>
+        <VDivider color={bc} />
+        <div style={{ flex: 1, padding: t.space[5] }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Projeção Próximos 24 Meses</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                 <div style={{ width: 16, height: 2, background: t.color.brand[600] }} />
@@ -534,9 +529,8 @@ export default function DashDepreciacoes() {
             </div>
           </div>
           <ProjectionChart />
-        </ChartCard>
+        </div>
       </div>
-    </div>
     </div>
   )
 }

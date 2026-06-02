@@ -504,7 +504,7 @@ export default function OverviewPanel() {
         </div>
 
         {/* ── Right aside ────────────────────────────────────────────────────── */}
-        <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
 
           {/* Radial gauge */}
           <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, borderBottom: sectionBorder, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

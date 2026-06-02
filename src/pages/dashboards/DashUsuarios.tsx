@@ -459,6 +459,15 @@ export default function DashUsuarios() {
   }
 
   return (
+    <div style={{
+      margin: `${t.space[5]}px ${t.space[6]}px`,
+      background: colors.surfaceBg,
+      borderRadius: t.radius['2xl'],
+      border: `1px solid ${colors.border}`,
+      boxShadow: isGbMode
+        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
       {/* Row 1 — KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
@@ -512,6 +521,7 @@ export default function DashUsuarios() {
       <ChartCard icon={Clock} title="Picos de Acesso por Hora">
         <HourlyStackedChart />
       </ChartCard>
+    </div>
     </div>
   )
 }

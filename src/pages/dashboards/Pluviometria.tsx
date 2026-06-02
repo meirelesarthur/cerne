@@ -543,6 +543,15 @@ export default function Pluviometria() {
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
   return (
+    <div style={{
+      margin: `${t.space[5]}px ${t.space[6]}px`,
+      background: colors.surfaceBg,
+      borderRadius: t.radius['2xl'],
+      border: `1px solid ${colors.border}`,
+      boxShadow: isGbMode
+        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    }}>
     <div
       style={{
         padding: t.space[4],
@@ -879,6 +888,7 @@ export default function Pluviometria() {
       ) : (
         <VolumeAreaChart colors={colors} isGbMode={isGbMode} />
       )}
+    </div>
     </div>
   )
 }

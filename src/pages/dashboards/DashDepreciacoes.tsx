@@ -438,7 +438,7 @@ function ProjectionChart() {
 // ─── DashDepreciacoes ─────────────────────────────────────────────────────────
 
 export default function DashDepreciacoes() {
-  const { colors } = useTheme()
+  const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -462,6 +462,15 @@ export default function DashDepreciacoes() {
   }
 
   return (
+    <div style={{
+      margin: `${t.space[5]}px ${t.space[6]}px`,
+      background: colors.surfaceBg,
+      borderRadius: t.radius['2xl'],
+      border: `1px solid ${colors.border}`,
+      boxShadow: isGbMode
+        ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
+        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], padding: t.space[4] }}>
       {/* Row 1 — KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4] }}>
@@ -527,6 +536,7 @@ export default function DashDepreciacoes() {
           <ProjectionChart />
         </ChartCard>
       </div>
+    </div>
     </div>
   )
 }

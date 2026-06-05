@@ -139,6 +139,9 @@ export function DataTable<T extends object>({
                           padding: `${t.space[2] + 4}px ${t.space[4]}px`,
                           textAlign: col.align ?? 'left',
                           transition: 'color 0.2s, background 0.15s',
+                          height: 48,
+                          maxHeight: 48,
+                          overflow: 'hidden',
                         }}
                       >
                         {col.render(row)}

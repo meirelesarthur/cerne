@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 
-type AvatarSize = 'sm' | 'md' | 'lg'
+type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
 
 interface AvatarProps {
   name:   string
@@ -13,12 +13,14 @@ const sizePx: Record<AvatarSize, number> = {
   sm: 28,
   md: 36,
   lg: 48,
+  xl: 64,
 }
 
 const fontFor: Record<AvatarSize, number> = {
   sm: t.font.size.xs,
   md: t.font.size.base,
   lg: t.font.size.lg,
+  xl: t.font.size['2xl'],
 }
 
 function initials(name: string): string {

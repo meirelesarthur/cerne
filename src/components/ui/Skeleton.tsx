@@ -1,5 +1,5 @@
-import React from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 type SkeletonVariant = 'text' | 'rect' | 'circle'
 
@@ -41,6 +41,7 @@ function SkeletonBlock({
   className?: string
 }) {
   injectStyles()
+  const { colors } = useTheme()
 
   const isCircle = variant === 'circle'
 
@@ -63,7 +64,7 @@ function SkeletonBlock({
         width:        resolvedWidth,
         height:       resolvedHeight,
         borderRadius: isCircle ? t.radius.full : t.radius.md,
-        background:   t.color.neutral[200],
+        background:   colors.border,
         animation:    `gb-skeleton-pulse ${t.animation.duration.slower} ease-in-out infinite`,
       }}
     />

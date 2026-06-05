@@ -1,10 +1,12 @@
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface DividerProps {
   label?: string
 }
 
 export function Divider({ label }: DividerProps) {
+  const { colors } = useTheme()
   return (
     <div
       role="separator"
@@ -16,14 +18,14 @@ export function Divider({ label }: DividerProps) {
     >
       <div
         aria-hidden="true"
-        style={{ flex: 1, height: 1, background: t.color.neutral[200] }}
+        style={{ flex: 1, height: 1, background: colors.border }}
       />
       {label && (
         <span
           style={{
             fontSize: t.font.size.xs,
             fontFamily: t.font.family.sans,
-            color: t.color.neutral[400],
+            color: colors.textMuted,
             whiteSpace: 'nowrap',
             flexShrink: 0,
           }}
@@ -33,7 +35,7 @@ export function Divider({ label }: DividerProps) {
       )}
       <div
         aria-hidden="true"
-        style={{ flex: 1, height: 1, background: t.color.neutral[200] }}
+        style={{ flex: 1, height: 1, background: colors.border }}
       />
     </div>
   )

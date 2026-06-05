@@ -14,8 +14,8 @@ const variantStyles: Record<BadgeVariant, { background: string; color: string }>
   warning: { background: t.color.warning.bg,   color: t.color.warning.text },
   neutral: { background: t.color.neutral[100], color: t.color.neutral[500] },
   info:    { background: t.color.info.bg,      color: t.color.info.text },
-  purple:  { background: '#f5f3ff',            color: '#7c3aed' },
-  cyan:    { background: '#ecfeff',            color: '#0891b2' },
+  purple:  { background: t.color.purple.bg,    color: t.color.purple.text },
+  cyan:    { background: t.color.cyan.bg,      color: t.color.cyan.text },
 }
 
 export function Badge({ label, variant }: BadgeProps) {

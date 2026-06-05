@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Package,
+  Plus, Pencil, Trash2,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -12,6 +12,8 @@ import { TableSearchInput, FilterChip, FilterButton } from '../../../components/
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
@@ -208,55 +210,20 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
         </>
       )}
 
-      {/* Rodapé */}
-      {!isLoading && filtered.length > 0 && (
-        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          N. Registros: {filtered.length}
-        </div>
-      )}
-
-      {/* ── Modal: Confirmar exclusão ────────────────────────────────────────── */}
-      {deleteTarget && (
-        <Modal onClose={() => setDeleteTarget(null)}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '4px 0' }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%',
-              background: '#fee2e2',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Trash2 size={22} color="#dc2626" />
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold,
-                color: colors.textPrimary, fontFamily: t.font.family.sans, marginBottom: 8,
-              }}>
-                Excluir embalagem?
-              </div>
-              <p style={{
-                fontSize: t.font.size.sm, color: colors.textSecondary,
-                fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0,
-              }}>
-                <strong style={{ color: colors.textPrimary }}>{deleteTarget.descricao}</strong>{' '}
-                será excluída permanentemente. Esta ação não pode ser desfeita.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
-              <Button variant="secondary" style={{ flex: 1 }} onClick={() => setDeleteTarget(null)}>
-                Cancelar
-              </Button>
-              <Button
-                variant="destructive"
-                style={{ flex: 1 }}
-                onClick={handleDeleteConfirm}
-              >
-                <Trash2 size={13} />
-                Excluir
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
+      {/* ── ConfirmDialog: Confirmar exclusão ───────────────────────────────── */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        tone="destructive"
+        title="Excluir embalagem?"
+        message={
+          deleteTarget
+            ? `"${deleteTarget.descricao}" será excluída permanentemente. Esta ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Excluir"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
@@ -332,104 +299,10 @@ function EmbalagemRow({
 
       {/* Ações inline */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-        <ActionBtn icon={<Pencil size={13} />} label="Editar"  onClick={onEdit}      colors={colors} />
-        <ActionBtn icon={<Trash2 size={13} />} label="Excluir" onClick={onDeleteReq} colors={colors} danger />
+        <IconButton icon={<Pencil size={13} />} aria-label="Editar"  size="xs" onClick={onEdit} />
+        <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" size="xs" danger onClick={onDeleteReq} />
       </div>
     </div>
   )
 }
 
-function ActionBtn({
-  icon, label, onClick, colors, danger = false,
-}: {
-  icon:    React.ReactNode
-  label:   string
-  onClick: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  danger?: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      type="button"
-      title={label}
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        width: 30, height: 30,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent',
-        border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`,
-        borderRadius: t.radius.DEFAULT,
-        cursor: 'pointer',
-        color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted,
-        transition: 'background 0.12s, border-color 0.12s, color 0.12s',
-      }}
-    >
-      {icon}
-    </button>
-  )
-}
-
-// ─── EmptyState ───────────────────────────────────────────────────────────────
-
-function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolean }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '60px 20px', gap: 12, textAlign: 'center',
-    }}>
-      <div style={{
-        width: 56, height: 56, borderRadius: 16, background: colors.brandBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Package size={24} color={colors.brand} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Nenhuma embalagem encontrada' : 'Nenhuma embalagem cadastrada'}
-      </div>
-      <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Ajuste o filtro de busca ou' : 'Comece adicionando sua primeira embalagem.'}
-      </div>
-      {!hasSearch && (
-        <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-          Adicionar Embalagem
-        </Button>
-      )}
-    </div>
-  )
-}
-
-// ─── Modal ────────────────────────────────────────────────────────────────────
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay, padding: 24,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: colors.surfaceBg, borderRadius: 24, padding: '28px',
-          maxWidth: 420, width: '100%',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-          animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-      <style>{`
-        @keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }
-      `}</style>
-    </div>
-  )
-}

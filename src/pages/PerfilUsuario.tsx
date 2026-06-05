@@ -1,21 +1,27 @@
 import { useState } from 'react'
-import { ChevronDown, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
+import { FormField } from '../components/ui/FormField'
+import { FormSelect } from '../components/ui/FormSelect'
+import { Button } from '../components/ui/Button'
+import { Avatar } from '../components/ui/Avatar'
+import { Heading } from '../components/ui/Heading'
+import { t } from '../design/tokens'
 
 // ─── primitives ──────────────────────────────────────────────────────────────
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 18, fontWeight: 400, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif", marginBottom: 16 }}>
+    <Heading level={2} size="lg" weight="normal" style={{ marginBottom: t.space[4] }}>
       {children}
-    </div>
+    </Heading>
   )
 }
 
 function SubTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
+    <Heading level={3} size="md" weight="medium" style={{ marginBottom: t.space[1] }}>
       {children}
-    </div>
+    </Heading>
   )
 }
 
@@ -40,110 +46,6 @@ function Section({ children, last }: { children: React.ReactNode; last?: boolean
       }}
     >
       {children}
-    </div>
-  )
-}
-
-function InputField({
-  label,
-  value,
-  type = 'text',
-  editable = true,
-  width,
-}: {
-  label: string
-  value: string
-  type?: string
-  editable?: boolean
-  width?: number | string
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: width ?? 320 }}>
-      <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif" }}>
-        {label}
-      </div>
-      <div style={{ position: 'relative' }}>
-        <input
-          type={type}
-          defaultValue={value}
-          style={{
-            width: '100%',
-            height: 40,
-            padding: '0 36px 0 13px',
-            border: '1px solid rgba(16,16,16,0.15)',
-            borderRadius: 8,
-            fontSize: 14,
-            color: '#1a1a1a',
-            background: 'white',
-            fontFamily: "'Outfit', sans-serif",
-            outline: 'none',
-            boxSizing: 'border-box',
-          }}
-          onFocus={(e) => { e.currentTarget.style.borderColor = '#059669' }}
-          onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(16,16,16,0.15)' }}
-        />
-        {editable && (
-          <div
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#9ca3af',
-            }}
-          >
-            <Pencil size={13} />
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function SelectField({ label, value, options, width }: { label: string; value: string; options: string[]; width?: number }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-      <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif" }}>
-        {label}
-      </div>
-      <div style={{ position: 'relative', width: width }}>
-        <select
-          defaultValue={value}
-          style={{
-            appearance: 'none',
-            width: '100%',
-            height: 40,
-            padding: '0 40px 0 13px',
-            border: '1px solid rgba(16,16,16,0.1)',
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 600,
-            color: '#1a1a1a',
-            background: 'white',
-            fontFamily: "'Outfit', sans-serif",
-            outline: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          {options.map((o) => <option key={o}>{o}</option>)}
-        </select>
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: 36,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderLeft: '1px solid rgba(16,16,16,0.05)',
-            pointerEvents: 'none',
-          }}
-        >
-          <ChevronDown size={15} color="#9ca3af" />
-        </div>
-      </div>
     </div>
   )
 }
@@ -181,36 +83,6 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
   )
 }
 
-function ActionButton({ children, variant = 'outline', onClick }: { children: React.ReactNode; variant?: 'outline' | 'danger'; onClick?: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        height: 32,
-        padding: '0 17px',
-        border: `1px solid ${variant === 'danger' ? 'rgba(220,38,38,0.3)' : 'rgba(16,16,16,0.2)'}`,
-        borderRadius: 8,
-        background: 'white',
-        fontSize: 12,
-        fontWeight: 500,
-        color: variant === 'danger' ? '#dc2626' : '#1a1a1a',
-        fontFamily: "'Outfit', sans-serif",
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        whiteSpace: 'nowrap',
-        transition: 'background 0.12s',
-        flexShrink: 0,
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = variant === 'danger' ? '#fee2e2' : '#f5f5f5' }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'white' }}
-    >
-      {children}
-    </button>
-  )
-}
-
 // ─── main component ───────────────────────────────────────────────────────────
 
 export default function PerfilUsuario() {
@@ -226,32 +98,15 @@ export default function PerfilUsuario() {
         boxSizing: 'border-box',
       }}
     >
-      <h1 style={{ fontSize: 18, fontWeight: 400, color: '#1a1a1a', margin: '0 0 28px' }}>
+      <Heading level={1} size="xl" weight="normal" style={{ marginBottom: t.space[7] }}>
         Perfil
-      </h1>
+      </Heading>
 
       {/* ── Avatar ── */}
       <Section>
         <SectionTitle>Avatar</SectionTitle>
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #059669, #34d399)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: 22,
-            fontWeight: 700,
-            cursor: 'pointer',
-            position: 'relative',
-            flexShrink: 0,
-          }}
-          title="Alterar avatar"
-        >
-          SV
+        <div title="Alterar avatar" style={{ cursor: 'pointer', display: 'inline-flex' }}>
+          <Avatar name="Silvio Ventura" size="xl" />
         </div>
       </Section>
 
@@ -259,9 +114,27 @@ export default function PerfilUsuario() {
       <Section>
         <SectionTitle>Dados pessoais</SectionTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <InputField label="Nome completo" value="Silvio Ventura Abreu" />
-          <InputField label="Usuário" value="silvioventura" />
-          <InputField label="E-mail" value="ventura.silvio@greenbelt-ti.com" editable={false} width="100%" />
+          <div style={{ width: 320 }}>
+            <FormField
+              label="Nome completo"
+              defaultValue="Silvio Ventura Abreu"
+              iconRight={<Pencil size={13} color="#9ca3af" />}
+            />
+          </div>
+          <div style={{ width: 320 }}>
+            <FormField
+              label="Usuário"
+              defaultValue="silvioventura"
+              iconRight={<Pencil size={13} color="#9ca3af" />}
+            />
+          </div>
+          <div style={{ width: '100%' }}>
+            <FormField
+              label="E-mail"
+              defaultValue="ventura.silvio@greenbelt-ti.com"
+              readOnly
+            />
+          </div>
         </div>
       </Section>
 
@@ -269,12 +142,51 @@ export default function PerfilUsuario() {
       <Section>
         <SectionTitle>Preferências do sistema</SectionTitle>
         <div style={{ display: 'flex', gap: 16, maxWidth: 620 }}>
-          <SelectField label="Idioma" value="Português (BR)" options={['Português (BR)', 'English', 'Español']} />
-          <SelectField label="Tema" value="Claro" options={['Claro', 'Escuro', 'Sistema']} />
+          <div style={{ flex: 1 }}>
+            <FormSelect
+              label="Idioma"
+              defaultValue="Português (BR)"
+              options={[
+                { value: 'Português (BR)', label: 'Português (BR)' },
+                { value: 'English', label: 'English' },
+                { value: 'Español', label: 'Español' },
+              ]}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <FormSelect
+              label="Tema"
+              defaultValue="Claro"
+              options={[
+                { value: 'Claro', label: 'Claro' },
+                { value: 'Escuro', label: 'Escuro' },
+                { value: 'Sistema', label: 'Sistema' },
+              ]}
+            />
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 16, maxWidth: 620 }}>
-          <SelectField label="Fazenda padrão" value="Fazenda Santa Luzia" options={['Fazenda Santa Luzia', 'Fazenda Bela Vista', 'Fazenda Cerrado Verde']} />
-          <SelectField label="Safra padrão" value="Safra 2024/25" options={['Safra 2024/25', 'Safra 2025/26']} />
+          <div style={{ flex: 1 }}>
+            <FormSelect
+              label="Fazenda padrão"
+              defaultValue="Fazenda Santa Luzia"
+              options={[
+                { value: 'Fazenda Santa Luzia', label: 'Fazenda Santa Luzia' },
+                { value: 'Fazenda Bela Vista', label: 'Fazenda Bela Vista' },
+                { value: 'Fazenda Cerrado Verde', label: 'Fazenda Cerrado Verde' },
+              ]}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <FormSelect
+              label="Safra padrão"
+              defaultValue="Safra 2024/25"
+              options={[
+                { value: 'Safra 2024/25', label: 'Safra 2024/25' },
+                { value: 'Safra 2025/26', label: 'Safra 2025/26' },
+              ]}
+            />
+          </div>
         </div>
       </Section>
 
@@ -289,7 +201,7 @@ export default function PerfilUsuario() {
             <Muted>
               <strong style={{ fontWeight: 600 }}>Atualize sua senha</strong> pelo botão abaixo. Você será redirecionado para uma nova página e deverá seguir as instruções.
             </Muted>
-            <ActionButton>Alterar senha</ActionButton>
+            <Button variant="secondary" size="sm">Alterar senha</Button>
           </div>
         </div>
 
@@ -331,7 +243,7 @@ export default function PerfilUsuario() {
           </svg>
           <span style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif", width: 60 }}>Google</span>
           <span style={{ flex: 1, fontSize: 14, color: '#616161', fontFamily: "'Outfit', sans-serif" }}>Conectado</span>
-          <ActionButton>Desconectar</ActionButton>
+          <Button variant="secondary" size="sm">Desconectar</Button>
         </div>
       </Section>
 
@@ -420,7 +332,9 @@ export default function PerfilUsuario() {
       {/* ── Excluir conta ── */}
       <Section last>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <ActionButton variant="danger">Excluir conta</ActionButton>
+          <div style={{ width: 'fit-content' }}>
+            <Button variant="destructive" size="sm">Excluir conta</Button>
+          </div>
           <p style={{ fontSize: 12, color: '#424242', fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
             <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
             Entre em contato com{' '}

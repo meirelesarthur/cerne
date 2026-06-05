@@ -5,6 +5,8 @@ import { ModuleCard, type ModuleCardConfig } from '../components/ModuleCard'
 import { menuModules } from '../data/menuData'
 import { useNavigation } from '../context/NavigationContext'
 import { useTheme } from '../context/ThemeContext'
+import { Button } from '../components/ui/Button'
+import { Heading } from '../components/ui/Heading'
 
 const moduleCardConfig: Record<string, ModuleCardConfig> = {
   painel:         { desc: 'Visão geral e indicadores' },
@@ -45,23 +47,22 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[3] }}>
-      <h3 style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary, margin: 0, transition: 'color 0.2s' }}>{title}</h3>
+      <Heading level={3} size="base" weight="semibold">{title}</Heading>
       {action && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowRight size={11} />}
           style={{
             fontSize: t.font.size.xs,
             color: colors.brand,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
             fontWeight: t.font.weight.medium,
+            height: 'auto',
+            padding: `${t.space[1]}px ${t.space[2]}px`,
           }}
         >
-          {action} <ArrowRight size={11} />
-        </button>
+          {action}
+        </Button>
       )}
     </div>
   )
@@ -75,19 +76,15 @@ export default function Dashboard() {
     <div style={{ padding: `${t.space[7]}px ${t.space[6]}px`, maxWidth: 1400, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       {/* Welcome + Search */}
       <div style={{ marginBottom: t.space[7], textAlign: 'center', paddingBottom: t.space[7] }}>
-        <h1
-          style={{
-            fontSize: t.font.size['3xl'],
-            fontWeight: t.font.weight.semibold,
-            color: colors.textPrimary,
-            marginBottom: t.space[2],
-            letterSpacing: '-0.4px',
-            fontFamily: "'Outfit', sans-serif",
-            transition: 'color 0.2s',
-          }}
+        <Heading
+          level={1}
+          size="3xl"
+          weight="semibold"
+          letterSpacing="-0.4px"
+          style={{ marginBottom: t.space[2] }}
         >
           Bom dia, vamos começar!
-        </h1>
+        </Heading>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <SearchBar />
         </div>
@@ -184,25 +181,25 @@ export default function Dashboard() {
                 </span>
               </div>
             ))}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<Plus size={13} />}
               onClick={() => navigateTo('cadastros', 'cad-est-faz')}
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                width: '100%',
                 justifyContent: 'center',
-                gap: 6,
                 padding: '9px',
-                borderRadius: t.radius.DEFAULT,
                 border: `1px dashed ${colors.border}`,
-                background: 'transparent',
-                cursor: 'pointer',
-                fontSize: t.font.size.sm,
+                borderRadius: t.radius.DEFAULT,
                 color: colors.textMuted,
+                fontSize: t.font.size.sm,
+                fontWeight: t.font.weight.medium,
                 transition: 'color 0.2s',
               }}
             >
-              <Plus size={13} /> Nova fazenda
-            </button>
+              Nova fazenda
+            </Button>
           </div>
         </div>
 

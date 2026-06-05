@@ -86,7 +86,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
           {...inputProps}
           style={{
             width: '100%',
-            height: 38,
+            height: t.size.control,
             border: `1.5px solid ${borderColor}`,
             borderRadius: t.radius.DEFAULT,
             paddingTop: 0,

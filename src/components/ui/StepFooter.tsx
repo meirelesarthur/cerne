@@ -54,7 +54,7 @@ export function StepFooter({
         <Button
           variant="secondary"
           size="md"
-          style={{ width: 180 }}
+          style={{ width: t.size.stepBtn }}
           onClick={onBack}
           disabled={isFirst}
         >
@@ -63,7 +63,7 @@ export function StepFooter({
         <Button
           variant="primary"
           size="md"
-          style={{ width: 180 }}
+          style={{ width: t.size.stepBtn }}
           onClick={onNext}
         >
           {label}

@@ -17,9 +17,9 @@ interface IconButtonProps {
 }
 
 const sizeValues: Record<IconButtonSize, number> = {
-  xs: 24,
-  sm: 30,
-  md: 36,
+  xs: t.size.iconBtn.sm,
+  sm: t.size.iconBtn.md,
+  md: t.size.iconBtn.lg,
 }
 
 export function IconButton({

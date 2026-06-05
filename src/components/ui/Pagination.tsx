@@ -66,8 +66,8 @@ export function Pagination({
     display:        'inline-flex',
     alignItems:     'center',
     justifyContent: 'center',
-    width:          32,
-    height:         32,
+    width:          t.size.pageBtn,
+    height:         t.size.pageBtn,
     borderRadius:   t.radius.md,
     border:         `1px solid ${colors.border}`,
     background:     colors.surfaceBg,
@@ -130,7 +130,7 @@ export function Pagination({
               value={pageSize}
               onChange={(e) => { onPageSizeChange(Number(e.target.value)); onPageChange(1) }}
               style={{
-                height:       32,
+                height:       t.size.pageBtn,
                 padding:      `0 ${t.space[2]}px`,
                 border:       `1px solid ${colors.border}`,
                 borderRadius: t.radius.md,
@@ -174,7 +174,7 @@ export function Pagination({
               <span
                 key={`ellipsis-${idx}`}
                 style={{
-                  width:          32,
+                  width:          t.size.pageBtn,
                   display:        'inline-flex',
                   alignItems:     'center',
                   justifyContent: 'center',

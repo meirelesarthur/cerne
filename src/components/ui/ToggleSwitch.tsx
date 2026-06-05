@@ -21,13 +21,13 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
         onClick={() => !disabled && onChange(!checked)}
         style={{
           position: 'relative',
-          width: 40,
+          width: t.size.toggle.track,
           height: 22,
           borderRadius: t.radius.full,
           background: checked ? t.color.brand[600] : colors.border,
           border: 'none',
           cursor: disabled ? 'not-allowed' : 'pointer',
-          transition: 'background 0.2s',
+          transition: `background ${t.transition.smooth}`,
           flexShrink: 0,
           opacity: disabled ? 0.5 : 1,
           padding: 0,
@@ -38,12 +38,12 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
             position: 'absolute',
             top: 2,
             left: checked ? 20 : 2,
-            width: 18,
-            height: 18,
+            width: t.size.toggle.thumb,
+            height: t.size.toggle.thumb,
             borderRadius: '50%',
             background: 'white',
             boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-            transition: 'left 0.2s',
+            transition: `left ${t.transition.smooth}`,
           }}
         />
       </button>

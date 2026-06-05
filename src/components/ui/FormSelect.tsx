@@ -49,7 +49,7 @@ export function FormSelect({ label, required, error, hint, options, style, ...se
           {...selectProps}
           style={{
             width: '100%',
-            height: 38,
+            height: t.size.control,
             border: error
               ? `1.5px solid ${t.color.error.text}`
               : `1.5px solid ${colors.border}`,

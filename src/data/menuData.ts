@@ -106,19 +106,14 @@ export const menuModules: NavModule[] = [
         label: 'Estrutura',
         icon: Layers,
         items: [
-          { id: 'cad-est-cc', label: 'Centros de Custo', path: '/cadastros/centros-custo' },
-          { id: 'cad-est-faz', label: 'Fazendas', path: '/cadastros/fazendas' },
-          { id: 'cad-est-saf', label: 'Safras', path: '/cadastros/safras' },
-          {
-            id: 'cad-est-pro', label: 'Produtos', path: '/cadastros/produtos',
-            children: [
-              { id: 'cad-est-pro-lista', label: 'Catálogo',       path: '/cadastros/produtos/catalogo' },
-              { id: 'cad-est-emb',       label: 'Embalagens',     path: '/cadastros/embalagens' },
-              { id: 'cad-est-arm',       label: 'Armazéns',       path: '/cadastros/armazens' },
-              { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',  path: '/cadastros/estoques-iniciais' },
-            ],
-          },
-          { id: 'cad-est-end', label: 'Endereçamentos', path: '/cadastros/enderecos' },
+          { id: 'cad-est-cc',        label: 'Centros de Custo', path: '/cadastros/centros-custo' },
+          { id: 'cad-est-faz',       label: 'Fazendas',         path: '/cadastros/fazendas' },
+          { id: 'cad-est-saf',       label: 'Safras',           path: '/cadastros/safras' },
+          { id: 'cad-est-pro-lista', label: 'Catálogo',         path: '/cadastros/produtos/catalogo' },
+          { id: 'cad-est-emb',       label: 'Embalagens',       path: '/cadastros/embalagens' },
+          { id: 'cad-est-arm',       label: 'Armazéns',         path: '/cadastros/armazens' },
+          { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',    path: '/cadastros/estoques-iniciais' },
+          { id: 'cad-est-end',       label: 'Endereçamentos',   path: '/cadastros/enderecos' },
         ],
       },
       {

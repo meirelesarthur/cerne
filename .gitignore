@@ -8,8 +8,8 @@ dist/
 Thumbs.db
 storybook-static/
 
-# Claude Code plugins (local only — não versionar)
-# .claude/plugins/ui-ux-pro-max/
+# Claude Code (local only — não versionar)
+.claude/
 
 # Vídeos — hospedados no Cloudflare R2, não versionar
 *.mp4

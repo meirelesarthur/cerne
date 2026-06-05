@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from 'react'
-import { ArrowLeft, ArrowRight, Save, Calendar } from 'lucide-react'
+import { ArrowLeft, Calendar } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { Stepper }       from '../../../components/ui/Stepper'
+import { StepHeader }    from '../../../components/ui/StepHeader'
+import { StepFooter }    from '../../../components/ui/StepFooter'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { WeekCanvas }    from './WeekCanvas'
@@ -214,23 +215,15 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
       </div>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginTop: 16, padding: '16px 0',
-      }}>
-        <Button variant="secondary" onClick={handleBack} icon={<ArrowLeft size={14} />}>
-          {step === 1 ? 'Cancelar' : 'Voltar'}
-        </Button>
-        {step === 1 ? (
-          <Button variant="primary" onClick={handleNextStep} icon={<ArrowRight size={14} />}>
-            Configurar Semanas
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
-            Salvar Safra
-          </Button>
-        )}
-      </div>
+      <StepFooter
+        currentStep={step}
+        totalSteps={2}
+        onBack={handleBack}
+        onNext={step === 1 ? handleNextStep : handleSave}
+        backLabel={step === 1 ? 'Cancelar' : 'Voltar'}
+        nextLabel={step === 1 ? 'Configurar Semanas' : 'Salvar Safra'}
+        backDisabled={false}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
@@ -337,15 +330,10 @@ function Step2({
 }) {
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: t.font.size.xl, fontWeight: 700, color: '#171717', margin: '0 0 4px', fontFamily: "'Outfit', sans-serif" }}>
-          Código Visual de Semanas
-        </h2>
-        <p style={{ fontSize: 13, color: '#6b7280', margin: 0, fontFamily: "'Outfit', sans-serif", lineHeight: 1.5 }}>
-          Defina as cores de cada semana. Este código será exibido em calendários, relatórios e dashboards.
-          Clique e arraste sobre os tiles para pintar múltiplas semanas de uma vez.
-        </p>
-      </div>
+      <StepHeader
+        title="Código Visual de Semanas"
+        subtitle="Defina as cores de cada semana. Este código será exibido em calendários, relatórios e dashboards. Clique e arraste sobre os tiles para pintar múltiplas semanas de uma vez."
+      />
       <WeekCanvas
         weeks={weeks}
         desc={form.desc}

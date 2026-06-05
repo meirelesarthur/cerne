@@ -10,6 +10,8 @@ interface StepFooterProps {
   onNext: () => void
   nextLabel?: string
   backLabel?: string
+  /** Sobrescreve o desabilitar padrão do botão Voltar (default: desabilitado na 1ª etapa). Útil quando a 1ª etapa deve permitir "Cancelar". */
+  backDisabled?: boolean
 }
 
 /**
@@ -23,11 +25,13 @@ export function StepFooter({
   onNext,
   nextLabel,
   backLabel = 'Voltar',
+  backDisabled,
 }: StepFooterProps) {
   const { colors } = useTheme()
   const isFirst = currentStep === 1
   const isLast  = currentStep === totalSteps
   const label   = nextLabel ?? (isLast ? 'Salvar' : 'Próximo')
+  const isBackDisabled = backDisabled ?? isFirst
 
   return (
     <div
@@ -44,7 +48,7 @@ export function StepFooter({
           fontSize: t.font.size.sm,
           color: colors.textMuted,
           fontFamily: t.font.family.sans,
-          transition: 'color 0.2s',
+          transition: `color ${t.transition.smooth}`,
         }}
       >
         Etapa {currentStep} de {totalSteps}
@@ -56,7 +60,7 @@ export function StepFooter({
           size="md"
           style={{ width: t.size.stepBtn }}
           onClick={onBack}
-          disabled={isFirst}
+          disabled={isBackDisabled}
         >
           {backLabel}
         </Button>

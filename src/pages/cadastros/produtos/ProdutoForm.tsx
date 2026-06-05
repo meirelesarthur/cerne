@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { Save } from 'lucide-react'
 import { PageContainer }      from '../../../components/ui/PageContainer'
 import { Button }             from '../../../components/ui/Button'
+import { FormPageHeader }     from '../../../components/ui/FormPageHeader'
 import { FormField }          from '../../../components/ui/FormField'
 import { FormSelect }         from '../../../components/ui/FormSelect'
 import { ToggleSwitch }       from '../../../components/ui/ToggleSwitch'
@@ -187,8 +188,6 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
     }, 150)
   }
 
-  const border = colors.border
-
   // Valores read-only formatados
   const codigoDisplay   = isEdit ? (initialData?.codigo ?? '—') : ''
   const precoDisplay    = initialData?.precoMedio
@@ -204,19 +203,11 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
     <PageContainer>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[6], paddingBottom: t.space[4], borderBottom: `1px solid ${border}` }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-            {isEdit ? 'Editar Produto' : 'Novo Produto'}
-          </h1>
-          <p style={{ margin: '4px 0 0', fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            {isEdit ? `Editando: ${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-          </p>
-        </div>
-        <Button variant="secondary" size="sm" icon={<ArrowLeft size={13} />} onClick={onBack}>
-          Voltar
-        </Button>
-      </div>
+      <FormPageHeader
+        title={isEdit ? 'Editar Produto' : 'Novo Produto'}
+        subtitle={isEdit ? `Editando: ${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+        onBack={onBack}
+      />
 
       {/* Formulário */}
       <div style={{ maxWidth: 800 }}>

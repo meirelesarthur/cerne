@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, Save, MapPin } from 'lucide-react'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button }        from '../../../components/ui/Button'
+import { Save, MapPin } from 'lucide-react'
+import { PageContainer }  from '../../../components/ui/PageContainer'
+import { Button }         from '../../../components/ui/Button'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
@@ -70,29 +71,11 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
     <PageContainer>
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: t.space[6], paddingBottom: t.space[4],
-        borderBottom: `1px solid ${border}`,
-      }}>
-        <div>
-          <h1 style={{
-            margin: 0, fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-            color: colors.textPrimary, fontFamily: t.font.family.sans,
-          }}>
-            {title}
-          </h1>
-          <p style={{ margin: '4px 0 0', fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-            {mode === 'edit'
-              ? `Editando: ${initialData!.descricao}`
-              : 'Preencha os campos abaixo para cadastrar.'
-            }
-          </p>
-        </div>
-        <Button variant="secondary" size="sm" icon={<ArrowLeft size={13} />} onClick={onBack}>
-          Voltar
-        </Button>
-      </div>
+      <FormPageHeader
+        title={title}
+        subtitle={mode === 'edit' ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+        onBack={onBack}
+      />
 
       {/* ── Card ────────────────────────────────────────────────────────────── */}
       <div style={{

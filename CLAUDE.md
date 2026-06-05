@@ -67,7 +67,7 @@ Todo elemento visível na tela é um componente de `src/components/ui/`.
 
 - Ao criar uma nova tela, apenas **importar e chamar** componentes existentes
 - Se o componente necessário não existe no catálogo, criá-lo em `src/components/ui/` **antes** de usá-lo na tela
-- Catálogo atual: `Badge`, `Button`, `Card`, `Checkbox`, `CollapsibleSection`, `DataTable`, `Divider`, `EmptyState`, `FilterDrawer`, `FormField`, `FormSection`, `FormSelect`, `IconButton`, `Modal`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `Skeleton`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar`, `ToggleSwitch`
+- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`, `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`, `FormSection`, `FormSelect`, `Heading`, `IconButton`, `Modal`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `Skeleton`, `Spinner`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar`, `Tabs`, `Tag`, `ToggleSwitch`, `Tooltip`
 
 ### Lei 2 — Fonte Única de Verdade (Propagação Global)
 
@@ -107,6 +107,106 @@ Após toda mudança concluída, um commit **deve ser criado imediatamente** — 
 - O push **nunca é feito automaticamente** — somente quando o usuário solicitar explicitamente
 - Mensagens de commit seguem o padrão Conventional Commits (`feat:`, `fix:`, `style:`, `refactor:`, `docs:`, etc.)
 - Um commit por unidade lógica de mudança — não acumular alterações não relacionadas no mesmo commit
+
+---
+
+## Padrões de Implementação (Modelo Canônico)
+
+Estas regras consolidam a auditoria e refatoração de toda a interface. **São de aplicação
+obrigatória** ao criar telas novas ou estender as existentes — o objetivo é escalar sempre
+sobre o mesmo modelo, nunca reinventando primitivas localmente.
+
+### Regra A — Proibido reimplementar primitiva que já existe no catálogo
+
+Antes de escrever qualquer JSX de tela, verifique o catálogo da Lei 1. É **violação** criar
+versão local de algo que o kit já oferece. Casos concretos já corrigidos (não repetir):
+
+| ❌ Nunca crie localmente | ✅ Use sempre |
+|---|---|
+| Modal de exclusão inline / `OverlayModal` local | `ConfirmDialog` |
+| `ActionBtn` / botão de ação de linha estilizado | `IconButton` |
+| `DropdownItem` + menu absoluto + estado de abertura manual | `DropdownMenu` |
+| `useToast`/`ToastMsg`/`TOAST_BG` locais | `useToast` + `ToastContainer` de `ui/Toast` |
+| `EmptyState` duplicado dentro da página | `EmptyState` |
+| Paginação custom com `<select>` de linhas | `Pagination` (tem `showPageSizeSelector`) |
+| Spinner manual / texto "Aguarde..." | prop `loading` do `Button` (mostra `Spinner` mantendo o rótulo) |
+| Avatar `<div>` com iniciais + gradiente | `Avatar` |
+| Breadcrumb `<nav>` inline | `Breadcrumb` |
+| Tooltip inline com `position: fixed` | `Tooltip` |
+| `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
+
+Se a primitiva **não existe**, crie-a em `src/components/ui/` com story, tokens e suporte aos
+dois temas **antes** de usá-la — nunca inline na página.
+
+### Regra B — Composição canônica de Listagens
+
+Toda tela de listagem segue esta ordem (referência: `FazendasLista.tsx`). É permitido grid
+manual quando o layout exige (árvore, cards), mas **as primitivas ao redor são sempre do kit**:
+
+```
+PageContainer
+  └── PageHeader (title, count, ação primária = Button)
+  └── [KPI/Summary bar opcional] — Skeleton enquanto isLoading
+  └── Toolbar: TableSearchInput · FilterChip(s) · "Limpar tudo" (Button ghost) · FilterButton
+  └── isLoading → Skeleton  |  vazio → EmptyState  |  dados → tabela/grid + Pagination
+  └── ConfirmDialog (exclusão)  ·  ToastContainer  ·  FilterDrawer > FormSelect
+```
+
+- Exclusão **sempre** via `ConfirmDialog` (Lei de ação destrutiva). Nunca excluir sem confirmação.
+- Ações de linha **sempre** via `IconButton` ou `DropdownMenu` — nunca `<button>` cru.
+- Sem rodapé "N. registros" redundante quando `PageHeader`/toolbar/`Pagination` já mostram o total.
+- Não deixar componente local morto (ex.: `EmptyState` definido e não usado) — remover.
+
+### Regra C — Composição canônica de CRUDs/Formulários
+
+- **Cabeçalho:** `FormPageHeader` (title + subtitle + Voltar). Padrão único — não recriar header
+  com `<h1>` + seta + ícone inline. Referência: `ProdutoForm.tsx`, `CentroCustoCadastro.tsx`.
+- **Single-page denso:** agrupar campos em `CollapsibleSection`. Referência: `ProdutoForm.tsx`.
+- **Multi-step:** `Stepper` + `StepHeader` (por etapa) + `StepFooter` (navegação).
+  Referência: `FazendaCadastro.tsx`, `SafraCadastro.tsx`. Não montar footer/header manual.
+- **Campos:** `FormField` (texto), `FormSelect` (select), `ToggleSwitch` (boolean). Nunca
+  `<input>`/`<select>` crus.
+- Validação inline por campo, foco no primeiro erro ao submeter (ver Diretrizes de Formulários).
+
+### Regra D — Extensão via props, nunca patch local (reforço da Lei 2)
+
+Quando um componente do kit não cobre um caso, **adicione uma prop opcional ao componente**
+(com default que preserva o comportamento atual) — nunca contorne com `style={}` inline na
+página nem clone o componente. Exemplo já aplicado: `StepFooter` ganhou `backDisabled?` para
+permitir "Cancelar" habilitado na 1ª etapa, sem quebrar as telas que dependiam do default.
+
+### Regra E — Tokens disponíveis (use estes, não invente literais)
+
+`src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
+literal, procure o token:
+
+- **Tamanhos de controle:** `t.size.control` (38), `controlSm` (30), `controlLg` (46),
+  `iconBtn.{sm,md,lg}`, `toggle.{track,thumb}`, `pageBtn` (32), `drawer` (320), `stepBtn` (180).
+- **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
+- **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
+- **GBMode:** `t.color.gbSurface` (superfície translúcida de card), `t.color.gbAccent` (verde claro de destaque).
+- **Badge/Tag auxiliares:** `t.color.purple.*`, `t.color.cyan.*`.
+- **Transições:** `t.transition.{fast,DEFAULT,smooth,drawer}` — nunca `'0.2s'` solto.
+
+Se o valor que você precisa não tem token e é reutilizável, **adicione o token primeiro** em
+`tokens.ts` e referencie — não espalhe o literal.
+
+### Regra F — Tipografia em páginas
+
+- Título de página de listagem → `PageHeader`. Título de página de formulário → `FormPageHeader`.
+- Demais títulos (boas-vindas, seção interna de card) → `Heading` (`level` semântico + `size` tokenizado).
+- Tamanho de fonte **sempre** de `t.font.size.*` — não usar `18`/`20`px soltos. Se faltar um degrau
+  na escala, ajustar a escala em `tokens.ts`, não hardcodar na tela.
+
+### Checklist rápido antes de abrir/escalar uma tela
+
+- [ ] Nenhuma primitiva reimplementada localmente (consultei a tabela da Regra A)
+- [ ] Listagem segue a composição da Regra B / formulário segue a Regra C
+- [ ] Exclusão usa `ConfirmDialog`; ações de linha usam `IconButton`/`DropdownMenu`
+- [ ] Cabeçalho via `FormPageHeader`/`PageHeader`; títulos via `Heading`
+- [ ] Zero `<button>/<input>/<select>/<table>/<h1-6>` crus na página
+- [ ] Todo valor de design vem de `t.*` (tamanho, cor, sombra, transição)
+- [ ] Extensão de comportamento feita por prop no componente do kit, não por `style` inline
 
 ---
 

@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, X, MoreVertical,
-  TrendingUp, TrendingDown, HelpCircle, AlertTriangle,
+  Plus, Pencil, Trash2,
+  TrendingUp, TrendingDown, HelpCircle,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -13,6 +13,8 @@ import { TableSearchInput, FilterChip, FilterButton } from '../../../components/
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
+import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
@@ -47,7 +49,6 @@ export default function CentrosCustoLista({
   const [page,        setPage]        = useState(1)
   const [deleteId,    setDeleteId]    = useState<number | null>(null)
   const [saibaMais,   setSaibaMais]   = useState(false)
-  const [openMenuId,  setOpenMenuId]  = useState<number | null>(null)
   const [isLoading,   setIsLoading]   = useState(true)
   const { toasts, show, dismiss }     = useToast()
 
@@ -87,14 +88,6 @@ export default function CentrosCustoLista({
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  // ── Fechar dropdown ao clicar fora ────────────────────────────────────────
-  useEffect(() => {
-    if (openMenuId === null) return
-    const handler = () => setOpenMenuId(null)
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
-  }, [openMenuId])
-
   const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
   const border = colors.border
 
@@ -118,36 +111,9 @@ export default function CentrosCustoLista({
         count={centros.length}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => setSaibaMais(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                height: 36, padding: '0 14px',
-                background: colors.surfaceBg,
-                border: `1.5px solid ${colors.border}`,
-                borderRadius: t.radius.DEFAULT,
-                fontSize: t.font.size.sm,
-                fontWeight: t.font.weight.medium,
-                fontFamily: t.font.family.sans,
-                color: colors.textSecondary,
-                cursor: 'pointer',
-                transition: 'background 0.15s, border-color 0.15s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = colors.surfaceSubtle
-                e.currentTarget.style.borderColor = colors.brand
-                e.currentTarget.style.color = colors.brand
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = colors.surfaceBg
-                e.currentTarget.style.borderColor = colors.border
-                e.currentTarget.style.color = colors.textSecondary
-              }}
-            >
-              <HelpCircle size={14} />
+            <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
               Saiba mais
-            </button>
+            </Button>
             <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
               Novo Centro
             </Button>
@@ -268,13 +234,9 @@ export default function CentrosCustoLista({
           />
         )}
         {activeFilterCount > 1 && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{ background: 'none', border: 'none', fontSize: t.font.size.xs, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: t.font.family.sans }}
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
             Limpar tudo
-          </button>
+          </Button>
         )}
         <div style={{ flex: 1 }} />
         <FilterButton
@@ -338,13 +300,8 @@ export default function CentrosCustoLista({
                 key={cc.id}
                 cc={cc}
                 isLast={idx === paginated.length - 1}
-                isMenuOpen={openMenuId === cc.id}
-                onMenuToggle={(e) => {
-                  e.stopPropagation()
-                  setOpenMenuId(prev => prev === cc.id ? null : cc.id)
-                }}
-                onEdit={() => { setOpenMenuId(null); onEdit(cc.id) }}
-                onDelete={() => { setOpenMenuId(null); setDeleteId(cc.id) }}
+                onEdit={() => onEdit(cc.id)}
+                onDelete={() => setDeleteId(cc.id)}
                 colors={colors}
                 border={border}
               />
@@ -369,41 +326,16 @@ export default function CentrosCustoLista({
         </>
       )}
 
-      {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
-      {deleteId !== null && (
-        <Modal onClose={() => setDeleteId(null)}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '8px 0 4px' }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%',
-              background: t.color.error.bg,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <AlertTriangle size={22} color={t.color.error.text} />
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans, marginBottom: 6 }}>
-                Excluir centro de custo?
-              </div>
-              <div style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.5 }}>
-                <strong>{deleteTarget?.codigo}</strong> — {deleteTarget?.descricao}
-                <br />Esta ação não pode ser desfeita.
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 10, width: '100%', marginTop: 4 }}>
-              <Button variant="secondary" style={{ flex: 1 }} onClick={() => setDeleteId(null)}>
-                Cancelar
-              </Button>
-              <Button
-                variant="destructive"
-                style={{ flex: 1 }}
-                onClick={handleConfirmDelete}
-              >
-                Excluir
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
+      {/* ── ConfirmDialog: Excluir ───────────────────────────────────────── */}
+      <ConfirmDialog
+        open={deleteId !== null}
+        tone="destructive"
+        title="Excluir centro de custo?"
+        message={deleteTarget ? `${deleteTarget.codigo} — ${deleteTarget.descricao}\nEsta ação não pode ser desfeita.` : 'Esta ação não pode ser desfeita.'}
+        confirmLabel="Excluir"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
 
       {/* ── Modal: Saiba mais ────────────────────────────────────────────── */}
       {saibaMais && (
@@ -492,19 +424,16 @@ export default function CentrosCustoLista({
 // ─── Linha da tabela ──────────────────────────────────────────────────────────
 
 function CCRow({
-  cc, isLast, isMenuOpen, onMenuToggle, onEdit, onDelete, colors, border,
+  cc, isLast, onEdit, onDelete, colors, border,
 }: {
-  cc:           CentroCusto
-  isLast:       boolean
-  isMenuOpen:   boolean
-  onMenuToggle: (e: React.MouseEvent) => void
-  onEdit:       () => void
-  onDelete:     () => void
-  colors:       ReturnType<typeof useTheme>['colors']
-  border:       string
+  cc:      CentroCusto
+  isLast:  boolean
+  onEdit:  () => void
+  onDelete: () => void
+  colors:  ReturnType<typeof useTheme>['colors']
+  border:  string
 }) {
-  const menuRef = useRef<HTMLDivElement>(null)
-  const classe  = classeOf(cc.antecessorId)
+  const classe = classeOf(cc.antecessorId)
 
   return (
     <div
@@ -571,98 +500,17 @@ function CCRow({
       </div>
 
       {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }} ref={menuRef}>
-        <button
-          type="button"
-          onClick={onMenuToggle}
-          style={{
-            width: 32, height: 32,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: isMenuOpen ? colors.brandBg : 'transparent',
-            border: `1px solid ${isMenuOpen ? colors.brand : 'transparent'}`,
-            borderRadius: t.radius.DEFAULT,
-            cursor: 'pointer',
-            color: isMenuOpen ? colors.brand : colors.textSecondary,
-            transition: 'background 0.12s, border-color 0.12s',
-          }}
-          onMouseEnter={e => {
-            if (!isMenuOpen) {
-              e.currentTarget.style.background = colors.surfaceSubtle
-              e.currentTarget.style.borderColor = colors.border
-            }
-          }}
-          onMouseLeave={e => {
-            if (!isMenuOpen) {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.borderColor = 'transparent'
-            }
-          }}
-        >
-          <MoreVertical size={15} />
-        </button>
-
-        {isMenuOpen && (
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 4px)',
-              right: 0,
-              background: colors.surfaceBg,
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.lg,
-              boxShadow: t.shadow.lg,
-              zIndex: t.zIndex.dropdown,
-              minWidth: 150,
-              overflow: 'hidden',
-            }}
-          >
-            <DropdownItem icon={<Pencil size={13} />} label="Editar" onClick={onEdit} colors={colors} />
-            <div style={{ height: 1, background: colors.borderSubtle }} />
-            <DropdownItem icon={<Trash2 size={13} />} label="Excluir" onClick={onDelete} colors={colors} danger />
-          </div>
-        )}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <DropdownMenu
+          align="right"
+          ariaLabel="Ações do centro de custo"
+          items={[
+            { id: 'edit',   label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
+            { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
+          ]}
+        />
       </div>
     </div>
-  )
-}
-
-function DropdownItem({
-  icon, label, onClick, colors, danger = false,
-}: {
-  icon:    React.ReactNode
-  label:   string
-  onClick: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  danger?: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        width: '100%', padding: '9px 14px',
-        border: 'none', cursor: 'pointer',
-        background: hov
-          ? (danger ? t.color.error.bg : colors.surfaceSubtle)
-          : 'transparent',
-        color: danger
-          ? (hov ? t.color.error.text : colors.textSecondary)
-          : (hov ? colors.textPrimary : colors.textSecondary),
-        fontSize: t.font.size.sm,
-        fontFamily: t.font.family.sans,
-        fontWeight: t.font.weight.medium,
-        transition: 'background 0.12s, color 0.12s',
-        textAlign: 'left',
-      }}
-    >
-      {icon}
-      {label}
-    </button>
   )
 }
 

@@ -42,6 +42,16 @@ export const color = {
   /** Notificação — âmbar (substitui valores hardcoded #f59e0b) */
   notification: '#f59e0b',
 
+  /** Overlays de modais e drawers (fundos escurecidos atrás de dialogs) */
+  overlay: {
+    modal:  'rgba(0,0,0,0.45)',
+    drawer: 'rgba(0,0,0,0.18)',
+  },
+
+  /** Acentos exclusivos do GBMode (tema escuro) — evita hex solto nos charts */
+  gbAccent:  '#4ade80',              // = brand[400], texto/destaque sobre fundo escuro
+  gbSurface: 'rgba(14,42,29,0.55)',  // superfície translúcida de cards no GBMode
+
   /** Semânticos */
   success: {
     bg:     '#f0fdf4',
@@ -66,6 +76,16 @@ export const color = {
     border: '#bfdbfe',
     text:   '#2563eb',
     solid:  '#3b82f6',
+  },
+
+  /** Acentos auxiliares para Badge/Tag (variantes não-semânticas) */
+  purple: {
+    bg:   '#f5f3ff',
+    text: '#7c3aed',
+  },
+  cyan: {
+    bg:   '#ecfeff',
+    text: '#0891b2',
   },
 }
 
@@ -124,6 +144,34 @@ export const space = {
   20: 80,
 }
 
+// ─── Tamanhos de controle ───────────────────────────────────────────────────
+// Alturas/larguras reutilizadas de controles interativos. Centraliza os px
+// antes soltos em FormField, Button, ToggleSwitch, IconButton, etc.
+
+export const size = {
+  /** Altura de inputs/selects/botões padrão */
+  control:   38,
+  controlSm: 30,
+  controlLg: 46,
+  /** Botões apenas-ícone (sm/md/lg) */
+  iconBtn: {
+    sm: 24,
+    md: 30,
+    lg: 36,
+  },
+  /** Switch (track + thumb) */
+  toggle: {
+    track: 40,
+    thumb: 18,
+  },
+  /** Botões de paginação (quadrados) */
+  pageBtn: 32,
+  /** Largura do FilterDrawer lateral */
+  drawer:  320,
+  /** Largura dos botões do StepFooter */
+  stepBtn: 180,
+}
+
 // ─── Border radius ────────────────────────────────────────────────────────────
 
 export const radius = {
@@ -149,6 +197,12 @@ export const shadow = {
   brand:   '0 4px 16px rgba(5,150,105,0.25)',
   overlay: '0 24px 64px rgba(0,0,0,0.14)', // sombra para modais/overlays
   modal:   '0 8px 40px rgba(0,0,0,0.12)',  // sombra focada para dialogs
+
+  /** Cards de dashboard — estado idle e hover (light + GBMode) */
+  card:        '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+  cardHover:   '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
+  cardDark:    '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+  cardDarkHover: '0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)',
 }
 
 // ─── Bordas ───────────────────────────────────────────────────────────────────
@@ -233,5 +287,5 @@ export const chart = {
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart }
+export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart }
 export default t

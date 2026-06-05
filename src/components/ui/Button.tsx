@@ -1,5 +1,6 @@
 import React from 'react'
 import { t } from '../../design/tokens'
+import { Spinner } from './Spinner'
 
 type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -95,8 +96,10 @@ export function Button({
         props.onMouseLeave?.(e)
       }}
     >
-      {icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
-      {loading ? 'Aguarde...' : children}
+      {loading
+        ? <Spinner size="sm" />
+        : icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
+      {children}
     </button>
   )
 }

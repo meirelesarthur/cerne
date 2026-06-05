@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Warehouse,
+  Plus, Pencil, Trash2,
   ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -147,13 +147,7 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
           />
         )}
         {activeFilterCount > 1 && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{ background: 'none', border: 'none', fontSize: t.font.size.xs, color: colors.textMuted, cursor: 'pointer', padding: '0 4px', fontFamily: t.font.family.sans }}
-          >
-            Limpar tudo
-          </button>
+          <Button variant="ghost" size="sm" onClick={clearFilters}>Limpar tudo</Button>
         )}
         <div style={{ flex: 1 }} />
         <FilterButton
@@ -218,12 +212,6 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
             </div>
           )}
         </>
-      )}
-
-      {!isLoading && filtered.length > 0 && (
-        <div style={{ marginTop: 10, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-          N. Registros: {filtered.length}
-        </div>
       )}
 
       {/* Modal exclusão */}
@@ -344,29 +332,5 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
 }
 
 // ActionBtn foi substituído por IconButton de src/components/ui/IconButton
-
-// ─── EmptyState ───────────────────────────────────────────────────────────────
-
-function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolean }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: 12, textAlign: 'center' }}>
-      <div style={{ width: 56, height: 56, borderRadius: t.radius['2xl'], background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Warehouse size={24} color={colors.brand} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Nenhum armazém encontrado' : 'Nenhum armazém cadastrado'}
-      </div>
-      <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Ajuste o filtro de busca.' : 'Comece adicionando o primeiro armazém.'}
-      </div>
-      {!hasSearch && (
-        <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-          Adicionar Armazém
-        </Button>
-      )}
-    </div>
-  )
-}
 
 // Modal local substituído por Modal de src/components/ui/Modal

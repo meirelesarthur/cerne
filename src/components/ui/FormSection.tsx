@@ -1,5 +1,6 @@
 import React from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface FormSectionProps {
   title: string
@@ -9,16 +10,18 @@ interface FormSectionProps {
 }
 
 export function FormSection({ title, subtitle, columns = 1, children }: FormSectionProps) {
+  const { colors } = useTheme()
+
   return (
     <div style={{ marginBottom: t.space[6] }}>
       <div
         style={{
           fontSize: t.font.size.base,
           fontWeight: t.font.weight.semibold,
-          color: t.color.neutral[800],
+          color: colors.textPrimary,
           fontFamily: t.font.family.sans,
           paddingBottom: t.space[2] + t.space[1] / 2,
-          borderBottom: `1px solid ${t.color.neutral[150]}`,
+          borderBottom: `1px solid ${colors.border}`,
           marginBottom: subtitle ? t.space[1] : 0,
         }}
       >
@@ -28,7 +31,7 @@ export function FormSection({ title, subtitle, columns = 1, children }: FormSect
         <div
           style={{
             fontSize: t.font.size.sm,
-            color: t.color.neutral[400],
+            color: colors.textMuted,
             fontFamily: t.font.family.sans,
           }}
         >

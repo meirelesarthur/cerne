@@ -71,7 +71,7 @@ export function Modal({
         style={{
           position:      'fixed',
           inset:         0,
-          background:    'rgba(0,0,0,0.45)',
+          background:    t.color.overlay.modal,
           zIndex:        t.zIndex.overlay,
           opacity:       open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',

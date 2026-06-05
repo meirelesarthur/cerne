@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { X, SlidersHorizontal } from 'lucide-react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface FilterDrawerProps {
   open: boolean
@@ -19,6 +20,8 @@ export function FilterDrawer({
   children,
   activeCount = 0,
 }: FilterDrawerProps) {
+  const { colors } = useTheme()
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     if (open) document.addEventListener('keydown', handler)
@@ -32,7 +35,7 @@ export function FilterDrawer({
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0,0,0,0.18)',
+          background: t.color.overlay.drawer,
           zIndex: t.zIndex.overlay,
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
@@ -45,8 +48,8 @@ export function FilterDrawer({
           top: 0,
           right: 0,
           height: '100vh',
-          width: 320,
-          background: t.color.neutral[0],
+          width: t.size.drawer,
+          background: colors.surfaceBg,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.drawer,
           display: 'flex',
@@ -62,7 +65,7 @@ export function FilterDrawer({
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: `${t.space[4]}px ${t.space[5]}px`,
-            borderBottom: `1px solid ${t.color.neutral[150]}`,
+            borderBottom: `1px solid ${colors.border}`,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
@@ -71,7 +74,7 @@ export function FilterDrawer({
               style={{
                 fontSize: t.font.size.md,
                 fontWeight: t.font.weight.semibold,
-                color: t.color.neutral[950],
+                color: colors.textPrimary,
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -100,14 +103,14 @@ export function FilterDrawer({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: t.color.neutral[400],
+              color: colors.textMuted,
               display: 'flex',
               alignItems: 'center',
               padding: t.space[1],
               borderRadius: t.radius.md,
               transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.neutral[100] }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
           >
             <X size={16} />
@@ -132,7 +135,7 @@ export function FilterDrawer({
         <div
           style={{
             padding: `${t.space[3] + t.space[1] / 2}px ${t.space[5]}px`,
-            borderTop: `1px solid ${t.color.neutral[150]}`,
+            borderTop: `1px solid ${colors.border}`,
             display: 'flex',
             gap: t.space[2],
           }}
@@ -143,18 +146,18 @@ export function FilterDrawer({
             style={{
               flex: 1,
               height: 38,
-              background: t.color.neutral[0],
-              border: `1px solid ${t.color.neutral[250]}`,
+              background: colors.surfaceBg,
+              border: `1px solid ${colors.border}`,
               borderRadius: t.radius.DEFAULT,
               fontSize: t.font.size.base,
               fontWeight: t.font.weight.medium,
-              color: t.color.neutral[600],
+              color: colors.textSecondary,
               cursor: 'pointer',
               fontFamily: t.font.family.sans,
               transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.neutral[50] }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = t.color.neutral[0] }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = colors.surfaceBg }}
           >
             Limpar
           </button>

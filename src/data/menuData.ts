@@ -118,7 +118,6 @@ export const menuModules: NavModule[] = [
               { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',  path: '/cadastros/estoques-iniciais' },
             ],
           },
-          { id: 'cad-est-rat', label: 'Rateios', path: '/cadastros/rateios' },
           { id: 'cad-est-end', label: 'Endereçamentos', path: '/cadastros/enderecos' },
         ],
       },

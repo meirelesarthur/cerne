@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react'
 import {
   Search, X, Lock, AlertTriangle, Plus, ArrowLeft, Save, ChevronDown,
 } from 'lucide-react'
-import { PageContainer } from '../../../components/ui/PageContainer'
-import { FormField }     from '../../../components/ui/FormField'
-import { FormSelect }    from '../../../components/ui/FormSelect'
-import { Button }        from '../../../components/ui/Button'
-import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
+import { PageContainer }       from '../../../components/ui/PageContainer'
+import { FormField }           from '../../../components/ui/FormField'
+import { FormSelect }          from '../../../components/ui/FormSelect'
+import { Button }              from '../../../components/ui/Button'
+import { CollapsibleSection }  from '../../../components/ui/CollapsibleSection'
+import { Modal }               from '../../../components/ui/Modal'
+import { ConfirmDialog }       from '../../../components/ui/ConfirmDialog'
+import { t }                   from '../../../design/tokens'
+import { useTheme }            from '../../../context/ThemeContext'
 import { mockProdutos }  from '../produtos/produtos.mock'
 import { mockArmazens }  from '../armazens/armazens.mock'
 import { UNIDADE_PRODUTO_OPTS, GRUPOS, type Produto } from '../produtos/produtos.types'
@@ -223,24 +226,6 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
 
   // ── Section style ─────────────────────────────────────────────────────────────
 
-  const sectionTitle: React.CSSProperties = {
-    fontSize: t.font.size.xs,
-    fontWeight: t.font.weight.semibold,
-    color: colors.textMuted,
-    fontFamily: t.font.family.sans,
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
-    marginBottom: t.space[4],
-  }
-
-  const sectionCard: React.CSSProperties = {
-    background: colors.surfaceBg,
-    border: `1px solid ${colors.border}`,
-    borderRadius: t.radius.xl,
-    padding: t.space[6],
-    marginBottom: t.space[4],
-  }
-
   const hintText: React.CSSProperties = {
     fontSize: t.font.size.xs,
     color: colors.textMuted,
@@ -252,8 +237,6 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
     background: colors.surfaceSubtle,
     cursor: 'not-allowed',
   }
-
-  const border = colors.border
 
   // ── Product select from dropdown ──────────────────────────────────────────────
 
@@ -337,12 +320,11 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
     <PageContainer>
       <style>{`
         @keyframes flashBg { 0%{background: #d1fae5;} 100%{background: transparent;} }
-        @keyframes modalIn { from { opacity:0; transform:scale(.94) translateY(10px) } to { opacity:1; transform:scale(1) translateY(0) } }
         .flash-computed { animation: flashBg 0.3s ease; }
       `}</style>
 
       {/* ── Form Header ───────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[6], paddingBottom: t.space[4], borderBottom: `1px solid ${border}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[6], paddingBottom: t.space[4], borderBottom: `1px solid ${colors.border}` }}>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
           {isEdit ? 'Editar Saldo Inicial' : 'Novo Saldo Inicial'}
         </h2>
@@ -352,8 +334,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
       </div>
 
       {/* ── ZONE 1 — IDENTIFICAÇÃO ────────────────────────────────────────────── */}
-      <div style={sectionCard}>
-        <div style={sectionTitle}>Identificação</div>
+      <CollapsibleSection title="Identificação" fieldCount={3} defaultOpen>
 
         {/* Product combobox */}
         <div style={{ marginBottom: t.space[4] }}>
@@ -480,11 +461,10 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             disabled={submitting}
           />
         </div>
-      </div>
+      </CollapsibleSection>
 
       {/* ── ZONE 2 — QUANTIDADES & VALORES ───────────────────────────────────── */}
-      <div style={sectionCard}>
-        <div style={sectionTitle}>Quantidades & Valores</div>
+      <CollapsibleSection title="Quantidades &amp; Valores" fieldCount={4} defaultOpen>
 
         {/* Row 1: Qtde + Vl Unit */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4], marginBottom: t.space[4] }}>
@@ -568,17 +548,11 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             </div>
           </div>
         )}
-      </div>
+      </CollapsibleSection>
 
       {/* ── ZONE 3 — INFORMAÇÕES ADICIONAIS (conditional) ─────────────────────── */}
-      <div style={{
-        maxHeight: showZone3 ? 400 : 0,
-        overflow: 'hidden',
-        opacity: showZone3 ? 1 : 0,
-        transition: 'max-height 0.3s ease, opacity 0.25s ease',
-      }}>
-        <div style={{ ...sectionCard, marginTop: 0 }}>
-          <div style={sectionTitle}>Informações Adicionais</div>
+      {showZone3 && (
+        <CollapsibleSection title="Informações Adicionais" fieldCount={2} defaultOpen>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
             <FormField
               label="Lote Fornecedor"
@@ -603,8 +577,8 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
               disabled={submitting}
             />
           </div>
-        </div>
-      </div>
+        </CollapsibleSection>
+      )}
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3], marginTop: t.space[2] }}>
@@ -615,97 +589,85 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
       </div>
 
       {/* ── Exit modal ────────────────────────────────────────────────────────── */}
-      {showExitModal && (
-        <OverlayModal onClose={() => setShowExitModal(false)} colors={colors}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-              Alterações não salvas
-            </div>
-            <p style={{ margin: 0, fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6 }}>
-              Você tem alterações não salvas. Deseja sair sem salvar?
-            </p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <Button variant="secondary" onClick={() => setShowExitModal(false)}>Ficar</Button>
-              <Button variant="destructive" onClick={() => { setShowExitModal(false); onBack() }}>Sair sem salvar</Button>
-            </div>
-          </div>
-        </OverlayModal>
-      )}
+      <ConfirmDialog
+        open={showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={() => { setShowExitModal(false); onBack() }}
+        onCancel={() => setShowExitModal(false)}
+      />
 
       {/* ── Quick Product Modal ───────────────────────────────────────────────── */}
-      {showProductModal && (
-        <OverlayModal onClose={() => setShowProductModal(false)} colors={colors} maxWidth={560}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-            <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-              Novo Produto (cadastro rápido)
-            </div>
-            <button type="button" onClick={() => setShowProductModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, display: 'flex', padding: 4 }}>
-              <X size={16} />
-            </button>
-          </div>
-
-          {/* Info banner */}
-          <div style={{ background: t.color.info.bg, border: `1px solid ${t.color.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 14 }}>ℹ</span>
-            <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
-          </div>
-
-          {/* Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
-            <FormField
-              label="Descrição"
-              required
-              placeholder="Ex: HERBICIDA ROUNDUP WG"
-              value={qp.descricao}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQp(prev => ({ ...prev, descricao: e.target.value }))}
-              error={qpTouched && qpErrors.descricao ? qpErrors.descricao : ''}
-              status={qpTouched ? (qpErrors.descricao ? 'err' : 'ok') : 'idle'}
-            />
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
-              <FormSelect
-                label="1ª Unidade de Medida"
-                required
-                value={qp.unidade}
-                onChange={e => setQp(prev => ({ ...prev, unidade: e.target.value }))}
-                options={[{ value: '', label: 'Selecione...' }, ...UNIDADE_PRODUTO_OPTS]}
-                error={qpTouched && qpErrors.unidade ? qpErrors.unidade : ''}
-              />
-              <FormSelect
-                label="Grupo"
-                required
-                value={qp.grupoId}
-                onChange={e => setQp(prev => ({ ...prev, grupoId: e.target.value }))}
-                options={grupoOpts}
-                error={qpTouched && qpErrors.grupoId ? qpErrors.grupoId : ''}
-              />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
-              <FormSelect
-                label="Controla Estoque"
-                required
-                value={qp.controlaEstoque ? 'sim' : 'nao'}
-                onChange={e => setQp(prev => ({ ...prev, controlaEstoque: e.target.value === 'sim' }))}
-                options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
-              />
-              <FormSelect
-                label="Ativo"
-                required
-                value={qp.ativo ? 'sim' : 'nao'}
-                onChange={e => setQp(prev => ({ ...prev, ativo: e.target.value === 'sim' }))}
-                options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
-              />
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3], marginTop: t.space[5] }}>
+      <Modal
+        open={showProductModal}
+        onClose={() => setShowProductModal(false)}
+        title="Novo Produto (cadastro rápido)"
+        size="md"
+        footer={
+          <>
             <Button variant="secondary" onClick={() => setShowProductModal(false)}>Cancelar</Button>
             <Button variant="primary" onClick={handleSaveQuickProduct}>Salvar e Selecionar</Button>
+          </>
+        }
+      >
+        {/* Info banner */}
+        <div style={{ background: t.color.info.bg, border: `1px solid ${t.color.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <span style={{ fontSize: 14 }}>ℹ</span>
+          <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
+        </div>
+
+        {/* Fields */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+          <FormField
+            label="Descrição"
+            required
+            placeholder="Ex: HERBICIDA ROUNDUP WG"
+            value={qp.descricao}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQp(prev => ({ ...prev, descricao: e.target.value }))}
+            error={qpTouched && qpErrors.descricao ? qpErrors.descricao : ''}
+            status={qpTouched ? (qpErrors.descricao ? 'err' : 'ok') : 'idle'}
+          />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
+            <FormSelect
+              label="1ª Unidade de Medida"
+              required
+              value={qp.unidade}
+              onChange={e => setQp(prev => ({ ...prev, unidade: e.target.value }))}
+              options={[{ value: '', label: 'Selecione...' }, ...UNIDADE_PRODUTO_OPTS]}
+              error={qpTouched && qpErrors.unidade ? qpErrors.unidade : ''}
+            />
+            <FormSelect
+              label="Grupo"
+              required
+              value={qp.grupoId}
+              onChange={e => setQp(prev => ({ ...prev, grupoId: e.target.value }))}
+              options={grupoOpts}
+              error={qpTouched && qpErrors.grupoId ? qpErrors.grupoId : ''}
+            />
           </div>
-        </OverlayModal>
-      )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
+            <FormSelect
+              label="Controla Estoque"
+              required
+              value={qp.controlaEstoque ? 'sim' : 'nao'}
+              onChange={e => setQp(prev => ({ ...prev, controlaEstoque: e.target.value === 'sim' }))}
+              options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
+            />
+            <FormSelect
+              label="Ativo"
+              required
+              value={qp.ativo ? 'sim' : 'nao'}
+              onChange={e => setQp(prev => ({ ...prev, ativo: e.target.value === 'sim' }))}
+              options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
+            />
+          </div>
+        </div>
+      </Modal>
 
     </PageContainer>
   )
@@ -749,25 +711,3 @@ function ProductDropdownRow({ product, onSelect, colors, isSelected }: {
   )
 }
 
-// ─── OverlayModal ─────────────────────────────────────────────────────────────
-
-function OverlayModal({ children, onClose, colors, maxWidth = 420 }: {
-  children: React.ReactNode
-  onClose: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-  maxWidth?: number
-}) {
-  return (
-    <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: t.zIndex.overlay, padding: 24 }}
-      onClick={onClose}
-    >
-      <div
-        style={{ background: colors.surfaceBg, borderRadius: 20, padding: '28px', maxWidth, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)', animation: 'modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)', maxHeight: '90vh', overflowY: 'auto' }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}

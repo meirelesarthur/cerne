@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import { HelpCircle } from 'lucide-react'
-import { Tooltip } from '../Tooltip'
+import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 

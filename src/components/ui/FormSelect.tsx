@@ -1,6 +1,6 @@
 import React from 'react'
 import { HelpCircle, ChevronDown } from 'lucide-react'
-import { Tooltip } from '../Tooltip'
+import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 

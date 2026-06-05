@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, MoreVertical, Eye, Pencil, Trash2,
+  Plus, Eye, Pencil, Trash2,
   Info, Calendar, CheckCircle2,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -10,7 +10,7 @@ import { Badge }           from '../../../components/ui/Badge'
 import { Modal }           from '../../../components/ui/Modal'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { IconButton }      from '../../../components/ui/IconButton'
+import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
 import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
@@ -42,7 +42,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const [search,       setSearch]       = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todas')
   const [drawerOpen,   setDrawerOpen]   = useState(false)
-  const [openDropId,   setOpenDropId]   = useState<number | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Safra | null>(null)
   const [showInfo,     setShowInfo]     = useState(false)
   const [isLoading,    setIsLoading]    = useState(true)
@@ -58,13 +57,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
 
   const activeFilterCount = statusFilter !== 'todas' ? 1 : 0
   const clearFilters = () => setStatusFilter('todas')
-
-  useEffect(() => {
-    if (openDropId === null) return
-    const handler = () => setOpenDropId(null)
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
-  }, [openDropId])
 
   const safrAtual = useMemo(() => {
     const ativas = safras.filter(s => s.ativo === 'sim')
@@ -246,8 +238,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
                 key={safra.id}
                 safra={safra}
                 isLast={idx === paginatedData.length - 1}
-                openDropId={openDropId}
-                onOpenDrop={setOpenDropId}
                 onView={onView}
                 onEdit={onEdit}
                 onDeleteReq={setDeleteTarget}
@@ -390,8 +380,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
 function SafraRow({
   safra,
   isLast,
-  openDropId,
-  onOpenDrop,
   onView,
   onEdit,
   onDeleteReq,
@@ -400,8 +388,6 @@ function SafraRow({
 }: {
   safra:        Safra
   isLast:       boolean
-  openDropId:   number | null
-  onOpenDrop:   (id: number | null) => void
   onView:       (id: number) => void
   onEdit:       (id: number) => void
   onDeleteReq:  (s: Safra) => void
@@ -409,7 +395,6 @@ function SafraRow({
   border:       string
 }) {
   const [hovered, setHovered] = useState(false)
-  const isOpen  = openDropId === safra.id
   const isAtiva = safra.ativo === 'sim'
 
   return (
@@ -453,53 +438,17 @@ function SafraRow({
         {safra.weeks.length} sem.
       </span>
 
-      {/* Ações — dropdown */}
-      <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <IconButton
-          icon={<MoreVertical size={14} />}
-          aria-label="Ações da safra"
-          size="sm"
-          variant={isOpen ? 'outline' : 'ghost'}
-          onClick={() => onOpenDrop(isOpen ? null : safra.id)}
+      {/* Ações — DropdownMenu do kit */}
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
+        <DropdownMenu
+          ariaLabel="Ações da safra"
+          align="right"
+          items={[
+            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />,    onClick: () => onView(safra.id) },
+            { id: 'edit',   label: 'Editar',     icon: <Pencil size={13} />, onClick: () => onEdit(safra.id) },
+            { id: 'delete', label: 'Excluir',    icon: <Trash2 size={13} />, onClick: () => onDeleteReq(safra), danger: true, divider: true },
+          ]}
         />
-
-        {isOpen && (
-          <div
-            role="menu"
-            style={{
-              position:    'absolute',
-              top:         '100%',
-              right:       0,
-              marginTop:   t.space[1],
-              background:  colors.surfaceBg,
-              border:      `1px solid ${colors.border}`,
-              borderRadius: t.radius.lg,
-              boxShadow:   t.shadow.lg,
-              minWidth:    140,
-              zIndex:      t.zIndex.dropdown,
-              overflow:    'hidden',
-              animation:   'dropIn 0.12s ease',
-            }}
-          >
-            <Button block variant="ghost" size="sm" icon={<Eye size={13} />}
-              onClick={() => { onOpenDrop(null); onView(safra.id) }}
-            >
-              Visualizar
-            </Button>
-            <Button block variant="ghost" size="sm" icon={<Pencil size={13} />}
-              onClick={() => { onOpenDrop(null); onEdit(safra.id) }}
-            >
-              Editar
-            </Button>
-            <div style={{ height: 1, background: colors.borderSubtle, margin: `${t.space[1]}px 0` }} />
-            <Button block variant="ghost" size="sm" icon={<Trash2 size={13} />}
-              style={{ color: t.color.error.text }}
-              onClick={() => { onOpenDrop(null); onDeleteReq(safra) }}
-            >
-              Excluir
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   )
@@ -545,25 +494,3 @@ function KpiCard({
   )
 }
 
-// ─── Animações ────────────────────────────────────────────────────────────────
-
-const globalStyles = `
-  @keyframes dropIn {
-    from { opacity: 0; transform: translateY(-5px) scale(.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    @keyframes dropIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-  }
-`
-
-// Injetar estilos globais uma vez
-if (typeof document !== 'undefined' && !document.getElementById('safras-lista-styles')) {
-  const s = document.createElement('style')
-  s.id = 'safras-lista-styles'
-  s.textContent = globalStyles
-  document.head.appendChild(s)
-}

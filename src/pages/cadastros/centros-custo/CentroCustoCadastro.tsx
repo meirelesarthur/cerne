@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { ArrowLeft, Save, ChevronDown, DollarSign } from 'lucide-react'
+import { ArrowLeft, Save, ChevronDown } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
@@ -117,45 +118,11 @@ export default function CentroCustoCadastro({
     <PageContainer>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            type="button"
-            onClick={onBack}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: colors.textMuted, display: 'flex', alignItems: 'center',
-              padding: 0, transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = colors.textPrimary }}
-            onMouseLeave={e => { e.currentTarget.style.color = colors.textMuted }}
-          >
-            <ArrowLeft size={20} strokeWidth={2} />
-          </button>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: colors.brandBg,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <DollarSign size={18} color={colors.brand} />
-          </div>
-          <div>
-            <h1 style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: colors.textPrimary, margin: 0,
-              fontFamily: t.font.family.sans, letterSpacing: '-0.3px',
-            }}>
-              {isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
-            </h1>
-            <p style={{ fontSize: t.font.size.sm, color: colors.textMuted, margin: 0, fontFamily: t.font.family.sans }}>
-              {isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
-            </p>
-          </div>
-        </div>
-        <Button variant="secondary" size="md" icon={<ArrowLeft size={14} />} onClick={onBack}>
-          Voltar
-        </Button>
-      </div>
+      <FormPageHeader
+        title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
+        subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
+        onBack={onBack}
+      />
 
       {/* ── Card de formulário ────────────────────────────────────────────── */}
       <div style={{

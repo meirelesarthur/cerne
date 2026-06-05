@@ -26,7 +26,7 @@ export function KpiStatCard({
 }: KpiStatCardProps) {
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState(false)
-  const ac = accentColor ?? (isGbMode ? '#10b981' : t.color.brand[600])
+  const ac = accentColor ?? (isGbMode ? t.color.brand[500] : t.color.brand[600])
   const isLong = value.length > 10
 
   return (
@@ -34,19 +34,15 @@ export function KpiStatCard({
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? 'rgba(14,42,29,0.55)' : colors.surfaceBg,
+        background: isGbMode ? t.color.gbSurface : colors.surfaceBg,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius.xl,
         border: `1px solid ${hov ? `${ac}55` : colors.border}`,
         borderTop: `2px solid ${ac}`,
         boxShadow: hov
-          ? (isGbMode
-              ? '0 4px 24px rgba(0,0,0,0.55)'
-              : '0 8px 32px rgba(0,0,0,0.10)')
-          : (isGbMode
-              ? '0 1px 2px rgba(0,0,0,0.30)'
-              : '0 1px 2px rgba(0,0,0,0.04)'),
+          ? (isGbMode ? t.shadow.cardDarkHover : t.shadow.cardHover)
+          : (isGbMode ? t.shadow.cardDark     : t.shadow.card),
         transition: 'border-color 0.18s ease, box-shadow 0.22s ease',
         padding: t.space[4],
         display: 'flex',
@@ -111,7 +107,7 @@ export function KpiStatCard({
         style={{
           fontSize: isLong ? t.font.size.lg : t.font.size['3xl'],
           fontWeight: t.font.weight.bold,
-          color: isGbMode ? '#4ade80' : colors.textPrimary,
+          color: isGbMode ? t.color.gbAccent : colors.textPrimary,
           fontFamily: t.font.family.sans,
           lineHeight: 1.1,
           textShadow: isGbMode ? `0 0 24px ${ac}55` : undefined,

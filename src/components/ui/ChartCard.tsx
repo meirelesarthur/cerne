@@ -26,19 +26,15 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? 'rgba(14,42,29,0.55)' : colors.surfaceBg,
+        background: isGbMode ? t.color.gbSurface : colors.surfaceBg,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius['2xl'],
         border: `1px solid ${colors.border}`,
         boxShadow: hov
-          ? (isGbMode
-              ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)'
-              : '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)')
-          : (isGbMode
-              ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
-              : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)'),
-        transition: 'box-shadow 0.22s ease',
+          ? (isGbMode ? t.shadow.cardDarkHover : t.shadow.cardHover)
+          : (isGbMode ? t.shadow.cardDark     : t.shadow.card),
+        transition: `box-shadow ${t.transition.smooth}`,
         padding: compact ? `${t.space[3]}px ${t.space[4]}px` : t.space[4],
         boxSizing: 'border-box' as const,
       }}

@@ -105,7 +105,8 @@ Valores hardcoded fora de `src/design/tokens.ts` e `tailwind.config.ts` são vio
 Após toda mudança concluída, um commit **deve ser criado imediatamente** — sem aguardar solicitação.
 
 - O push **nunca é feito automaticamente** — somente quando o usuário solicitar explicitamente
-- Mensagens de commit seguem o padrão Conventional Commits (`feat:`, `fix:`, `style:`, `refactor:`, `docs:`, etc.)
+- Mensagens de commit seguem o padrão Conventional Commits **com escopo** quando aplicável:
+  `feat(modulo):`, `fix(componente):`, `style(ui):`, `refactor(hook):`, `docs(guidelines):`, `chore(deps):`
 - Um commit por unidade lógica de mudança — não acumular alterações não relacionadas no mesmo commit
 
 ---
@@ -210,6 +211,101 @@ Se o valor que você precisa não tem token e é reutilizável, **adicione o tok
 
 ---
 
+## Sistema de Tokens (Referência de Valores)
+
+Os valores abaixo são a fonte da verdade de `src/design/tokens.ts`. **Nunca hardcodar** —
+referenciar sempre via `t.*`. Se faltar um degrau, ajustar a escala em `tokens.ts`.
+
+### Paleta de Cores
+
+| Token | Valor | Uso |
+|---|---|---|
+| `t.color.brand[600]` | `#059669` | Cor primária de ação, botões, foco |
+| `t.color.brand[700]` | `#047857` | Hover de botões primários |
+| `t.color.brand[500]` | `#10b981` | GBMode — cor primária no tema escuro |
+| `t.color.neutral[0]` | `#ffffff` | Superfície máxima (cards light) |
+| `t.color.neutral[50]` | `#f9fafb` | Background de página (light) |
+| `t.color.neutral[200]` | — | Border padrão |
+| `t.color.neutral[900]` | `#111827` | Texto primário |
+| `t.color.success.*` / `error.*` / `warning.*` / `info.*` | — | Estados (bg, border, text, solid) |
+
+**Hue consistency:** em superfícies com background de cor (card brand, GBMode), bordas, sombras e
+texto de suporte devem ser tingidos ao mesmo hue — nunca cinza neutro puro sobre fundo colorido.
+
+### Escala de Espaçamento
+
+Grid base de **4px**: `t.space[1]`=4px → `t.space[20]`=80px. Não usar valores fora da grade
+sem motivo explícito.
+
+### Border Radius
+
+| Token | Valor | Uso |
+|---|---|---|
+| `t.radius.sm` | 4px | Badges, chips pequenos |
+| `t.radius.DEFAULT` | 8px | Inputs, botões |
+| `t.radius.lg` | 10px | Cards internos |
+| `t.radius.xl` | 12px | Cards de formulário |
+| `t.radius.modal` | 20px | Modals, drawers |
+| `t.radius.full` | 9999px | Pills, avatares circulares |
+
+**Radii aninhados:** `r_filho ≤ r_pai`; para alinhamento perfeito de curvas `r_filho = r_pai − padding`.
+
+### Sombras
+
+Mínimo 2 camadas (ambient + direct). Tokens: `t.shadow.sm` (cards leves) · `t.shadow.DEFAULT`
+(padrão) · `t.shadow.brand` (glow verde — hover de card fazenda) · `t.shadow.modal` (overlays).
+Já cobertos também: `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover`.
+
+### Z-Index
+
+| Token | Valor | Uso |
+|---|---|---|
+| `t.zIndex.base` | 1 | Elementos padrão |
+| `t.zIndex.dropdown` | 100 | Menus, selects |
+| `t.zIndex.overlay` | 200 | Overlays de fundo |
+| `t.zIndex.drawer` | 201 | FilterDrawer, sidebars |
+| `t.zIndex.toast` | 9999 | Notificações globais |
+
+### Transições
+
+`t.transition.{fast,DEFAULT,smooth,drawer}` — **nunca** `transition: all` nem `'0.2s'` solto.
+Listar as propriedades explicitamente.
+
+---
+
+## Tipografia e Conteúdo
+
+### Fonte
+
+**Outfit** é a única fonte do projeto (`t.font.family` → `'Outfit, sans-serif'`).
+Pesos disponíveis: **400, 500, 600, 700, 800**.
+
+### Hierarquia de Tamanhos
+
+| Token | px | Uso |
+|---|---|---|
+| `t.font.size.xs` | 11 | Metadados, rodapés, labels de eixo em charts |
+| `t.font.size.sm` | 12 | Labels de campos, badges |
+| `t.font.size.base` | 13 | Texto de tabela, listas |
+| `t.font.size.md` | 14 | Corpo padrão de formulários |
+| `t.font.size.lg` | 15 | Títulos de cards, seções |
+| `t.font.size.xl` | 16 | Títulos de página secundários |
+| `t.font.size.2xl` | 22 | PageHeader titles |
+| `t.font.size.3xl` | 26 | KPIs, números de destaque |
+
+Tamanho de fonte **sempre** de `t.font.size.*` — não usar `18`/`20`px soltos.
+
+### Regras de Conteúdo
+
+- **Números tabulares:** em tabelas e comparações, usar `fontVariantNumeric: 'tabular-nums'`
+- **Reticências tipográfica:** usar o caractere `…` (U+2026), nunca três pontos `...`
+- **Aspas curvas:** `"texto"` em vez de `"texto"` em conteúdo editorial
+- **Espaço non-breaking:** `10 kg`, `R$ 10,00`, `5 ha` — evitar quebra entre número e unidade
+- **Evitar órfãs e viúvas** em textos longos de descrição
+- **Todos os estados desenhados:** vazio, esparso, denso e com erro (ver Estados da UI)
+
+---
+
 ## Diretrizes de Interface (UI Web Guide)
 
 ### Temas
@@ -221,11 +317,21 @@ Todo componente em `src/components/ui/` deve suportar **ambos os temas** (light 
 - GBMode: bordas, sombras e textos de suporte usam hues verdes — nunca cinza neutro sobre fundo colorido
 - Quando GBMode ativo, definir `color-scheme: dark` no `<html>` para alinhar scrollbars e controles nativos do OS
 
+Valores de referência (gerenciados por `src/context/ThemeContext.tsx`, aplicados via `data-theme` no `<body>`):
+
+| Propriedade | Light (`data-theme="light"`) | GBMode (`data-theme="gb"`) |
+|---|---|---|
+| Background de página | `#f5f5f5` | `#051008` |
+| Superfície (cards) | `#ffffff` | `#0e2a1d` |
+| Brand principal | `#059669` | `#10b981` |
+
 ### Interações e Acessibilidade
 
+- **100% operável por teclado** — todos os fluxos críticos devem funcionar sem mouse
 - Usar `:focus-visible` em vez de `:focus` — não mostra ring em cliques de mouse
 - Focus ring padrão: `t.glow.brand`
 - Modals e drawers prendem o foco enquanto abertos (focus trap obrigatório)
+- Headings hierárquicos: a estrutura `h1 → h2 → h3` deve ser lógica e **nunca pular níveis**
 - Hit targets mínimos: **24×24px** desktop / **44×44px** mobile — sem dead zones
 - Loading com delay inicial **150–300ms** (evitar flash); tempo mínimo visível **300–500ms** (evitar flicker)
 - Botões em loading mantêm o rótulo original + spinner via prop `loading` — nunca substituir o texto
@@ -235,7 +341,8 @@ Todo componente em `src/components/ui/` deve suportar **ambos os temas** (light 
 - `IconButton` sempre com `aria-label` descritivo; decoração com `aria-hidden="true"`
 - Toasts e validação inline com `aria-live="polite"`
 - Inputs mobile com `font-size ≥ 16px` (evitar auto-zoom iOS); `touch-action: manipulation` em controles
-- Deep-link tudo: filtros, abas, paginação e painéis expandidos persistem na URL
+- Nunca desabilitar o zoom do browser; nunca bloquear `paste` em campos
+- Deep-link tudo: filtros, abas, paginação e painéis expandidos persistem na URL (Back/Forward restaura o estado, incluindo posição de scroll)
 
 ### Formulários
 
@@ -243,21 +350,28 @@ Todo componente em `src/components/ui/` deve suportar **ambos os temas** (light 
 - `<textarea>`: `Ctrl/⌘+Enter` submete; `Enter` insere nova linha
 - Submit habilitado até o início da request; desabilitar **durante** + mostrar spinner
 - Nunca pré-desabilitar submit — permitir submissão incompleta para exibir feedback de validação
+- Todo campo tem `<label>` associado (`htmlFor` ou wrapping); clicar no label deve **focar o controle**
 - Erros exibidos próximos ao campo; ao submeter com erros, focar o primeiro campo com erro
 - Mensagens de erro guiam a correção: não "campo inválido" — mas "CPF deve ter 11 dígitos"
 - `spellcheck="false"` em e-mails, códigos, usernames, tokens de API
-- Definir `autocomplete` e `name` significativos para habilitar autofill
+- Definir `autocomplete` e `name` significativos para habilitar autofill; em campos não-auth usar
+  `autocomplete="off"` (ou valor específico) para não disparar gerenciadores de senha
+- Garantir compatibilidade com gerenciadores de senha e preenchimento de 2FA
+- Placeholder como **exemplo de formato**, nunca como label: `+55 (11) 99999-9999`
 - Fazer `trim()` antes de validar — evitar erros por espaço acidental
-- `type` e `inputMode` corretos: numérico → `type="text" inputMode="numeric"`; telefone → `type="tel"`
+- `type` e `inputMode` corretos: numérico → `type="text" inputMode="numeric"`; telefone → `type="tel"`; email → `type="email"`
+- `<select>` no Windows: definir explicitamente `backgroundColor` e `color` no `FormSelect` para evitar inconsistências visuais
 
 ### Animações e Transições
 
+- Animar apenas quando **clarifica causa/efeito** ou adiciona deleite deliberado — nunca decorativo sem propósito
 - Animar apenas `transform`, `opacity` e `filter` — propriedades GPU accelerated
 - **Nunca usar `transition: all`** — listar propriedades explicitamente
 - Respeitar `prefers-reduced-motion`: incluir `@media (prefers-reduced-motion: reduce)` com duração `0.01ms`
 - Durações via `t.animation.duration.*`: fast=150ms, normal=200ms, slow=300ms, slower=400ms
 - Easing via `t.animation.easing.*`: easeOut para entradas, easeIn para saídas, spring para drag
 - Ancorar `transformOrigin` onde o movimento começa fisicamente (dropdown → `top center`, modal → `center center`)
+- SVG transforms: aplicar em wrappers `<g>` + `transform-box: fill-box; transform-origin: center`
 - Animações canceláveis por input do usuário; nunca autoplay
 
 ### Estados da UI
@@ -274,13 +388,18 @@ Todo componente e toda tela deve ter **todos os estados** implementados antes de
 | Denso (+500 itens) | Paginação + virtualização |
 
 - Skeletons devem refletir a estrutura real do conteúdo — evitar placeholders genéricos que causam layout shift
-- Toda tela oferece próximo passo ou caminho de recuperação (sem dead ends)
-- Usar `ProgressBar` no topo de cards/seções com operação em andamento
+- Delay de ~150ms antes de exibir skeleton (operações rápidas não devem piscar)
+- Virtualização a partir de **+100 itens** visíveis (além de paginação)
+- Toda tela oferece próximo passo ou caminho de recuperação (sem dead ends): lista vazia → "Cadastrar primeiro item"; erro de rede → "Tentar novamente"; sem permissão → solicitar acesso
+- Usar `ProgressBar` no topo de cards/seções com operação em andamento (`idle`/`loading`/`success`/`error`)
 
 ### Layout e Responsividade
 
 - Usar CSS Grid e Flexbox — evitar dimensionamento via JavaScript
-- Testar em: mobile (360px), laptop (1280px), wide (1920px)
+- **Alinhamento óptico:** ajustar ±1–2px quando a percepção supera a geometria perfeita (ex: ícone ao lado de texto)
+- **Alinhamento deliberado:** cada elemento deve alinhar intencionalmente com algo — grid, baseline, borda ou centro óptico
+- Testar em: mobile (360px), laptop (1280px), wide (1920px) — nenhum elemento vaza, sobrepõe ou estica em excesso
+- Corrigir `overflow` para evitar scrollbars indesejados; testar com macOS "Show Scroll Bars: Always"
 - Modals e drawers: `overscroll-behavior: contain`
 - Links de navegação: usar `<a>` ou `<Link>` — nunca `<button>` ou `<div onClick>` para URLs
 - Radii aninhados: `r_filho ≤ r_pai`; para alinhamento de curvas: `r_filho = r_pai − padding`
@@ -294,8 +413,23 @@ Todo componente e toda tela deve ter **todos os estados** implementados antes de
 - Ações com consequência futura terminam com reticências (`…`): "Excluir safra…"
 - Erros guiam a saída: não "Erro ao salvar" — mas "Erro ao salvar: verifique sua conexão e tente novamente"
 - Linguagem técnica → humana: "Timeout" → "A operação demorou mais que o esperado"
+- Ações em processamento com reticências: "Salvando…", "Carregando…" (caractere `…`, nunca `...`)
 - Numerais para contagens: "8 safras" — não "oito safras"
+- Moeda: 0 ou 2 decimais — nunca misturar no mesmo contexto; espaço non-breaking em `10 ha`, `R$ 100,00`
+- Datas e horas: formato locale-aware (`pt-BR` como padrão)
+- `font-variant-numeric: tabular-nums` em colunas numéricas de tabelas
 - Terminologia: **Fazenda** (não Propriedade), **Safra** (não Ciclo), **Produtor**, **Cadastrar**, **Excluir**
+
+### Performance
+
+- Monitorar re-renders com React DevTools — minimizar re-renders desnecessários
+- `useMemo`/`useCallback` apenas onde o profiling confirmar necessidade (não prematuramente)
+- Listas com **+100 itens** visíveis: considerar virtualização
+- `POST`/`PATCH`/`DELETE`: target < **500ms**; acima disso a UI deve indicar loading
+- Inputs de busca: **debounce de ~300ms** antes de disparar request
+- Imagens com `width` e `height` explícitos (evitar **CLS**); lazy-load abaixo do fold
+- Fontes críticas com `preload` para evitar **FOUT**
+- Processamentos pesados (> 50ms) fora do main thread — considerar Web Workers
 
 ### Checklist antes de todo PR
 
@@ -303,9 +437,21 @@ Todo componente e toda tela deve ter **todos os estados** implementados antes de
 - [ ] Todos os componentes vêm de `src/components/ui/`
 - [ ] Suporte a ambos os temas (light e GBMode)
 - [ ] Todos os estados da UI implementados (loading, vazio, erro)
-- [ ] Inputs com `aria-label` ou `<label>` associado
-- [ ] Botões apenas-ícone com `aria-label`
+- [ ] Inputs com `aria-label` ou `<label>` associado; clicar no label foca o controle
+- [ ] Botões apenas-ícone com `aria-label`; headings sem pular níveis
 - [ ] `@media (prefers-reduced-motion: reduce)` presente em animações
 - [ ] Nenhum `transition: all` no código
-- [ ] Fonte Outfit em toda tipografia
-- [ ] Commit criado com mensagem Conventional Commits
+- [ ] Fonte Outfit em toda tipografia; tamanhos via `t.font.size.*`
+- [ ] Reticências `…`, espaço non-breaking em número+unidade, datas `pt-BR`
+- [ ] Imagens com `width`/`height`; busca com debounce; sem re-renders desnecessários
+- [ ] Commit criado com mensagem Conventional Commits (com escopo quando aplicável)
+
+---
+
+## Manutenção deste Documento
+
+Atualizar este arquivo sempre que:
+- Um novo componente é adicionado ao catálogo (Lei 1)
+- Um novo token é criado em `tokens.ts`
+- Uma nova lei ou regra é aprovada pela equipe
+- Um padrão de interação é definido para casos recorrentes

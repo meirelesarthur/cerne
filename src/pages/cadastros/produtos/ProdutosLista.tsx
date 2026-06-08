@@ -10,7 +10,7 @@ import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { Skeleton }        from '../../../components/ui/Skeleton'
@@ -217,53 +217,36 @@ export default function ProdutosLista({
       />
 
       {/* Toolbar: busca + chips */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={searchRaw} onChange={setSearchRaw} placeholder="Buscar produto..." />
-        {grupoFilter && (
-          <FilterChip
-            label={`Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`}
-            onRemove={() => { setGrupoFilter(''); setCatFilter(''); setClasseFilter('') }}
-          />
-        )}
-        {catFilter && (
-          <FilterChip
-            label={`Cat.: ${catOpts.find(c => String(c.id) === catFilter)?.nome ?? catFilter}`}
-            onRemove={() => { setCatFilter(''); setClasseFilter('') }}
-          />
-        )}
-        {classeFilter && (
-          <FilterChip
-            label={`Classe: ${classeOpts.find(c => String(c.id) === classeFilter)?.nome ?? classeFilter}`}
-            onRemove={() => setClasseFilter('')}
-          />
-        )}
-        {tipoFilter && (
-          <FilterChip
-            label={`Tipo: ${TIPO_PRODUTO_LABEL[tipoFilter as TipoProduto] ?? tipoFilter}`}
-            onRemove={() => setTipoFilter('')}
-          />
-        )}
-        {ativoFilter && (
-          <FilterChip
-            label={ativoFilter === 'true' ? 'Ativo' : 'Inativo'}
-            onRemove={() => setAtivoFilter('')}
-          />
-        )}
-        {activeFilterCount > 1 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Limpar tudo
-          </Button>
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={searchRaw}
+        onSearch={setSearchRaw}
+        searchPlaceholder="Buscar produto..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        onClearAll={clearFilters}
+        chips={[
+          grupoFilter && {
+            label: `Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`,
+            onRemove: () => { setGrupoFilter(''); setCatFilter(''); setClasseFilter('') },
+          },
+          catFilter && {
+            label: `Cat.: ${catOpts.find(c => String(c.id) === catFilter)?.nome ?? catFilter}`,
+            onRemove: () => { setCatFilter(''); setClasseFilter('') },
+          },
+          classeFilter && {
+            label: `Classe: ${classeOpts.find(c => String(c.id) === classeFilter)?.nome ?? classeFilter}`,
+            onRemove: () => setClasseFilter(''),
+          },
+          tipoFilter && {
+            label: `Tipo: ${TIPO_PRODUTO_LABEL[tipoFilter as TipoProduto] ?? tipoFilter}`,
+            onRemove: () => setTipoFilter(''),
+          },
+          ativoFilter && {
+            label: ativoFilter === 'true' ? 'Ativo' : 'Inativo',
+            onRemove: () => setAtivoFilter(''),
+          },
+        ]}
+      />
 
       {/* Tabela */}
       {isLoading ? (

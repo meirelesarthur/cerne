@@ -8,7 +8,7 @@ import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -102,24 +102,19 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
       />
 
       {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar embalagem..." />
-        {filters.unidade && (
-          <FilterChip
-            label={`Un.: ${UNIDADE_OPTS.find(o => o.value === filters.unidade)?.label.split(' — ')[0] ?? filters.unidade}`}
-            onRemove={() => setFilters(f => ({ ...f, unidade: '' }))}
-          />
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Buscar embalagem..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        chips={[
+          filters.unidade && {
+            label: `Un.: ${UNIDADE_OPTS.find(o => o.value === filters.unidade)?.label.split(' — ')[0] ?? filters.unidade}`,
+            onRemove: () => setFilters(f => ({ ...f, unidade: '' })),
+          },
+        ]}
+      />
 
       {/* ── Tabela ──────────────────────────────────────────────────────────── */}
       {isLoading ? (

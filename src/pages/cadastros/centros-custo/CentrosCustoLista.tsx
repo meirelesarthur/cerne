@@ -9,7 +9,7 @@ import { Button }          from '../../../components/ui/Button'
 import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -213,38 +213,28 @@ export default function CentrosCustoLista({
       </div>}
 
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar por código, descrição..." />
-        {filters.condicao && (
-          <FilterChip
-            label={`Condição: ${({ ambos: 'Ambos', receita: 'Receita', despesa: 'Despesa' } as Record<string, string>)[filters.condicao]}`}
-            onRemove={() => setFilters(f => ({ ...f, condicao: '' }))}
-          />
-        )}
-        {filters.classe && (
-          <FilterChip
-            label={`Classe: ${filters.classe === 'sintetica' ? 'Sintética' : 'Analítica'}`}
-            onRemove={() => setFilters(f => ({ ...f, classe: '' }))}
-          />
-        )}
-        {filters.ativo && (
-          <FilterChip
-            label={filters.ativo === 'sim' ? 'Ativo' : 'Inativo'}
-            onRemove={() => setFilters(f => ({ ...f, ativo: '' }))}
-          />
-        )}
-        {activeFilterCount > 1 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Limpar tudo
-          </Button>
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={v => { setSearch(v); setPage(1) }}
+        searchPlaceholder="Buscar por código, descrição..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        onClearAll={clearFilters}
+        chips={[
+          filters.condicao && {
+            label: `Condição: ${({ ambos: 'Ambos', receita: 'Receita', despesa: 'Despesa' } as Record<string, string>)[filters.condicao]}`,
+            onRemove: () => setFilters(f => ({ ...f, condicao: '' })),
+          },
+          filters.classe && {
+            label: `Classe: ${filters.classe === 'sintetica' ? 'Sintética' : 'Analítica'}`,
+            onRemove: () => setFilters(f => ({ ...f, classe: '' })),
+          },
+          filters.ativo && {
+            label: filters.ativo === 'sim' ? 'Ativo' : 'Inativo',
+            onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
+          },
+        ]}
+      />
 
       {/* ── Tabela ──────────────────────────────────────────────────────── */}
       {isLoading ? (

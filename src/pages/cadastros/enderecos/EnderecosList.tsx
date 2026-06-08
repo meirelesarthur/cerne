@@ -7,7 +7,8 @@ import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { t }               from '../../../design/tokens'
@@ -108,18 +109,17 @@ export default function EnderecosList({
       />
 
       {/* ── Toolbar ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar endereçamento..." />
-        {filters.tipo && (
-          <FilterChip
-            label={`Tipo: ${TIPO_LABEL[filters.tipo as keyof typeof TIPO_LABEL] ?? filters.tipo}`}
-            onRemove={() => setFilters(f => ({ ...f, tipo: '' }))}
-          />
-        )}
-        <span style={{ marginLeft: 'auto', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {totalCount} {totalCount === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Buscar endereçamento..."
+        chips={[
+          filters.tipo && {
+            label: `Tipo: ${TIPO_LABEL[filters.tipo as keyof typeof TIPO_LABEL] ?? filters.tipo}`,
+            onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
+          },
+        ]}
+      />
 
       {/* ── Tree ──────────────────────────────────────────────────────────────── */}
       {filteredTree.length === 0 ? (

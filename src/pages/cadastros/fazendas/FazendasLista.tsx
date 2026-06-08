@@ -13,7 +13,7 @@ import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { Badge }           from '../../../components/ui/Badge'
 import type { BadgeVariant } from '../../../components/ui/Badge'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -230,46 +230,31 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
       )}
 
-      {/* ── Toolbar: search (esq.) → chips → [spacer] → toggle (dir.) ────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, marginTop: 4, flexWrap: 'wrap' }}>
-
-        {/* Busca — extrema esquerda */}
-        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar fazenda..." />
-
-        {/* Chips de filtro ativos */}
-        {filters.tipoExploracao && (
-          <FilterChip
-            label={`Tipo: ${filters.tipoExploracao}`}
-            onRemove={() => setFilters((f) => ({ ...f, tipoExploracao: '' }))}
-          />
-        )}
-        {filters.ativo && (
-          <FilterChip
-            label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
-            onRemove={() => setFilters((f) => ({ ...f, ativo: '' }))}
-          />
-        )}
-        {activeFilterCount > 1 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Limpar tudo
-          </Button>
-        )}
-
-        {/* Espaçador */}
-        <div style={{ flex: 1 }} />
-
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-
-        {/* Separador vertical */}
-        <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
-
-        {/* Toggle Lista / Cards — extrema direita */}
-        <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
-      </div>
+      {/* ── Toolbar: busca + filtro + toggle (linha 1) · chips (linha 2) ──── */}
+      <ListToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Buscar fazenda..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        onClearAll={clearFilters}
+        chips={[
+          filters.tipoExploracao && {
+            label: `Tipo: ${filters.tipoExploracao}`,
+            onRemove: () => setFilters((f) => ({ ...f, tipoExploracao: '' })),
+          },
+          filters.ativo && {
+            label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
+            onRemove: () => setFilters((f) => ({ ...f, ativo: '' })),
+          },
+        ]}
+        actions={
+          <>
+            <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
+            <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
+          </>
+        }
+      />
 
       {/* ── Conteúdo: Lista ou Cards ─────────────────────────────────────── */}
       {isLoading ? (

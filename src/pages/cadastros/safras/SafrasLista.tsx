@@ -11,7 +11,7 @@ import { Modal }           from '../../../components/ui/Modal'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -168,24 +168,19 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       )}
 
       {/* ── Toolbar ───────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + 2, marginBottom: t.space[3], flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar safra..." />
-        {statusFilter !== 'todas' && (
-          <FilterChip
-            label={statusFilter === 'ativas' ? 'Ativas' : 'Inativas'}
-            onRemove={clearFilters}
-          />
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Buscar safra..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        chips={[
+          statusFilter !== 'todas' && {
+            label: statusFilter === 'ativas' ? 'Ativas' : 'Inativas',
+            onRemove: clearFilters,
+          },
+        ]}
+      />
 
       {/* ── Tabela ────────────────────────────────────────────────────────── */}
       {isLoading ? (

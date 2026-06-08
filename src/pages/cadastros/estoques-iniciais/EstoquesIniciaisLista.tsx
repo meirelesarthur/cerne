@@ -8,7 +8,7 @@ import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -168,24 +168,19 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
       </div>
 
       {/* Filter bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={v => { setSearch(v); setPage(1) }} placeholder="Buscar produto, código ou armazém..." />
-        {filterArmazem && (
-          <FilterChip
-            label={`Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`}
-            onRemove={() => { setFilterArmazem(''); setPage(1) }}
-          />
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={v => { setSearch(v); setPage(1) }}
+        searchPlaceholder="Buscar produto, código ou armazém..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        chips={[
+          filterArmazem && {
+            label: `Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`,
+            onRemove: () => { setFilterArmazem(''); setPage(1) },
+          },
+        ]}
+      />
 
       {/* Table card */}
       {isLoading ? (

@@ -10,7 +10,7 @@ import { Modal }           from '../../../components/ui/Modal'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
-import { TableSearchInput, FilterChip, FilterButton } from '../../../components/ui/TableToolbar'
+import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -132,33 +132,24 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       />
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-        <TableSearchInput value={search} onChange={setSearch} placeholder="Buscar armazém..." />
-        {filters.tipo && (
-          <FilterChip
-            label={`Tipo: ${TIPO_ARMAZEM_LABEL[filters.tipo as TipoArmazem]}`}
-            onRemove={() => setFilters(f => ({ ...f, tipo: '' }))}
-          />
-        )}
-        {filters.ativo && (
-          <FilterChip
-            label={filters.ativo === 'true' ? 'Ativo' : 'Inativo'}
-            onRemove={() => setFilters(f => ({ ...f, ativo: '' }))}
-          />
-        )}
-        {activeFilterCount > 1 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>Limpar tudo</Button>
-        )}
-        <div style={{ flex: 1 }} />
-        <FilterButton
-          active={activeFilterCount > 0}
-          count={activeFilterCount}
-          onClick={() => setDrawerOpen(true)}
-        />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
-      </div>
+      <ListToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Buscar armazém..."
+        onOpenFilter={() => setDrawerOpen(true)}
+        filterCount={activeFilterCount}
+        onClearAll={clearFilters}
+        chips={[
+          filters.tipo && {
+            label: `Tipo: ${TIPO_ARMAZEM_LABEL[filters.tipo as TipoArmazem]}`,
+            onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
+          },
+          filters.ativo && {
+            label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
+            onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
+          },
+        ]}
+      />
 
       {/* Tabela */}
       {isLoading ? (

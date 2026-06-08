@@ -1,23 +1,42 @@
-import { useId } from 'react'
+import { useId, useRef, useEffect } from 'react'
 import { t } from '../../design/tokens'
 
 interface CheckboxProps {
-  label: string
+  /** Rótulo visível. Quando ausente, informe `aria-label` para acessibilidade. */
+  label?: string
   checked: boolean
   onChange: (checked: boolean) => void
+  /** Estado parcial (ex.: "selecionar todos" com seleção mista). */
+  indeterminate?: boolean
   disabled?: boolean
+  'aria-label'?: string
 }
 
-export function Checkbox({ label, checked, onChange, disabled }: CheckboxProps) {
+export function Checkbox({
+  label,
+  checked,
+  onChange,
+  indeterminate = false,
+  disabled,
+  'aria-label': ariaLabel,
+}: CheckboxProps) {
   const id = useId()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // `indeterminate` só existe no DOM, não como atributo JSX
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = indeterminate && !checked
+  }, [indeterminate, checked])
+
+  const filled = checked || indeterminate
 
   return (
     <label
       htmlFor={id}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: t.space[2],
+        gap: label ? t.space[2] : 0,
         cursor: disabled ? 'not-allowed' : 'pointer',
         userSelect: 'none',
         opacity: disabled ? 0.5 : 1,
@@ -27,9 +46,11 @@ export function Checkbox({ label, checked, onChange, disabled }: CheckboxProps) 
         {/* Input nativo visualmente oculto mas totalmente acessível */}
         <input
           id={id}
+          ref={inputRef}
           type="checkbox"
           checked={checked}
           disabled={disabled}
+          aria-label={!label ? ariaLabel : undefined}
           onChange={e => onChange(e.target.checked)}
           style={{
             position: 'absolute',
@@ -48,11 +69,11 @@ export function Checkbox({ label, checked, onChange, disabled }: CheckboxProps) 
           style={{
             position: 'absolute',
             inset: 0,
-            border: checked
+            border: filled
               ? `1.5px solid ${t.color.brand[600]}`
               : `1.5px solid ${t.color.neutral[300]}`,
             borderRadius: t.radius.sm,
-            background: checked ? t.color.brand[600] : t.color.neutral[0],
+            background: filled ? t.color.brand[600] : t.color.neutral[0],
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -71,19 +92,26 @@ export function Checkbox({ label, checked, onChange, disabled }: CheckboxProps) 
               />
             </svg>
           )}
+          {indeterminate && !checked && (
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M2.5 5h5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          )}
         </span>
       </span>
 
-      <span
-        style={{
-          fontSize: t.font.size.base,
-          fontFamily: t.font.family.sans,
-          color: t.color.neutral[600],
-          lineHeight: 1,
-        }}
-      >
-        {label}
-      </span>
+      {label && (
+        <span
+          style={{
+            fontSize: t.font.size.base,
+            fontFamily: t.font.family.sans,
+            color: t.color.neutral[600],
+            lineHeight: 1,
+          }}
+        >
+          {label}
+        </span>
+      )}
     </label>
   )
 }

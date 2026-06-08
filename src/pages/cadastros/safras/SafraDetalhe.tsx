@@ -1,6 +1,8 @@
 import React from 'react'
 import { ArrowLeft, Pencil, Calendar, Users, TrendingUp, Clock } from 'lucide-react'
 import { Button }     from '../../../components/ui/Button'
+import { Badge }      from '../../../components/ui/Badge'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { t }          from '../../../design/tokens'
 import { useTheme }   from '../../../context/ThemeContext'
 import { WeekCanvas } from './WeekCanvas'
@@ -111,113 +113,20 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
       gap: 16,
     }}>
 
-      {/* ── Header card gradient ────────────────────────────────────────── */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0d2b1a 0%, #14532d 100%)',
-        borderRadius: t.radius['2xl'],
-        padding: '28px 32px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        gap: 16,
-      }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Back + title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <button
-              type="button"
-              onClick={onBack}
-              style={{
-                background: 'rgba(255,255,255,0.12)',
-                border: 'none',
-                borderRadius: 8,
-                width: 32,
-                height: 32,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: 'rgba(255,255,255,0.8)',
-                flexShrink: 0,
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
-              aria-label="Voltar"
-            >
-              <ArrowLeft size={16} />
-            </button>
-
-            <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              background: 'rgba(255,255,255,0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <Calendar size={20} color="rgba(255,255,255,0.9)" />
-            </div>
-
-            <h1 style={{
-              fontSize: t.font.size['2xl'],
-              fontWeight: t.font.weight.bold,
-              color: '#ffffff',
-              margin: 0,
-              fontFamily: t.font.family.sans,
-              letterSpacing: '-0.3px',
-              lineHeight: 1.2,
-            }}>
-              {safra.desc}
-            </h1>
-          </div>
-
-          {/* Meta */}
-          <div style={{ paddingLeft: 42, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: t.font.size.sm, color: 'rgba(255,255,255,0.6)', fontFamily: t.font.family.sans }}>
-              {fmtYMDtoDMY(safra.ini)} — {fmtYMDtoDMY(safra.fim)}
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
-            <span style={{ fontSize: t.font.size.sm, color: 'rgba(255,255,255,0.6)' }}>
-              Rebanho: {rebLabels[safra.reb]}
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
-            <span style={{ fontSize: t.font.size.sm, color: 'rgba(255,255,255,0.6)' }}>
-              Evolução: {evoLabels[safra.evo]}
-            </span>
-          </div>
-        </div>
-
-        {/* Status badge + edit button */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 12, flexShrink: 0 }}>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '4px 12px',
-            background: isAtiva ? 'rgba(22,163,74,0.25)' : 'rgba(148,163,184,0.2)',
-            color: isAtiva ? '#86efac' : 'rgba(255,255,255,0.6)',
-            borderRadius: t.radius.full,
-            fontSize: t.font.size.xs,
-            fontWeight: t.font.weight.semibold,
-            border: `1px solid ${isAtiva ? 'rgba(22,163,74,0.4)' : 'rgba(255,255,255,0.15)'}`,
-            fontFamily: t.font.family.sans,
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: isAtiva ? '#4ade80' : 'rgba(255,255,255,0.5)' }} />
-            {isAtiva ? 'Ativa' : 'Inativa'}
-          </span>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<Pencil size={13} />}
-            onClick={onEdit}
-            style={{ background: 'rgba(255,255,255,0.12)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}
-          >
-            Editar
-          </Button>
-        </div>
-      </div>
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <FormPageHeader
+        title={safra.desc}
+        subtitle={`${fmtYMDtoDMY(safra.ini)} — ${fmtYMDtoDMY(safra.fim)} · Rebanho: ${rebLabels[safra.reb]} · Evolução: ${evoLabels[safra.evo]}`}
+        onBack={onBack}
+        actions={
+          <>
+            <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
+            <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+              Editar
+            </Button>
+          </>
+        }
+      />
 
       {/* ── Stats strip ───────────────────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>

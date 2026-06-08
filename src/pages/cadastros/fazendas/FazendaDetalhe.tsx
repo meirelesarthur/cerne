@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  ArrowLeft,
   Pencil,
   MapPin,
   Ruler,
@@ -11,6 +10,8 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { Badge } from '../../../components/ui/Badge'
+import { Button } from '../../../components/ui/Button'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
@@ -400,78 +401,20 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <button
-              type="button"
-              onClick={onBack}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: colors.textMuted,
-                padding: 0,
-                flexShrink: 0,
-                transition: 'color 0.15s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = colors.textPrimary }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = colors.textMuted }}
-              title="Voltar para Fazendas"
-              aria-label="Voltar para fazendas"
-            >
-              <ArrowLeft size={20} strokeWidth={2} />
-            </button>
-            <h1
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: colors.textPrimary,
-                letterSpacing: '-0.4px',
-                margin: 0,
-                fontFamily: "'Outfit', sans-serif",
-                transition: 'color 0.2s',
-              }}
-            >
-              {fazenda.nome}
-            </h1>
+      <FormPageHeader
+        title={fazenda.nome}
+        subtitle={`${fazenda.tipoExploracao} · ${fazenda.cidade}, ${fazenda.uf}`}
+        onBack={onBack}
+        backLabel="Voltar para fazendas"
+        actions={
+          <>
             <Badge label={fazenda.ativo ? 'Ativo' : 'Inativo'} variant={fazenda.ativo ? 'success' : 'neutral'} />
-          </div>
-          <p style={{ fontSize: 12, color: colors.textSecondary, margin: 0, paddingLeft: 30, transition: 'color 0.2s' }}>
-            {fazenda.tipoExploracao} · {fazenda.cidade}, {fazenda.uf}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onEdit}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: colors.brand,
-            border: 'none',
-            borderRadius: 8,
-            padding: '0 16px',
-            height: 36,
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'white',
-            cursor: 'pointer',
-            fontFamily: "'Outfit', sans-serif",
-            flexShrink: 0,
-            transition: 'background 0.15s',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = colors.brandHover }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = colors.brand }}
-        >
-          <Pencil size={13} />
-          Editar
-        </button>
-      </div>
+            <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+              Editar
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>

@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import { PageHeader } from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
-import { Button } from '../../../components/ui/Button'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { StepFooter } from '../../../components/ui/StepFooter'
 import { Stepper } from '../../../components/ui/Stepper'
 import { useTheme } from '../../../context/ThemeContext'
@@ -162,6 +160,12 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
   return (
     <PageContainer>
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
+
+      <FormPageHeader
+        title="Nova Fazenda"
+        subtitle="Preencha os dados da fazenda"
+        onBack={onBack}
+      />
 
       <Stepper
         steps={STEPS}

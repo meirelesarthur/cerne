@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
-import { ArrowLeft } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { Stepper }       from '../../../components/ui/Stepper'
@@ -158,30 +158,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
     <PageContainer>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button
-              type="button"
-              onClick={handleBack}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, display: 'flex', alignItems: 'center', padding: 0, transition: 'color 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = colors.textPrimary }}
-              onMouseLeave={e => { e.currentTarget.style.color = colors.textMuted }}
-              aria-label="Voltar"
-            >
-              <ArrowLeft size={20} strokeWidth={2} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, margin: 0, fontFamily: t.font.family.sans, letterSpacing: '-0.3px' }}>
-                {pageTitle}
-              </h1>
-              <p style={{ fontSize: t.font.size.sm, color: colors.textMuted, margin: 0, fontFamily: t.font.family.sans }}>
-                {pageDesc}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <FormPageHeader title={pageTitle} subtitle={pageDesc} onBack={handleBack} />
 
       {/* ── Stepper (fora do card, padrão Fazendas) ──────────────────────────── */}
       <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />

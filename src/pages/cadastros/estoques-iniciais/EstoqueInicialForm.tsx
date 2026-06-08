@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
-  Search, X, Lock, AlertTriangle, Plus, ArrowLeft, Save, ChevronDown,
+  Search, X, Lock, AlertTriangle, Plus, Save, ChevronDown,
 } from 'lucide-react'
 import { PageContainer }       from '../../../components/ui/PageContainer'
+import { FormPageHeader }      from '../../../components/ui/FormPageHeader'
 import { FormField }           from '../../../components/ui/FormField'
 import { FormSelect }          from '../../../components/ui/FormSelect'
 import { Button }              from '../../../components/ui/Button'
@@ -324,14 +325,11 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
       `}</style>
 
       {/* ── Form Header ───────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[6], paddingBottom: t.space[4], borderBottom: `1px solid ${colors.border}` }}>
-        <h2 style={{ margin: 0, fontSize: 22, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-          {isEdit ? 'Editar Saldo Inicial' : 'Novo Saldo Inicial'}
-        </h2>
-        <Button variant="secondary" size="sm" icon={<ArrowLeft size={13} />} onClick={handleBack}>
-          Voltar
-        </Button>
-      </div>
+      <FormPageHeader
+        title={isEdit ? 'Editar Saldo Inicial' : 'Novo Saldo Inicial'}
+        subtitle={isEdit ? 'Atualize o saldo inicial de estoque' : 'Preencha os dados do saldo inicial de estoque'}
+        onBack={handleBack}
+      />
 
       {/* ── ZONE 1 — IDENTIFICAÇÃO ────────────────────────────────────────────── */}
       <CollapsibleSection title="Identificação" fieldCount={3} defaultOpen>

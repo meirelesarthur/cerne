@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, ChevronUp, ChevronDown,
+  Plus, Pencil, Trash2,
   Download, Package,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -9,6 +9,7 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { SortHeader }  from '../../../components/ui/SortHeader'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -205,17 +206,13 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
               <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
               <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
               <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
-              <button
-                type="button"
-                onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-                style={{ ...colStyle, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3, textAlign: 'left' as const }}
-              >
-                Dt. Movimento
-                <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.3 }} />
-                  <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.3 }} />
-                </span>
-              </button>
+              <SortHeader
+                label="Dt. Movimento"
+                field="dtMovimento"
+                activeField="dtMovimento"
+                direction={sortDir}
+                onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+              />
               <span style={colStyle}>Lote</span>
               <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
             </div>

@@ -1,6 +1,6 @@
 # CERNE — Web Interface Guidelines
 
-> Documento vivo de padrões de interface para o painel AGRO365 / GB CERNE.
+> Documento vivo de padrões de interface para o painel GB CERNE.
 > Combina as Leis internas do projeto com melhores práticas derivadas de design systems de referência (Vercel Design Guidelines).
 > Toda geração de código deve seguir estas regras. Em caso de conflito, as **Leis** prevalecem.
 

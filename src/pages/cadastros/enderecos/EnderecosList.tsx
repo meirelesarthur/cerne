@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Plus, Pencil, Trash2, ChevronRight, MapPin,
 } from 'lucide-react'
@@ -11,6 +11,8 @@ import { FilterButton } from '../../../components/ui/TableToolbar'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
+import { IconButton }      from '../../../components/ui/IconButton'
+import { EmptyState }      from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import {
@@ -123,7 +125,20 @@ export default function EnderecosList({
 
       {/* ── Tree ──────────────────────────────────────────────────────────────── */}
       {filteredTree.length === 0 ? (
-        <EmptyState onAddRoot={onAddRoot} hasSearch={search.length > 0} />
+        search.length > 0 ? (
+          <EmptyState
+            icon={<MapPin size={40} strokeWidth={1.5} />}
+            message="Nenhum endereçamento encontrado"
+            description="Ajuste o filtro de busca."
+          />
+        ) : (
+          <EmptyState
+            icon={<MapPin size={40} strokeWidth={1.5} />}
+            message="Nenhum endereçamento cadastrado"
+            description="Comece adicionando o primeiro setor."
+            action={{ label: 'Adicionar Setor', onClick: onAddRoot }}
+          />
+        )
       ) : (
         <div style={{
           background: colors.surfaceBg,
@@ -310,15 +325,16 @@ function TreeNode({
         {/* Ações inline */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 3 }}>
           {canHaveChild && (
-            <ActionBtn
-              icon={<Plus size={12} />}
-              label={`Adicionar ${TIPO_LABEL[TIPO_CHILD[node.tipo]!]}`}
+            <IconButton
+              icon={<Plus size={13} />}
+              aria-label={`Adicionar ${TIPO_LABEL[TIPO_CHILD[node.tipo]!]}`}
               onClick={() => onAddChild(node.id)}
-              colors={colors}
+              size="sm"
+              variant="ghost"
             />
           )}
-          <ActionBtn icon={<Pencil size={12} />} label="Editar"  onClick={() => onEdit(node.id)}      colors={colors} />
-          <ActionBtn icon={<Trash2 size={12} />} label="Excluir" onClick={() => onDeleteReq(node)}    colors={colors} danger />
+          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  onClick={() => onEdit(node.id)}   size="sm" variant="ghost" />
+          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" onClick={() => onDeleteReq(node)} size="sm" variant="ghost" danger />
         </div>
       </div>
 
@@ -343,68 +359,4 @@ function TreeNode({
   )
 }
 
-// ─── ActionBtn ────────────────────────────────────────────────────────────────
-
-function ActionBtn({
-  icon, label, onClick, colors, danger = false,
-}: {
-  icon:    React.ReactNode
-  label:   string
-  onClick: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  danger?: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      type="button"
-      title={label}
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        width: 28, height: 28,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent',
-        border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`,
-        borderRadius: t.radius.DEFAULT,
-        cursor: 'pointer',
-        color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted,
-        transition: 'background 0.12s, border-color 0.12s, color 0.12s',
-      }}
-    >
-      {icon}
-    </button>
-  )
-}
-
-// ─── EmptyState ───────────────────────────────────────────────────────────────
-
-function EmptyState({ onAddRoot, hasSearch }: { onAddRoot: () => void; hasSearch: boolean }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '60px 20px', gap: 12, textAlign: 'center',
-    }}>
-      <div style={{
-        width: 56, height: 56, borderRadius: 16, background: colors.brandBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <MapPin size={24} color={colors.brand} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Nenhum endereçamento encontrado' : 'Nenhum endereçamento cadastrado'}
-      </div>
-      <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Ajuste o filtro de busca.' : 'Comece adicionando o primeiro setor.'}
-      </div>
-      {!hasSearch && (
-        <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
-          Adicionar Setor
-        </Button>
-      )}
-    </div>
-  )
-}
 

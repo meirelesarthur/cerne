@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ArrowLeft, Save, ChevronDown } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
+import { Checkbox }      from '../../../components/ui/Checkbox'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
@@ -346,11 +347,11 @@ function CategoriasSection({
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                 onClick={() => setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] }))}
               >
-                <CCCheckbox
+                <Checkbox
                   checked={groupSelected}
                   indeterminate={groupPartial}
                   onChange={() => toggleGroup(cat)}
-                  colors={colors}
+                  aria-label={cat.label}
                 />
                 <span style={{
                   flex: 1, fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
@@ -387,10 +388,10 @@ function CategoriasSection({
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       onClick={() => toggleItem(child.id)}
                     >
-                      <CCCheckbox
+                      <Checkbox
                         checked={selected.includes(child.id)}
                         onChange={() => toggleItem(child.id)}
-                        colors={colors}
+                        aria-label={child.label}
                       />
                       <span style={{
                         fontSize: t.font.size.sm, color: colors.textSecondary,
@@ -410,38 +411,3 @@ function CategoriasSection({
   )
 }
 
-// ─── Checkbox customizado ─────────────────────────────────────────────────────
-
-function CCCheckbox({
-  checked,
-  indeterminate = false,
-  onChange,
-  colors,
-}: {
-  checked:       boolean
-  indeterminate?: boolean
-  onChange:      () => void
-  colors:        ReturnType<typeof useTheme>['colors']
-}) {
-  const ref = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (ref.current) ref.current.indeterminate = indeterminate
-  }, [indeterminate])
-
-  return (
-    <input
-      ref={ref}
-      type="checkbox"
-      checked={checked}
-      onChange={e => { e.stopPropagation(); onChange() }}
-      onClick={e => e.stopPropagation()}
-      style={{
-        width: 15, height: 15,
-        cursor: 'pointer',
-        accentColor: colors.brand,
-        flexShrink: 0,
-      }}
-    />
-  )
-}

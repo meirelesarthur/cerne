@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
-  Search, X, Lock, AlertTriangle, Plus, Save, ChevronDown,
+  Lock, AlertTriangle, Plus, Save,
 } from 'lucide-react'
 import { PageContainer }       from '../../../components/ui/PageContainer'
 import { FormPageHeader }      from '../../../components/ui/FormPageHeader'
 import { FormField }           from '../../../components/ui/FormField'
 import { FormSelect }          from '../../../components/ui/FormSelect'
+import { SearchSelect }        from '../../../components/ui/SearchSelect'
 import { Button }              from '../../../components/ui/Button'
 import { CollapsibleSection }  from '../../../components/ui/CollapsibleSection'
 import { Modal }               from '../../../components/ui/Modal'
@@ -94,23 +95,9 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
   const [showExitModal,       setShowExitModal]       = useState(false)
   const [showDuplicateAlert,  setShowDuplicateAlert]  = useState(false)
   const [showProductModal,    setShowProductModal]     = useState(false)
-  const [productSearch,       setProductSearch]        = useState('')
-  const [showProductDropdown, setShowProductDropdown] = useState(false)
+  const [productSearch, setProductSearch] = useState('')
 
   const [flashKey, setFlashKey] = useState(0)
-
-  const comboboxRef = useRef<HTMLDivElement>(null)
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleMouseDown(e: MouseEvent) {
-      if (comboboxRef.current && !comboboxRef.current.contains(e.target as Node)) {
-        setShowProductDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [])
 
   // Flash computed fields when values change
   useEffect(() => {
@@ -141,15 +128,6 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
     { value: '', label: 'Selecione o armazém...' },
     ...mockArmazens.filter(a => a.ativo).map(a => ({ value: String(a.id), label: a.descricao })),
   ]
-
-  // ── Filtered products for combobox ────────────────────────────────────────────
-
-  const filteredProducts = productSearch.trim().length >= 1
-    ? getAllProducts().filter(p =>
-        p.descricao.toLowerCase().includes(productSearch.toLowerCase()) ||
-        p.codigo.toLowerCase().includes(productSearch.toLowerCase())
-      )
-    : getAllProducts()
 
   // ── Validation ────────────────────────────────────────────────────────────────
 
@@ -248,7 +226,6 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
       unidade:   p.unidadePrimaria,
     }))
     setProductSearch(p.descricao)
-    setShowProductDropdown(false)
     setIsDirty(true)
     touch('produtoId')
   }
@@ -336,104 +313,26 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
 
         {/* Product combobox */}
         <div style={{ marginBottom: t.space[4] }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-              Produto <span style={{ color: t.color.error.text }}>*</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => { setShowProductModal(true) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.brand, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, display: 'flex', alignItems: 'center', gap: 3 }}
-            >
-              <Plus size={11} /> Novo Produto
-            </button>
-          </div>
-
-          <div ref={comboboxRef} style={{ position: 'relative' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              height: 36,
-              border: `1.5px solid ${touched.produtoId && errors.produtoId ? t.color.error.text : showProductDropdown ? t.color.brand[600] : colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              padding: '0 10px',
-              background: colors.surfaceBg,
-              transition: 'border-color 0.15s',
-            }}>
-              <Search size={13} color={showProductDropdown ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} />
-              <input
-                type="text"
-                placeholder="Buscar produto por nome ou código..."
-                value={productSearch}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setProductSearch(e.target.value)
-                  setShowProductDropdown(true)
-                  if (!e.target.value) {
-                    setField('produtoId', '')
-                    setField('unidade', '')
-                  }
-                }}
-                onFocus={() => setShowProductDropdown(true)}
-                style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
-              />
-              {productSearch && (
-                <button
-                  type="button"
-                  onClick={() => { setProductSearch(''); setField('produtoId', ''); setField('unidade', ''); setShowProductDropdown(false) }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}
-                >
-                  <X size={11} />
-                </button>
-              )}
-              <ChevronDown size={12} color={colors.textMuted} />
-            </div>
-
-            {/* Dropdown */}
-            {showProductDropdown && (
-              <div style={{
-                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
-                background: colors.surfaceBg,
-                border: `1px solid ${colors.border}`,
-                borderRadius: t.radius.lg,
-                boxShadow: t.shadow.md,
-                maxHeight: 280,
-                overflowY: 'auto',
-                marginTop: 2,
-              }}>
-                {/* Header */}
-                <div style={{ padding: '8px 12px 6px', fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, borderBottom: `1px solid ${colors.borderSubtle}` }}>
-                  {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
-                </div>
-
-                {/* Items */}
-                {filteredProducts.slice(0, 8).map(p => (
-                  <ProductDropdownRow
-                    key={p.id}
-                    product={p}
-                    onSelect={() => handleSelectProduct(p)}
-                    colors={colors}
-                    isSelected={form.produtoId === String(p.id)}
-                  />
-                ))}
-
-                {/* Footer */}
-                <div style={{ borderTop: `1px solid ${colors.borderSubtle}` }}>
-                  <button
-                    type="button"
-                    onClick={() => { setShowProductDropdown(false); setShowProductModal(true) }}
-                    style={{ width: '100%', padding: '10px 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.sm, color: colors.brand, fontFamily: t.font.family.sans, fontWeight: t.font.weight.bold, textAlign: 'left', display: 'flex', alignItems: 'center', gap: 6 }}
-                  >
-                    <Plus size={13} /> Novo Produto
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {touched.produtoId && errors.produtoId && (
-            <span style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans, marginTop: 4, display: 'block' }}>
-              {errors.produtoId}
-            </span>
-          )}
+          <SearchSelect
+            label="Produto"
+            required
+            placeholder="Buscar produto por nome ou código..."
+            query={productSearch}
+            onQueryChange={(v) => {
+              setProductSearch(v)
+              if (!v) { setField('produtoId', ''); setField('unidade', '') }
+            }}
+            options={getAllProducts().map(p => ({ id: String(p.id), label: p.descricao, code: p.codigo }))}
+            selectedId={form.produtoId || null}
+            onSelect={(opt) => {
+              const p = getAllProducts().find(pp => String(pp.id) === opt.id)
+              if (p) handleSelectProduct(p)
+            }}
+            onClear={() => { setProductSearch(''); setField('produtoId', ''); setField('unidade', '') }}
+            error={touched.produtoId && errors.produtoId ? errors.produtoId : undefined}
+            headerAction={{ label: 'Novo Produto', icon: <Plus size={11} />, onClick: () => setShowProductModal(true) }}
+            footerAction={{ label: 'Novo Produto', icon: <Plus size={13} />, onClick: () => setShowProductModal(true) }}
+          />
         </div>
 
         {/* Unidade + Armazém */}
@@ -672,40 +571,4 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
 }
 
 // ─── ProductDropdownRow ───────────────────────────────────────────────────────
-
-function ProductDropdownRow({ product, onSelect, colors, isSelected }: {
-  product: Produto
-  onSelect: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-  isSelected: boolean
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        width: '100%',
-        padding: '8px 12px',
-        background: isSelected ? colors.brandBg : hov ? colors.surfaceSubtle : 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        textAlign: 'left',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        transition: 'background 0.1s',
-      }}
-    >
-      <span style={{ fontSize: t.font.size.xs, color: colors.brand, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, minWidth: 52 }}>
-        {product.codigo}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {product.descricao}
-      </span>
-    </button>
-  )
-}
 

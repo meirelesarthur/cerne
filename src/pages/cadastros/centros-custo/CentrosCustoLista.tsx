@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
   TrendingUp, TrendingDown, HelpCircle,
@@ -6,6 +6,8 @@ import {
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
+import { Heading }         from '../../../components/ui/Heading'
+import { Modal }           from '../../../components/ui/Modal'
 import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
@@ -325,41 +327,43 @@ export default function CentrosCustoLista({
       />
 
       {/* ── Modal: Saiba mais ────────────────────────────────────────────── */}
-      {saibaMais && (
-        <Modal onClose={() => setSaibaMais(false)} width={560}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: colors.brandBg,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <HelpCircle size={22} color={colors.brand} />
-              </div>
-              <h2 style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.bold, color: colors.textPrimary, margin: 0, fontFamily: t.font.family.sans }}>
-                Centros de Custo
-              </h2>
+      <Modal
+        open={saibaMais}
+        onClose={() => setSaibaMais(false)}
+        size="lg"
+        footer={
+          <Button variant="primary" onClick={() => setSaibaMais(false)}>
+            Entendido
+          </Button>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
+            <div style={{
+              width: t.space[10], height: t.space[10], borderRadius: t.radius.xl,
+              background: colors.brandBg,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <HelpCircle size={22} color={colors.brand} />
             </div>
-            <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.7 }}>
-              <p style={{ margin: '0 0 12px' }}>
-                Os <strong style={{ color: colors.textPrimary }}>Centros de Custo</strong> são unidades organizacionais
-                utilizadas para apropriar receitas e despesas, permitindo análises por área, atividade ou projeto.
-              </p>
-              <ul style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <li><strong>Sintético:</strong> centro raiz, agrupa outros centros. Não recebe lançamentos diretos.</li>
-                <li><strong>Analítico:</strong> nível operacional, recebe apontamentos e movimentações.</li>
-                <li><strong>Condição:</strong> define se o centro aceita receitas, despesas ou ambos.</li>
-                <li><strong>Categorias:</strong> vincula o centro às categorias financeiras habilitadas.</li>
-              </ul>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button variant="primary" onClick={() => setSaibaMais(false)}>
-                Entendido
-              </Button>
-            </div>
+            <Heading level={2} size="xl" weight="bold">
+              Centros de Custo
+            </Heading>
           </div>
-        </Modal>
-      )}
+          <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
+            <p style={{ margin: `0 0 ${t.space[3]}px` }}>
+              Os <strong style={{ color: colors.textPrimary }}>Centros de Custo</strong> são unidades organizacionais
+              utilizadas para apropriar receitas e despesas, permitindo análises por área, atividade ou projeto.
+            </p>
+            <ul style={{ margin: 0, padding: `0 0 0 ${t.space[5]}px`, display: 'flex', flexDirection: 'column', gap: t.space[2] - 2 }}>
+              <li><strong>Sintético:</strong> centro raiz, agrupa outros centros. Não recebe lançamentos diretos.</li>
+              <li><strong>Analítico:</strong> nível operacional, recebe apontamentos e movimentações.</li>
+              <li><strong>Condição:</strong> define se o centro aceita receitas, despesas ou ambos.</li>
+              <li><strong>Categorias:</strong> vincula o centro às categorias financeiras habilitadas.</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
@@ -496,47 +500,6 @@ function CCRow({
             { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
           ]}
         />
-      </div>
-    </div>
-  )
-}
-
-// ─── Modal genérico ───────────────────────────────────────────────────────────
-
-function Modal({
-  children,
-  onClose,
-  width = 440,
-}: {
-  children: React.ReactNode
-  onClose:  () => void
-  width?:   number
-}) {
-  const { colors } = useTheme()
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.45)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: t.zIndex.overlay,
-        padding: 24,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: colors.surfaceBg,
-          borderRadius: t.radius['2xl'],
-          padding: 28,
-          width: '100%',
-          maxWidth: width,
-          boxShadow: t.shadow.lg,
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {children}
       </div>
     </div>
   )

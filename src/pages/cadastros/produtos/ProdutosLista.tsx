@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Package, X,
-  ChevronUp, ChevronDown,
-  Download, CheckSquare,
+  Plus, Pencil, Trash2, Package,
+  Download,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
+import { Checkbox }        from '../../../components/ui/Checkbox'
+import { SortHeader }      from '../../../components/ui/SortHeader'
+import { BulkActionBar }   from '../../../components/ui/BulkActionBar'
+import { EmptyState }      from '../../../components/ui/EmptyState'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
@@ -188,13 +191,6 @@ export default function ProdutosLista({
     textTransform: 'uppercase', letterSpacing: '0.05em',
   }
 
-  const SortIcon = ({ field }: { field: SortField }) => (
-    <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <ChevronUp  size={9} style={{ opacity: sortField === field && sortDir === 'asc'  ? 1 : 0.3 }} />
-      <ChevronDown size={9} style={{ opacity: sortField === field && sortDir === 'desc' ? 1 : 0.3 }} />
-    </span>
-  )
-
   const GRID = '40px 100px 1fr 160px 110px 90px 96px'
 
   return (
@@ -256,21 +252,32 @@ export default function ProdutosLista({
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <EmptyState onNew={onNew} hasSearch={searchRaw.length > 0 || !!grupoFilter || !!catFilter || !!classeFilter || !!tipoFilter || !!ativoFilter} />
+        (() => {
+          const hasSearch = searchRaw.length > 0 || !!grupoFilter || !!catFilter || !!classeFilter || !!tipoFilter || !!ativoFilter
+          return (
+            <EmptyState
+              icon={<Package size={40} strokeWidth={1.5} />}
+              message={hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
+              description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece adicionando o primeiro produto ao catálogo.'}
+              action={hasSearch ? undefined : { label: 'Adicionar Produto', onClick: onNew }}
+            />
+          )
+        })()
       ) : (
         <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
           {/* Header */}
           <div style={{ display: 'grid', gridTemplateColumns: GRID, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
             {/* Checkbox all */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <HeaderCheckbox checked={isAllSelected} partial={isPartialSelected} onChange={toggleSelectAll} colors={colors} />
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={isPartialSelected}
+                onChange={toggleSelectAll}
+                aria-label="Selecionar todos os produtos"
+              />
             </div>
-            <button type="button" onClick={() => handleSort('codigo')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: 0, ...colStyle }}>
-              Código <SortIcon field="codigo" />
-            </button>
-            <button type="button" onClick={() => handleSort('descricao')} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: 0, ...colStyle }}>
-              Descrição <SortIcon field="descricao" />
-            </button>
+            <SortHeader label="Código"    field="codigo"    activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+            <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
             <span style={colStyle}>Grupo</span>
             <span style={colStyle}>Tipo</span>
             <span style={colStyle}>Status</span>
@@ -308,21 +315,16 @@ export default function ProdutosLista({
       )}
 
       {/* Bulk action bar */}
-      {selected.size > 0 && (
-        <div style={{ position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', background: t.color.neutral[800], borderRadius: t.radius.xl, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.28)', zIndex: t.zIndex.toast, whiteSpace: 'nowrap' }}>
-          <CheckSquare size={15} color={t.color.brand[400]} />
-          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: 'white', fontFamily: t.font.family.sans }}>
-            {selected.size} selecionado{selected.size !== 1 ? 's' : ''}
-          </span>
-          <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)' }} />
-          <BulkBtn onClick={handleBulkActivate}>Ativar</BulkBtn>
-          <BulkBtn onClick={handleBulkDeactivate}>Inativar</BulkBtn>
-          <BulkBtn onClick={handleBulkDelete} danger>Excluir</BulkBtn>
-          <button onClick={() => setSelected(new Set())} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', padding: 4, display: 'flex', marginLeft: 4 }}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
+      <BulkActionBar
+        count={selected.size}
+        noun="selecionado"
+        onClose={() => setSelected(new Set())}
+        actions={[
+          { label: 'Ativar',   onClick: handleBulkActivate },
+          { label: 'Inativar', onClick: handleBulkDeactivate },
+          { label: 'Excluir',  onClick: handleBulkDelete, danger: true },
+        ]}
+      />
 
       {/* Confirmação de exclusão */}
       <ConfirmDialog
@@ -404,7 +406,7 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
       onMouseLeave={() => setHovered(false)}
     >
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <RowCheckbox checked={isSelected} onChange={onToggle} colors={colors} />
+        <Checkbox checked={isSelected} onChange={onToggle} aria-label={`Selecionar ${prod.descricao}`} />
       </div>
       <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.textSecondary, fontFamily: t.font.family.sans, letterSpacing: '0.05em' }}>
         {prod.codigo}
@@ -429,59 +431,6 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
         <IconButton icon={<Pencil size={13} />} aria-label="Editar"  onClick={onEdit}      size="sm" variant="ghost" />
         <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" onClick={onDeleteReq} size="sm" variant="ghost" danger />
       </div>
-    </div>
-  )
-}
-
-// ─── Helpers de UI ────────────────────────────────────────────────────────────
-
-function HeaderCheckbox({ checked, partial, onChange, colors }: {
-  checked: boolean; partial: boolean; onChange: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  return (
-    <button type="button" onClick={onChange} style={{ width: 16, height: 16, border: `1.5px solid ${checked || partial ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.sm, background: checked ? t.color.brand[600] : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.12s', padding: 0, flexShrink: 0 }}>
-      {checked && <span style={{ width: 8, height: 8, background: 'white', borderRadius: 1, display: 'block' }} />}
-      {partial && !checked && <span style={{ width: 8, height: 2, background: t.color.brand[600], borderRadius: 1, display: 'block' }} />}
-    </button>
-  )
-}
-
-function RowCheckbox({ checked, onChange, colors }: {
-  checked: boolean; onChange: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-}) {
-  return (
-    <button type="button" onClick={e => { e.stopPropagation(); onChange() }} style={{ width: 16, height: 16, border: `1.5px solid ${checked ? t.color.brand[600] : colors.border}`, borderRadius: t.radius.sm, background: checked ? t.color.brand[600] : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.12s', padding: 0, flexShrink: 0 }}>
-      {checked && <span style={{ width: 8, height: 8, background: 'white', borderRadius: 1, display: 'block' }} />}
-    </button>
-  )
-}
-
-function BulkBtn({ onClick, danger, children }: { onClick: () => void; danger?: boolean; children: React.ReactNode }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button type="button" onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ padding: '4px 12px', borderRadius: t.radius.DEFAULT, border: 'none', cursor: 'pointer', fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, background: hov ? (danger ? t.color.error.text : t.color.brand[600]) : (danger ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.15)'), color: danger ? (hov ? 'white' : '#fca5a5') : 'white', transition: 'background 0.12s, color 0.12s' }}>
-      {children}
-    </button>
-  )
-}
-
-
-function EmptyState({ onNew, hasSearch }: { onNew: () => void; hasSearch: boolean }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: 12, textAlign: 'center' }}>
-      <div style={{ width: 56, height: 56, borderRadius: 16, background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Package size={24} color={colors.brand} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontSize: t.font.size.lg, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
-      </div>
-      <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-        {hasSearch ? 'Ajuste os filtros de busca.' : 'Comece adicionando o primeiro produto ao catálogo.'}
-      </div>
-      {!hasSearch && <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>Adicionar Produto</Button>}
     </div>
   )
 }

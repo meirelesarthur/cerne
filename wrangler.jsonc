@@ -1,0 +1,15 @@
+{
+  // Deploy de site estático (assets-only) no Cloudflare Workers.
+  // A presença deste arquivo faz o `wrangler deploy` publicar diretamente o
+  // diretório `dist/` gerado por `npm run build`, sem acionar a autodetecção de
+  // framework do Wrangler — que, sem config, exige Vite >= 6.0.0.
+  // Não há script de Worker: nenhum campo `main` é necessário.
+  "name": "gb-cerne",
+  "compatibility_date": "2026-06-08",
+  "assets": {
+    "directory": "./dist",
+    // Rotas que não casam com um asset retornam index.html (200) para o
+    // roteamento client-side da SPA assumir.
+    "not_found_handling": "single-page-application"
+  }
+}

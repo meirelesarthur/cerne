@@ -124,7 +124,7 @@ function AreaChart() {
           top: tooltip.y - 44,
           background: isGbMode ? '#0b1e14' : '#fff',
           border: `1px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.default,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
           color: colors.textPrimary as string,
@@ -241,7 +241,7 @@ function DonutModulos() {
           top: tooltip.y - 36,
           background: isGbMode ? '#0b1e14' : '#fff',
           border: `1px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.default,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
           color: colors.textPrimary as string,
@@ -265,7 +265,7 @@ function DonutModulos() {
               alignItems: 'center',
               gap: t.space[2],
               padding: `${t.space[1]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               background: hovSeg === i ? (isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[50]) : 'transparent',
               transition: 'background 0.15s ease',
               cursor: 'default',
@@ -405,7 +405,7 @@ function HourlyStackedChart() {
           top: tooltip.y + 8,
           background: isGbMode ? '#0b1e14' : '#fff',
           border: `1px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.default,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
           color: colors.textPrimary as string,
@@ -472,7 +472,7 @@ export default function DashUsuarios() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Análise de Usuários</span>
-        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.default, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
           Últimos 30 dias <ChevronDown size={11} />
         </button>
       </div>

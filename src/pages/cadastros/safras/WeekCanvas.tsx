@@ -131,7 +131,7 @@ export function WeekCanvas({
               display: 'flex', alignItems: 'center', gap: 5,
               background: 'none',
               border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               padding: '5px 12px',
               fontSize: t.font.size.sm,
               color: colors.textSecondary,
@@ -154,7 +154,7 @@ export function WeekCanvas({
           Visão geral — como aparecerá nos relatórios e calendários
         </div>
         <div style={{ height: 28 }}>
-          <div style={{ display: 'flex', height: 24, borderRadius: t.radius.DEFAULT, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', height: 24, borderRadius: t.radius.default, overflow: 'hidden' }}>
             {weeks.map((w, i) => {
               const def = WEEK_COLORS[w.color]
               return (

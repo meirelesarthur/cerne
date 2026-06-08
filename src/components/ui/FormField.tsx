@@ -88,7 +88,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
             width: '100%',
             height: t.size.control,
             border: `1.5px solid ${borderColor}`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.default,
             paddingTop: 0,
             paddingBottom: 0,
             paddingLeft: iconLeft ? 44 : t.space[2] + t.space[1] / 2,
@@ -99,7 +99,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
             background: isError ? t.color.error.bg : colors.inputBg,
             outline: 'none',
             boxSizing: 'border-box',
-            transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
+            transition: `border-color ${t.transition.default}, background ${t.transition.smooth}`,
             ...style,
           }}
           onFocus={(e) => {

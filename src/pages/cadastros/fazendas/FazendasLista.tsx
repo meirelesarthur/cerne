@@ -504,7 +504,7 @@ function ViewToggle({
     <div style={{
       display: 'inline-flex',
       border: `1.5px solid ${colors.border}`,
-      borderRadius: t.radius.DEFAULT,
+      borderRadius: t.radius.default,
       overflow: 'hidden',
       flexShrink: 0,
     }}>

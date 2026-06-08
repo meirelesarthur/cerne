@@ -114,7 +114,7 @@ function HorizontalGroupedBar() {
           top: tooltip.y - 30,
           background: isGbMode ? '#0b1e14' : '#fff',
           border: `1px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.default,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
           color: colors.textPrimary as string,
@@ -331,7 +331,7 @@ function ManutChart() {
           top: tooltip.y + 10,
           background: isGbMode ? '#0b1e14' : '#fff',
           border: `1px solid ${colors.border}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.default,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
           color: colors.textPrimary as string,
@@ -400,7 +400,7 @@ export default function DashAtivos() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Ativos</span>
-        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.default, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
           Últimos 30 dias <ChevronDown size={11} />
         </button>
       </div>

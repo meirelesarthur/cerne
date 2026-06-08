@@ -51,7 +51,7 @@ function ReadOnlyField({ label, value, hint }: { label: string; value: string; h
           </span>
         )}
       </div>
-      <div style={{ height: 38, border: `1.5px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, padding: `0 ${t.space[2]}px`, fontSize: t.font.size.base, fontFamily: t.font.family.sans, color: colors.textMuted, background: colors.surfaceSubtle, display: 'flex', alignItems: 'center', userSelect: 'none' }}>
+      <div style={{ height: 38, border: `1.5px solid ${colors.border}`, borderRadius: t.radius.default, padding: `0 ${t.space[2]}px`, fontSize: t.font.size.base, fontFamily: t.font.family.sans, color: colors.textMuted, background: colors.surfaceSubtle, display: 'flex', alignItems: 'center', userSelect: 'none' }}>
         {value || '—'}
       </div>
     </div>
@@ -66,7 +66,7 @@ function ToggleItem({ checked, onChange, label, hint, disabled }: {
 }) {
   const { colors } = useTheme()
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border}` }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.default, border: `1px solid ${colors.border}` }}>
       <ToggleSwitch checked={checked} onChange={onChange} disabled={disabled} />
       <div>
         <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: disabled ? colors.textMuted : colors.textPrimary, fontFamily: t.font.family.sans }}>{label}</div>

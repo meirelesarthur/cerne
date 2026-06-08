@@ -153,7 +153,7 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
             y={padT}
             width={122}
             height={58}
-            rx={t.radius.DEFAULT}
+            rx={t.radius.default}
             fill={tooltipFill}
             stroke={colors.border as string}
             strokeWidth={0.8}
@@ -282,7 +282,7 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
             onMouseLeave={() => setHovIdx(null)}
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               background: hovIdx === i
                 ? (isGbMode ? 'rgba(255,255,255,0.04)' : t.color.neutral[50])
                 : 'transparent',
@@ -356,7 +356,7 @@ export default function DashLivroCaixa() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Livro Caixa</span>
-        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.default, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
           Últimos 30 dias <ChevronDown size={11} />
         </button>
       </div>

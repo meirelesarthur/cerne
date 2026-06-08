@@ -23,17 +23,17 @@ export function TableSearchInput({
         display: 'flex', alignItems: 'center', gap: t.space[2],
         height: 38,
         border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.default,
         padding: `0 ${t.space[2] + 2}px`,
         background: colors.surfaceBg,
-        transition: `border-color ${t.transition.DEFAULT}`,
+        transition: `border-color ${t.transition.default}`,
         minWidth: 220,
       }}
     >
       <Search
         size={13}
         color={focused ? t.color.brand[600] : colors.textMuted}
-        style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
+        style={{ flexShrink: 0, transition: `color ${t.transition.default}` }}
       />
       <input
         type="search"
@@ -77,7 +77,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
         height: 38,
         background: colors.brandBg,
         border: `1.5px solid ${colors.brand}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.default,
         padding: `0 ${t.space[2]}px 0 ${t.space[2] + 2}px`,
         fontSize: t.font.size.sm,
         color: colors.brand,
@@ -128,14 +128,14 @@ export function FilterButton({
         background: active    ? colors.brandBg
           : hovered ? colors.surfaceSubtle : colors.surfaceBg,
         border: `1.5px solid ${active ? colors.brand : colors.border}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.default,
         padding: `0 ${t.space[3] + 2}px`, // 14px
         fontSize: t.font.size.base,
         fontWeight: t.font.weight.medium,
         fontFamily: t.font.family.sans,
         color: active ? colors.brand : colors.textSecondary,
         cursor: 'pointer',
-        transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+        transition: `background ${t.transition.default}, border-color ${t.transition.default}, color ${t.transition.default}`,
       }}
     >
       <SlidersHorizontal size={13} />

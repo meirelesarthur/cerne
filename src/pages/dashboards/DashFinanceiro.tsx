@@ -167,7 +167,7 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
       {hovIdx !== null && (
         <g>
           <rect x={Math.min(xOf(hovIdx) - 4, W - padR - 110)} y={padT} width={108} height={46}
-            rx={t.radius.DEFAULT} fill={tooltipFill} stroke={colors.border as string} strokeWidth={0.8} />
+            rx={t.radius.default} fill={tooltipFill} stroke={colors.border as string} strokeWidth={0.8} />
           <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 14}
             fontSize={9} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
             {monthLabels[hovIdx]}
@@ -320,7 +320,7 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
               transition: 'background 0.15s ease', cursor: 'default',
             }}>
@@ -410,7 +410,7 @@ export default function DashFinanceiro() {
         </div>
         <button style={{
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+          border: `1px solid ${bc}`, borderRadius: t.radius.default,
           padding: `5px ${t.space[3]}px`, background: 'transparent',
           cursor: 'pointer', fontSize: t.font.size.xs,
           color: colors.textSecondary as string, fontFamily: t.font.family.sans,

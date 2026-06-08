@@ -12,6 +12,7 @@ exato do `tokens.ts`, trocando `.` e `[ ]` por `/`.
 t.color.brand[600]   →   color/brand/600
 t.space[4]           →   space/4
 t.font.size['2xl']   →   font/size/2xl
+t.radius.default     →   radius/default
 ```
 
 Faltou um token? **Cria primeiro em `tokens.ts`** (Lei 3), depois no Figma — nunca o inverso.
@@ -40,8 +41,9 @@ Telas no Layout espelham os arquivos de página:
 ### `primitive` — mode único (escalas cruas)
 
 Cobre toda a paleta, espaçamento, raios, tamanhos de controle e escalas de fonte.
-Segmentos = chave do código, **case-sensitive**. Exceção: `DEFAULT` → `default`
-(Figma não usa maiúsculas em path). Tabela completa de valores em `tokens.ts`.
+Segmentos = chave do código, **case-sensitive** — paridade 1:1 (o código usa `default`
+minúsculo em `radius`/`shadow`/`transition`/`border`, alinhado ao path Figma).
+Tabela completa de valores em `tokens.ts`.
 
 Grupos: `color/*` · `space/*` · `radius/*` · `size/*` · `font/size/*` ·
 `font/weight/*` · `font/lineHeight/*` · `login/*` · `dashboard/*` · `chart/*`.

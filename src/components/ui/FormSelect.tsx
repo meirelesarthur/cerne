@@ -53,7 +53,7 @@ export function FormSelect({ label, required, error, hint, options, style, ...se
             border: error
               ? `1.5px solid ${t.color.error.text}`
               : `1.5px solid ${colors.border}`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.default,
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
@@ -63,7 +63,7 @@ export function FormSelect({ label, required, error, hint, options, style, ...se
             boxSizing: 'border-box',
             appearance: 'none',
             cursor: 'pointer',
-            transition: `border-color ${t.transition.DEFAULT}, background 0.2s, color 0.2s`,
+            transition: `border-color ${t.transition.default}, background 0.2s, color 0.2s`,
             ...style,
           }}
           onFocus={(e) => {

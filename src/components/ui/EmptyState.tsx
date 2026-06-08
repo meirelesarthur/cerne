@@ -84,7 +84,7 @@ export function EmptyState({
             marginTop:    t.space[1],
             height:       36,
             padding:      `0 ${t.space[4]}px`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.default,
             border:       `1.5px solid ${isGbMode ? t.color.brand[500] : t.color.brand[600]}`,
             background:   'transparent',
             color:        isGbMode ? t.color.brand[400] : t.color.brand[600],
@@ -92,7 +92,7 @@ export function EmptyState({
             fontWeight:   t.font.weight.semibold,
             fontFamily:   t.font.family.sans,
             cursor:       'pointer',
-            transition:   `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+            transition:   `background ${t.transition.default}, color ${t.transition.default}`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = t.color.brand[600]

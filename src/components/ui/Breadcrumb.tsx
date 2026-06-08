@@ -51,7 +51,7 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
                   color:          colors.textSecondary,
                   textDecoration: 'none',
                   fontWeight:     t.font.weight.normal,
-                  transition:     `color ${t.transition.DEFAULT}`,
+                  transition:     `color ${t.transition.default}`,
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = colors.brand }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = colors.textSecondary }}

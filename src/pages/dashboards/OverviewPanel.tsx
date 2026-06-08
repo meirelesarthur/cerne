@@ -330,7 +330,7 @@ export default function OverviewPanel() {
         <div style={{
           position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.DEFAULT,
+          background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.default,
           padding: `5px ${t.space[2]}px`, backdropFilter: 'blur(4px)',
           boxShadow: t.shadow.sm, cursor: 'pointer',
         }}>
@@ -368,7 +368,7 @@ export default function OverviewPanel() {
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.default,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -376,7 +376,7 @@ export default function OverviewPanel() {
               </button>
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.default,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -384,7 +384,7 @@ export default function OverviewPanel() {
               </button>
               <button style={{
                 display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+                border: `1px solid ${bc}`, borderRadius: t.radius.default,
                 padding: `6px ${t.space[3]}px`, background: 'transparent',
                 cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
               }}>
@@ -455,7 +455,7 @@ export default function OverviewPanel() {
                   <BarChart2 size={13} color={colors.textMuted as string} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Insights</span>
                 </div>
-                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.default, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
                   <MessageCircle size={11} /> Perguntar
                 </button>
               </div>
@@ -530,7 +530,7 @@ export default function OverviewPanel() {
             />
             <button style={{
               width: '100%', marginTop: t.space[3],
-              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${bc}`, borderRadius: t.radius.default,
               padding: `8px 0`, background: 'transparent',
               cursor: 'pointer', fontSize: t.font.size.xs,
               color: colors.textSecondary, fontFamily: t.font.family.sans,
@@ -603,7 +603,7 @@ export default function OverviewPanel() {
             ))}
             <button style={{
               width: '100%', marginTop: t.space[1],
-              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${bc}`, borderRadius: t.radius.default,
               padding: `8px 0`, background: 'transparent',
               cursor: 'pointer', fontSize: t.font.size.xs,
               color: colors.textSecondary, fontFamily: t.font.family.sans,

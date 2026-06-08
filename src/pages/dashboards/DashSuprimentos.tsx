@@ -135,7 +135,7 @@ function FornecedoresList({ colors, isGbMode }: { colors: ReturnType<typeof useT
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
               transition: 'background 0.15s ease', cursor: 'default',
             }}>
@@ -229,7 +229,7 @@ export default function DashSuprimentos() {
         </div>
         <button style={{
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+          border: `1px solid ${bc}`, borderRadius: t.radius.default,
           padding: `5px ${t.space[3]}px`, background: 'transparent',
           cursor: 'pointer', fontSize: t.font.size.xs,
           color: colors.textSecondary as string, fontFamily: t.font.family.sans,

@@ -177,7 +177,7 @@ export const size = {
 export const radius = {
   sm:      4,
   md:      6,
-  DEFAULT: 8,   // inputs, botões
+  default: 8,   // inputs, botões
   lg:      10,  // tabelas com borda
   xl:      12,  // cards de formulário
   '2xl':   16,  // container principal
@@ -191,7 +191,7 @@ export const radius = {
 
 export const shadow = {
   sm:      '0 1px 2px rgba(0,0,0,0.05)',
-  DEFAULT: '0 1px 4px rgba(0,0,0,0.08)',
+  default: '0 1px 4px rgba(0,0,0,0.08)',
   md:      '0 4px 12px rgba(0,0,0,0.08)',
   lg:      '0 8px 24px rgba(0,0,0,0.10)',
   brand:   '0 4px 16px rgba(5,150,105,0.25)',
@@ -208,7 +208,7 @@ export const shadow = {
 // ─── Bordas ───────────────────────────────────────────────────────────────────
 
 export const border = {
-  DEFAULT: `1px solid ${color.neutral[200]}`,
+  default: `1px solid ${color.neutral[200]}`,
   medium:  `1.5px solid ${color.neutral[250]}`,
   brand:   `1px solid ${color.brand[200]}`,
   error:   `1.5px solid ${color.error.solid}`,
@@ -228,7 +228,7 @@ export const zIndex = {
 
 export const transition = {
   fast:    '0.1s ease',
-  DEFAULT: '0.15s ease',
+  default: '0.15s ease',
   smooth:  '0.2s ease',
   drawer:  '0.25s cubic-bezier(0.4, 0, 0.2, 1)',
 }

@@ -354,7 +354,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
               display: 'flex', alignItems: 'center', gap: 7,
               height: 36,
               border: `1.5px solid ${touched.produtoId && errors.produtoId ? t.color.error.text : showProductDropdown ? t.color.brand[600] : colors.border}`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.default,
               padding: '0 10px',
               background: colors.surfaceBg,
               transition: 'border-color 0.15s',
@@ -493,7 +493,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         {/* Row 2: Computed fields */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
           <div>
-            <div key={`vt-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.DEFAULT }}>
+            <div key={`vt-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.default }}>
               <FormField
                 label="Valor Total"
                 value={`R$ ${valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
@@ -504,7 +504,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             <p style={hintText}>= Qtde. × Vl. Unit.</p>
           </div>
           <div>
-            <div key={`cm-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.DEFAULT }}>
+            <div key={`cm-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.default }}>
               <FormField
                 label="Custo Médio Unitário"
                 value={`R$ ${custoMedioUnit.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`}
@@ -612,7 +612,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         }
       >
         {/* Info banner */}
-        <div style={{ background: t.color.info.bg, border: `1px solid ${t.color.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <div style={{ background: t.color.info.bg, border: `1px solid ${t.color.info.border}`, borderRadius: t.radius.default, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 14 }}>ℹ</span>
           <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
         </div>

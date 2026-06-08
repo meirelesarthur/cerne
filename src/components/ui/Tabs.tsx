@@ -33,7 +33,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas' }: TabsProps) {
         gap:          t.space[1],
         background:   colors.surfaceSubtle,
         padding:      t.space[1],
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.default,
         border:       `1px solid ${colors.border}`,
       }}
     >
@@ -61,7 +61,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas' }: TabsProps) {
               borderRadius:   t.radius.md,
               cursor:         'pointer',
               whiteSpace:     'nowrap',
-              transition:     `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+              transition:     `background ${t.transition.default}, color ${t.transition.default}`,
             }}
           >
             {item.icon && <span style={{ display: 'flex', alignItems: 'center' }} aria-hidden="true">{item.icon}</span>}

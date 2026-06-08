@@ -367,7 +367,7 @@ function ActionBtn({
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: hov ? (danger ? '#fee2e2' : colors.surfaceSubtle) : 'transparent',
         border: `1px solid ${hov ? (danger ? '#fca5a5' : colors.border) : 'transparent'}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.default,
         cursor: 'pointer',
         color: hov ? (danger ? '#dc2626' : colors.textPrimary) : colors.textMuted,
         transition: 'background 0.12s, border-color 0.12s, color 0.12s',

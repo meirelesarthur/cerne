@@ -524,7 +524,7 @@ export default function DashPecuaria() {
         </span>
         <button style={{
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
+          border: `1px solid ${bc}`, borderRadius: t.radius.default,
           padding: `5px ${t.space[3]}px`, background: 'transparent',
           cursor: 'pointer', fontSize: t.font.size.sm,
           color: colors.textSecondary as string, fontFamily: t.font.family.sans,

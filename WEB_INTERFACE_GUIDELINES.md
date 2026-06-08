@@ -61,7 +61,7 @@ Extensões de comportamento são feitas **adicionando props ao componente**, nun
 color: t.color.brand[600]
 fontSize: t.font.size.sm
 padding: t.space[4]
-borderRadius: t.radius.DEFAULT
+borderRadius: t.radius.default
 
 // Violação — hardcoded fora do arquivo de tokens
 color: '#059669'
@@ -112,7 +112,7 @@ Grid base de 4px: `t.space[1]`=4px → `t.space[20]`=80px. Não usar valores for
 | Token | Valor | Uso recomendado |
 |---|---|---|
 | `t.radius.sm` | 4px | Badges, chips pequenos |
-| `t.radius.DEFAULT` | 8px | Inputs, botões |
+| `t.radius.default` | 8px | Inputs, botões |
 | `t.radius.lg` | 10px | Cards internos |
 | `t.radius.xl` | 12px | Cards de formulário |
 | `t.radius.modal` | 20px | Modals, drawers |
@@ -126,7 +126,7 @@ Mínimo 2 camadas para sombras realistas (ambient + direct). Já implementado no
 
 ```ts
 t.shadow.sm     // cards leves
-t.shadow.DEFAULT // padrão
+t.shadow.default // padrão
 t.shadow.brand  // glow verde — hover de card fazenda, focus especial
 t.shadow.modal  // overlay modals
 ```
@@ -147,7 +147,7 @@ Usar `t.transition.*` para consistência. Nunca usar `transition: all` — lista
 
 ```ts
 // Correto
-transition: `opacity ${t.transition.DEFAULT}, transform ${t.transition.DEFAULT}`
+transition: `opacity ${t.transition.default}, transform ${t.transition.default}`
 
 // Violação
 transition: 'all 0.2s ease'

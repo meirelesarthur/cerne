@@ -187,7 +187,7 @@ literal, procure o token:
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
 - **GBMode:** `t.color.gbSurface` (superfície translúcida de card), `t.color.gbAccent` (verde claro de destaque).
 - **Badge/Tag auxiliares:** `t.color.purple.*`, `t.color.cyan.*`.
-- **Transições:** `t.transition.{fast,DEFAULT,smooth,drawer}` — nunca `'0.2s'` solto.
+- **Transições:** `t.transition.{fast,default,smooth,drawer}` — nunca `'0.2s'` solto.
 
 Se o valor que você precisa não tem token e é reutilizável, **adicione o token primeiro** em
 `tokens.ts` e referencie — não espalhe o literal.
@@ -245,7 +245,7 @@ sem motivo explícito.
 | Token | Valor | Uso |
 |---|---|---|
 | `t.radius.sm` | 4px | Badges, chips pequenos |
-| `t.radius.DEFAULT` | 8px | Inputs, botões |
+| `t.radius.default` | 8px | Inputs, botões |
 | `t.radius.lg` | 10px | Cards internos |
 | `t.radius.xl` | 12px | Cards de formulário |
 | `t.radius.modal` | 20px | Modals, drawers |
@@ -255,7 +255,7 @@ sem motivo explícito.
 
 ### Sombras
 
-Mínimo 2 camadas (ambient + direct). Tokens: `t.shadow.sm` (cards leves) · `t.shadow.DEFAULT`
+Mínimo 2 camadas (ambient + direct). Tokens: `t.shadow.sm` (cards leves) · `t.shadow.default`
 (padrão) · `t.shadow.brand` (glow verde — hover de card fazenda) · `t.shadow.modal` (overlays).
 Já cobertos também: `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover`.
 
@@ -271,7 +271,7 @@ Já cobertos também: `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHove
 
 ### Transições
 
-`t.transition.{fast,DEFAULT,smooth,drawer}` — **nunca** `transition: all` nem `'0.2s'` solto.
+`t.transition.{fast,default,smooth,drawer}` — **nunca** `transition: all` nem `'0.2s'` solto.
 Listar as propriedades explicitamente.
 
 ---

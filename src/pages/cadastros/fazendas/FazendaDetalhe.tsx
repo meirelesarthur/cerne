@@ -19,6 +19,7 @@ import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
 import type { FazendaDetalheData } from './fazendas.types'
 import { useTheme } from '../../../context/ThemeContext'
+import { Tabs } from '../../../components/ui/Tabs'
 
 interface FazendaDetalheProps {
   onBack: () => void
@@ -488,39 +489,16 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
         {/* Tab bar */}
         <div
           style={{
-            display: 'flex',
             borderBottom: `1px solid ${colors.border}`,
-            padding: '0 20px',
-            gap: 4,
+            padding: '12px 20px',
           }}
         >
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  height: 44,
-                  padding: '0 14px',
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: isActive ? `2px solid ${colors.brand}` : '2px solid transparent',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? colors.brand : colors.textSecondary,
-                  fontFamily: "'Outfit', sans-serif",
-                  transition: 'color 0.12s, border-color 0.12s',
-                  whiteSpace: 'nowrap',
-                  marginBottom: -1,
-                }}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
+          <Tabs
+            items={TABS}
+            activeId={activeTab}
+            onChange={(id) => setActiveTab(id as Tab)}
+            label="Seções da fazenda"
+          />
         </div>
 
         {/* Tab content */}

@@ -13,6 +13,41 @@ interface Step3MapaProps {
   onChange: (field: keyof FazendaFormData, value: string) => void
 }
 
+const PAISES_SUPORTADOS = ['Brasil', 'Argentina', 'Paraguai', 'Bolívia', 'Uruguai']
+
+// Geocodificação reversa best-effort: traduz o centróide do perímetro em
+// endereço. Falhas de rede são silenciosas — os campos seguem editáveis.
+async function reverseGeocode(
+  lat: number,
+  lng: number,
+  onChange: (field: keyof FazendaFormData, value: string) => void,
+) {
+  try {
+    const url =
+      'https://nominatim.openstreetmap.org/reverse?format=jsonv2' +
+      `&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=pt-BR`
+    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    if (!res.ok) return
+    const json = await res.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a: Record<string, string> = json.address ?? {}
+
+    const cidade = a.city || a.town || a.municipality || a.village || a.county || ''
+    const bairro = a.suburb || a.neighbourhood || a.village || a.hamlet || ''
+    const endereco = a.road || (json.display_name ? String(json.display_name).split(',')[0] : '')
+    const cep = a.postcode || ''
+    const pais = a.country || ''
+
+    if (cidade) onChange('cidade', cidade)
+    if (bairro) onChange('bairro', bairro)
+    if (endereco) onChange('endereco', endereco)
+    if (cep) onChange('cep', cep)
+    if (PAISES_SUPORTADOS.includes(pais)) onChange('pais', pais)
+  } catch {
+    // Falha de rede/geocoding — campos seguem para preenchimento manual
+  }
+}
+
 export function Step3Mapa({ data, onChange }: Step3MapaProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
@@ -24,6 +59,44 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
       const geojson = fg.toGeoJSON()
       const features = (geojson as GeoJSON.FeatureCollection).features
       onChange('perimetroGeoJSON', features.length > 0 ? JSON.stringify(geojson) : '')
+    },
+    [onChange],
+  )
+
+  // O perímetro é a fonte da verdade da localização: dele derivamos área total,
+  // coordenadas e endereço, que as etapas seguintes apenas confirmam.
+  const deriveFromDrawn = useCallback(
+    (fg: L.FeatureGroup) => {
+      const layers = fg.getLayers()
+      if (layers.length === 0) {
+        onChange('areaTotal', '')
+        onChange('latitude', '')
+        onChange('longitude', '')
+        return
+      }
+
+      // Área total (ha) — soma geodésica de todos os polígonos
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const GeometryUtil = (L as any).GeometryUtil
+      let totalM2 = 0
+      layers.forEach((layer) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const latlngs = (layer as any).getLatLngs?.()
+        if (!latlngs) return
+        const ring = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs
+        if (GeometryUtil?.geodesicArea) totalM2 += GeometryUtil.geodesicArea(ring)
+      })
+      if (totalM2 > 0) {
+        onChange('areaTotal', String(Math.round((totalM2 / 10000) * 100) / 100))
+      }
+
+      // Centróide → latitude/longitude
+      const center = fg.getBounds().getCenter()
+      onChange('latitude', center.lat.toFixed(6))
+      onChange('longitude', center.lng.toFixed(6))
+
+      // Endereço via geocodificação reversa (best-effort, não bloqueia o fluxo)
+      void reverseGeocode(center.lat, center.lng, onChange)
     },
     [onChange],
   )
@@ -71,9 +144,16 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
     map.on('draw:created', (e: any) => {
       drawn.addLayer(e.layer)
       syncGeoJSON(drawn)
+      deriveFromDrawn(drawn)
     })
-    map.on('draw:edited', () => syncGeoJSON(drawn))
-    map.on('draw:deleted', () => syncGeoJSON(drawn))
+    map.on('draw:edited', () => {
+      syncGeoJSON(drawn)
+      deriveFromDrawn(drawn)
+    })
+    map.on('draw:deleted', () => {
+      syncGeoJSON(drawn)
+      deriveFromDrawn(drawn)
+    })
 
     // Restore existing perimeter from form state
     if (data.perimetroGeoJSON) {
@@ -141,6 +221,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
       if (drawn.getLayers().length > 0) {
         mapRef.current.fitBounds(drawn.getBounds(), { padding: [24, 24] })
         syncGeoJSON(drawn)
+        deriveFromDrawn(drawn)
       }
     }
     reader.readAsText(file)
@@ -263,7 +344,9 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
                 display: 'inline-block',
               }}
             />
-            Perímetro demarcado com sucesso
+            Perímetro demarcado
+            {data.areaTotal ? ` · ${data.areaTotal} ha` : ''} — área e endereço
+            preenchidos automaticamente nas próximas etapas
           </div>
         ) : (
           <div

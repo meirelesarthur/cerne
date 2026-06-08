@@ -14,6 +14,7 @@ import { Badge }           from '../../../components/ui/Badge'
 import type { BadgeVariant } from '../../../components/ui/Badge'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -235,8 +236,6 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         search={search}
         onSearch={setSearch}
         searchPlaceholder="Buscar fazenda..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
         onClearAll={clearFilters}
         chips={[
           filters.tipoExploracao && {
@@ -250,8 +249,13 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         ]}
         actions={
           <>
-            <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
             <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
+            <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
+            <FilterButton
+              active={activeFilterCount > 0}
+              count={activeFilterCount}
+              onClick={() => setDrawerOpen(true)}
+            />
           </>
         }
       />

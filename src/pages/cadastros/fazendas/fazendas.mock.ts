@@ -112,6 +112,26 @@ export const mockFazendaSantaLuzia: FazendaDetalheData = {
   bairro: 'Zona Rural',
   latitude: '-12.5436',
   longitude: '-55.7215',
+  perimetroGeoJSON: JSON.stringify({
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [-55.745, -12.520],
+            [-55.698, -12.525],
+            [-55.690, -12.560],
+            [-55.725, -12.575],
+            [-55.752, -12.548],
+            [-55.745, -12.520],
+          ]],
+        },
+      },
+    ],
+  }),
   moeda: 'BRL',
   areaTotal: 2450,
   valorHa: 28500,

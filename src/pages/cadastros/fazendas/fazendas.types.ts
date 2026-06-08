@@ -70,6 +70,7 @@ export interface FazendaDetalheData {
   bairro: string
   latitude: string
   longitude: string
+  perimetroGeoJSON?: string
   // Financeiro
   moeda: string
   areaTotal: number

@@ -12,6 +12,8 @@ import {
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
+import { MapView } from '../../../components/ui/MapView'
+import { EmptyState } from '../../../components/ui/EmptyState'
 import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
@@ -161,9 +163,23 @@ function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
 
 function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
   const googleMapsUrl = `https://www.google.com/maps?q=${f.latitude},${f.longitude}`
+  const hasLocation = !!(f.perimetroGeoJSON || (f.latitude && f.longitude))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div>
+        <SectionTitle>Demarcação da Área</SectionTitle>
+        {hasLocation ? (
+          <MapView geoJSON={f.perimetroGeoJSON} lat={f.latitude} lng={f.longitude} height={340} />
+        ) : (
+          <EmptyState
+            icon={<MapPin size={28} />}
+            message="Sem demarcação cadastrada"
+            description="Edite a fazenda para desenhar o perímetro no mapa ou importar um arquivo KML."
+          />
+        )}
+      </div>
+
       <div>
         <SectionTitle>Endereço</SectionTitle>
         <FieldGrid>

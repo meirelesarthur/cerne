@@ -183,13 +183,11 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
         </div>
       </div>
 
-      {/* ── Card principal ─────────────────────────────────────────────────── */}
-      <div style={{ background: colors.surfaceBg, borderRadius: t.radius['2xl'], overflow: 'hidden', transition: 'background 0.2s' }}>
+      {/* ── Stepper (fora do card, padrão Fazendas) ──────────────────────────── */}
+      <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />
 
-        {/* Stepper */}
-        <div style={{ padding: '24px 24px 0' }}>
-          <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />
-        </div>
+      {/* ── Card principal ─────────────────────────────────────────────────── */}
+      <div style={{ marginTop: 32, background: colors.surfaceBg, borderRadius: t.radius['2xl'], overflow: 'hidden', transition: 'background 0.2s' }}>
 
         {/* Conteúdo do step */}
         <div style={{ padding: '32px 24px 40px' }}>

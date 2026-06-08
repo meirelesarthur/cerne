@@ -1,4 +1,4 @@
-# AGRO365 Panel — Instruções para Claude Code
+# GB CERNE — Instruções para Claude Code
 
 ## Roteamento de Modelos (Orquestração Multi-Model)
 

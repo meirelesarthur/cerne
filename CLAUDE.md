@@ -216,6 +216,9 @@ Se o valor que você precisa não tem token e é reutilizável, **adicione o tok
 Os valores abaixo são a fonte da verdade de `src/design/tokens.ts`. **Nunca hardcodar** —
 referenciar sempre via `t.*`. Se faltar um degrau, ajustar a escala em `tokens.ts`.
 
+> **Ponte com o Figma:** a convenção de nomenclatura que mantém design e código alinhados
+> (variáveis, modes de tema, componentes e Code Connect) está em `FIGMA_NAMING.md` na raiz.
+
 ### Paleta de Cores
 
 | Token | Valor | Uso |

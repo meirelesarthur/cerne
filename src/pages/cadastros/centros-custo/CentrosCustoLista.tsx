@@ -244,9 +244,6 @@ export default function CentrosCustoLista({
           count={activeFilterCount}
           onClick={() => setDrawerOpen(true)}
         />
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, whiteSpace: 'nowrap' }}>
-          {filtered.length} {filtered.length === 1 ? 'registro' : 'registros'}
-        </span>
       </div>
 
       {/* ── Tabela ──────────────────────────────────────────────────────── */}

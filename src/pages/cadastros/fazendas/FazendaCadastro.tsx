@@ -21,9 +21,9 @@ interface FazendaCadastroProps {
 }
 
 const STEPS = [
-  { id: 1, label: 'Identificação' },
-  { id: 2, label: 'Documentação' },
-  { id: 3, label: 'Demarcação' },
+  { id: 1, label: 'Demarcação' },
+  { id: 2, label: 'Identificação' },
+  { id: 3, label: 'Documentação' },
   { id: 4, label: 'Endereço' },
   { id: 5, label: 'Financeiro' },
   { id: 6, label: 'Configurações' },
@@ -32,7 +32,9 @@ const STEPS = [
 function validateStep(step: number, data: FazendaFormData): Record<string, string> {
   const errors: Record<string, string> = {}
 
-  if (step === 1) {
+  // Step 1 (Demarcação) is optional — user can advance without drawing
+
+  if (step === 2) {
     if (!data.nome || data.nome.trim().length < 3) {
       errors.nome = 'Nome deve ter pelo menos 3 caracteres'
     }
@@ -42,13 +44,11 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     }
   }
 
-  if (step === 2) {
+  if (step === 3) {
     if (!data.tipoExploracao) {
       errors.tipoExploracao = 'Selecione o tipo de exploração'
     }
   }
-
-  // Step 3 (Demarcação) is optional — user can advance without drawing
 
   if (step === 4) {
     if (!data.pais) errors.pais = 'País é obrigatório'
@@ -129,11 +129,11 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step1Identificacao data={formData} errors={errors} onChange={handleChange} />
-      case 2:
-        return <Step2Documentacao data={formData} errors={errors} onChange={handleChange} />
-      case 3:
         return <Step3Mapa data={formData} errors={errors} onChange={handleChange} />
+      case 2:
+        return <Step1Identificacao data={formData} errors={errors} onChange={handleChange} />
+      case 3:
+        return <Step2Documentacao data={formData} errors={errors} onChange={handleChange} />
       case 4:
         return <Step4Endereco data={formData} errors={errors} onChange={handleChange} />
       case 5:

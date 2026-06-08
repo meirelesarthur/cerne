@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { ArrowLeft, Calendar } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
@@ -171,18 +171,13 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
             >
               <ArrowLeft size={20} strokeWidth={2} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Calendar size={18} color={colors.brand} />
-              </div>
-              <div>
-                <h1 style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, margin: 0, fontFamily: t.font.family.sans, letterSpacing: '-0.3px' }}>
-                  {pageTitle}
-                </h1>
-                <p style={{ fontSize: t.font.size.sm, color: colors.textMuted, margin: 0, fontFamily: t.font.family.sans }}>
-                  {pageDesc}
-                </p>
-              </div>
+            <div>
+              <h1 style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, margin: 0, fontFamily: t.font.family.sans, letterSpacing: '-0.3px' }}>
+                {pageTitle}
+              </h1>
+              <p style={{ fontSize: t.font.size.sm, color: colors.textMuted, margin: 0, fontFamily: t.font.family.sans }}>
+                {pageDesc}
+              </p>
             </div>
           </div>
         </div>

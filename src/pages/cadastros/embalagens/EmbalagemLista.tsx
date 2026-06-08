@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
-  ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -9,6 +8,7 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { SortHeader }  from '../../../components/ui/SortHeader'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -145,23 +145,13 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
               borderBottom: `1px solid ${border}`,
             }}>
               {/* Descrição — ordenável */}
-              <button
-                type="button"
-                onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                  color: colors.textMuted, fontFamily: t.font.family.sans,
-                  textTransform: 'uppercase', letterSpacing: '0.05em',
-                }}
-              >
-                Descrição
-                <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <ChevronUp  size={9} style={{ opacity: sortDir === 'asc'  ? 1 : 0.35 }} />
-                  <ChevronDown size={9} style={{ opacity: sortDir === 'desc' ? 1 : 0.35 }} />
-                </span>
-              </button>
+              <SortHeader
+                label="Descrição"
+                field="descricao"
+                activeField="descricao"
+                direction={sortDir}
+                onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+              />
               {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
                 <span key={h} style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,

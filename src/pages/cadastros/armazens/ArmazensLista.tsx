@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
-  ChevronUp, ChevronDown,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -11,6 +10,7 @@ import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { SortHeader }  from '../../../components/ui/SortHeader'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -103,13 +103,6 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
 
   const border = colors.border
 
-  const SortIcon = ({ field }: { field: SortField }) => (
-    <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <ChevronUp  size={9} style={{ opacity: sortField === field && sortDir === 'asc'  ? 1 : 0.3 }} />
-      <ChevronDown size={9} style={{ opacity: sortField === field && sortDir === 'desc' ? 1 : 0.3 }} />
-    </span>
-  )
-
   const colStyle: React.CSSProperties = {
     fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
     color: colors.textMuted, fontFamily: t.font.family.sans,
@@ -168,8 +161,8 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
           <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
             {/* Cabeçalho */}
             <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
-              <SortBtn label="Sigla" field="sigla" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="sigla" />} />
-              <SortBtn label="Descrição" field="descricao" sortField={sortField} onSort={handleSort} colors={colors} SortIconEl={<SortIcon field="descricao" />} />
+              <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+              <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
               <span style={colStyle}>Tipo</span>
               <span style={colStyle}>Status</span>
               <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
@@ -264,21 +257,6 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── SortBtn ──────────────────────────────────────────────────────────────────
-
-function SortBtn({ label, field, sortField, onSort, colors, SortIconEl }: {
-  label: string; field: SortField; sortField: SortField
-  onSort: (f: SortField) => void
-  colors: ReturnType<typeof useTheme>['colors']
-  SortIconEl: React.ReactNode
-}) {
-  return (
-    <button type="button" onClick={() => onSort(field)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textMuted, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-      {label} {SortIconEl}
-    </button>
   )
 }
 

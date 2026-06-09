@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Save, MapPin } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
@@ -43,7 +44,6 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
 
   const tipoLabel = TIPO_LABEL[tipo]
   const tipoColor = TIPO_COLOR[tipo]
-  const border    = colors.border
 
   const title =
     mode === 'edit'         ? `Editar ${tipoLabel}` :
@@ -68,96 +68,95 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
   }
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={onBack} disabled={submitting}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              icon={<Save size={13} />}
+              onClick={handleSubmit}
+              loading={submitting}
+              disabled={!isValid || submitting}
+            >
+              Salvar
+            </Button>
+          </>
+        }
+      >
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <FormPageHeader
-        title={title}
-        subtitle={mode === 'edit' ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-        onBack={onBack}
-      />
+        {/* ── Header ──────────────────────────────────────────────────────────── */}
+        <FormPageHeader
+          title={title}
+          subtitle={mode === 'edit' ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+          onBack={onBack}
+          paddingTop={t.space[4]}
+        />
 
-      {/* ── Card ────────────────────────────────────────────────────────────── */}
-      <div style={{
-        background: colors.surfaceBg,
-        border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
-        padding: t.space[6],
-        maxWidth: 520,
-      }}>
+        {/* ── Campos ──────────────────────────────────────────────────────────── */}
+        <div style={{ maxWidth: 520 }}>
 
-        {/* Tipo (read-only badge) */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          marginBottom: t.space[5],
-          padding: `${t.space[3]}px ${t.space[4]}px`,
-          background: tipoColor.bg,
-          borderRadius: t.radius.DEFAULT,
-          border: `1px solid ${tipoColor.text}22`,
-        }}>
-          <MapPin size={14} color={tipoColor.text} />
-          <span style={{
-            fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-            color: tipoColor.text, fontFamily: t.font.family.sans,
-          }}>
-            Tipo: {tipoLabel}
-          </span>
-        </div>
-
-        {/* Endereçamento pai (read-only, apenas ao criar filho) */}
-        {mode === 'create-child' && parentNode && (
+          {/* Tipo (read-only badge) */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             marginBottom: t.space[5],
             padding: `${t.space[3]}px ${t.space[4]}px`,
-            background: colors.surfaceSubtle,
+            background: tipoColor.bg,
             borderRadius: t.radius.DEFAULT,
-            border: `1px solid ${border}`,
+            border: `1px solid ${tipoColor.text}22`,
           }}>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              📍 Endereçamento pai:
-            </span>
-            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-              {TIPO_LABEL[parentNode.tipo]} — {parentNode.descricao}
+            <MapPin size={14} color={tipoColor.text} />
+            <span style={{
+              fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
+              color: tipoColor.text, fontFamily: t.font.family.sans,
+            }}>
+              Tipo: {tipoLabel}
             </span>
           </div>
-        )}
 
-        {/* Divisor */}
-        <div style={{ height: 1, background: border, marginBottom: t.space[5] }} />
+          {/* Endereçamento pai (read-only, apenas ao criar filho) */}
+          {mode === 'create-child' && parentNode && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              marginBottom: t.space[5],
+              padding: `${t.space[3]}px ${t.space[4]}px`,
+              background: colors.surfaceSubtle,
+              borderRadius: t.radius.DEFAULT,
+              border: `1px solid ${colors.border}`,
+            }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                📍 Endereçamento pai:
+              </span>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+                {TIPO_LABEL[parentNode.tipo]} — {parentNode.descricao}
+              </span>
+            </div>
+          )}
 
-        {/* Descrição */}
-        <div style={{ marginBottom: t.space[6] }}>
-          <FormField
-            label="Descrição"
-            required
-            placeholder={`Ex: ${tipo === 'setor' ? 'Armazém Central' : 'Corredor A'}`}
-            value={descricao}
-            onChange={e => setDescricao(e.target.value)}
-            onBlur={() => setTouched(true)}
-            error={errDescricao}
-            status={errDescricao ? 'err' : touched && descricao.trim() ? 'ok' : 'idle'}
-            disabled={submitting}
-          />
+          {/* Divisor */}
+          <div style={{ height: 1, background: colors.border, marginBottom: t.space[5] }} />
+
+          {/* Descrição */}
+          <div style={{ marginBottom: t.space[6] }}>
+            <FormField
+              label="Descrição"
+              required
+              placeholder={`Ex: ${tipo === 'setor' ? 'Armazém Central' : 'Corredor A'}`}
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              onBlur={() => setTouched(true)}
+              error={errDescricao}
+              status={errDescricao ? 'err' : touched && descricao.trim() ? 'ok' : 'idle'}
+              disabled={submitting}
+            />
+          </div>
+
         </div>
 
-        {/* Botões */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3] }}>
-          <Button variant="secondary" onClick={onBack} disabled={submitting}>
-            Cancelar
-          </Button>
-          <Button
-            variant="primary"
-            icon={<Save size={13} />}
-            onClick={handleSubmit}
-            loading={submitting}
-            disabled={!isValid || submitting}
-          >
-            Salvar
-          </Button>
-        </div>
-
-      </div>
+      </PageCard>
     </PageContainer>
   )
 }

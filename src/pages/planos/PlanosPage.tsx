@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowUpRight, Check, CheckCircle2, ChevronRight, Minus, PackageCheck, Plus, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Minus, PackageCheck, Plus } from 'lucide-react'
 import { PageContainer } from '../../components/ui/PageContainer'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { FormPageHeader } from '../../components/ui/FormPageHeader'
@@ -501,11 +501,11 @@ function PlanoCard({
         ) : (
           <>
             <Button
-              variant={atual ? 'primary' : 'secondary'}
+              variant="primary"
               block
               size="lg"
               loading={comprando}
-              icon={atual ? <Sparkles size={15} /> : undefined}
+              iconRight={<ArrowRight size={16} />}
               onClick={onComprar}
             >
               Comprar agora
@@ -691,7 +691,7 @@ function PlanoDetalhe({
                     block
                     size="lg"
                     loading={comprando}
-                    icon={<Sparkles size={15} />}
+                    iconRight={<ArrowRight size={16} />}
                     onClick={onComprar}
                   >
                     Comprar agora

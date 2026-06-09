@@ -6,12 +6,13 @@ type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant
-  size?:    ButtonSize
-  loading?: boolean
-  icon?:    React.ReactNode
-  block?:   boolean
-  children: React.ReactNode
+  variant?:   ButtonVariant
+  size?:      ButtonSize
+  loading?:   boolean
+  icon?:      React.ReactNode
+  iconRight?: React.ReactNode
+  block?:     boolean
+  children:   React.ReactNode
 }
 
 const variantBase: Record<ButtonVariant, React.CSSProperties> = {
@@ -56,6 +57,7 @@ export function Button({
   loading = false,
   block   = false,
   icon,
+  iconRight,
   children,
   style,
   disabled,
@@ -65,6 +67,8 @@ export function Button({
   const sz         = sizeStyle[size]
   const isDisabled = disabled || loading
 
+  const justify = block && iconRight ? 'space-between' : block ? 'flex-start' : 'center'
+
   return (
     <button
       {...props}
@@ -72,7 +76,7 @@ export function Button({
       style={{
         display:        'inline-flex',
         alignItems:     'center',
-        justifyContent: block ? 'flex-start' : 'center',
+        justifyContent: justify,
         width:          block ? '100%' : undefined,
         gap: t.space[1] + t.space[1] / 2,
         borderRadius: t.radius.DEFAULT,
@@ -100,6 +104,9 @@ export function Button({
         ? <Spinner size="sm" />
         : icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
       {children}
+      {!loading && iconRight && (
+        <span style={{ display: 'flex', alignItems: 'center' }}>{iconRight}</span>
+      )}
     </button>
   )
 }

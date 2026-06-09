@@ -402,7 +402,8 @@ function SafraRow({
       style={{
         display:         'grid',
         gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-        padding:         `${t.space[3]}px ${t.space[4]}px`,
+        padding:         `0 ${t.space[4]}px`,
+        height:          t.size.tableRow,
         borderBottom:    isLast ? 'none' : `1px solid ${border}`,
         background:      hovered ? colors.surfaceSubtle : 'transparent',
         transition:      `background ${t.transition.fast}`,
@@ -414,17 +415,17 @@ function SafraRow({
       onClick={() => onView(safra.id)}
     >
       {/* Descrição */}
-      <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.brand, fontFamily: t.font.family.sans }}>
+      <span title={safra.desc} style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.brand, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {safra.desc}
       </span>
 
       {/* Dt. Início */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+      <span title={fmtYMDtoDMY(safra.ini)} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtYMDtoDMY(safra.ini)}
       </span>
 
       {/* Dt. Fim */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+      <span title={fmtYMDtoDMY(safra.fim)} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtYMDtoDMY(safra.fim)}
       </span>
 
@@ -434,7 +435,7 @@ function SafraRow({
       </div>
 
       {/* Semanas */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans, textAlign: 'center' }}>
+      <span title={`${safra.weeks.length} sem.`} style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {safra.weeks.length} sem.
       </span>
 

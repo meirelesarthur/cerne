@@ -266,12 +266,14 @@ function TreeNode({
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 120px 104px',
-          padding: '10px 16px',
+          padding: '0 16px',
           paddingLeft: 16 + indent,
+          height: t.size.tableRow,
           borderBottom: isLastRow && depth === 0 ? 'none' : `1px solid ${border}`,
           background: hovered ? colors.surfaceSubtle : 'transparent',
           transition: 'background 0.12s',
           alignItems: 'center',
+          boxSizing: 'border-box',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -303,12 +305,12 @@ function TreeNode({
           ) : (
             <span style={{ width: 18, height: 18, flexShrink: 0 }} />
           )}
-          <span style={{
+          <span title={node.descricao} style={{
             fontSize: t.font.size.base,
             fontWeight: depth === 0 ? t.font.weight.semibold : t.font.weight.medium,
             color: depth === 0 ? colors.brand : colors.textPrimary,
             fontFamily: t.font.family.sans,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {node.descricao}
           </span>

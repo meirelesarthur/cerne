@@ -311,7 +311,8 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
       style={{
         display: 'grid',
         gridTemplateColumns: colTemplate,
-        padding: '11px 16px',
+        padding: '0 16px',
+        height: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         background: hovered ? colors.surfaceSubtle : 'transparent',
         transition: 'background 0.12s',
@@ -322,7 +323,7 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
       onMouseLeave={() => setHovered(false)}
     >
       {/* Produto */}
-      <div title={registro.produtoDescricao} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+      <div title={`${registro.produtoCodigo} ${registro.produtoDescricao}`} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
           {registro.produtoCodigo}
         </span>
@@ -332,37 +333,37 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
       </div>
 
       {/* Un. */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+      <span title={registro.unidade} style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {registro.unidade}
       </span>
 
       {/* Armazém */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={registro.armazemDescricao} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {registro.armazemDescricao}
       </span>
 
       {/* Qtde. */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+      <span title={fmtQtde(registro.qtdeTotal)} style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtQtde(registro.qtdeTotal)}
       </span>
 
       {/* Vl. Unit. */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+      <span title={fmtUnit(registro.vlUnitario)} style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtUnit(registro.vlUnitario)}
       </span>
 
       {/* Valor Total */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: t.font.weight.semibold }}>
+      <span title={fmtTotal(registro.valorTotal)} style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: t.font.weight.semibold, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtTotal(registro.valorTotal)}
       </span>
 
       {/* Dt. Movimento */}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+      <span title={fmtDate(registro.dtMovimento)} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtDate(registro.dtMovimento)}
       </span>
 
       {/* Lote */}
-      <span style={{ fontSize: t.font.size.sm, color: registro.loteFornecedor ? colors.textPrimary : colors.textMuted, fontFamily: t.font.family.sans }}>
+      <span title={registro.loteFornecedor || '—'} style={{ fontSize: t.font.size.sm, color: registro.loteFornecedor ? colors.textPrimary : colors.textMuted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {registro.loteFornecedor || '—'}
       </span>
 

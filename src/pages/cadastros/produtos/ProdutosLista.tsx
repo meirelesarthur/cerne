@@ -406,20 +406,20 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: GRID, padding: '11px 16px', borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.surfaceSubtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.surfaceSubtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Checkbox checked={isSelected} onChange={onToggle} aria-label={`Selecionar ${prod.descricao}`} />
       </div>
-      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.textSecondary, fontFamily: t.font.family.sans, letterSpacing: '0.05em' }}>
+      <span title={prod.codigo} style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.textSecondary, fontFamily: t.font.family.sans, letterSpacing: '0.05em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {prod.codigo}
       </span>
-      <span style={{ fontSize: t.font.size.base, color: colors.textPrimary, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={prod.descricao}>
+      <span title={prod.descricao} style={{ fontSize: t.font.size.base, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {prod.descricao}
       </span>
-      <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+      <span title={grupoNome} style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {grupoNome}
       </span>
       <span style={{ display: 'inline-flex' }}>

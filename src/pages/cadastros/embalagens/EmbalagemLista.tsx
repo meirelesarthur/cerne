@@ -260,7 +260,8 @@ function EmbalagemRow({
       style={{
         display: 'grid',
         gridTemplateColumns: '1fr 140px 160px 96px',
-        padding: '12px 16px',
+        padding: '0 16px',
+        height: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         background: hovered ? colors.surfaceSubtle : 'transparent',
         transition: 'background 0.12s',
@@ -269,21 +270,23 @@ function EmbalagemRow({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <span style={{
+      <span title={emb.descricao} style={{
         fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
         color: colors.brand, fontFamily: t.font.family.sans,
+        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {emb.descricao}
       </span>
 
-      <span style={{
+      <span title={fmtQtd(emb.quantidade)} style={{
         fontSize: t.font.size.sm, color: colors.textSecondary,
         fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums',
+        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {fmtQtd(emb.quantidade)}
       </span>
 
-      <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+      <span title={unidadeLabel} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {unidadeLabel}
       </span>
 

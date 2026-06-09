@@ -277,14 +277,14 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '12px 16px', borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.surfaceSubtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.surfaceSubtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.brand, fontFamily: t.font.family.sans, letterSpacing: '0.02em' }}>
+      <span title={arm.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.brand, fontFamily: t.font.family.sans, letterSpacing: '0.02em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {arm.sigla}
       </span>
-      <span style={{ fontSize: t.font.size.base, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+      <span title={arm.descricao} style={{ fontSize: t.font.size.base, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {arm.descricao}
       </span>
       <span style={{ display: 'inline-flex' }}>

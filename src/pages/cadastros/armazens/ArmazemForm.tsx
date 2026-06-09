@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
@@ -84,86 +85,89 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
     }, 150)
   }
 
-  const border = colors.border
-
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
+            <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
+              Salvar
+            </Button>
+          </>
+        }
+      >
 
-      {/* Header */}
-      <FormPageHeader
-        title={isEdit ? 'Editar Armazém' : 'Novo Armazém'}
-        subtitle={isEdit ? `Editando: ${initialData!.sigla} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-        onBack={onBack}
-      />
+        {/* Header */}
+        <FormPageHeader
+          title={isEdit ? 'Editar Armazém' : 'Novo Armazém'}
+          subtitle={isEdit ? `Editando: ${initialData!.sigla} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+          onBack={onBack}
+          paddingTop={t.space[4]}
+        />
 
-      {/* Card */}
-      <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, padding: `${t.space[6]}px`, maxWidth: 600 }}>
+        {/* Campos */}
+        <div style={{ maxWidth: 600 }}>
 
-        {/* Sigla + Tipo */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: t.space[4], marginBottom: t.space[5] }}>
-          <FormField
-            label="Sigla"
-            required
-            placeholder="Ex: AZM01"
-            value={sigla}
-            onChange={e => setSigla(e.target.value.toUpperCase())}
-            onBlur={() => setTouched(p => ({ ...p, sigla: true }))}
-            error={errSigla}
-            status={errSigla ? 'err' : touched.sigla && !validateSigla(sigla, existingArmazens, initialData?.id) ? 'ok' : 'idle'}
-            disabled={submitting}
-          />
-          <FormSelect
-            label="Tipo"
-            required
-            value={tipo}
-            onChange={e => {
-              setTipo(e.target.value as TipoArmazem | '')
-              setTouched(p => ({ ...p, tipo: true }))
-            }}
-            onBlur={() => setTouched(p => ({ ...p, tipo: true }))}
-            options={[{ value: '', label: 'Selecione...' }, ...TIPO_ARMAZEM_OPTS]}
-            error={errTipo}
-            disabled={submitting}
-          />
-        </div>
+          {/* Sigla + Tipo */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: t.space[4], marginBottom: t.space[5] }}>
+            <FormField
+              label="Sigla"
+              required
+              placeholder="Ex: AZM01"
+              value={sigla}
+              onChange={e => setSigla(e.target.value.toUpperCase())}
+              onBlur={() => setTouched(p => ({ ...p, sigla: true }))}
+              error={errSigla}
+              status={errSigla ? 'err' : touched.sigla && !validateSigla(sigla, existingArmazens, initialData?.id) ? 'ok' : 'idle'}
+              disabled={submitting}
+            />
+            <FormSelect
+              label="Tipo"
+              required
+              value={tipo}
+              onChange={e => {
+                setTipo(e.target.value as TipoArmazem | '')
+                setTouched(p => ({ ...p, tipo: true }))
+              }}
+              onBlur={() => setTouched(p => ({ ...p, tipo: true }))}
+              options={[{ value: '', label: 'Selecione...' }, ...TIPO_ARMAZEM_OPTS]}
+              error={errTipo}
+              disabled={submitting}
+            />
+          </div>
 
-        {/* Descrição */}
-        <div style={{ marginBottom: t.space[5] }}>
-          <FormField
-            label="Descrição"
-            required
-            placeholder="Ex: Armazém Principal de Insumos"
-            value={descricao}
-            onChange={e => setDescricao(e.target.value)}
-            onBlur={() => setTouched(p => ({ ...p, descricao: true }))}
-            error={errDescricao}
-            status={errDescricao ? 'err' : touched.descricao && !validateDescricao(descricao) ? 'ok' : 'idle'}
-            disabled={submitting}
-          />
-        </div>
+          {/* Descrição */}
+          <div style={{ marginBottom: t.space[5] }}>
+            <FormField
+              label="Descrição"
+              required
+              placeholder="Ex: Armazém Principal de Insumos"
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              onBlur={() => setTouched(p => ({ ...p, descricao: true }))}
+              error={errDescricao}
+              status={errDescricao ? 'err' : touched.descricao && !validateDescricao(descricao) ? 'ok' : 'idle'}
+              disabled={submitting}
+            />
+          </div>
 
-        {/* Ativo */}
-        <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${border}` }}>
-          <ToggleSwitch checked={ativo} onChange={setAtivo} disabled={submitting} />
-          <div>
-            <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
-              Armazém ativo
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-              {ativo ? 'Disponível para movimentações de estoque.' : 'Indisponível para novas movimentações.'}
+          {/* Ativo */}
+          <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border}` }}>
+            <ToggleSwitch checked={ativo} onChange={setAtivo} disabled={submitting} />
+            <div>
+              <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+                Armazém ativo
+              </div>
+              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                {ativo ? 'Disponível para movimentações de estoque.' : 'Indisponível para novas movimentações.'}
+              </div>
             </div>
           </div>
+
         </div>
 
-        {/* Botões */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3] }}>
-          <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
-          <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
-            Salvar
-          </Button>
-        </div>
-      </div>
-
+      </PageCard>
     </PageContainer>
   )
 }

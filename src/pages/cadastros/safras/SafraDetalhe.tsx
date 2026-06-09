@@ -3,6 +3,8 @@ import { ArrowLeft, Pencil, Calendar, Users, TrendingUp, Clock } from 'lucide-re
 import { Button }     from '../../../components/ui/Button'
 import { Badge }      from '../../../components/ui/Badge'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
+import { PageContainer } from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { t }          from '../../../design/tokens'
 import { useTheme }   from '../../../context/ThemeContext'
 import { WeekCanvas } from './WeekCanvas'
@@ -104,120 +106,120 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
   ]
 
   return (
-    <div style={{
-      padding: '24px 28px',
-      fontFamily: t.font.family.sans,
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 16,
-    }}>
-
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <FormPageHeader
-        title={safra.desc}
-        subtitle={`${fmtYMDtoDMY(safra.ini)} — ${fmtYMDtoDMY(safra.fim)} · Rebanho: ${rebLabels[safra.reb]} · Evolução: ${evoLabels[safra.evo]}`}
-        onBack={onBack}
-        actions={
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard
+        footer={
           <>
-            <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
-            <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+            <Button variant="secondary" icon={<ArrowLeft size={14} />} onClick={onBack}>
+              Voltar
+            </Button>
+            <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>
               Editar
             </Button>
           </>
         }
-      />
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* ── Stats strip ───────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-        {stats.map(s => (
-          <div
-            key={s.label}
-            style={{
-              background: colors.surfaceBg,
-              borderRadius: t.radius.lg,
-              padding: '12px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              transition: 'background 0.2s',
-            }}
-          >
+          {/* ── Header ──────────────────────────────────────────────────────── */}
+          <FormPageHeader
+            title={safra.desc}
+            subtitle={`${fmtYMDtoDMY(safra.ini)} — ${fmtYMDtoDMY(safra.fim)} · Rebanho: ${rebLabels[safra.reb]} · Evolução: ${evoLabels[safra.evo]}`}
+            onBack={onBack}
+            paddingTop={t.space[4]}
+            actions={
+              <>
+                <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
+                <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+                  Editar
+                </Button>
+              </>
+            }
+          />
+
+          {/* ── Stats strip ───────────────────────────────────────────────────── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {stats.map(s => (
+              <div
+                key={s.label}
+                style={{
+                  background: colors.surfaceBg,
+                  borderRadius: t.radius.lg,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  transition: 'background 0.2s',
+                }}
+              >
+                <div style={{
+                  width: 34, height: 34, borderRadius: 8,
+                  background: s.iconBg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  {s.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
+                    {s.label}
+                  </div>
+                  <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
+                    {s.value}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Dados gerais ─────────────────────────────────────────────────── */}
+          <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 8,
-              background: s.iconBg,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
+              fontSize: t.font.size.xs,
+              fontWeight: t.font.weight.semibold,
+              color: colors.textMuted,
+              textTransform: 'uppercase',
+              letterSpacing: '0.6px',
+              marginBottom: 16,
+              paddingBottom: 10,
+              borderBottom: `1px solid ${colors.borderSubtle}`,
+              fontFamily: t.font.family.sans,
             }}>
-              {s.icon}
+              Dados Gerais
             </div>
-            <div>
-              <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
-                {s.label}
-              </div>
-              <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
-                {s.value}
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px 28px' }}>
+              <InfoField label="Data de Início" value={fmtYMDtoDMY(safra.ini)} />
+              <InfoField label="Data de Fim"    value={fmtYMDtoDMY(safra.fim)} />
+              <InfoField label="1º Semestre"    value={mesLabel(safra.s1)} />
+              <InfoField label="2º Semestre"    value={mesLabel(safra.s2)} />
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* ── Dados gerais ─────────────────────────────────────────────────── */}
-      <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
-        <div style={{
-          fontSize: t.font.size.xs,
-          fontWeight: t.font.weight.semibold,
-          color: colors.textMuted,
-          textTransform: 'uppercase',
-          letterSpacing: '0.6px',
-          marginBottom: 16,
-          paddingBottom: 10,
-          borderBottom: `1px solid ${colors.borderSubtle}`,
-          fontFamily: t.font.family.sans,
-        }}>
-          Dados Gerais
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px 28px' }}>
-          <InfoField label="Data de Início" value={fmtYMDtoDMY(safra.ini)} />
-          <InfoField label="Data de Fim"    value={fmtYMDtoDMY(safra.fim)} />
-          <InfoField label="1º Semestre"    value={mesLabel(safra.s1)} />
-          <InfoField label="2º Semestre"    value={mesLabel(safra.s2)} />
-        </div>
-      </div>
+          {/* ── Canvas de semanas (read-only) ─────────────────────────────────── */}
+          <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
+            <div style={{
+              fontSize: t.font.size.xs,
+              fontWeight: t.font.weight.semibold,
+              color: colors.textMuted,
+              textTransform: 'uppercase',
+              letterSpacing: '0.6px',
+              marginBottom: 16,
+              paddingBottom: 10,
+              borderBottom: `1px solid ${colors.borderSubtle}`,
+              fontFamily: t.font.family.sans,
+            }}>
+              Código Visual de Semanas
+            </div>
+            <WeekCanvas
+              weeks={safra.weeks}
+              iniLabel={fmtYMDtoDMY(safra.ini)}
+              fimLabel={fmtYMDtoDMY(safra.fim)}
+              editable={false}
+            />
+          </div>
 
-      {/* ── Canvas de semanas (read-only) ─────────────────────────────────── */}
-      <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
-        <div style={{
-          fontSize: t.font.size.xs,
-          fontWeight: t.font.weight.semibold,
-          color: colors.textMuted,
-          textTransform: 'uppercase',
-          letterSpacing: '0.6px',
-          marginBottom: 16,
-          paddingBottom: 10,
-          borderBottom: `1px solid ${colors.borderSubtle}`,
-          fontFamily: t.font.family.sans,
-        }}>
-          Código Visual de Semanas
         </div>
-        <WeekCanvas
-          weeks={safra.weeks}
-          iniLabel={fmtYMDtoDMY(safra.ini)}
-          fimLabel={fmtYMDtoDMY(safra.fim)}
-          editable={false}
-        />
-      </div>
-
-      {/* ── Botões de ação ─────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 }}>
-        <Button variant="secondary" icon={<ArrowLeft size={14} />} onClick={onBack}>
-          Voltar
-        </Button>
-        <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>
-          Editar
-        </Button>
-      </div>
-    </div>
+      </PageCard>
+    </PageContainer>
   )
 }

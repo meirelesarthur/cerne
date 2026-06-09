@@ -20,6 +20,9 @@ import { mockFazendaSantaLuzia } from './fazendas.mock'
 import type { FazendaDetalheData } from './fazendas.types'
 import { useTheme } from '../../../context/ThemeContext'
 import { Tabs } from '../../../components/ui/Tabs'
+import { PageContainer } from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
+import { t }             from '../../../design/tokens'
 
 interface FazendaDetalheProps {
   onBack: () => void
@@ -407,105 +410,101 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
   }
 
   return (
-    <div
-      style={{
-        padding: '24px 28px',
-        fontFamily: "'Outfit', sans-serif",
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}
-    >
-      {/* Header */}
-      <FormPageHeader
-        title={fazenda.nome}
-        subtitle={`${fazenda.tipoExploracao} · ${fazenda.cidade}, ${fazenda.uf}`}
-        onBack={onBack}
-        backLabel="Voltar para fazendas"
-        actions={
-          <>
-            <Badge label={fazenda.ativo ? 'Ativo' : 'Inativo'} variant={fazenda.ativo ? 'success' : 'neutral'} />
-            <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
-              Editar
-            </Button>
-          </>
-        }
-      />
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Header */}
+          <FormPageHeader
+            title={fazenda.nome}
+            subtitle={`${fazenda.tipoExploracao} · ${fazenda.cidade}, ${fazenda.uf}`}
+            onBack={onBack}
+            backLabel="Voltar para fazendas"
+            paddingTop={t.space[4]}
+            actions={
+              <>
+                <Badge label={fazenda.ativo ? 'Ativo' : 'Inativo'} variant={fazenda.ativo ? 'success' : 'neutral'} />
+                <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+                  Editar
+                </Button>
+              </>
+            }
+          />
 
-      {/* Stats strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-        {stats.map((s) => (
+          {/* Stats strip */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {stats.map((s) => (
+              <div
+                key={s.label}
+                style={{
+                  background: colors.surfaceBg,
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  transition: 'background 0.2s',
+                }}
+              >
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 8,
+                    background: s.iconBg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: 'color 0.2s' }}>
+                    {s.label}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, transition: 'color 0.2s' }}>
+                    {s.value}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tabs + content */}
           <div
-            key={s.label}
             style={{
               background: colors.surfaceBg,
-              borderRadius: 10,
-              padding: '12px 14px',
+              borderRadius: 12,
+              overflow: 'hidden',
               display: 'flex',
-              alignItems: 'center',
-              gap: 12,
+              flexDirection: 'column',
+              flex: 1,
               transition: 'background 0.2s',
             }}
           >
+            {/* Tab bar */}
             <div
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 8,
-                background: s.iconBg,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                borderBottom: `1px solid ${colors.border}`,
+                padding: '12px 20px',
               }}
             >
-              {s.icon}
+              <Tabs
+                items={TABS}
+                activeId={activeTab}
+                onChange={(id) => setActiveTab(id as Tab)}
+                label="Seções da fazenda"
+              />
             </div>
-            <div>
-              <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: 'color 0.2s' }}>
-                {s.label}
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, transition: 'color 0.2s' }}>
-                {s.value}
-              </div>
+
+            {/* Tab content */}
+            <div style={{ padding: 24 }}>
+              {renderTab()}
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Tabs + content */}
-      <div
-        style={{
-          background: colors.surfaceBg,
-          borderRadius: 12,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          transition: 'background 0.2s',
-        }}
-      >
-        {/* Tab bar */}
-        <div
-          style={{
-            borderBottom: `1px solid ${colors.border}`,
-            padding: '12px 20px',
-          }}
-        >
-          <Tabs
-            items={TABS}
-            activeId={activeTab}
-            onChange={(id) => setActiveTab(id as Tab)}
-            label="Seções da fazenda"
-          />
         </div>
-
-        {/* Tab content */}
-        <div style={{ padding: 24 }}>
-          {renderTab()}
-        </div>
-      </div>
-    </div>
+      </PageCard>
+    </PageContainer>
   )
 }

@@ -640,7 +640,6 @@ function PlanoDetalhe({
         title={`Plano ${plano.nome}`}
         subtitle={plano.subtitulo}
         onBack={onVoltar}
-        backLabel="Voltar aos planos"
       />
 
       <BarraControles

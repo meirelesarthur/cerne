@@ -418,7 +418,6 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             title={fazenda.nome}
             subtitle={`${fazenda.tipoExploracao} · ${fazenda.cidade}, ${fazenda.uf}`}
             onBack={onBack}
-            backLabel="Voltar para fazendas"
             paddingTop={t.space[4]}
             actions={
               <>

@@ -138,7 +138,6 @@ export default function CentroCustoCadastro({
             title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
             subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
             onBack={onBack}
-            onClose={onBack}
             paddingTop={t.space[4]}
           />
 

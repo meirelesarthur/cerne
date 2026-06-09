@@ -105,7 +105,7 @@ export default function CentrosCustoLista({
   const deleteTarget = centros.find(c => c.id === deleteId)
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
       {/* ── Card principal com scroll interno ───────────────────────────── */}
       <div style={{
@@ -114,7 +114,7 @@ export default function CentrosCustoLista({
         boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 112px)',
+        height: 'calc(100vh - 88px)',
         overflow: 'hidden',
       }}>
         <div style={{ flex: 1, overflowY: 'auto', padding: `0 ${t.space[6]}px ${t.space[6]}px` }}>

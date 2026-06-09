@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Check, Minus, Plus, Sparkles } from 'lucide-react'
+import { ArrowUpRight, Check, ChevronRight, Minus, Plus, Sparkles } from 'lucide-react'
 import { PageContainer } from '../../components/ui/PageContainer'
 import { PageHeader } from '../../components/ui/PageHeader'
+import { FormPageHeader } from '../../components/ui/FormPageHeader'
 import { Card } from '../../components/ui/Card'
-import { Badge } from '../../components/ui/Badge'
+import { Badge, type BadgeVariant } from '../../components/ui/Badge'
 import { Heading } from '../../components/ui/Heading'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
@@ -15,12 +16,17 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import {
   planos, addOns, tabelaComparativa, formatBRL,
-  type PlanoId, type LinhaComparacao,
+  type Plano, type PlanoId, type LinhaComparacao,
 } from './planosData'
 
 const N_MIN = 1
 const N_MAX = 200
-const COMP_COLS = '2fr repeat(3, 1fr)'
+
+/** Ordem das faixas (do menor para o maior) — base da lógica de upsell. */
+const TIER_ORDER: PlanoId[] = ['essencial', 'profissional', 'enterprise']
+
+/** Plano que o usuário possui hoje (mock — trocar por dado da assinatura real). */
+const PLANO_ATUAL_ID: PlanoId = 'essencial'
 
 const gridStyle: React.CSSProperties = {
   display: 'grid',
@@ -35,7 +41,22 @@ const reducedMotionCss = `
   }
 `
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+const planoPorId = (id: PlanoId) => planos.find((p) => p.id === id)!
+
+/**
+ * Colunas do benchmark de upsell: plano atual + selecionado + a faixa
+ * imediatamente acima da maior das duas — para sempre oferecer um próximo passo.
+ */
+function benchmarkColunasIds(atualId: PlanoId, selecionadoId: PlanoId): PlanoId[] {
+  const idxAtual = TIER_ORDER.indexOf(atualId)
+  const idxSel = TIER_ORDER.indexOf(selecionadoId)
+  const acimaIdx = Math.max(idxAtual, idxSel) + 1
+  const ids = new Set<PlanoId>([atualId, selecionadoId])
+  if (acimaIdx < TIER_ORDER.length) ids.add(TIER_ORDER[acimaIdx])
+  return TIER_ORDER.filter((id) => ids.has(id))
+}
+
+// ─── Main page ──────────────────────────────────────────────────────────────
 
 export default function PlanosPage() {
   const { colors, isGbMode } = useTheme()
@@ -43,6 +64,7 @@ export default function PlanosPage() {
   const [anual, setAnual] = useState(true)
   const [loading, setLoading] = useState(true)
   const [comprando, setComprando] = useState<PlanoId | null>(null)
+  const [detalheId, setDetalheId] = useState<PlanoId | null>(null)
 
   useEffect(() => {
     const timerId = window.setTimeout(() => setLoading(false), 450)
@@ -54,68 +76,97 @@ export default function PlanosPage() {
     window.setTimeout(() => setComprando(null), 1600)
   }
 
+  const planoDetalhe = detalheId ? planoPorId(detalheId) : null
+
   return (
     <PageContainer>
       <style>{reducedMotionCss}</style>
 
-      <PageHeader
-        title="Planos e Preços"
-        description="Licenças por usuário, sem taxa de setup"
-      />
-
-      {loading ? (
-        <PlanosSkeleton />
+      {planoDetalhe ? (
+        <PlanoDetalhe
+          plano={planoDetalhe}
+          nUsuarios={nUsuarios}
+          setNUsuarios={setNUsuarios}
+          anual={anual}
+          setAnual={setAnual}
+          colors={colors}
+          isGbMode={isGbMode}
+          comprando={comprando === planoDetalhe.id}
+          onComprar={() => handleComprar(planoDetalhe.id)}
+          onVoltar={() => setDetalheId(null)}
+        />
       ) : (
         <>
-          <BarraControles
-            nUsuarios={nUsuarios}
-            setNUsuarios={setNUsuarios}
-            anual={anual}
-            setAnual={setAnual}
-            colors={colors}
+          <PageHeader
+            title="Planos e Preços"
+            description="Licenças por usuário, sem taxa de setup"
           />
 
-          <div style={{ ...gridStyle, marginTop: t.space[6] }}>
-            {planos.map((plano) => (
-              <PlanoCard
-                key={plano.id}
-                plano={plano}
+          {loading ? (
+            <PlanosSkeleton />
+          ) : (
+            <>
+              <BarraControles
                 nUsuarios={nUsuarios}
+                setNUsuarios={setNUsuarios}
                 anual={anual}
+                setAnual={setAnual}
                 colors={colors}
-                isGbMode={isGbMode}
-                comprando={comprando === plano.id}
-                onComprar={() => handleComprar(plano.id)}
               />
-            ))}
-          </div>
 
-          <SecaoAddOns nUsuarios={nUsuarios} colors={colors} />
-          <TabelaComparativa colors={colors} />
+              <div style={{ ...gridStyle, marginTop: t.space[6] }}>
+                {planos.map((plano) => (
+                  <PlanoCard
+                    key={plano.id}
+                    plano={plano}
+                    nUsuarios={nUsuarios}
+                    anual={anual}
+                    colors={colors}
+                    isGbMode={isGbMode}
+                    atual={plano.id === PLANO_ATUAL_ID}
+                    comprando={comprando === plano.id}
+                    onComprar={() => handleComprar(plano.id)}
+                    onVerDetalhes={() => setDetalheId(plano.id)}
+                  />
+                ))}
+              </div>
+
+              <SecaoAddOns nUsuarios={nUsuarios} colors={colors} />
+
+              <TabelaComparacao
+                titulo="Comparativo de recursos"
+                colunas={planos.map((p) => ({
+                  planoId: p.id,
+                  badge: p.popular ? { label: 'Popular', variant: 'success' as BadgeVariant } : undefined,
+                }))}
+                colors={colors}
+              />
+            </>
+          )}
+
+          <div style={{ marginTop: t.space[10] }}>
+            <Divider />
+            <p style={notaRodapeStyle(colors)}>
+              ¹ Valores em reais (BRL), sem impostos incluídos. &nbsp;·&nbsp;
+              ² Licença por usuário ativo ao mês. &nbsp;·&nbsp;
+              ³ Cobrança anual faturada de uma só vez; mensal renovada todo mês. &nbsp;·&nbsp;
+              ⁴ Usuários podem ser adicionados ou removidos a qualquer momento — a fatura é ajustada proporcionalmente.
+            </p>
+          </div>
         </>
       )}
-
-      <div style={{ marginTop: t.space[10] }}>
-        <Divider />
-        <p
-          style={{
-            marginTop: t.space[4],
-            textAlign: 'center',
-            fontSize: t.font.size.xs,
-            color: colors.textMuted,
-            fontFamily: t.font.family.sans,
-            lineHeight: t.font.lineHeight.relaxed,
-          }}
-        >
-          ¹ Valores em reais (BRL), sem impostos incluídos. &nbsp;·&nbsp;
-          ² Licença por usuário ativo ao mês. &nbsp;·&nbsp;
-          ³ Cobrança anual faturada de uma só vez; mensal renovada todo mês. &nbsp;·&nbsp;
-          ⁴ Usuários podem ser adicionados ou removidos a qualquer momento — a fatura é ajustada proporcionalmente.
-        </p>
-      </div>
     </PageContainer>
   )
 }
+
+const notaRodapeStyle = (colors: ReturnType<typeof useTheme>['colors']): React.CSSProperties => ({
+  marginTop: t.space[4],
+  textAlign: 'center',
+  fontSize: t.font.size.xs,
+  color: colors.textMuted,
+  fontFamily: t.font.family.sans,
+  lineHeight: t.font.lineHeight.relaxed,
+})
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -236,23 +287,124 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
   )
 }
 
+// ─── Reusable price + total blocks ─────────────────────────────────────────────
+
+function BlocoPreco({
+  plano, anual, colors,
+}: {
+  plano: Plano
+  anual: boolean
+  colors: ReturnType<typeof useTheme>['colors']
+}) {
+  const preco = anual ? plano.precoUsuarioMesAnual : plano.precoUsuarioMesMensal
+  if (preco === null) {
+    return (
+      <Heading level={4} size="2xl" weight="bold" tone="secondary">
+        Sob consulta
+      </Heading>
+    )
+  }
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
+        <Heading level={4} size="4xl" weight="extrabold">{formatBRL(preco)}</Heading>
+        <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          /usuário/mês
+        </span>
+      </div>
+      {anual && (
+        <span
+          style={{
+            display: 'block',
+            marginTop: t.space[1],
+            fontSize: t.font.size.xs,
+            color: colors.textMuted,
+            fontFamily: t.font.family.sans,
+          }}
+        >
+          Cobrança anual — {formatBRL(preco * 12)}/usuário/ano
+        </span>
+      )}
+    </>
+  )
+}
+
+function BlocoTotal({
+  plano, nUsuarios, anual, colors,
+}: {
+  plano: Plano
+  nUsuarios: number
+  anual: boolean
+  colors: ReturnType<typeof useTheme>['colors']
+}) {
+  const preco = anual ? plano.precoUsuarioMesAnual : plano.precoUsuarioMesMensal
+  if (preco === null) return null
+  const totalMes = nUsuarios * preco
+
+  return (
+    <div
+      style={{
+        background: colors.brandBg,
+        borderRadius: t.radius.lg,
+        padding: `${t.space[3]}px ${t.space[4]}px`,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+          {nUsuarios} {nUsuarios === 1 ? 'usuário' : 'usuários'}
+        </span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
+          <span
+            style={{
+              fontSize: t.font.size['2xl'],
+              fontWeight: t.font.weight.extrabold,
+              fontFamily: t.font.family.sans,
+              color: colors.brand,
+            }}
+          >
+            {formatBRL(totalMes)}
+          </span>
+          <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+            /mês
+          </span>
+        </div>
+      </div>
+      {anual && (
+        <span
+          style={{
+            display: 'block',
+            marginTop: t.space[1],
+            fontSize: t.font.size.xs,
+            color: colors.textMuted,
+            fontFamily: t.font.family.sans,
+            textAlign: 'right',
+          }}
+        >
+          {formatBRL(totalMes * 12)}/ano
+        </span>
+      )}
+    </div>
+  )
+}
+
 // ─── Plan card ────────────────────────────────────────────────────────────────
 
 interface PlanoCardProps {
-  plano: typeof planos[0]
+  plano: Plano
   nUsuarios: number
   anual: boolean
   colors: ReturnType<typeof useTheme>['colors']
   isGbMode: boolean
+  atual: boolean
   comprando: boolean
   onComprar: () => void
+  onVerDetalhes: () => void
 }
 
-function PlanoCard({ plano, nUsuarios, anual, colors, isGbMode, comprando, onComprar }: PlanoCardProps) {
+function PlanoCard({
+  plano, nUsuarios, anual, colors, isGbMode, atual, comprando, onComprar, onVerDetalhes,
+}: PlanoCardProps) {
   const sobConsulta = plano.precoUsuarioMesAnual === null
-  const preco = anual ? plano.precoUsuarioMesAnual : plano.precoUsuarioMesMensal
-  const totalMes = preco ? nUsuarios * preco : 0
-  const totalAno = totalMes * 12
 
   return (
     <Card
@@ -269,9 +421,10 @@ function PlanoCard({ plano, nUsuarios, anual, colors, isGbMode, comprando, onCom
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: t.space[2] }}>
         <Heading level={3} size="2xl" weight="bold">{plano.nome}</Heading>
         {plano.destaque && <Badge label={plano.destaque} variant="success" />}
+        {atual && <Badge label="Seu plano atual" variant="info" />}
       </div>
       <p
         style={{
@@ -288,126 +441,22 @@ function PlanoCard({ plano, nUsuarios, anual, colors, isGbMode, comprando, onCom
 
       {/* Price */}
       <div style={{ marginTop: t.space[5] }}>
-        {sobConsulta ? (
-          <Heading level={4} size="2xl" weight="bold" tone="secondary">
-            Sob consulta
-          </Heading>
-        ) : (
-          <>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
-              <Heading level={4} size="4xl" weight="extrabold">
-                {formatBRL(preco ?? 0)}
-              </Heading>
-              <span
-                style={{
-                  fontSize: t.font.size.sm,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                /usuário/mês
-              </span>
-            </div>
-            {anual && (
-              <span
-                style={{
-                  display: 'block',
-                  marginTop: t.space[1],
-                  fontSize: t.font.size.xs,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                Cobrança anual — {formatBRL((preco ?? 0) * 12)}/usuário/ano
-              </span>
-            )}
-          </>
-        )}
+        <BlocoPreco plano={plano} anual={anual} colors={colors} />
       </div>
 
       {/* Live total */}
       {!sobConsulta && (
-        <div
-          style={{
-            marginTop: t.space[4],
-            background: colors.brandBg,
-            borderRadius: t.radius.lg,
-            padding: `${t.space[3]}px ${t.space[4]}px`,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span
-              style={{
-                fontSize: t.font.size.sm,
-                color: colors.textSecondary,
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              {nUsuarios} {nUsuarios === 1 ? 'usuário' : 'usuários'}
-            </span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
-              <span
-                style={{
-                  fontSize: t.font.size['2xl'],
-                  fontWeight: t.font.weight.extrabold,
-                  fontFamily: t.font.family.sans,
-                  color: colors.brand,
-                }}
-              >
-                {formatBRL(totalMes)}
-              </span>
-              <span
-                style={{
-                  fontSize: t.font.size.sm,
-                  color: colors.textMuted,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
-                /mês
-              </span>
-            </div>
-          </div>
-          {anual && (
-            <span
-              style={{
-                display: 'block',
-                marginTop: t.space[1],
-                fontSize: t.font.size.xs,
-                color: colors.textMuted,
-                fontFamily: t.font.family.sans,
-                textAlign: 'right',
-              }}
-            >
-              {formatBRL(totalAno)}/ano
-            </span>
-          )}
+        <div style={{ marginTop: t.space[4] }}>
+          <BlocoTotal plano={plano} nUsuarios={nUsuarios} anual={anual} colors={colors} />
         </div>
       )}
 
       {/* CTAs */}
-      <div
-        style={{
-          marginTop: t.space[5],
-          display: 'flex',
-          flexDirection: 'column',
-          gap: t.space[2],
-        }}
-      >
+      <div style={{ marginTop: t.space[5], display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
         {sobConsulta ? (
-          <>
-            <Button variant="secondary" block size="lg" loading={comprando} onClick={onComprar}>
-              Falar com vendas
-            </Button>
-            <Button variant="ghost" block size="md">
-              Ver todos os recursos
-            </Button>
-          </>
+          <Button variant="secondary" block size="lg" loading={comprando} onClick={onComprar}>
+            Falar com vendas
+          </Button>
         ) : (
           <>
             <Button
@@ -466,6 +515,20 @@ function PlanoCard({ plano, nUsuarios, anual, colors, isGbMode, comprando, onCom
         ))}
       </ul>
 
+      {/* Detail link (Microsoft "Detalhes") */}
+      <div
+        style={{
+          marginTop: 'auto',
+          paddingTop: t.space[5],
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Button variant="ghost" size="md" onClick={onVerDetalhes} icon={<ChevronRight size={14} />}>
+          Ver detalhes e comparar
+        </Button>
+      </div>
+
       {/* GBMode glow for popular plan */}
       {isGbMode && plano.popular && (
         <span
@@ -480,6 +543,181 @@ function PlanoCard({ plano, nUsuarios, anual, colors, isGbMode, comprando, onCom
         />
       )}
     </Card>
+  )
+}
+
+// ─── Plan detail view (Microsoft-style upsell benchmark) ────────────────────────
+
+interface PlanoDetalheProps {
+  plano: Plano
+  nUsuarios: number
+  setNUsuarios: (n: number) => void
+  anual: boolean
+  setAnual: (v: boolean) => void
+  colors: ReturnType<typeof useTheme>['colors']
+  isGbMode: boolean
+  comprando: boolean
+  onComprar: () => void
+  onVoltar: () => void
+}
+
+function PlanoDetalhe({
+  plano, nUsuarios, setNUsuarios, anual, setAnual, colors, isGbMode, comprando, onComprar, onVoltar,
+}: PlanoDetalheProps) {
+  const sobConsulta = plano.precoUsuarioMesAnual === null
+  const ehAtual = plano.id === PLANO_ATUAL_ID
+
+  // Benchmark de upsell: atual + selecionado + faixa acima.
+  const colunasIds = benchmarkColunasIds(PLANO_ATUAL_ID, plano.id)
+  const acimaIdx = Math.max(TIER_ORDER.indexOf(PLANO_ATUAL_ID), TIER_ORDER.indexOf(plano.id)) + 1
+  const acimaId: PlanoId | undefined = TIER_ORDER[acimaIdx]
+
+  const colunas: ColunaComp[] = colunasIds.map((id) => {
+    if (id === acimaId) return { planoId: id, badge: { label: 'Recomendado ↑', variant: 'purple' }, destacar: true }
+    if (id === plano.id && id === PLANO_ATUAL_ID) return { planoId: id, badge: { label: 'Atual · Selecionado', variant: 'success' } }
+    if (id === plano.id) return { planoId: id, badge: { label: 'Selecionado', variant: 'success' } }
+    if (id === PLANO_ATUAL_ID) return { planoId: id, badge: { label: 'Seu plano atual', variant: 'info' } }
+    return { planoId: id }
+  })
+
+  const planoAcima = acimaId ? planoPorId(acimaId) : null
+
+  return (
+    <>
+      <FormPageHeader
+        title={`Plano ${plano.nome}`}
+        subtitle={plano.subtitulo}
+        onBack={onVoltar}
+        backLabel="Voltar aos planos"
+      />
+
+      <BarraControles
+        nUsuarios={nUsuarios}
+        setNUsuarios={setNUsuarios}
+        anual={anual}
+        setAnual={setAnual}
+        colors={colors}
+      />
+
+      {/* Hero — selected plan */}
+      <Card
+        radius="xl"
+        shadow="lg"
+        padding={t.space[6]}
+        style={{
+          position: 'relative',
+          marginTop: t.space[6],
+          border: plano.popular ? `1.5px solid ${t.color.brand[600]}` : `1px solid ${colors.border}`,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: t.space[6],
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Left: identity + price */}
+          <div style={{ flex: '1 1 240px', minWidth: 240 }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: t.space[2] }}>
+              <Heading level={2} size="3xl" weight="extrabold">{plano.nome}</Heading>
+              {plano.destaque && <Badge label={plano.destaque} variant="success" />}
+              {ehAtual && <Badge label="Seu plano atual" variant="info" />}
+            </div>
+            <div style={{ marginTop: t.space[4] }}>
+              <BlocoPreco plano={plano} anual={anual} colors={colors} />
+            </div>
+          </div>
+
+          {/* Right: total + CTAs */}
+          <div style={{ flex: '0 1 320px', minWidth: 260, display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
+            {!sobConsulta && <BlocoTotal plano={plano} nUsuarios={nUsuarios} anual={anual} colors={colors} />}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+              {sobConsulta ? (
+                <Button variant="secondary" block size="lg" loading={comprando} onClick={onComprar}>
+                  Falar com vendas
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="primary"
+                    block
+                    size="lg"
+                    loading={comprando}
+                    icon={<Sparkles size={15} />}
+                    onClick={onComprar}
+                  >
+                    Comprar agora
+                  </Button>
+                  <Button variant="ghost" block size="md">
+                    Testar {plano.trialDias} dias grátis
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {isGbMode && plano.popular && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: t.radius.xl,
+              boxShadow: t.glow.brandLg,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+      </Card>
+
+      {/* Upsell nudge */}
+      {planoAcima && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: t.space[3],
+            marginTop: t.space[6],
+            padding: `${t.space[3]}px ${t.space[4]}px`,
+            borderRadius: t.radius.lg,
+            background: colors.brandBg,
+            border: `1px solid ${t.color.brand[200]}`,
+          }}
+        >
+          <ArrowUpRight size={18} color={t.color.brand[600]} aria-hidden="true" style={{ flexShrink: 0 }} />
+          <span
+            style={{
+              fontSize: t.font.size.base,
+              color: colors.textSecondary,
+              fontFamily: t.font.family.sans,
+              lineHeight: t.font.lineHeight.snug,
+            }}
+          >
+            Quer ir além? O plano <strong style={{ color: colors.brand }}>{planoAcima.nome}</strong>{' '}
+            desbloqueia ainda mais recursos para a sua operação crescer.
+          </span>
+        </div>
+      )}
+
+      {/* Benchmark comparison */}
+      <TabelaComparacao
+        titulo="Compare e escolha o ideal para crescer"
+        colunas={colunas}
+        colors={colors}
+      />
+
+      <div style={{ marginTop: t.space[8] }}>
+        <Divider />
+        <p style={notaRodapeStyle(colors)}>
+          Comparativo entre o seu plano atual, o plano selecionado e a faixa recomendada.
+          Valores em BRL por usuário/mês, sem impostos.
+        </p>
+      </div>
+    </>
   )
 }
 
@@ -562,24 +800,12 @@ function SecaoAddOns({ nUsuarios, colors }: SecaoAddOnsProps) {
                 >
                   {formatBRL(addon.precoUsuarioMesAnual)}
                 </span>
-                <span
-                  style={{
-                    fontSize: t.font.size.xs,
-                    color: colors.textMuted,
-                    fontFamily: t.font.family.sans,
-                  }}
-                >
+                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
                   /usuário/mês
                 </span>
               </div>
 
-              <span
-                style={{
-                  fontSize: t.font.size.xs,
-                  color: colors.textSecondary,
-                  fontFamily: t.font.family.sans,
-                }}
-              >
+              <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
                 Total para {nUsuarios} usuários: {formatBRL(totalMes)}/mês
               </span>
 
@@ -602,13 +828,19 @@ function SecaoAddOns({ nUsuarios, colors }: SecaoAddOnsProps) {
   )
 }
 
-// ─── Comparison table ─────────────────────────────────────────────────────────
+// ─── Comparison table (parameterized by columns) ────────────────────────────────
 
-interface TabelaComparativaProps {
-  colors: ReturnType<typeof useTheme>['colors']
+interface ColunaComp {
+  planoId: PlanoId
+  badge?: { label: string; variant: BadgeVariant }
+  destacar?: boolean
 }
 
-const PLANO_KEYS = ['essencial', 'profissional', 'enterprise'] as const
+interface TabelaComparacaoProps {
+  titulo: string
+  colunas: ColunaComp[]
+  colors: ReturnType<typeof useTheme>['colors']
+}
 
 function CelulaComparacao({
   value,
@@ -618,20 +850,13 @@ function CelulaComparacao({
   colors: ReturnType<typeof useTheme>['colors']
 }) {
   if (value === true) {
-    return (
-      <Check size={14} color={t.color.brand[600]} strokeWidth={2.5} aria-label="Incluído" />
-    )
+    return <Check size={14} color={t.color.brand[600]} strokeWidth={2.5} aria-label="Incluído" />
   }
   if (value === false) {
     return (
       <span
         aria-label="Não incluído"
-        style={{
-          fontSize: t.font.size.lg,
-          color: colors.textMuted,
-          fontFamily: t.font.family.sans,
-          lineHeight: 1,
-        }}
+        style={{ fontSize: t.font.size.lg, color: colors.textMuted, fontFamily: t.font.family.sans, lineHeight: 1 }}
       >
         —
       </span>
@@ -641,19 +866,15 @@ function CelulaComparacao({
     return <Tag label="Add-on" variant="brand" />
   }
   return (
-    <span
-      style={{
-        fontSize: t.font.size.sm,
-        color: colors.textSecondary,
-        fontFamily: t.font.family.sans,
-      }}
-    >
+    <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
       {value}
     </span>
   )
 }
 
-function TabelaComparativa({ colors }: TabelaComparativaProps) {
+function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
+  const gridCols = `2fr repeat(${colunas.length}, 1fr)`
+
   const headerCell: React.CSSProperties = {
     padding: `${t.space[3]}px ${t.space[4]}px`,
     fontSize: t.font.size.sm,
@@ -669,55 +890,52 @@ function TabelaComparativa({ colors }: TabelaComparativaProps) {
     fontFamily: t.font.family.sans,
   }
 
-  const valueCell: React.CSSProperties = {
-    padding: `${t.space[3]}px ${t.space[4]}px`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderLeft: `1px solid ${colors.borderSubtle}`,
-  }
-
   return (
     <div style={{ marginTop: t.space[12] }}>
       <Heading level={2} size="2xl" weight="bold" style={{ marginBottom: t.space[6] }}>
-        Comparativo de recursos
+        {titulo}
       </Heading>
 
       <div style={{ overflowX: 'auto' }}>
-        <Card radius="xl" shadow="md" padding={0} style={{ overflow: 'hidden', minWidth: 600 }}>
+        <Card radius="xl" shadow="md" padding={0} style={{ overflow: 'hidden', minWidth: 560 }}>
           {/* Header row */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: COMP_COLS,
+              gridTemplateColumns: gridCols,
               background: colors.surfaceSubtle,
               borderBottom: `1px solid ${colors.border}`,
             }}
           >
             <div style={headerCell}>Recurso</div>
-            {planos.map((p) => (
-              <div
-                key={p.id}
-                style={{
-                  ...headerCell,
-                  textAlign: 'center',
-                  borderLeft: `1px solid ${colors.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: t.space[2],
-                }}
-              >
-                {p.nome}
-                {p.popular && <Badge label="Popular" variant="success" />}
-              </div>
-            ))}
+            {colunas.map((col) => {
+              const plano = planoPorId(col.planoId)
+              return (
+                <div
+                  key={col.planoId}
+                  style={{
+                    ...headerCell,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: t.space[1],
+                    textAlign: 'center',
+                    borderLeft: `1px solid ${colors.border}`,
+                    background: col.destacar ? colors.brandBg : undefined,
+                    color: col.destacar ? colors.brand : colors.textPrimary,
+                  }}
+                >
+                  {plano.nome}
+                  {col.badge && <Badge label={col.badge.label} variant={col.badge.variant} />}
+                </div>
+              )
+            })}
           </div>
 
           {/* Categories */}
           {tabelaComparativa.map((cat) => (
             <div key={cat.id}>
-              {/* Category header */}
               <div
                 style={{
                   padding: `${t.space[2]}px ${t.space[4]}px`,
@@ -725,7 +943,7 @@ function TabelaComparativa({ colors }: TabelaComparativaProps) {
                   fontWeight: t.font.weight.semibold,
                   fontFamily: t.font.family.sans,
                   color: t.color.brand[600],
-                  textTransform: 'uppercase' as const,
+                  textTransform: 'uppercase',
                   letterSpacing: '0.06em',
                   background: colors.surfaceSubtle,
                   borderTop: `2px solid ${t.color.brand[600]}`,
@@ -734,20 +952,29 @@ function TabelaComparativa({ colors }: TabelaComparativaProps) {
                 {cat.titulo}
               </div>
 
-              {/* Feature rows */}
               {cat.linhas.map((linha: LinhaComparacao) => (
                 <div
                   key={linha.feature}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: COMP_COLS,
+                    gridTemplateColumns: gridCols,
                     borderTop: `1px solid ${colors.borderSubtle}`,
                   }}
                 >
                   <div style={featureCell}>{linha.feature}</div>
-                  {PLANO_KEYS.map((key) => (
-                    <div key={key} style={valueCell}>
-                      <CelulaComparacao value={linha[key]} colors={colors} />
+                  {colunas.map((col) => (
+                    <div
+                      key={col.planoId}
+                      style={{
+                        padding: `${t.space[3]}px ${t.space[4]}px`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderLeft: `1px solid ${colors.borderSubtle}`,
+                        background: col.destacar ? colors.brandBg : undefined,
+                      }}
+                    >
+                      <CelulaComparacao value={linha[col.planoId]} colors={colors} />
                     </div>
                   ))}
                 </div>

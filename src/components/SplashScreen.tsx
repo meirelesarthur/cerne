@@ -3,6 +3,21 @@ import t from '../design/tokens'
 
 const DURATION_MS = 3000
 
+// Marca CERNE — aperture C, variante GBMode (rampa brand 500→300 de tokens.ts)
+// Paths gerados por scripts/gen-logos.mjs — manter em sincronia com src/assets/logo-min-white.svg
+const MARK_WEDGES: Array<{ d: string; c: string }> = [
+  { d: 'M 193.06 175.91 A 92 92 0 0 1 166.32 199.49 L 145.50 158.28 A 46 46 0 0 0 154.79 150.10 Z', c: '#86efac' },
+  { d: 'M 156.50 204.45 A 92 92 0 0 1 121.65 211.99 L 123.58 165.86 A 46 46 0 0 0 135.68 163.24 Z', c: '#79eba2' },
+  { d: 'M 110.66 211.52 A 92 92 0 0 1 76.56 201.10 L 100.75 161.78 A 46 46 0 0 0 112.59 165.40 Z', c: '#6be798' },
+  { d: 'M 67.20 195.34 A 92 92 0 0 1 42.52 169.60 L 82.82 147.08 A 46 46 0 0 0 91.39 156.02 Z', c: '#5ee48f' },
+  { d: 'M 37.15 160.00 A 92 92 0 0 1 28.16 125.50 L 74.33 125.50 A 46 46 0 0 0 77.45 137.48 Z', c: '#51e085' },
+  { d: 'M 28.16 114.50 A 92 92 0 0 1 37.15 80.00 L 77.45 102.52 A 46 46 0 0 0 74.33 114.50 Z', c: '#46db7c' },
+  { d: 'M 42.52 70.40 A 92 92 0 0 1 67.20 44.66 L 91.39 83.98 A 46 46 0 0 0 82.82 92.92 Z', c: '#3dd675' },
+  { d: 'M 76.56 38.90 A 92 92 0 0 1 110.66 28.48 L 112.59 74.60 A 46 46 0 0 0 100.75 78.22 Z', c: '#34d06d' },
+  { d: 'M 121.65 28.01 A 92 92 0 0 1 156.50 35.55 L 135.68 76.76 A 46 46 0 0 0 123.58 74.14 Z', c: '#2bcb66' },
+  { d: 'M 166.32 40.51 A 92 92 0 0 1 193.06 64.09 L 154.79 89.90 A 46 46 0 0 0 145.50 81.72 Z', c: '#22c55e' },
+]
+
 const keyframes = `
   @keyframes sp-bg-in {
     from { opacity: 0; }
@@ -121,41 +136,29 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         {/* Marca central + nome */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
 
-          {/* Ícone hexagonal */}
+          {/* Marca CERNE — aperture C */}
           <div
             style={{
               animation: 'sp-mark-in 0.65s cubic-bezier(0.34,1.56,0.64,1) 0.1s both',
             }}
           >
             <svg
-              viewBox="0 0 64 64"
-              width={72}
-              height={72}
+              viewBox="0 0 240 240"
+              width={84}
+              height={84}
               fill="none"
               aria-hidden="true"
             >
-              {/* Hexágono fundo */}
-              <path
-                d="M32 4L58 19v26L32 60 6 45V19L32 4z"
-                fill="rgba(5,150,105,0.15)"
-                stroke="rgba(5,150,105,0.6)"
-                strokeWidth="1.5"
-              />
-              {/* Triângulo interno — simbologia agrícola/crescimento */}
-              <path
-                d="M32 16L48 44H16L32 16z"
-                fill="none"
-                stroke="rgba(255,255,255,0.9)"
-                strokeWidth="1.8"
-                strokeLinejoin="round"
-              />
-              {/* Barra central */}
-              <path
-                d="M24 38h16"
-                stroke="rgba(5,150,105,0.9)"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+              {MARK_WEDGES.map(w => (
+                <path
+                  key={w.c}
+                  d={w.d}
+                  fill={w.c}
+                  stroke={w.c}
+                  strokeWidth={7}
+                  strokeLinejoin="round"
+                />
+              ))}
             </svg>
           </div>
 

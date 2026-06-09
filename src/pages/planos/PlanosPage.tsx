@@ -295,7 +295,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
                 marginLeft: t.space[1],
               }}
             >
-              Para +200 usuários, consulte o Enterprise
+              Para +200 usuários, veja o plano Enterprise
             </span>
           )}
         </div>
@@ -510,9 +510,12 @@ function PlanoCard({
             >
               Comprar agora
             </Button>
-            <Button variant="ghost" block size="md">
-              Testar {plano.trialDias} dias grátis
-            </Button>
+            {plano.trialDias > 0 && (
+              <Button variant="ghost" block size="md">
+                Testar {plano.trialDias} dias grátis
+                {plano.trialUsuarios ? ` · até ${plano.trialUsuarios} usuários` : ''}
+              </Button>
+            )}
           </>
         )}
       </div>
@@ -693,9 +696,12 @@ function PlanoDetalhe({
                   >
                     Comprar agora
                   </Button>
-                  <Button variant="ghost" block size="md">
-                    Testar {plano.trialDias} dias grátis
-                  </Button>
+                  {plano.trialDias > 0 && (
+                    <Button variant="ghost" block size="md">
+                      Testar {plano.trialDias} dias grátis
+                      {plano.trialUsuarios ? ` · até ${plano.trialUsuarios} usuários` : ''}
+                    </Button>
+                  )}
                 </>
               )}
             </div>

@@ -18,6 +18,8 @@ export interface Plano {
   economiaPercentual: number
   limiteUsuarios: number | null
   trialDias: number
+  /** Limite de usuários durante o trial (apenas quando trialDias > 0). */
+  trialUsuarios?: number
   features: FeatureItem[]
   preRequisitos: string[]
 }
@@ -71,7 +73,8 @@ export const planos: Plano[] = [
     precoUsuarioMesTrienal: 44,
     economiaPercentual: 17,
     limiteUsuarios: 300,
-    trialDias: 30,
+    trialDias: 7,
+    trialUsuarios: 3,
     features: [
       { label: 'Fazendas ilimitadas' },
       { label: 'Cadastros base completos' },
@@ -93,7 +96,7 @@ export const planos: Plano[] = [
     precoUsuarioMesTrienal: 89,
     economiaPercentual: 17,
     limiteUsuarios: 300,
-    trialDias: 30,
+    trialDias: 0,
     features: [
       { label: 'Tudo do Essencial' },
       { label: 'Módulos operacionais completos' },
@@ -111,17 +114,17 @@ export const planos: Plano[] = [
   {
     id: 'enterprise',
     nome: 'Enterprise',
-    subtitulo: 'Para grupos agrícolas com múltiplas operações e integrações sob medida',
-    precoUsuarioMesAnual: null,
-    precoUsuarioMesMensal: null,
-    precoUsuarioMesTrienal: null,
-    economiaPercentual: 0,
+    subtitulo: 'Para grupos agrícolas com múltiplas operações, usuários ilimitados e API dedicada',
+    precoUsuarioMesAnual: 149,
+    precoUsuarioMesMensal: 179,
+    precoUsuarioMesTrienal: 134,
+    economiaPercentual: 17,
     limiteUsuarios: null,
     trialDias: 0,
     features: [
       { label: 'Usuários ilimitados' },
       { label: 'Todos os módulos inclusos' },
-      { label: 'Integrações e API sob medida' },
+      { label: 'API dedicada e integrações' },
       { label: 'SLA dedicado e gestor de conta' },
       { label: 'Onboarding e treinamento in-loco' },
       { label: 'Ambiente e segurança dedicados' },
@@ -130,7 +133,6 @@ export const planos: Plano[] = [
     preRequisitos: [
       ...PRE_REQUISITOS_BASE,
       'Certificado digital A1 para emissão de documentos fiscais',
-      'Alinhamento prévio com o gestor de conta para integrações sob medida',
       'Contrato com cláusula de SLA dedicado',
     ],
   },

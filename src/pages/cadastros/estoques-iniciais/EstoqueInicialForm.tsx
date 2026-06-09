@@ -3,6 +3,7 @@ import {
   Lock, AlertTriangle, Plus, Save,
 } from 'lucide-react'
 import { PageContainer }       from '../../../components/ui/PageContainer'
+import { PageCard }            from '../../../components/ui/PageCard'
 import { FormPageHeader }      from '../../../components/ui/FormPageHeader'
 import { FormField }           from '../../../components/ui/FormField'
 import { FormSelect }          from '../../../components/ui/FormSelect'
@@ -295,18 +296,30 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
   ]
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
       <style>{`
         @keyframes flashBg { 0%{background: #d1fae5;} 100%{background: transparent;} }
         .flash-computed { animation: flashBg 0.3s ease; }
       `}</style>
 
-      {/* ── Form Header ───────────────────────────────────────────────────────── */}
-      <FormPageHeader
-        title={isEdit ? 'Editar Saldo Inicial' : 'Novo Saldo Inicial'}
-        subtitle={isEdit ? 'Atualize o saldo inicial de estoque' : 'Preencha os dados do saldo inicial de estoque'}
-        onBack={handleBack}
-      />
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={handleBack} disabled={submitting}>Cancelar</Button>
+            <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
+              Salvar
+            </Button>
+          </>
+        }
+      >
+
+        {/* ── Form Header ───────────────────────────────────────────────────────── */}
+        <FormPageHeader
+          title={isEdit ? 'Editar Saldo Inicial' : 'Novo Saldo Inicial'}
+          subtitle={isEdit ? 'Atualize o saldo inicial de estoque' : 'Preencha os dados do saldo inicial de estoque'}
+          onBack={handleBack}
+          paddingTop={t.space[4]}
+        />
 
       {/* ── ZONE 1 — IDENTIFICAÇÃO ────────────────────────────────────────────── */}
       <CollapsibleSection title="Identificação" fieldCount={3} defaultOpen>
@@ -477,13 +490,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         </CollapsibleSection>
       )}
 
-      {/* ── Footer ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3], marginTop: t.space[2] }}>
-        <Button variant="secondary" onClick={handleBack} disabled={submitting}>Cancelar</Button>
-        <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
-          Salvar
-        </Button>
-      </div>
+      </PageCard>
 
       {/* ── Exit modal ────────────────────────────────────────────────────────── */}
       <ConfirmDialog

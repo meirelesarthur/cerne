@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
@@ -130,126 +131,130 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   }
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      <PageHeader
-        title="Saldo Inicial de Estoque"
-        count={registros.length}
-        actions={
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="secondary" size="md" icon={<Download size={14} />}>
-              Exportar
-            </Button>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Adicionar
-            </Button>
-          </div>
-        }
-      />
+      <PageCard>
 
-      {/* Summary bar */}
-      <div style={{
-        background: colors.surfaceSubtle,
-        padding: t.space[3],
-        borderRadius: t.radius.lg,
-        fontSize: t.font.size.xs,
-        color: colors.textMuted,
-        fontFamily: t.font.family.sans,
-        marginBottom: 12,
-        display: 'flex',
-        gap: 8,
-        alignItems: 'center',
-      }}>
-        <Package size={12} color={colors.brand} />
-        <span>
-          <strong style={{ color: colors.textPrimary }}>{registros.length}</strong> registros · {' '}
-          <strong style={{ color: colors.textPrimary }}>{uniqueArmazens}</strong> armazéns · Última entrada: {' '}
-          <strong style={{ color: colors.textPrimary }}>{lastEntry}</strong>
-        </span>
-      </div>
-
-      {/* Filter bar */}
-      <ListToolbar
-        search={search}
-        onSearch={v => { setSearch(v); setPage(1) }}
-        searchPlaceholder="Buscar produto, código ou armazém..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
-        chips={[
-          filterArmazem && {
-            label: `Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`,
-            onRemove: () => { setFilterArmazem(''); setPage(1) },
-          },
-        ]}
-      />
-
-      {/* Table card */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={48} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          message="Nenhum registro encontrado."
-          description="Tente ajustar os filtros ou limpar a busca."
-        />
-      ) : (
-        <>
-          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-            {/* Header row */}
-            <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
-              <span style={colStyle}>Produto</span>
-              <span style={colStyle}>Un.</span>
-              <span style={colStyle}>Armazém</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
-              <SortHeader
-                label="Dt. Movimento"
-                field="dtMovimento"
-                activeField="dtMovimento"
-                direction={sortDir}
-                onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-              />
-              <span style={colStyle}>Lote</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+        <PageHeader
+          title="Saldo Inicial de Estoque"
+          count={registros.length}
+          actions={
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button variant="secondary" size="md" icon={<Download size={14} />}>
+                Exportar
+              </Button>
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                Adicionar
+              </Button>
             </div>
+          }
+        />
 
-            {/* Rows */}
-            {pageSlice.map((r, idx) => (
-              <TableRow
-                key={r.id}
-                registro={r}
-                isLast={idx === pageSlice.length - 1}
-                onEdit={() => onEdit(r.id)}
-                onDeleteReq={() => setDeleteId(r.id)}
-                colors={colors}
-                border={border}
-                colTemplate={colTemplate}
-              />
+        {/* Summary bar */}
+        <div style={{
+          background: colors.surfaceSubtle,
+          padding: t.space[3],
+          borderRadius: t.radius.lg,
+          fontSize: t.font.size.xs,
+          color: colors.textMuted,
+          fontFamily: t.font.family.sans,
+          marginBottom: 12,
+          display: 'flex',
+          gap: 8,
+          alignItems: 'center',
+        }}>
+          <Package size={12} color={colors.brand} />
+          <span>
+            <strong style={{ color: colors.textPrimary }}>{registros.length}</strong> registros · {' '}
+            <strong style={{ color: colors.textPrimary }}>{uniqueArmazens}</strong> armazéns · Última entrada: {' '}
+            <strong style={{ color: colors.textPrimary }}>{lastEntry}</strong>
+          </span>
+        </div>
+
+        {/* Filter bar */}
+        <ListToolbar
+          search={search}
+          onSearch={v => { setSearch(v); setPage(1) }}
+          searchPlaceholder="Buscar produto, código ou armazém..."
+          onOpenFilter={() => setDrawerOpen(true)}
+          filterCount={activeFilterCount}
+          chips={[
+            filterArmazem && {
+              label: `Armazém: ${armazemOpts.find(o => o.value === filterArmazem)?.label ?? filterArmazem}`,
+              onRemove: () => { setFilterArmazem(''); setPage(1) },
+            },
+          ]}
+        />
+
+        {/* Table card */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} variant="rect" width="100%" height={48} />
             ))}
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            message="Nenhum registro encontrado."
+            description="Tente ajustar os filtros ou limpar a busca."
+          />
+        ) : (
+          <>
+            <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+              {/* Header row */}
+              <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
+                <span style={colStyle}>Produto</span>
+                <span style={colStyle}>Un.</span>
+                <span style={colStyle}>Armazém</span>
+                <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
+                <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
+                <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
+                <SortHeader
+                  label="Dt. Movimento"
+                  field="dtMovimento"
+                  activeField="dtMovimento"
+                  direction={sortDir}
+                  onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                />
+                <span style={colStyle}>Lote</span>
+                <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+              </div>
 
-          {/* Pagination */}
-          {filtered.length > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={safePage}
-                total={filtered.length}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
-              />
+              {/* Rows */}
+              {pageSlice.map((r, idx) => (
+                <TableRow
+                  key={r.id}
+                  registro={r}
+                  isLast={idx === pageSlice.length - 1}
+                  onEdit={() => onEdit(r.id)}
+                  onDeleteReq={() => setDeleteId(r.id)}
+                  colors={colors}
+                  border={border}
+                  colTemplate={colTemplate}
+                />
+              ))}
             </div>
-          )}
 
-        </>
-      )}
+            {/* Pagination */}
+            {filtered.length > PAGE_SIZE && (
+              <div style={{
+                marginTop: t.space[4],
+                paddingTop: t.space[4],
+                borderTop: `1px solid ${colors.borderSubtle}`,
+              }}>
+                <Pagination
+                  page={safePage}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+
+          </>
+        )}
+
+      </PageCard>
 
       {/* Delete confirmation */}
       <ConfirmDialog

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { DataTable }       from '../../../components/ui/DataTable'
@@ -205,121 +206,125 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
   ]
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── PageHeader ──────────────────────────────────────────────────── */}
-      <PageHeader
-        title="Fazendas"
-        count={data.length}
-        actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Nova Fazenda
-            </Button>
-          </div>
-        }
-      />
+      <PageCard>
 
-      {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-      {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={80} />
-          ))}
-        </div>
-      ) : (
-        <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
-      )}
-
-      {/* ── Toolbar: busca + filtro + toggle (linha 1) · chips (linha 2) ──── */}
-      <ListToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Buscar fazenda..."
-        onClearAll={clearFilters}
-        chips={[
-          filters.tipoExploracao && {
-            label: `Tipo: ${filters.tipoExploracao}`,
-            onRemove: () => setFilters((f) => ({ ...f, tipoExploracao: '' })),
-          },
-          filters.ativo && {
-            label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
-            onRemove: () => setFilters((f) => ({ ...f, ativo: '' })),
-          },
-        ]}
-        actions={
-          <>
-            <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
-            <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
-            />
-          </>
-        }
-      />
-
-      {/* ── Conteúdo: Lista ou Cards ─────────────────────────────────────── */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={48} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          message="Nenhuma fazenda encontrada."
-          description="Tente ajustar os filtros ou limpar a busca."
+        {/* ── PageHeader ──────────────────────────────────────────────────── */}
+        <PageHeader
+          title="Fazendas"
+          count={data.length}
+          actions={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                Nova Fazenda
+              </Button>
+            </div>
+          }
         />
-      ) : viewMode === 'list' ? (
-        <>
-          <DataTable<FazendaRow>
-            columns={columns}
-            data={paginatedData}
-            keyField="id"
-            emptyMessage="Nenhuma fazenda encontrada."
-            onRowClick={(row) => onView(row.id)}
-          />
-          {totalFiltered > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={page}
-                total={totalFiltered}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
+
+        {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
+        {isLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} variant="rect" width="100%" height={80} />
+            ))}
+          </div>
+        ) : (
+          <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
+        )}
+
+        {/* ── Toolbar: busca + filtro + toggle (linha 1) · chips (linha 2) ──── */}
+        <ListToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Buscar fazenda..."
+          onClearAll={clearFilters}
+          chips={[
+            filters.tipoExploracao && {
+              label: `Tipo: ${filters.tipoExploracao}`,
+              onRemove: () => setFilters((f) => ({ ...f, tipoExploracao: '' })),
+            },
+            filters.ativo && {
+              label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
+              onRemove: () => setFilters((f) => ({ ...f, ativo: '' })),
+            },
+          ]}
+          actions={
+            <>
+              <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
+              <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
+              <FilterButton
+                active={activeFilterCount > 0}
+                count={activeFilterCount}
+                onClick={() => setDrawerOpen(true)}
               />
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          <CardsGrid
-            data={paginatedData}
-            onView={onView}
-            onEdit={onEdit}
-            colors={colors}
+            </>
+          }
+        />
+
+        {/* ── Conteúdo: Lista ou Cards ─────────────────────────────────────── */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} variant="rect" width="100%" height={48} />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            message="Nenhuma fazenda encontrada."
+            description="Tente ajustar os filtros ou limpar a busca."
           />
-          {totalFiltered > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={page}
-                total={totalFiltered}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
-        </>
-      )}
+        ) : viewMode === 'list' ? (
+          <>
+            <DataTable<FazendaRow>
+              columns={columns}
+              data={paginatedData}
+              keyField="id"
+              emptyMessage="Nenhuma fazenda encontrada."
+              onRowClick={(row) => onView(row.id)}
+            />
+            {totalFiltered > PAGE_SIZE && (
+              <div style={{
+                marginTop: t.space[4],
+                paddingTop: t.space[4],
+                borderTop: `1px solid ${colors.borderSubtle}`,
+              }}>
+                <Pagination
+                  page={page}
+                  total={totalFiltered}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <CardsGrid
+              data={paginatedData}
+              onView={onView}
+              onEdit={onEdit}
+              colors={colors}
+            />
+            {totalFiltered > PAGE_SIZE && (
+              <div style={{
+                marginTop: t.space[4],
+                paddingTop: t.space[4],
+                borderTop: `1px solid ${colors.borderSubtle}`,
+              }}>
+                <Pagination
+                  page={page}
+                  total={totalFiltered}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+      </PageCard>
 
       {/* ── Filter Drawer ────────────────────────────────────────────────── */}
       <FilterDrawer

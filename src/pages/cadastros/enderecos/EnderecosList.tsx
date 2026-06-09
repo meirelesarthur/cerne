@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
@@ -90,101 +91,105 @@ export default function EnderecosList({
   const totalCount = enderecos.length
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <PageHeader
-        title="Endereçamentos"
-        count={totalCount}
-        actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterButton
-              active={activeFilterCount > 0}
-              count={activeFilterCount}
-              onClick={() => setDrawerOpen(true)}
+      <PageCard>
+
+        {/* ── Header ────────────────────────────────────────────────────────────── */}
+        <PageHeader
+          title="Endereçamentos"
+          count={totalCount}
+          actions={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FilterButton
+                active={activeFilterCount > 0}
+                count={activeFilterCount}
+                onClick={() => setDrawerOpen(true)}
+              />
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
+                Adicionar Setor
+              </Button>
+            </div>
+          }
+        />
+
+        {/* ── Toolbar ───────────────────────────────────────────────────────────── */}
+        <ListToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Buscar endereçamento..."
+          chips={[
+            filters.tipo && {
+              label: `Tipo: ${TIPO_LABEL[filters.tipo as keyof typeof TIPO_LABEL] ?? filters.tipo}`,
+              onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
+            },
+          ]}
+        />
+
+        {/* ── Tree ──────────────────────────────────────────────────────────────── */}
+        {filteredTree.length === 0 ? (
+          search.length > 0 ? (
+            <EmptyState
+              icon={<MapPin size={40} strokeWidth={1.5} />}
+              message="Nenhum endereçamento encontrado"
+              description="Ajuste o filtro de busca."
             />
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
-              Adicionar Setor
-            </Button>
-          </div>
-        }
-      />
-
-      {/* ── Toolbar ───────────────────────────────────────────────────────────── */}
-      <ListToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Buscar endereçamento..."
-        chips={[
-          filters.tipo && {
-            label: `Tipo: ${TIPO_LABEL[filters.tipo as keyof typeof TIPO_LABEL] ?? filters.tipo}`,
-            onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
-          },
-        ]}
-      />
-
-      {/* ── Tree ──────────────────────────────────────────────────────────────── */}
-      {filteredTree.length === 0 ? (
-        search.length > 0 ? (
-          <EmptyState
-            icon={<MapPin size={40} strokeWidth={1.5} />}
-            message="Nenhum endereçamento encontrado"
-            description="Ajuste o filtro de busca."
-          />
+          ) : (
+            <EmptyState
+              icon={<MapPin size={40} strokeWidth={1.5} />}
+              message="Nenhum endereçamento cadastrado"
+              description="Comece adicionando o primeiro setor."
+              action={{ label: 'Adicionar Setor', onClick: onAddRoot }}
+            />
+          )
         ) : (
-          <EmptyState
-            icon={<MapPin size={40} strokeWidth={1.5} />}
-            message="Nenhum endereçamento cadastrado"
-            description="Comece adicionando o primeiro setor."
-            action={{ label: 'Adicionar Setor', onClick: onAddRoot }}
-          />
-        )
-      ) : (
-        <div style={{
-          background: colors.surfaceBg,
-          border: `1px solid ${border}`,
-          borderRadius: t.radius.lg,
-          overflow: 'hidden',
-        }}>
-          {/* Cabeçalho */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 120px 104px',
-            padding: '10px 16px',
-            background: colors.surfaceSubtle,
-            borderBottom: `1px solid ${border}`,
+            background: colors.surfaceBg,
+            border: `1px solid ${border}`,
+            borderRadius: t.radius.lg,
+            overflow: 'hidden',
           }}>
-            {['Descrição', 'Tipo', 'Ações'].map((h, i) => (
-              <span key={h} style={{
-                fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                color: colors.textMuted, fontFamily: t.font.family.sans,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-                textAlign: i === 2 ? 'right' : 'left',
-              }}>
-                {h}
-              </span>
+            {/* Cabeçalho */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 120px 104px',
+              padding: '10px 16px',
+              background: colors.surfaceSubtle,
+              borderBottom: `1px solid ${border}`,
+            }}>
+              {['Descrição', 'Tipo', 'Ações'].map((h, i) => (
+                <span key={h} style={{
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                  color: colors.textMuted, fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                  textAlign: i === 2 ? 'right' : 'left',
+                }}>
+                  {h}
+                </span>
+              ))}
+            </div>
+
+            {/* Nodes */}
+            {filteredTree.map((node, idx) => (
+              <TreeNode
+                key={node.id}
+                node={node}
+                depth={0}
+                isLastSibling={idx === filteredTree.length - 1}
+                expandedIds={expandedIds}
+                onToggle={toggleExpand}
+                onAddChild={onAddChild}
+                onEdit={onEdit}
+                onDeleteReq={setDeleteTarget}
+                colors={colors}
+                border={border}
+                forceExpand={search.length > 0}
+              />
             ))}
           </div>
+        )}
 
-          {/* Nodes */}
-          {filteredTree.map((node, idx) => (
-            <TreeNode
-              key={node.id}
-              node={node}
-              depth={0}
-              isLastSibling={idx === filteredTree.length - 1}
-              expandedIds={expandedIds}
-              onToggle={toggleExpand}
-              onAddChild={onAddChild}
-              onEdit={onEdit}
-              onDeleteReq={setDeleteTarget}
-              colors={colors}
-              border={border}
-              forceExpand={search.length > 0}
-            />
-          ))}
-        </div>
-      )}
+      </PageCard>
 
       {/* ── Confirmar exclusão ────────────────────────────────────────────────── */}
       <ConfirmDialog

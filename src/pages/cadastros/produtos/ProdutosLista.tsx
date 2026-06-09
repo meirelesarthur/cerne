@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { Checkbox }        from '../../../components/ui/Checkbox'
@@ -194,125 +195,129 @@ export default function ProdutosLista({
   const GRID = '40px 100px 1fr 160px 110px 90px 96px'
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* Header */}
-      <PageHeader
-        title="Catálogo de Produtos"
-        count={produtos.length}
-        actions={
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="secondary" size="md" icon={<Download size={14} />} disabled>
-              Exportar
-            </Button>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Adicionar Produto
-            </Button>
-          </div>
-        }
-      />
+      <PageCard>
 
-      {/* Toolbar: busca + chips */}
-      <ListToolbar
-        search={searchRaw}
-        onSearch={setSearchRaw}
-        searchPlaceholder="Buscar produto..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
-        onClearAll={clearFilters}
-        chips={[
-          grupoFilter && {
-            label: `Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`,
-            onRemove: () => { setGrupoFilter(''); setCatFilter(''); setClasseFilter('') },
-          },
-          catFilter && {
-            label: `Cat.: ${catOpts.find(c => String(c.id) === catFilter)?.nome ?? catFilter}`,
-            onRemove: () => { setCatFilter(''); setClasseFilter('') },
-          },
-          classeFilter && {
-            label: `Classe: ${classeOpts.find(c => String(c.id) === classeFilter)?.nome ?? classeFilter}`,
-            onRemove: () => setClasseFilter(''),
-          },
-          tipoFilter && {
-            label: `Tipo: ${TIPO_PRODUTO_LABEL[tipoFilter as TipoProduto] ?? tipoFilter}`,
-            onRemove: () => setTipoFilter(''),
-          },
-          ativoFilter && {
-            label: ativoFilter === 'true' ? 'Ativo' : 'Inativo',
-            onRemove: () => setAtivoFilter(''),
-          },
-        ]}
-      />
-
-      {/* Tabela */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {Array.from({ length: pageSize }, (_, i) => (
-            <Skeleton key={i} variant="rect" height={44} width="100%" />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        (() => {
-          const hasSearch = searchRaw.length > 0 || !!grupoFilter || !!catFilter || !!classeFilter || !!tipoFilter || !!ativoFilter
-          return (
-            <EmptyState
-              icon={<Package size={40} strokeWidth={1.5} />}
-              message={hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
-              description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece adicionando o primeiro produto ao catálogo.'}
-              action={hasSearch ? undefined : { label: 'Adicionar Produto', onClick: onNew }}
-            />
-          )
-        })()
-      ) : (
-        <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-          {/* Header */}
-          <div style={{ display: 'grid', gridTemplateColumns: GRID, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
-            {/* Checkbox all */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Checkbox
-                checked={isAllSelected}
-                indeterminate={isPartialSelected}
-                onChange={toggleSelectAll}
-                aria-label="Selecionar todos os produtos"
-              />
+        {/* Header */}
+        <PageHeader
+          title="Catálogo de Produtos"
+          count={produtos.length}
+          actions={
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button variant="secondary" size="md" icon={<Download size={14} />} disabled>
+                Exportar
+              </Button>
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                Adicionar Produto
+              </Button>
             </div>
-            <SortHeader label="Código"    field="codigo"    activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-            <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-            <span style={colStyle}>Grupo</span>
-            <span style={colStyle}>Tipo</span>
-            <span style={colStyle}>Status</span>
-            <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+          }
+        />
+
+        {/* Toolbar: busca + chips */}
+        <ListToolbar
+          search={searchRaw}
+          onSearch={setSearchRaw}
+          searchPlaceholder="Buscar produto..."
+          onOpenFilter={() => setDrawerOpen(true)}
+          filterCount={activeFilterCount}
+          onClearAll={clearFilters}
+          chips={[
+            grupoFilter && {
+              label: `Grupo: ${GRUPOS.find(g => String(g.id) === grupoFilter)?.nome ?? grupoFilter}`,
+              onRemove: () => { setGrupoFilter(''); setCatFilter(''); setClasseFilter('') },
+            },
+            catFilter && {
+              label: `Cat.: ${catOpts.find(c => String(c.id) === catFilter)?.nome ?? catFilter}`,
+              onRemove: () => { setCatFilter(''); setClasseFilter('') },
+            },
+            classeFilter && {
+              label: `Classe: ${classeOpts.find(c => String(c.id) === classeFilter)?.nome ?? classeFilter}`,
+              onRemove: () => setClasseFilter(''),
+            },
+            tipoFilter && {
+              label: `Tipo: ${TIPO_PRODUTO_LABEL[tipoFilter as TipoProduto] ?? tipoFilter}`,
+              onRemove: () => setTipoFilter(''),
+            },
+            ativoFilter && {
+              label: ativoFilter === 'true' ? 'Ativo' : 'Inativo',
+              onRemove: () => setAtivoFilter(''),
+            },
+          ]}
+        />
+
+        {/* Tabela */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {Array.from({ length: pageSize }, (_, i) => (
+              <Skeleton key={i} variant="rect" height={44} width="100%" />
+            ))}
           </div>
+        ) : filtered.length === 0 ? (
+          (() => {
+            const hasSearch = searchRaw.length > 0 || !!grupoFilter || !!catFilter || !!classeFilter || !!tipoFilter || !!ativoFilter
+            return (
+              <EmptyState
+                icon={<Package size={40} strokeWidth={1.5} />}
+                message={hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
+                description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece adicionando o primeiro produto ao catálogo.'}
+                action={hasSearch ? undefined : { label: 'Adicionar Produto', onClick: onNew }}
+              />
+            )
+          })()
+        ) : (
+          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ display: 'grid', gridTemplateColumns: GRID, padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
+              {/* Checkbox all */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Checkbox
+                  checked={isAllSelected}
+                  indeterminate={isPartialSelected}
+                  onChange={toggleSelectAll}
+                  aria-label="Selecionar todos os produtos"
+                />
+              </div>
+              <SortHeader label="Código"    field="codigo"    activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+              <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+              <span style={colStyle}>Grupo</span>
+              <span style={colStyle}>Tipo</span>
+              <span style={colStyle}>Status</span>
+              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+            </div>
 
-          {paginated.map((prod, idx) => (
-            <ProdutoRow
-              key={prod.id}
-              prod={prod}
-              isLast={idx === paginated.length - 1}
-              isSelected={selected.has(prod.id)}
-              onToggle={() => toggleOne(prod.id)}
-              onEdit={() => onEdit(prod.id)}
-              onDeleteReq={() => setDeleteTarget(prod)}
-              colors={colors}
-              border={border}
+            {paginated.map((prod, idx) => (
+              <ProdutoRow
+                key={prod.id}
+                prod={prod}
+                isLast={idx === paginated.length - 1}
+                isSelected={selected.has(prod.id)}
+                onToggle={() => toggleOne(prod.id)}
+                onEdit={() => onEdit(prod.id)}
+                onDeleteReq={() => setDeleteTarget(prod)}
+                colors={colors}
+                border={border}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Paginação */}
+        {filtered.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <Pagination
+              page={page}
+              total={filtered.length}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+              showPageSizeSelector
             />
-          ))}
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Paginação */}
-      {filtered.length > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <Pagination
-            page={page}
-            total={filtered.length}
-            pageSize={pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={size => { setPageSize(size); setPage(1) }}
-            showPageSizeSelector
-          />
-        </div>
-      )}
+      </PageCard>
 
       {/* Bulk action bar */}
       <BulkActionBar

@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
@@ -86,114 +87,118 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   // (o pai não chama diretamente — toasts locais aqui)
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <PageHeader
-        title="Embalagens"
-        count={embalagens.length}
-        actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Adicionar Embalagem
-            </Button>
-          </div>
-        }
-      />
+      <PageCard>
 
-      {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
-      <ListToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Buscar embalagem..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
-        chips={[
-          filters.unidade && {
-            label: `Un.: ${UNIDADE_OPTS.find(o => o.value === filters.unidade)?.label.split(' — ')[0] ?? filters.unidade}`,
-            onRemove: () => setFilters(f => ({ ...f, unidade: '' })),
-          },
-        ]}
-      />
-
-      {/* ── Tabela ──────────────────────────────────────────────────────────── */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={48} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyStateUI
-          message="Nenhuma embalagem encontrada."
-          description="Tente ajustar os filtros ou limpar a busca."
+        {/* ── Header ──────────────────────────────────────────────────────────── */}
+        <PageHeader
+          title="Embalagens"
+          count={embalagens.length}
+          actions={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                Adicionar Embalagem
+              </Button>
+            </div>
+          }
         />
-      ) : (
-        <>
-          <div style={{
-            background: colors.surfaceBg,
-            border: `1px solid ${border}`,
-            borderRadius: t.radius.lg,
-            overflow: 'hidden',
-          }}>
-            {/* Cabeçalho */}
+
+        {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
+        <ListToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Buscar embalagem..."
+          onOpenFilter={() => setDrawerOpen(true)}
+          filterCount={activeFilterCount}
+          chips={[
+            filters.unidade && {
+              label: `Un.: ${UNIDADE_OPTS.find(o => o.value === filters.unidade)?.label.split(' — ')[0] ?? filters.unidade}`,
+              onRemove: () => setFilters(f => ({ ...f, unidade: '' })),
+            },
+          ]}
+        />
+
+        {/* ── Tabela ──────────────────────────────────────────────────────────── */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} variant="rect" width="100%" height={48} />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateUI
+            message="Nenhuma embalagem encontrada."
+            description="Tente ajustar os filtros ou limpar a busca."
+          />
+        ) : (
+          <>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 140px 160px 96px',
-              padding: '10px 16px',
-              background: colors.surfaceSubtle,
-              borderBottom: `1px solid ${border}`,
+              background: colors.surfaceBg,
+              border: `1px solid ${border}`,
+              borderRadius: t.radius.lg,
+              overflow: 'hidden',
             }}>
-              {/* Descrição — ordenável */}
-              <SortHeader
-                label="Descrição"
-                field="descricao"
-                activeField="descricao"
-                direction={sortDir}
-                onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-              />
-              {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
-                <span key={h} style={{
-                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                  color: colors.textMuted, fontFamily: t.font.family.sans,
-                  textTransform: 'uppercase', letterSpacing: '0.05em',
-                  textAlign: i === 2 ? 'right' : 'left',
-                }}>
-                  {h}
-                </span>
+              {/* Cabeçalho */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 140px 160px 96px',
+                padding: '10px 16px',
+                background: colors.surfaceSubtle,
+                borderBottom: `1px solid ${border}`,
+              }}>
+                {/* Descrição — ordenável */}
+                <SortHeader
+                  label="Descrição"
+                  field="descricao"
+                  activeField="descricao"
+                  direction={sortDir}
+                  onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                />
+                {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
+                  <span key={h} style={{
+                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                    color: colors.textMuted, fontFamily: t.font.family.sans,
+                    textTransform: 'uppercase', letterSpacing: '0.05em',
+                    textAlign: i === 2 ? 'right' : 'left',
+                  }}>
+                    {h}
+                  </span>
+                ))}
+              </div>
+
+              {/* Linhas */}
+              {paginatedData.map((emb, idx) => (
+                <EmbalagemRow
+                  key={emb.id}
+                  emb={emb}
+                  isLast={idx === paginatedData.length - 1}
+                  onEdit={() => onEdit(emb.id)}
+                  onDeleteReq={() => setDeleteTarget(emb)}
+                  colors={colors}
+                  border={border}
+                />
               ))}
             </div>
 
-            {/* Linhas */}
-            {paginatedData.map((emb, idx) => (
-              <EmbalagemRow
-                key={emb.id}
-                emb={emb}
-                isLast={idx === paginatedData.length - 1}
-                onEdit={() => onEdit(emb.id)}
-                onDeleteReq={() => setDeleteTarget(emb)}
-                colors={colors}
-                border={border}
-              />
-            ))}
-          </div>
+            {totalFiltered > PAGE_SIZE && (
+              <div style={{
+                marginTop: t.space[4],
+                paddingTop: t.space[4],
+                borderTop: `1px solid ${colors.borderSubtle}`,
+              }}>
+                <Pagination
+                  page={page}
+                  total={totalFiltered}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
 
-          {totalFiltered > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={page}
-                total={totalFiltered}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
-        </>
-      )}
+      </PageCard>
 
       {/* ── ConfirmDialog: Confirmar exclusão ───────────────────────────────── */}
       <ConfirmDialog

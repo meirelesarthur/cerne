@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { Modal }           from '../../../components/ui/Modal'
 import { IconButton }      from '../../../components/ui/IconButton'
@@ -110,93 +111,97 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   }
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      <PageHeader
-        title="Armazéns"
-        count={armazens.length}
-        actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Adicionar Armazém
-            </Button>
-          </div>
-        }
-      />
+      <PageCard>
 
-      {/* Toolbar */}
-      <ListToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Buscar armazém..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
-        onClearAll={clearFilters}
-        chips={[
-          filters.tipo && {
-            label: `Tipo: ${TIPO_ARMAZEM_LABEL[filters.tipo as TipoArmazem]}`,
-            onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
-          },
-          filters.ativo && {
-            label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
-            onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
-          },
-        ]}
-      />
-
-      {/* Tabela */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={48} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyStateUI
-          message="Nenhum armazém encontrado."
-          description="Tente ajustar os filtros ou limpar a busca."
-        />
-      ) : (
-        <>
-          <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-            {/* Cabeçalho */}
-            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
-              <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-              <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-              <span style={colStyle}>Tipo</span>
-              <span style={colStyle}>Status</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+        <PageHeader
+          title="Armazéns"
+          count={armazens.length}
+          actions={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                Adicionar Armazém
+              </Button>
             </div>
+          }
+        />
 
-            {paginatedData.map((arm, idx) => (
-              <ArmazemRow
-                key={arm.id}
-                arm={arm}
-                isLast={idx === paginatedData.length - 1}
-                onEdit={() => onEdit(arm.id)}
-                onDeleteReq={() => setDeleteTarget(arm)}
-                colors={colors}
-                border={border}
-              />
+        {/* Toolbar */}
+        <ListToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Buscar armazém..."
+          onOpenFilter={() => setDrawerOpen(true)}
+          filterCount={activeFilterCount}
+          onClearAll={clearFilters}
+          chips={[
+            filters.tipo && {
+              label: `Tipo: ${TIPO_ARMAZEM_LABEL[filters.tipo as TipoArmazem]}`,
+              onRemove: () => setFilters(f => ({ ...f, tipo: '' })),
+            },
+            filters.ativo && {
+              label: filters.ativo === 'true' ? 'Ativo' : 'Inativo',
+              onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
+            },
+          ]}
+        />
+
+        {/* Tabela */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} variant="rect" width="100%" height={48} />
             ))}
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyStateUI
+            message="Nenhum armazém encontrado."
+            description="Tente ajustar os filtros ou limpar a busca."
+          />
+        ) : (
+          <>
+            <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+              {/* Cabeçalho */}
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
+                <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+                <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
+                <span style={colStyle}>Tipo</span>
+                <span style={colStyle}>Status</span>
+                <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
+              </div>
 
-          {totalFiltered > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={page}
-                total={totalFiltered}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
-              />
+              {paginatedData.map((arm, idx) => (
+                <ArmazemRow
+                  key={arm.id}
+                  arm={arm}
+                  isLast={idx === paginatedData.length - 1}
+                  onEdit={() => onEdit(arm.id)}
+                  onDeleteReq={() => setDeleteTarget(arm)}
+                  colors={colors}
+                  border={border}
+                />
+              ))}
             </div>
-          )}
-        </>
-      )}
+
+            {totalFiltered > PAGE_SIZE && (
+              <div style={{
+                marginTop: t.space[4],
+                paddingTop: t.space[4],
+                borderTop: `1px solid ${colors.borderSubtle}`,
+              }}>
+                <Pagination
+                  page={page}
+                  total={totalFiltered}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+      </PageCard>
 
       {/* Modal exclusão */}
       <Modal

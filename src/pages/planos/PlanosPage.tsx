@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Minus, PackageCheck, Plus } from 'lucide-react'
+import { Breadcrumb } from '../../components/ui/Breadcrumb'
 import { PageContainer } from '../../components/ui/PageContainer'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { FormPageHeader } from '../../components/ui/FormPageHeader'
@@ -121,8 +122,14 @@ export default function PlanosPage() {
       ) : (
         <>
           <PageHeader
-            title="Planos e Preços"
+            title="Produtos e Planos"
             description="Licenças por usuário, sem taxa de setup"
+            breadcrumb={
+              <Breadcrumb items={[
+                { label: 'Início' },
+                { label: 'Produtos e Planos' },
+              ]} />
+            }
           />
 
           {loading ? (

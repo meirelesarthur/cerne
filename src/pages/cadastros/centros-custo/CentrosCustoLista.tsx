@@ -110,7 +110,6 @@ export default function CentrosCustoLista({
       {/* ── Card principal com scroll interno ───────────────────────────── */}
       <div style={{
         background: colors.surfaceBg,
-        border: `1px solid ${border}`,
         borderRadius: t.radius.xl,
         boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
         display: 'flex',

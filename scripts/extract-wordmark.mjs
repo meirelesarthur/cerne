@@ -1,4 +1,4 @@
-// Uso único: extrai os contornos de "ERNE" em Outfit ExtraBold para embutir
+// Uso único: extrai os contornos de "ERNE" em Outfit SemiBold para embutir
 // em gen-logos.mjs — no lockup horizontal a marca (aperture C) é o "C" da
 // palavra. Requer: npm i --no-save opentype.js + TTF no %TEMP%.
 // Posiciona glifo a glifo (charToGlyph) para evitar o shaper GSUB da opentype.js.
@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import opentype from 'opentype.js'
 
-const ttf = readFileSync(join(process.env.TEMP, 'Outfit-ExtraBold.ttf'))
+const ttf = readFileSync(join(process.env.TEMP, 'Outfit-SemiBold.ttf'))
 const font = opentype.parse(ttf.buffer.slice(ttf.byteOffset, ttf.byteOffset + ttf.byteLength))
 
 const upem = font.unitsPerEm

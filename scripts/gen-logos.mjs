@@ -53,12 +53,12 @@ function markPaths(stops, dx = 0) {
   return out
 }
 
-// ---- wordmark ERNE (Outfit ExtraBold 800, convertido em outlines) ------
+// ---- wordmark ERNE (Outfit SemiBold 600, convertido em outlines) -------
 // No lockup horizontal a marca é o "C" da palavra CERNE. Gerado por
 // scripts/extract-wordmark.mjs: cap height 183 (overshoot óptico de 4px
 // vs. a marca, que vai de y 24.5 a 215.5), baseline 211.5, gap marca→E
-// de 26px (mesmo ritmo do vão E→R da fonte), kerning aplicado.
-const WORDMARK_PATH = 'M361.03 211.50L225.26 211.50L225.26 28.50L359.48 28.50L359.48 67.47L271.46 67.47L271.46 99.22L351.73 99.22L351.73 137.16L271.46 137.16L271.46 172.53L361.03 172.53L361.03 211.50M433.30 211.50L387.10 211.50L387.10 28.50L465.05 28.50Q483.63 28.50 497.70 35.47Q511.76 42.44 519.76 54.57Q527.77 66.70 527.77 82.96Q527.77 99.22 519.64 111.48Q511.50 123.74 497.05 130.45Q490.86 133.55 483.63 135.10L539.64 211.50L486.21 211.50L436.14 137.42L433.30 137.42L433.30 211.50M458.59 62.83L433.30 62.83L433.30 104.38L458.59 104.38Q469.95 104.38 476.01 98.83Q482.08 93.29 482.08 83.74Q482.08 74.44 476.01 68.64Q469.95 62.83 458.59 62.83M600.81 211.50L554.61 211.50L554.61 28.50L586.87 28.50L668.95 132.52L668.95 28.50L715.15 28.50L715.15 211.50L680.83 211.50L600.81 109.80L600.81 211.50M883.44 211.50L747.68 211.50L747.68 28.50L881.89 28.50L881.89 67.47L793.88 67.47L793.88 99.22L874.15 99.22L874.15 137.16L793.88 137.16L793.88 172.53L883.44 172.53'
+// de ~28px (mesmo ritmo do vão E→R da fonte), kerning aplicado.
+const WORDMARK_PATH = 'M355.04 211.50L227.74 211.50L227.74 28.50L353.73 28.50L353.73 59.74L263.15 59.74L263.15 102.95L345.92 102.95L345.92 133.15L263.15 133.15L263.15 180.26L355.04 180.26L355.04 211.50M419.85 211.50L384.45 211.50L384.45 28.50L456.04 28.50Q473.74 28.50 487.14 35.40Q500.55 42.30 507.97 54.27Q515.39 66.25 515.39 81.86Q515.39 98 507.97 109.85Q500.55 121.69 487.01 128.20Q477.64 132.89 466.19 134.45L527.36 211.50L484.41 211.50L426.10 134.97L419.85 134.97L419.85 211.50M452.91 57.39L419.85 57.39L419.85 107.37L452.91 107.37Q465.93 107.37 473.09 100.74Q480.25 94.10 480.25 82.38Q480.25 71.71 473.09 64.55Q465.93 57.39 452.91 57.39M582.81 211.50L547.41 211.50L547.41 28.50L572.14 28.50L663.77 147.20L663.77 28.50L699.43 28.50L699.43 211.50L673.92 211.50L582.81 93.58L582.81 211.50M863.95 211.50L736.65 211.50L736.65 28.50L862.65 28.50L862.65 59.74L772.06 59.74L772.06 102.95L854.84 102.95L854.84 133.15L772.06 133.15L772.06 180.26L863.95 180.26'
 
 function wordmark(color) {
   return `<path d="${WORDMARK_PATH}" fill="${color}"/>\n`
@@ -68,10 +68,10 @@ function wordmark(color) {
 const svg = (w, h, vw, vh, body) =>
   `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" fill="none" xmlns="http://www.w3.org/2000/svg">\n${body}</svg>\n`
 
-const FULL_W = 910 // marca (C) 0–215 + ERNE (até x≈883.4) + respiro
+const FULL_W = 890 // marca (C) 0–215 + ERNE (até x≈864) + respiro
 const files = {
-  'Logo.svg':           svg(121, 32, FULL_W, 240, markPaths(LIGHT_STOPS) + wordmark('#111827')),
-  'Logo-white.svg':     svg(121, 32, FULL_W, 240, markPaths(DARK_STOPS) + wordmark('#ffffff')),
+  'Logo.svg':           svg(119, 32, FULL_W, 240, markPaths(LIGHT_STOPS) + wordmark('#111827')),
+  'Logo-white.svg':     svg(119, 32, FULL_W, 240, markPaths(DARK_STOPS) + wordmark('#ffffff')),
   'logo-min.svg':       svg(32, 32, 240, 240, markPaths(LIGHT_STOPS)),
   'logo-min-white.svg': svg(32, 32, 240, 240, markPaths(DARK_STOPS)),
 }

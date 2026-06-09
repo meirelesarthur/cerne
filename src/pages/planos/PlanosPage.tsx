@@ -301,8 +301,26 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
         </div>
 
         {/* Billing toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
-          <ToggleSwitch checked={anual} onChange={setAnual} label="Cobrança anual" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+          <span style={{
+            fontSize: t.font.size.sm,
+            fontWeight: t.font.weight.medium,
+            color: !anual ? colors.textPrimary : colors.textMuted,
+            fontFamily: t.font.family.sans,
+            transition: `color ${t.transition.DEFAULT}`,
+          }}>
+            Mensal
+          </span>
+          <ToggleSwitch checked={anual} onChange={setAnual} />
+          <span style={{
+            fontSize: t.font.size.sm,
+            fontWeight: t.font.weight.medium,
+            color: anual ? colors.textPrimary : colors.textMuted,
+            fontFamily: t.font.family.sans,
+            transition: `color ${t.transition.DEFAULT}`,
+          }}>
+            Anual
+          </span>
           {anual && <Badge label="Economize 17%" variant="success" />}
         </div>
       </div>

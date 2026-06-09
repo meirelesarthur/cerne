@@ -13,10 +13,13 @@ export interface Plano {
   popular?: boolean
   precoUsuarioMesAnual: number | null
   precoUsuarioMesMensal: number | null
+  /** Preço por usuário/mês no compromisso de 3 anos (maior desconto). */
+  precoUsuarioMesTrienal: number | null
   economiaPercentual: number
   limiteUsuarios: number | null
   trialDias: number
   features: FeatureItem[]
+  preRequisitos: string[]
 }
 
 export interface AddOn {
@@ -41,6 +44,23 @@ export interface CategoriaComparacao {
   linhas: LinhaComparacao[]
 }
 
+export type DuracaoId = 'mensal' | 'anual' | 'trienal'
+
+export interface OpcaoDuracao {
+  id: DuracaoId
+  rotulo: string
+  descricao: string
+  /** Meses faturados no compromisso (1, 12, 36). */
+  mesesCompromisso: number
+}
+
+/** Pré-requisitos comuns a todos os planos. */
+const PRE_REQUISITOS_BASE = [
+  'Navegador moderno (Chrome, Edge, Firefox ou Safari atualizados)',
+  'Conexão estável com a internet',
+  'Um e-mail corporativo válido por usuário licenciado',
+]
+
 export const planos: Plano[] = [
   {
     id: 'essencial',
@@ -48,6 +68,7 @@ export const planos: Plano[] = [
     subtitulo: 'Para produtores que estão digitalizando a fazenda',
     precoUsuarioMesAnual: 49,
     precoUsuarioMesMensal: 59,
+    precoUsuarioMesTrienal: 44,
     economiaPercentual: 17,
     limiteUsuarios: 300,
     trialDias: 30,
@@ -59,6 +80,7 @@ export const planos: Plano[] = [
       { label: 'Controle de estoque inicial' },
       { label: 'Suporte por e-mail' },
     ],
+    preRequisitos: [...PRE_REQUISITOS_BASE],
   },
   {
     id: 'profissional',
@@ -68,6 +90,7 @@ export const planos: Plano[] = [
     popular: true,
     precoUsuarioMesAnual: 99,
     precoUsuarioMesMensal: 119,
+    precoUsuarioMesTrienal: 89,
     economiaPercentual: 17,
     limiteUsuarios: 300,
     trialDias: 30,
@@ -80,6 +103,10 @@ export const planos: Plano[] = [
       { label: 'Relatórios e exportações' },
       { label: 'Suporte prioritário' },
     ],
+    preRequisitos: [
+      ...PRE_REQUISITOS_BASE,
+      'Certificado digital A1 para emissão de documentos fiscais (NF-e, CT-e, MDF-e)',
+    ],
   },
   {
     id: 'enterprise',
@@ -87,6 +114,7 @@ export const planos: Plano[] = [
     subtitulo: 'Para grupos agrícolas com múltiplas operações e integrações sob medida',
     precoUsuarioMesAnual: null,
     precoUsuarioMesMensal: null,
+    precoUsuarioMesTrienal: null,
     economiaPercentual: 0,
     limiteUsuarios: null,
     trialDias: 0,
@@ -99,8 +127,27 @@ export const planos: Plano[] = [
       { label: 'Ambiente e segurança dedicados' },
       { label: 'Suporte 24/7' },
     ],
+    preRequisitos: [
+      ...PRE_REQUISITOS_BASE,
+      'Certificado digital A1 para emissão de documentos fiscais',
+      'Alinhamento prévio com o gestor de conta para integrações sob medida',
+      'Contrato com cláusula de SLA dedicado',
+    ],
   },
 ]
+
+export const duracoes: OpcaoDuracao[] = [
+  { id: 'mensal', rotulo: '1 mês', descricao: 'Flexível — renovação e cancelamento mensais', mesesCompromisso: 1 },
+  { id: 'anual', rotulo: '1 ano', descricao: 'Economia de 17% — faturado anualmente', mesesCompromisso: 12 },
+  { id: 'trienal', rotulo: '3 anos', descricao: 'Maior economia — faturado a cada 3 anos', mesesCompromisso: 36 },
+]
+
+/** Preço por usuário/mês de um plano em uma duração de contrato. */
+export const precoPorDuracao = (plano: Plano, duracaoId: DuracaoId): number | null => {
+  if (duracaoId === 'mensal') return plano.precoUsuarioMesMensal
+  if (duracaoId === 'anual') return plano.precoUsuarioMesAnual
+  return plano.precoUsuarioMesTrienal
+}
 
 export const addOns: AddOn[] = [
   {

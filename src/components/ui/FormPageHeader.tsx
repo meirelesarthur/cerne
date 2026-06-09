@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { IconButton } from './IconButton'
@@ -11,6 +11,14 @@ interface FormPageHeaderProps {
   backLabel?: string
   /** Conteúdo opcional alinhado à direita (ex.: status + botão Editar em telas de detalhe). */
   actions?:   ReactNode
+  /**
+   * Quando definido, oculta a seta "voltar" à esquerda e exibe um botão de
+   * fechar (X) no extremo direito. Default mantém o comportamento de seta.
+   */
+  onClose?:    () => void
+  closeLabel?: string
+  /** Espaçamento superior — alinha o título ao padrão das listagens (PageHeader). */
+  paddingTop?: number
 }
 
 /**
@@ -18,7 +26,10 @@ interface FormPageHeaderProps {
  * esquerda, título + subtítulo ao lado e, opcionalmente, ações à direita.
  * Fonte única do padrão — não recriar headers inline nas páginas.
  */
-export function FormPageHeader({ title, subtitle, onBack, backLabel = 'Voltar', actions }: FormPageHeaderProps) {
+export function FormPageHeader({
+  title, subtitle, onBack, backLabel = 'Voltar', actions,
+  onClose, closeLabel = 'Fechar', paddingTop,
+}: FormPageHeaderProps) {
   const { colors } = useTheme()
   return (
     <div
@@ -26,16 +37,19 @@ export function FormPageHeader({ title, subtitle, onBack, backLabel = 'Voltar', 
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'space-between',
+        paddingTop:     paddingTop,
         marginBottom:   t.space[6],
         gap:            t.space[4],
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], minWidth: 0 }}>
-        <IconButton
-          icon={<ArrowLeft size={20} strokeWidth={2} />}
-          onClick={onBack}
-          aria-label={backLabel}
-        />
+        {!onClose && (
+          <IconButton
+            icon={<ArrowLeft size={20} strokeWidth={2} />}
+            onClick={onBack}
+            aria-label={backLabel}
+          />
+        )}
         <div style={{ minWidth: 0 }}>
           <h1
             style={{
@@ -64,9 +78,16 @@ export function FormPageHeader({ title, subtitle, onBack, backLabel = 'Voltar', 
         </div>
       </div>
 
-      {actions && (
+      {(actions || onClose) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], flexShrink: 0 }}>
           {actions}
+          {onClose && (
+            <IconButton
+              icon={<X size={20} strokeWidth={2} />}
+              onClick={onClose}
+              aria-label={closeLabel}
+            />
+          )}
         </div>
       )}
     </div>

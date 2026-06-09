@@ -450,13 +450,13 @@ function PlanoCard({
   return (
     <Card
       radius="xl"
-      shadow={plano.popular ? 'lg' : 'md'}
+      shadow={atual ? 'lg' : 'md'}
       padding={t.space[6]}
       style={{
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        border: plano.popular
+        border: atual
           ? `1.5px solid ${t.color.brand[600]}`
           : `1px solid ${colors.border}`,
       }}
@@ -501,11 +501,11 @@ function PlanoCard({
         ) : (
           <>
             <Button
-              variant={plano.popular ? 'primary' : 'secondary'}
+              variant={atual ? 'primary' : 'secondary'}
               block
               size="lg"
               loading={comprando}
-              icon={plano.popular ? <Sparkles size={15} /> : undefined}
+              icon={atual ? <Sparkles size={15} /> : undefined}
               onClick={onComprar}
             >
               Comprar agora
@@ -573,8 +573,8 @@ function PlanoCard({
         </Button>
       </div>
 
-      {/* GBMode glow for popular plan */}
-      {isGbMode && plano.popular && (
+      {/* GBMode glow for current plan */}
+      {isGbMode && atual && (
         <span
           aria-hidden="true"
           style={{
@@ -652,7 +652,7 @@ function PlanoDetalhe({
         style={{
           position: 'relative',
           marginTop: t.space[6],
-          border: plano.popular ? `1.5px solid ${t.color.brand[600]}` : `1px solid ${colors.border}`,
+          border: ehAtual ? `1.5px solid ${t.color.brand[600]}` : `1px solid ${colors.border}`,
         }}
       >
         <div
@@ -708,7 +708,7 @@ function PlanoDetalhe({
           </div>
         </div>
 
-        {isGbMode && plano.popular && (
+        {isGbMode && ehAtual && (
           <span
             aria-hidden="true"
             style={{

@@ -53,32 +53,23 @@ function markPaths(stops, dx = 0) {
   return out
 }
 
-// ---- wordmark CERNE (monolinha geométrica) -----------------------------
-// Cap height 120 (y 60→180, terminais com inset 11 p/ round caps de stroke 22)
-const SW = 22 // stroke do wordmark
-function letterC(xc) {
-  const r = 49, a = 35 * Math.PI / 180
-  const sx = (xc + r * Math.cos(a)).toFixed(2), sy = (120 - r * Math.sin(a)).toFixed(2)
-  const ey = (120 + r * Math.sin(a)).toFixed(2)
-  return `M ${sx} ${sy} A ${r} ${r} 0 1 0 ${sx} ${ey}`
-}
-const letterE = x => `M ${x} 71 V 169 M ${x} 71 H ${x + 51} M ${x} 120 H ${x + 45} M ${x} 169 H ${x + 51}`
-const letterR = x => `M ${x} 169 V 71 H ${x + 30} A 24.5 24.5 0 0 1 ${x + 30} 120 H ${x} M ${x + 32} 120 L ${x + 51} 169`
-const letterN = x => `M ${x} 169 V 71 L ${x + 51} 169 V 71`
+// ---- wordmark CERNE (Outfit ExtraBold 800, convertido em outlines) -----
+// Gerado por scripts/extract-wordmark.mjs: cap height 120, baseline 180,
+// início x=300, letter-spacing 0.08em, kerning da fonte aplicado.
+const WORDMARK_PATH = 'M368.89 181.86Q355.18 181.86 343.50 177.21Q331.82 172.55 323.10 164.17Q314.39 155.80 309.56 144.46Q304.74 133.12 304.74 119.92Q304.74 106.54 309.56 95.29Q314.39 84.03 323.10 75.74Q331.82 67.45 343.41 62.71Q355.01 57.97 368.55 57.97Q382.76 57.97 394.10 62.45Q405.44 66.94 414.08 74.89L393.77 95.20Q389.53 90.47 383.27 87.76Q377.01 85.05 368.55 85.05Q361.27 85.05 355.26 87.42Q349.25 89.79 344.85 94.44Q340.45 99.10 338 105.53Q335.54 111.96 335.54 119.92Q335.54 127.87 338 134.30Q340.45 140.73 344.85 145.39Q349.25 150.04 355.26 152.50Q361.27 154.95 368.55 154.95Q377.01 154.95 383.44 152.33Q389.87 149.70 394.44 144.80L414.75 165.11Q405.95 173.06 394.87 177.46Q383.78 181.86 368.89 181.86M530.35 180L441.33 180L441.33 60L529.34 60L529.34 85.56L471.62 85.56L471.62 106.38L524.26 106.38L524.26 131.26L471.62 131.26L471.62 154.44L530.35 154.44L530.35 180M591.28 180L560.99 180L560.99 60L612.10 60Q624.29 60 633.51 64.57Q642.74 69.14 647.98 77.09Q653.23 85.05 653.23 95.71Q653.23 106.38 647.90 114.41Q642.57 122.45 633.09 126.85Q629.03 128.89 624.29 129.90L661.02 180L625.98 180L593.15 131.42L591.28 131.42L591.28 180M607.87 82.51L591.28 82.51L591.28 109.76L607.87 109.76Q615.32 109.76 619.29 106.12Q623.27 102.48 623.27 96.22Q623.27 90.13 619.29 86.32Q615.32 82.51 607.87 82.51M714.67 180L684.37 180L684.37 60L705.53 60L759.35 128.21L759.35 60L789.65 60L789.65 180L767.14 180L714.67 113.31L714.67 180M913.54 180L824.51 180L824.51 60L912.52 60L912.52 85.56L854.81 85.56L854.81 106.38L907.45 106.38L907.45 131.26L854.81 131.26L854.81 154.44L913.54 154.44Z'
 
 function wordmark(color) {
-  const d = [letterC(356), letterE(454), letterR(554), letterN(654), letterE(754)].join(' ')
-  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${SW}" stroke-linecap="round" stroke-linejoin="round"/>\n`
+  return `<path d="${WORDMARK_PATH}" fill="${color}"/>\n`
 }
 
 // ---- montagem ----------------------------------------------------------
 const svg = (w, h, vw, vh, body) =>
   `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" fill="none" xmlns="http://www.w3.org/2000/svg">\n${body}</svg>\n`
 
-const FULL_W = 840 // mark 0–240 + gap + CERNE (até x≈816) + respiro
+const FULL_W = 940 // mark 0–240 + gap + CERNE (até x≈913.5) + respiro
 const files = {
-  'Logo.svg':           svg(112, 32, FULL_W, 240, markPaths(LIGHT_STOPS) + wordmark('#111827')),
-  'Logo-white.svg':     svg(112, 32, FULL_W, 240, markPaths(DARK_STOPS) + wordmark('#ffffff')),
+  'Logo.svg':           svg(125, 32, FULL_W, 240, markPaths(LIGHT_STOPS) + wordmark('#111827')),
+  'Logo-white.svg':     svg(125, 32, FULL_W, 240, markPaths(DARK_STOPS) + wordmark('#ffffff')),
   'logo-min.svg':       svg(32, 32, 240, 240, markPaths(LIGHT_STOPS)),
   'logo-min-white.svg': svg(32, 32, 240, 240, markPaths(DARK_STOPS)),
 }

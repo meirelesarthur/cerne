@@ -1,0 +1,42 @@
+// Uso único: extrai os contornos de "CERNE" em Outfit ExtraBold para embutir
+// em gen-logos.mjs. Requer: npm i --no-save opentype.js + TTF no %TEMP%.
+// Posiciona glifo a glifo (charToGlyph) para evitar o shaper GSUB da opentype.js.
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import opentype from 'opentype.js'
+
+const ttf = readFileSync(join(process.env.TEMP, 'Outfit-ExtraBold.ttf'))
+const font = opentype.parse(ttf.buffer.slice(ttf.byteOffset, ttf.byteOffset + ttf.byteLength))
+
+const upem = font.unitsPerEm
+const capHeight = font.tables.os2.sCapHeight ?? font.charToGlyph('C').getMetrics().yMax
+console.log('unitsPerEm:', upem, '| capHeight(units):', capHeight)
+
+// Cap height alvo = 120 (mesma altura do wordmark monolinha anterior)
+const fontSize = 120 * (upem / capHeight)
+const scale = fontSize / upem
+const baseline = 180
+const startX = 300
+const letterSpacingPx = 0.08 * fontSize
+
+let x = startX
+const paths = []
+const chars = [...'CERNE']
+for (let i = 0; i < chars.length; i++) {
+  const glyph = font.charToGlyph(chars[i])
+  paths.push(glyph.getPath(x, baseline, fontSize))
+  let advance = glyph.advanceWidth * scale
+  if (i < chars.length - 1) {
+    const kern = font.getKerningValue(glyph, font.charToGlyph(chars[i + 1])) * scale
+    advance += kern + letterSpacingPx
+  }
+  x += advance
+}
+
+const full = new opentype.Path()
+for (const p of paths) full.commands.push(...p.commands)
+const bb = full.getBoundingBox()
+console.log('fontSize:', fontSize.toFixed(2))
+console.log('bbox:', JSON.stringify({ x1: +bb.x1.toFixed(1), y1: +bb.y1.toFixed(1), x2: +bb.x2.toFixed(1), y2: +bb.y2.toFixed(1) }))
+console.log('PATH_DATA:')
+console.log(full.toPathData(2))

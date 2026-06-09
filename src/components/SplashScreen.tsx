@@ -1,7 +1,38 @@
 import { useEffect } from 'react'
 import t from '../design/tokens'
 
-const DURATION_MS = 3000
+const DURATION_MS = 4800
+
+// Coreografia: a pilha de gomos parte do topo e anda um slot por vez,
+// largando um gomo a cada parada (fase 1); o C completo encolhe até a
+// posição final (fase 2) e o nome entra (fase 3).
+const WEDGE_SLOT_DEG = 29.2 // (360 − 68 da boca) / 10 gomos
+const HOP_CYCLE_S = 0.18 // intervalo entre saltos da pilha
+const HOP_DUR_S = 0.13 // duração de cada salto
+const DEAL_DELAY_S = 0.25 // espera antes do primeiro salto
+const DEAL_DUR_S = 9 * HOP_CYCLE_S
+const SHRINK_DELAY_S = 1.95
+
+// Gomo i faz (9−i) saltos de um slot junto com a pilha e para no seu lugar.
+function wedgeKeyframes(i: number): string {
+  const hops = 9 - i
+  if (hops === 0) return ''
+  const ease = 'animation-timing-function: cubic-bezier(0.33,1,0.68,1);'
+  const frames: string[] = [
+    `    0% { transform: rotate(${(hops * WEDGE_SLOT_DEG).toFixed(1)}deg); ${ease} }`,
+  ]
+  for (let k = 1; k <= hops; k++) {
+    const pEnd = (((k - 1) * HOP_CYCLE_S + HOP_DUR_S) / DEAL_DUR_S) * 100
+    const angle = ((hops - k) * WEDGE_SLOT_DEG).toFixed(1)
+    frames.push(`    ${pEnd.toFixed(2)}% { transform: rotate(${angle}deg); }`)
+    if (k < hops) {
+      const pNext = ((k * HOP_CYCLE_S) / DEAL_DUR_S) * 100
+      frames.push(`    ${pNext.toFixed(2)}% { transform: rotate(${angle}deg); ${ease} }`)
+    }
+  }
+  frames.push('    100% { transform: rotate(0deg); }')
+  return `  @keyframes sp-wedge-${i} {\n${frames.join('\n')}\n  }`
+}
 
 // Marca CERNE — aperture C, variante GBMode (rampa brand 500→300 de tokens.ts)
 // Paths gerados por scripts/gen-logos.mjs — manter em sincronia com src/assets/logo-min-white.svg
@@ -31,11 +62,15 @@ const keyframes = `
     from { transform: rotate(0deg); }
     to   { transform: rotate(-360deg); }
   }
-  @keyframes sp-mark-in {
-    0%   { transform: scale(0.5) rotate(-12deg); opacity: 0; }
-    60%  { transform: scale(1.06) rotate(2deg);  opacity: 1; }
-    100% { transform: scale(1)   rotate(0deg);   opacity: 1; }
+  @keyframes sp-mark-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
+  @keyframes sp-mark-shrink {
+    from { transform: translateY(62px) scale(3.3); }
+    to   { transform: translateY(0) scale(1); }
+  }
+${MARK_WEDGES.map((_, i) => wedgeKeyframes(i)).filter(Boolean).join('\n')}
   @keyframes sp-name-in {
     from { opacity: 0; transform: translateY(14px) scale(0.96); letter-spacing: 0.35em; }
     to   { opacity: 1; transform: translateY(0)    scale(1);    letter-spacing: 0.22em; }
@@ -43,10 +78,6 @@ const keyframes = `
   @keyframes sp-tag-in {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0);   }
-  }
-  @keyframes sp-dot-pulse {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50%       { opacity: 1;   transform: scale(1);   }
   }
   @keyframes sp-out {
     from { opacity: 1; }
@@ -97,6 +128,17 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         />
 
         {/* Anéis orbitais */}
+        <div aria-hidden="true" style={{ position: 'absolute', width: 440, height: 440 }}>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              border: '1px solid rgba(5,150,105,0.08)',
+              borderRadius: '50%',
+              animation: 'sp-ring-spin 18s linear infinite',
+            }}
+          />
+        </div>
         <div aria-hidden="true" style={{ position: 'absolute', width: 320, height: 320 }}>
           <div
             style={{
@@ -136,10 +178,10 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         {/* Marca central + nome */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
 
-          {/* Marca CERNE — aperture C */}
+          {/* Marca CERNE — aperture C: nasce grande, gomo a gomo, e encolhe até a posição final */}
           <div
             style={{
-              animation: 'sp-mark-in 0.65s cubic-bezier(0.34,1.56,0.64,1) 0.1s both',
+              animation: `sp-mark-fade 0.35s ease both, sp-mark-shrink 0.7s cubic-bezier(0.22,1,0.36,1) ${SHRINK_DELAY_S}s both`,
             }}
           >
             <svg
@@ -149,7 +191,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
               fill="none"
               aria-hidden="true"
             >
-              {MARK_WEDGES.map(w => (
+              {MARK_WEDGES.map((w, i) => (
                 <path
                   key={w.c}
                   d={w.d}
@@ -157,6 +199,15 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                   stroke={w.c}
                   strokeWidth={7}
                   strokeLinejoin="round"
+                  style={
+                    i < MARK_WEDGES.length - 1
+                      ? {
+                          transformOrigin: '120px 120px',
+                          transformBox: 'view-box',
+                          animation: `sp-wedge-${i} ${DEAL_DUR_S.toFixed(2)}s linear ${DEAL_DELAY_S}s both`,
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </svg>
@@ -171,7 +222,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                 color: '#ffffff',
                 letterSpacing: '0.22em',
                 lineHeight: 1,
-                animation: 'sp-name-in 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both',
+                animation: 'sp-name-in 0.55s cubic-bezier(0.22,1,0.36,1) 2.55s both',
               }}
             >
               CERNE
@@ -185,35 +236,13 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                 fontWeight: t.font.weight.medium,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                animation: 'sp-tag-in 0.45s ease 0.75s both',
+                animation: 'sp-tag-in 0.45s ease 2.95s both',
               }}
             >
               Sistema de Gestão Agropecuária
             </span>
           </div>
 
-          {/* Indicador de carregamento — três pontos pulsantes */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 7,
-              animation: 'sp-tag-in 0.4s ease 1.0s both',
-            }}
-            aria-hidden="true"
-          >
-            {[0, 1, 2].map(i => (
-              <div
-                key={i}
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: t.color.brand[500],
-                  animation: `sp-dot-pulse 1.2s ease ${i * 0.2}s infinite`,
-                }}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </>

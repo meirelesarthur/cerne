@@ -107,213 +107,229 @@ export default function CentrosCustoLista({
   return (
     <PageContainer>
 
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <PageHeader
-        title="Centros de Custo"
-        count={centros.length}
-        actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
-              Saiba mais
-            </Button>
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
-              Novo Centro
-            </Button>
-          </div>
-        }
-      />
-
-      {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-      {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={80} />
-          ))}
-        </div>
-      ) : null}
-      {!isLoading && <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 1,
+      {/* ── Card principal com scroll interno ───────────────────────────── */}
+      <div style={{
+        background: colors.surfaceBg,
         border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
+        borderRadius: t.radius.xl,
+        boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 112px)',
         overflow: 'hidden',
-        marginBottom: 16,
       }}>
-        {[
-          {
-            label: 'Total de Centros', value: String(kpis.total),
-            sub: 'cadastrados',
-          },
-          {
-            label: 'Sintéticos', value: String(kpis.sinteticas),
-            trendValue: kpis.total > 0 ? `${Math.round(kpis.sinteticas / kpis.total * 100)}%` : '0%',
-            trend: 'neutral' as const,
-          },
-          {
-            label: 'Analíticos', value: String(kpis.analiticas),
-            trendValue: kpis.total > 0 ? `${Math.round(kpis.analiticas / kpis.total * 100)}%` : '0%',
-            trend: 'up' as const,
-          },
-          {
-            label: 'Ativos', value: String(kpis.ativas),
-            trendValue: `${kpis.ativasPct}%`,
-            trend: (kpis.ativasPct >= 80 ? 'up' : 'down') as 'up' | 'down',
-          },
-        ].map((item, idx, arr) => (
-          <div
-            key={item.label}
-            style={{
-              padding: `${t.space[4]}px ${t.space[5]}px`,
-              background: cardBg,
-              borderRight: idx < arr.length - 1 ? `1px solid ${border}` : undefined,
-              display: 'flex', flexDirection: 'column', gap: 6,
-            }}
-          >
-            <span style={{
-              fontSize: t.font.size.xs,
-              fontWeight: t.font.weight.medium,
-              color: colors.textMuted,
-              fontFamily: t.font.family.sans,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-            }}>
-              {item.label}
-            </span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{
-                fontSize: t.font.size['3xl'],
-                fontWeight: t.font.weight.bold,
-                color: colors.textPrimary,
-                fontFamily: t.font.family.sans,
-                lineHeight: 1,
-              }}>
-                {item.value}
-              </span>
-              {'trendValue' in item && item.trendValue && (
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 3,
-                  fontSize: t.font.size.xs,
-                  fontWeight: t.font.weight.semibold,
-                  color: item.trend === 'up' ? t.color.success.text : item.trend === 'down' ? t.color.error.text : colors.textMuted,
-                  background: item.trend === 'up' ? t.color.success.bg : item.trend === 'down' ? t.color.error.bg : colors.surfaceSubtle,
-                  padding: '2px 6px', borderRadius: t.radius.full,
-                }}>
-                  {item.trend === 'up'   && <TrendingUp  size={10} />}
-                  {item.trend === 'down' && <TrendingDown size={10} />}
-                  {item.trendValue}
-                </span>
-              )}
-              {'sub' in item && item.sub && (
-                <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
-                  {item.sub}
-                </span>
-              )}
+        <div style={{ flex: 1, overflowY: 'auto', padding: `0 ${t.space[6]}px ${t.space[6]}px` }}>
+
+          {/* ── Header ────────────────────────────────────────────────── */}
+          <PageHeader
+            title="Centros de Custo"
+            count={centros.length}
+            actions={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+                  Saiba mais
+                </Button>
+                <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                  Novo Centro
+                </Button>
+              </div>
+            }
+          />
+
+          {/* ── KPI Bar ───────────────────────────────────────────────── */}
+          {isLoading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} variant="rect" width="100%" height={80} />
+              ))}
             </div>
-          </div>
-        ))}
-      </div>}
-
-      {/* ── Toolbar ─────────────────────────────────────────────────────── */}
-      <ListToolbar
-        search={search}
-        onSearch={v => { setSearch(v); setPage(1) }}
-        searchPlaceholder="Buscar por código, descrição..."
-        onOpenFilter={() => setDrawerOpen(true)}
-        filterCount={activeFilterCount}
-        onClearAll={clearFilters}
-        chips={[
-          filters.condicao && {
-            label: `Condição: ${({ ambos: 'Ambos', receita: 'Receita', despesa: 'Despesa' } as Record<string, string>)[filters.condicao]}`,
-            onRemove: () => setFilters(f => ({ ...f, condicao: '' })),
-          },
-          filters.classe && {
-            label: `Classe: ${filters.classe === 'sintetica' ? 'Sintética' : 'Analítica'}`,
-            onRemove: () => setFilters(f => ({ ...f, classe: '' })),
-          },
-          filters.ativo && {
-            label: filters.ativo === 'sim' ? 'Ativo' : 'Inativo',
-            onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
-          },
-        ]}
-      />
-
-      {/* ── Tabela ──────────────────────────────────────────────────────── */}
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} variant="rect" width="100%" height={48} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyStateUI
-          message="Nenhum centro de custo encontrado."
-          description="Tente ajustar os filtros ou limpar a busca."
-        />
-      ) : (
-        <>
-          <div style={{
-            background: colors.surfaceBg,
+          ) : null}
+          {!isLoading && <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 1,
             border: `1px solid ${border}`,
             borderRadius: t.radius.lg,
             overflow: 'hidden',
+            marginBottom: 16,
           }}>
-            {/* Cabeçalho */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
-              padding: '10px 16px',
-              borderBottom: `1px solid ${border}`,
-              background: colors.surfaceSubtle,
-            }}>
-              {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
-                <div
-                  key={h}
-                  style={{
-                    fontSize: t.font.size.xs,
-                    fontWeight: t.font.weight.semibold,
-                    color: colors.textMuted,
+            {[
+              {
+                label: 'Total de Centros', value: String(kpis.total),
+                sub: 'cadastrados',
+              },
+              {
+                label: 'Sintéticos', value: String(kpis.sinteticas),
+                trendValue: kpis.total > 0 ? `${Math.round(kpis.sinteticas / kpis.total * 100)}%` : '0%',
+                trend: 'neutral' as const,
+              },
+              {
+                label: 'Analíticos', value: String(kpis.analiticas),
+                trendValue: kpis.total > 0 ? `${Math.round(kpis.analiticas / kpis.total * 100)}%` : '0%',
+                trend: 'up' as const,
+              },
+              {
+                label: 'Ativos', value: String(kpis.ativas),
+                trendValue: `${kpis.ativasPct}%`,
+                trend: (kpis.ativasPct >= 80 ? 'up' : 'down') as 'up' | 'down',
+              },
+            ].map((item, idx, arr) => (
+              <div
+                key={item.label}
+                style={{
+                  padding: `${t.space[4]}px ${t.space[5]}px`,
+                  background: cardBg,
+                  borderRight: idx < arr.length - 1 ? `1px solid ${border}` : undefined,
+                  display: 'flex', flexDirection: 'column', gap: 6,
+                }}
+              >
+                <span style={{
+                  fontSize: t.font.size.xs,
+                  fontWeight: t.font.weight.medium,
+                  color: colors.textMuted,
+                  fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}>
+                  {item.label}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{
+                    fontSize: t.font.size['3xl'],
+                    fontWeight: t.font.weight.bold,
+                    color: colors.textPrimary,
                     fontFamily: t.font.family.sans,
-                    letterSpacing: '0.06em',
-                    textAlign: i >= 4 ? 'center' : 'left',
-                  }}
-                >
-                  {h}
+                    lineHeight: 1,
+                  }}>
+                    {item.value}
+                  </span>
+                  {'trendValue' in item && item.trendValue && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 3,
+                      fontSize: t.font.size.xs,
+                      fontWeight: t.font.weight.semibold,
+                      color: item.trend === 'up' ? t.color.success.text : item.trend === 'down' ? t.color.error.text : colors.textMuted,
+                      background: item.trend === 'up' ? t.color.success.bg : item.trend === 'down' ? t.color.error.bg : colors.surfaceSubtle,
+                      padding: '2px 6px', borderRadius: t.radius.full,
+                    }}>
+                      {item.trend === 'up'   && <TrendingUp  size={10} />}
+                      {item.trend === 'down' && <TrendingDown size={10} />}
+                      {item.trendValue}
+                    </span>
+                  )}
+                  {'sub' in item && item.sub && (
+                    <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                      {item.sub}
+                    </span>
+                  )}
                 </div>
+              </div>
+            ))}
+          </div>}
+
+          {/* ── Toolbar ───────────────────────────────────────────────── */}
+          <ListToolbar
+            search={search}
+            onSearch={v => { setSearch(v); setPage(1) }}
+            searchPlaceholder="Buscar por código, descrição..."
+            onOpenFilter={() => setDrawerOpen(true)}
+            filterCount={activeFilterCount}
+            onClearAll={clearFilters}
+            chips={[
+              filters.condicao && {
+                label: `Condição: ${({ ambos: 'Ambos', receita: 'Receita', despesa: 'Despesa' } as Record<string, string>)[filters.condicao]}`,
+                onRemove: () => setFilters(f => ({ ...f, condicao: '' })),
+              },
+              filters.classe && {
+                label: `Classe: ${filters.classe === 'sintetica' ? 'Sintética' : 'Analítica'}`,
+                onRemove: () => setFilters(f => ({ ...f, classe: '' })),
+              },
+              filters.ativo && {
+                label: filters.ativo === 'sim' ? 'Ativo' : 'Inativo',
+                onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
+              },
+            ]}
+          />
+
+          {/* ── Tabela ────────────────────────────────────────────────── */}
+          {isLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} variant="rect" width="100%" height={48} />
               ))}
             </div>
+          ) : filtered.length === 0 ? (
+            <EmptyStateUI
+              message="Nenhum centro de custo encontrado."
+              description="Tente ajustar os filtros ou limpar a busca."
+            />
+          ) : (
+            <>
+              <div style={{
+                background: colors.surfaceBg,
+                border: `1px solid ${border}`,
+                borderRadius: t.radius.lg,
+                overflow: 'hidden',
+              }}>
+                {/* Cabeçalho */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
+                  padding: '10px 16px',
+                  borderBottom: `1px solid ${border}`,
+                  background: colors.surfaceSubtle,
+                }}>
+                  {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
+                    <div
+                      key={h}
+                      style={{
+                        fontSize: t.font.size.xs,
+                        fontWeight: t.font.weight.semibold,
+                        color: colors.textMuted,
+                        fontFamily: t.font.family.sans,
+                        letterSpacing: '0.06em',
+                        textAlign: i >= 4 ? 'center' : 'left',
+                      }}
+                    >
+                      {h}
+                    </div>
+                  ))}
+                </div>
 
-            {/* Linhas */}
-            {paginated.map((cc, idx) => (
-              <CCRow
-                key={cc.id}
-                cc={cc}
-                isLast={idx === paginated.length - 1}
-                onEdit={() => onEdit(cc.id)}
-                onDelete={() => setDeleteId(cc.id)}
-                colors={colors}
-                border={border}
-              />
-            ))}
-          </div>
+                {/* Linhas */}
+                {paginated.map((cc, idx) => (
+                  <CCRow
+                    key={cc.id}
+                    cc={cc}
+                    isLast={idx === paginated.length - 1}
+                    onEdit={() => onEdit(cc.id)}
+                    onDelete={() => setDeleteId(cc.id)}
+                    colors={colors}
+                    border={border}
+                  />
+                ))}
+              </div>
 
-          {/* ── Paginação ─────────────────────────────────────────────── */}
-          {filtered.length > PAGE_SIZE && (
-            <div style={{
-              marginTop: t.space[4],
-              paddingTop: t.space[4],
-              borderTop: `1px solid ${colors.borderSubtle}`,
-            }}>
-              <Pagination
-                page={page}
-                total={filtered.length}
-                pageSize={PAGE_SIZE}
-                onPageChange={setPage}
-              />
-            </div>
+              {/* ── Paginação ───────────────────────────────────────── */}
+              {filtered.length > PAGE_SIZE && (
+                <div style={{
+                  marginTop: t.space[4],
+                  paddingTop: t.space[4],
+                  borderTop: `1px solid ${colors.borderSubtle}`,
+                }}>
+                  <Pagination
+                    page={page}
+                    total={filtered.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setPage}
+                  />
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+
+        </div>
+      </div>
 
       {/* ── ConfirmDialog: Excluir ───────────────────────────────────────── */}
       <ConfirmDialog

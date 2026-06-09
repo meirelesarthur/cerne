@@ -41,7 +41,7 @@ interface FormData {
 export default function CentroCustoCadastro({
   initialData, allCentros, onBack, onSave,
 }: CentroCustoCadastroProps) {
-  const { colors } = useTheme()
+  const { colors, isGbMode } = useTheme()
   const isEdit     = !!initialData
 
   const [form, setForm] = useState<FormData>(() =>
@@ -116,119 +116,133 @@ export default function CentroCustoCadastro({
   }
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── Header ────────────────────────────────────────────────────────── */}
-      <FormPageHeader
-        title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
-        subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
-        onBack={onBack}
-      />
-
-      {/* ── Card de formulário ────────────────────────────────────────────── */}
+      {/* ── Card principal com scroll ─────────────────────────────────────── */}
       <div style={{
         background: colors.surfaceBg,
-        borderRadius: t.radius['2xl'],
-        padding: '28px 28px 32px',
-        display: 'flex', flexDirection: 'column', gap: 20,
-        transition: 'background 0.2s',
+        borderRadius: t.radius.xl,
+        boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 88px)',
+        overflow: 'hidden',
       }}>
 
-        {/* Código derivado (read-only) */}
+        {/* ── Área com scroll ─────────────────────────────────────────────── */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: `0 ${t.space[6]}px` }}>
+
+          {/* Header */}
+          <FormPageHeader
+            title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
+            subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
+            onBack={onBack}
+          />
+
+          {/* Campos do formulário */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: t.space[6] }}>
+
+            {/* Código derivado (read-only) */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '10px 14px',
+              background: colors.surfaceSubtle,
+              borderRadius: t.radius.lg,
+              border: `1px solid ${colors.borderSubtle}`,
+            }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Código gerado:
+              </span>
+              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+                {codigoPreview}
+              </span>
+              <span style={{
+                fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+                padding: '2px 8px', borderRadius: t.radius.full,
+                background: classe === 'sintetica' ? '#eff6ff' : '#f0fdf4',
+                color:      classe === 'sintetica' ? '#2563eb' : '#059669',
+                fontFamily: t.font.family.sans,
+              }}>
+                {CLASSE_LABEL[classe]}
+              </span>
+            </div>
+
+            {/* Linha 1: Condição | Descrição | Ativo | Apontamento */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 }}>
+              <FormSelect
+                label="Condição Normal"
+                required
+                options={CONDICAO_OPTS}
+                value={form.condicao}
+                onChange={e => set('condicao', e.target.value as CondicaoCC | '')}
+                error={errors.condicao}
+              />
+              <FormField
+                label="Descrição"
+                required
+                placeholder="Ex.: Administração da Sede"
+                value={form.descricao}
+                error={errors.descricao}
+                onChange={e => set('descricao', e.target.value)}
+              />
+              <FormSelect
+                label="Ativo"
+                required
+                options={ATIVO_OPTS}
+                value={form.ativo}
+                onChange={e => set('ativo', e.target.value as 'sim' | 'nao')}
+              />
+              <FormSelect
+                label="Apontamento"
+                required
+                options={ATIVO_OPTS}
+                value={form.apontamento}
+                onChange={e => set('apontamento', e.target.value as 'sim' | 'nao')}
+              />
+            </div>
+
+            {/* Linha 2: Tipo (full width) */}
+            <FormSelect
+              label="Tipo"
+              required
+              options={TIPO_OPTS}
+              value={form.tipo}
+              onChange={e => set('tipo', e.target.value as TipoCC)}
+            />
+
+            {/* Linha 3: Antecessor (full width) */}
+            <FormSelect
+              label="Antecessor"
+              options={antecessorOpts}
+              value={form.antecessorId === null ? '' : String(form.antecessorId)}
+              onChange={e => set('antecessorId', e.target.value === '' ? null : Number(e.target.value))}
+            />
+
+            {/* Seção: Categorias */}
+            <CategoriasSection
+              selected={form.categorias}
+              onChange={cats => set('categorias', cats)}
+              colors={colors}
+            />
+
+          </div>
+        </div>
+
+        {/* ── Footer fixo na base do card ──────────────────────────────────── */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 14px',
-          background: colors.surfaceSubtle,
-          borderRadius: t.radius.lg,
-          border: `1px solid ${colors.borderSubtle}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: `${t.space[3]}px ${t.space[6]}px`,
+          borderTop: `1px solid ${colors.borderSubtle}`,
+          flexShrink: 0,
         }}>
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Código gerado:
-          </span>
-          <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
-            {codigoPreview}
-          </span>
-          <span style={{
-            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-            padding: '2px 8px', borderRadius: t.radius.full,
-            background: classe === 'sintetica' ? '#eff6ff' : '#f0fdf4',
-            color:      classe === 'sintetica' ? '#2563eb' : '#059669',
-            fontFamily: t.font.family.sans,
-          }}>
-            {CLASSE_LABEL[classe]}
-          </span>
+          <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
+            {isEdit ? 'Salvar alterações' : 'Cadastrar Centro'}
+          </Button>
         </div>
 
-        {/* Linha 1: Condição | Descrição | Ativo | Apontamento */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 }}>
-          <FormSelect
-            label="Condição Normal"
-            required
-            options={CONDICAO_OPTS}
-            value={form.condicao}
-            onChange={e => set('condicao', e.target.value as CondicaoCC | '')}
-            error={errors.condicao}
-          />
-          <FormField
-            label="Descrição"
-            required
-            placeholder="Ex.: Administração da Sede"
-            value={form.descricao}
-            error={errors.descricao}
-            onChange={e => set('descricao', e.target.value)}
-          />
-          <FormSelect
-            label="Ativo"
-            required
-            options={ATIVO_OPTS}
-            value={form.ativo}
-            onChange={e => set('ativo', e.target.value as 'sim' | 'nao')}
-          />
-          <FormSelect
-            label="Apontamento"
-            required
-            options={ATIVO_OPTS}
-            value={form.apontamento}
-            onChange={e => set('apontamento', e.target.value as 'sim' | 'nao')}
-          />
-        </div>
-
-        {/* Linha 2: Tipo (full width) */}
-        <FormSelect
-          label="Tipo"
-          required
-          options={TIPO_OPTS}
-          value={form.tipo}
-          onChange={e => set('tipo', e.target.value as TipoCC)}
-        />
-
-        {/* Linha 3: Antecessor (full width) */}
-        <FormSelect
-          label="Antecessor"
-          options={antecessorOpts}
-          value={form.antecessorId === null ? '' : String(form.antecessorId)}
-          onChange={e => set('antecessorId', e.target.value === '' ? null : Number(e.target.value))}
-        />
-
-        {/* Seção: Categorias */}
-        <CategoriasSection
-          selected={form.categorias}
-          onChange={cats => set('categorias', cats)}
-          colors={colors}
-        />
-      </div>
-
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginTop: 16, padding: '16px 0',
-      }}>
-        <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
-          Cancelar
-        </Button>
-        <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
-          {isEdit ? 'Salvar alterações' : 'Cadastrar Centro'}
-        </Button>
       </div>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />

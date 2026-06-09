@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
@@ -64,7 +65,6 @@ interface SafraCadastroProps {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function SafraCadastro({ initialData, onBack, onSave }: SafraCadastroProps) {
-  const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
   const isEdit = !!initialData
@@ -155,16 +155,27 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
   const pageDesc  = isEdit ? 'Atualize os dados da safra' : 'Preencha os dados da safra'
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── Header ────────────────────────────────────────────────────────── */}
-      <FormPageHeader title={pageTitle} subtitle={pageDesc} onBack={handleBack} />
+      <PageCard
+        footer={
+          <StepFooter
+            currentStep={step}
+            totalSteps={2}
+            onBack={handleBack}
+            onNext={step === 1 ? handleNextStep : handleSave}
+            backLabel={step === 1 ? 'Cancelar' : 'Voltar'}
+            nextLabel={step === 1 ? 'Configurar Semanas' : 'Salvar Safra'}
+            backDisabled={false}
+          />
+        }
+        footerBare
+      >
+        {/* ── Header ────────────────────────────────────────────────────────── */}
+        <FormPageHeader title={pageTitle} subtitle={pageDesc} onBack={handleBack} paddingTop={t.space[4]} />
 
-      {/* ── Stepper (fora do card, padrão Fazendas) ──────────────────────────── */}
-      <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />
-
-      {/* ── Card principal ─────────────────────────────────────────────────── */}
-      <div style={{ marginTop: 32, background: colors.surfaceBg, borderRadius: t.radius['2xl'], overflow: 'hidden', transition: 'background 0.2s' }}>
+        {/* ── Stepper ──────────────────────────────────────────────────────── */}
+        <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />
 
         {/* Conteúdo do step */}
         <div style={{ padding: '32px 24px 40px' }}>
@@ -182,18 +193,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
             />
           )}
         </div>
-      </div>
-
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <StepFooter
-        currentStep={step}
-        totalSteps={2}
-        onBack={handleBack}
-        onNext={step === 1 ? handleNextStep : handleSave}
-        backLabel={step === 1 ? 'Cancelar' : 'Voltar'}
-        nextLabel={step === 1 ? 'Configurar Semanas' : 'Salvar Safra'}
-        backDisabled={false}
-      />
+      </PageCard>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>

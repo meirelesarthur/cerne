@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { StepFooter } from '../../../components/ui/StepFooter'
 import { Stepper } from '../../../components/ui/Stepper'
-import { useTheme } from '../../../context/ThemeContext'
+import { t } from '../../../design/tokens'
 import { Step1Identificacao } from './steps/Step1Identificacao'
 import { Step2Documentacao } from './steps/Step2Documentacao'
 import { Step3Mapa } from './steps/Step3Mapa'
@@ -66,7 +67,6 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
 }
 
 export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
-  const { colors } = useTheme()
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [formData, setFormData] = useState<FazendaFormData>(emptyFazendaForm)
@@ -158,44 +158,40 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
   }
 
   return (
-    <PageContainer>
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
+    <PageContainer style={{ paddingBottom: 0 }}>
 
-      <FormPageHeader
-        title="Nova Fazenda"
-        subtitle="Preencha os dados da fazenda"
-        onBack={onBack}
-      />
-
-      <Stepper
-        steps={STEPS}
-        current={currentStep}
-        completed={completedSteps}
-        onStepClick={handleStepClick}
-      />
-
-      <div
-        style={{
-          marginTop: 32,
-          background: colors.surfaceBg,
-          borderRadius: 12,
-          overflow: 'hidden',
-          boxSizing: 'border-box',
-          transition: 'background 0.2s',
-        }}
+      <PageCard
+        footer={
+          <StepFooter
+            currentStep={currentStep}
+            totalSteps={6}
+            onBack={handleBack}
+            onNext={handleNext}
+          />
+        }
+        footerBare
       >
+        <FormPageHeader
+          title="Nova Fazenda"
+          subtitle="Preencha os dados da fazenda"
+          onBack={onBack}
+          paddingTop={t.space[4]}
+        />
+
+        <Stepper
+          steps={STEPS}
+          current={currentStep}
+          completed={completedSteps}
+          onStepClick={handleStepClick}
+        />
+
         {/* Conteúdo do step */}
         <div style={{ padding: '40px 24px 80px' }}>
           {renderStep()}
         </div>
-      </div>
+      </PageCard>
 
-      <StepFooter
-        currentStep={currentStep}
-        totalSteps={6}
-        onBack={handleBack}
-        onNext={handleNext}
-      />
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
   )
 }

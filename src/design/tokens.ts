@@ -284,8 +284,22 @@ export const chart = {
   expense: '#ef4444',  // vermelho vivo — despesas
 }
 
+// ─── Layout ───────────────────────────────────────────────────────────────────
+// Constantes do chassi da aplicação (AppLayout). Centralizadas para evitar
+// números mágicos espalhados nas telas.
+
+export const layout = {
+  /**
+   * Altura total consumida pelo chassi acima/abaixo da área de conteúdo:
+   * padding do root (8+8) + padding do card externo (8+8) + Topbar (48) + gap (8) = 88.
+   * Use `calc(100vh - ${t.layout.contentOffset}px)` para um card que preenche
+   * exatamente a altura da navegação secundária (sub-menu).
+   */
+  contentOffset: 88,
+}
+
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart }
+export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart, layout }
 export default t

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { Heading }         from '../../../components/ui/Heading'
 import { Modal }           from '../../../components/ui/Modal'
@@ -108,16 +109,7 @@ export default function CentrosCustoLista({
     <PageContainer style={{ paddingBottom: 0 }}>
 
       {/* ── Card principal com scroll interno ───────────────────────────── */}
-      <div style={{
-        background: colors.surfaceBg,
-        borderRadius: t.radius.xl,
-        boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-        display: 'flex',
-        flexDirection: 'column',
-        height: 'calc(100vh - 88px)',
-        overflow: 'hidden',
-      }}>
-        <div style={{ flex: 1, overflowY: 'auto', padding: `0 ${t.space[6]}px ${t.space[6]}px` }}>
+      <PageCard>
 
           {/* ── Header ────────────────────────────────────────────────── */}
           <PageHeader
@@ -327,8 +319,7 @@ export default function CentrosCustoLista({
             </>
           )}
 
-        </div>
-      </div>
+      </PageCard>
 
       {/* ── ConfirmDialog: Excluir ───────────────────────────────────────── */}
       <ConfirmDialog

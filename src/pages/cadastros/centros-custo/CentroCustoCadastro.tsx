@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, Save, ChevronDown } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
@@ -41,7 +42,7 @@ interface FormData {
 export default function CentroCustoCadastro({
   initialData, allCentros, onBack, onSave,
 }: CentroCustoCadastroProps) {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const isEdit     = !!initialData
 
   const [form, setForm] = useState<FormData>(() =>
@@ -118,19 +119,19 @@ export default function CentroCustoCadastro({
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
 
-      {/* ── Card principal com scroll ─────────────────────────────────────── */}
-      <div style={{
-        background: colors.surfaceBg,
-        borderRadius: t.radius.xl,
-        boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-        display: 'flex',
-        flexDirection: 'column',
-        height: 'calc(100vh - 88px)',
-        overflow: 'hidden',
-      }}>
-
-        {/* ── Área com scroll ─────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: `0 ${t.space[6]}px` }}>
+      {/* ── Card principal com scroll interno + footer fixo ──────────────── */}
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
+              {isEdit ? 'Salvar alterações' : 'Cadastrar Centro'}
+            </Button>
+          </>
+        }
+      >
 
           {/* Header */}
           <FormPageHeader
@@ -228,24 +229,8 @@ export default function CentroCustoCadastro({
             />
 
           </div>
-        </div>
 
-        {/* ── Footer fixo na base do card ──────────────────────────────────── */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: `${t.space[3]}px ${t.space[6]}px`,
-          borderTop: `1px solid ${colors.borderSubtle}`,
-          flexShrink: 0,
-        }}>
-          <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
-            {isEdit ? 'Salvar alterações' : 'Cadastrar Centro'}
-          </Button>
-        </div>
-
-      </div>
+      </PageCard>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>

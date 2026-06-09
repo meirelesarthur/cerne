@@ -111,7 +111,12 @@ export function ThemeProvider({ children, defaultMode = 'light' }: { children: R
 
   useEffect(() => {
     document.body.setAttribute('data-theme', mode)
-    return () => { document.body.removeAttribute('data-theme') }
+    // Alinha scrollbars e controles nativos do OS ao tema ativo (UI Guide).
+    document.documentElement.style.colorScheme = mode === 'gbMode' ? 'dark' : 'light'
+    return () => {
+      document.body.removeAttribute('data-theme')
+      document.documentElement.style.colorScheme = ''
+    }
   }, [mode])
 
   return (

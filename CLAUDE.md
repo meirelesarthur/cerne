@@ -67,7 +67,7 @@ Todo elemento visível na tela é um componente de `src/components/ui/`.
 
 - Ao criar uma nova tela, apenas **importar e chamar** componentes existentes
 - Se o componente necessário não existe no catálogo, criá-lo em `src/components/ui/` **antes** de usá-lo na tela
-- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`, `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`, `FormSection`, `FormSelect`, `Heading`, `IconButton`, `Modal`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `Skeleton`, `Spinner`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar`, `Tabs`, `Tag`, `ToggleSwitch`, `Tooltip`
+- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`, `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`, `FormSection`, `FormSelect`, `Heading`, `IconButton`, `Modal`, `PageCard`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `Skeleton`, `Spinner`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar`, `Tabs`, `Tag`, `ToggleSwitch`, `Tooltip`
 
 ### Lei 2 — Fonte Única de Verdade (Propagação Global)
 
@@ -144,13 +144,19 @@ Toda tela de listagem segue esta ordem (referência: `FazendasLista.tsx`). É pe
 manual quando o layout exige (árvore, cards), mas **as primitivas ao redor são sempre do kit**:
 
 ```
-PageContainer
-  └── PageHeader (title, count, ação primária = Button)
-  └── [KPI/Summary bar opcional] — Skeleton enquanto isLoading
-  └── Toolbar: TableSearchInput · FilterChip(s) · "Limpar tudo" (Button ghost) · FilterButton
-  └── isLoading → Skeleton  |  vazio → EmptyState  |  dados → tabela/grid + Pagination
-  └── ConfirmDialog (exclusão)  ·  ToastContainer  ·  FilterDrawer > FormSelect
+PageContainer (style={{ paddingBottom: 0 }})
+  └── PageCard                          ← casca padrão: altura do submenu + scroll só interno
+        └── PageHeader (title, count, ação primária = Button)
+        └── [KPI/Summary bar opcional] — Skeleton enquanto isLoading
+        └── Toolbar: TableSearchInput · FilterChip(s) · "Limpar tudo" (Button ghost) · FilterButton
+        └── isLoading → Skeleton  |  vazio → EmptyState  |  dados → tabela/grid + Pagination
+  └── ConfirmDialog (exclusão)  ·  ToastContainer  ·  FilterDrawer > FormSelect   ← overlays FORA do PageCard
 ```
+
+- **Casca obrigatória:** o conteúdo da listagem vive dentro de `PageCard` (fundo, sombra por
+  tema, altura `calc(100vh - t.layout.contentOffset)` e scroll interno). Overlays (`ConfirmDialog`,
+  `Modal`, `ToastContainer`, `FilterDrawer`, `BulkActionBar`) ficam **fora** do `PageCard`, como
+  irmãos dentro do `PageContainer`. Nunca recriar esse card inline. Referência: `CentrosCustoLista.tsx`.
 
 - Exclusão **sempre** via `ConfirmDialog` (Lei de ação destrutiva). Nunca excluir sem confirmação.
 - Ações de linha **sempre** via `IconButton` ou `DropdownMenu` — nunca `<button>` cru.
@@ -159,6 +165,10 @@ PageContainer
 
 ### Regra C — Composição canônica de CRUDs/Formulários
 
+- **Casca:** o formulário vive dentro de `PageCard` (mesma altura do submenu + scroll interno),
+  envolto por `PageContainer style={{ paddingBottom: 0 }}`. A barra de ações vai na prop
+  `footer` do `PageCard` (fixa na base) — pares de `Button` no `footer` padrão; `StepFooter`
+  no `footer` com `footerBare`. Não montar footer/scroll manual. Referência: `CentroCustoCadastro.tsx`.
 - **Cabeçalho:** `FormPageHeader` (title + subtitle + Voltar). Padrão único — não recriar header
   com `<h1>` + seta + ícone inline. Referência: `ProdutoForm.tsx`, `CentroCustoCadastro.tsx`.
 - **Single-page denso:** agrupar campos em `CollapsibleSection`. Referência: `ProdutoForm.tsx`.
@@ -187,6 +197,8 @@ literal, procure o token:
 - **GBMode:** `t.color.gbSurface` (superfície translúcida de card), `t.color.gbAccent` (verde claro de destaque).
 - **Badge/Tag auxiliares:** `t.color.purple.*`, `t.color.cyan.*`.
 - **Transições:** `t.transition.{fast,DEFAULT,smooth,drawer}` — nunca `'0.2s'` solto.
+- **Layout:** `t.layout.contentOffset` (88) — altura do chassi acima/abaixo do conteúdo; base do
+  `calc(100vh - …)` usado pelo `PageCard`. Não hardcodar `88` nas telas.
 
 Se o valor que você precisa não tem token e é reutilizável, **adicione o token primeiro** em
 `tokens.ts` e referencie — não espalhe o literal.

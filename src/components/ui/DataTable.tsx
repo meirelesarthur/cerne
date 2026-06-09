@@ -129,24 +129,38 @@ export function DataTable<T extends object>({
                       cursor: onRowClick ? 'pointer' : 'default',
                     }}
                   >
-                    {columns.map((col) => (
-                      <td
-                        key={col.key}
-                        style={{
-                          fontSize: t.font.size.base,
-                          color: textCell,
-                          fontFamily: t.font.family.sans,
-                          padding: `${t.space[2] + 4}px ${t.space[4]}px`,
-                          textAlign: col.align ?? 'left',
-                          transition: 'color 0.2s, background 0.15s',
-                          height: 48,
-                          maxHeight: 48,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {col.render(row)}
-                      </td>
-                    ))}
+                    {columns.map((col) => {
+                      const content = col.render(row)
+                      return (
+                        <td
+                          key={col.key}
+                          style={{
+                            fontSize: t.font.size.base,
+                            color: textCell,
+                            fontFamily: t.font.family.sans,
+                            padding: `0 ${t.space[4]}px`,
+                            textAlign: col.align ?? 'left',
+                            transition: 'color 0.2s, background 0.15s',
+                            height: t.size.tableRow,
+                            maxWidth: col.width,
+                            boxSizing: 'border-box',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {/* Trunca com reticências; texto completo no hover (title) */}
+                          <div
+                            title={typeof content === 'string' ? content : undefined}
+                            style={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {content}
+                          </div>
+                        </td>
+                      )
+                    })}
                   </tr>
                 )
               })

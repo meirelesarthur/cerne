@@ -437,7 +437,8 @@ function CCRow({
       style={{
         display: 'grid',
         gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
-        padding: '12px 16px',
+        padding: '0 16px',
+        height: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         alignItems: 'center',
         transition: 'background 0.12s',
@@ -446,12 +447,16 @@ function CCRow({
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
     >
       {/* Código */}
-      <span style={{
+      <span title={cc.codigo} style={{
         fontSize: t.font.size.sm,
         fontWeight: t.font.weight.semibold,
         color: colors.textPrimary,
         fontFamily: t.font.family.sans,
         fontVariantNumeric: 'tabular-nums',
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
       }}>
         {cc.codigo}
       </span>
@@ -470,20 +475,28 @@ function CCRow({
       </span>
 
       {/* Condição */}
-      <span style={{
+      <span title={CONDICAO_LABEL[cc.condicao]} style={{
         fontSize: t.font.size.sm,
         color: colors.textSecondary,
         fontFamily: t.font.family.sans,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
       }}>
         {CONDICAO_LABEL[cc.condicao]}
       </span>
 
       {/* Descrição */}
-      <span style={{
+      <span title={cc.descricao} style={{
         fontSize: t.font.size.base,
         color: colors.textPrimary,
         fontFamily: t.font.family.sans,
         paddingLeft: cc.antecessorId !== null ? 16 : 0,
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
       }}>
         {cc.descricao}
       </span>

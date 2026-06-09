@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
+import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { t }             from '../../../design/tokens'
-import { useTheme }      from '../../../context/ThemeContext'
 import { UNIDADE_OPTS, type Embalagem, type UnidadeMedida } from './embalagens.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -45,7 +45,6 @@ function validateUnidade(v: string): string | undefined {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props) {
-  const { colors } = useTheme()
   const isEdit = Boolean(initialData)
 
   const [descricao,  setDescricao]  = useState(initialData?.descricao ?? '')
@@ -84,91 +83,88 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
     }, 150)
   }
 
-  const border = colors.border
-
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={onBack} disabled={submitting}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              icon={<Save size={13} />}
+              onClick={handleSubmit}
+              loading={submitting}
+              disabled={!isValid || submitting}
+            >
+              Salvar
+            </Button>
+          </>
+        }
+      >
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <FormPageHeader
-        title={isEdit ? 'Editar Embalagem' : 'Nova Embalagem'}
-        subtitle={isEdit ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-        onBack={onBack}
-      />
+        {/* ── Header ────────────────────────────────────────────────────────────── */}
+        <FormPageHeader
+          title={isEdit ? 'Editar Embalagem' : 'Nova Embalagem'}
+          subtitle={isEdit ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+          onBack={onBack}
+          paddingTop={t.space[4]}
+        />
 
-      {/* ── Card do formulário ────────────────────────────────────────────────── */}
-      <div style={{
-        background: colors.surfaceBg,
-        border: `1px solid ${border}`,
-        borderRadius: t.radius.lg,
-        padding: `${t.space[6]}px`,
-        maxWidth: 600,
-      }}>
+        {/* ── Campos ────────────────────────────────────────────────────────────── */}
+        <div style={{ maxWidth: 600 }}>
 
-        {/* Descrição */}
-        <div style={{ marginBottom: t.space[5] }}>
-          <FormField
-            label="Descrição"
-            required
-            placeholder="Ex: SC 60KG"
-            value={descricao}
-            onChange={e => setDescricao(e.target.value)}
-            onBlur={() => setTouched(p => ({ ...p, descricao: true }))}
-            error={errDescricao}
-            status={errDescricao ? 'err' : touched.descricao && descricao.trim() ? 'ok' : 'idle'}
-            disabled={submitting}
-          />
+          {/* Descrição */}
+          <div style={{ marginBottom: t.space[5] }}>
+            <FormField
+              label="Descrição"
+              required
+              placeholder="Ex: SC 60KG"
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              onBlur={() => setTouched(p => ({ ...p, descricao: true }))}
+              error={errDescricao}
+              status={errDescricao ? 'err' : touched.descricao && descricao.trim() ? 'ok' : 'idle'}
+              disabled={submitting}
+            />
+          </div>
+
+          {/* Quantidade + Unidade de Medida */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4], marginBottom: t.space[6] }}>
+            <FormField
+              label="Quantidade"
+              required
+              placeholder="0,00"
+              value={qtdRaw}
+              onChange={e => setQtdRaw(e.target.value)}
+              onBlur={() => setTouched(p => ({ ...p, qtd: true }))}
+              error={errQtd}
+              status={errQtd ? 'err' : touched.qtd && !validateQuantidade(qtdRaw) ? 'ok' : 'idle'}
+              disabled={submitting}
+              inputMode="decimal"
+            />
+            <FormSelect
+              label="Un. de Medida"
+              required
+              value={unidade}
+              onChange={e => {
+                setUnidade(e.target.value as UnidadeMedida | '')
+                setTouched(p => ({ ...p, unidade: true }))
+              }}
+              onBlur={() => setTouched(p => ({ ...p, unidade: true }))}
+              options={[
+                { value: '', label: 'Selecione...' },
+                ...UNIDADE_OPTS,
+              ]}
+              error={errUnidade}
+              disabled={submitting}
+            />
+          </div>
+
         </div>
 
-        {/* Quantidade + Unidade de Medida */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4], marginBottom: t.space[6] }}>
-          <FormField
-            label="Quantidade"
-            required
-            placeholder="0,00"
-            value={qtdRaw}
-            onChange={e => setQtdRaw(e.target.value)}
-            onBlur={() => setTouched(p => ({ ...p, qtd: true }))}
-            error={errQtd}
-            status={errQtd ? 'err' : touched.qtd && !validateQuantidade(qtdRaw) ? 'ok' : 'idle'}
-            disabled={submitting}
-            inputMode="decimal"
-          />
-          <FormSelect
-            label="Un. de Medida"
-            required
-            value={unidade}
-            onChange={e => {
-              setUnidade(e.target.value as UnidadeMedida | '')
-              setTouched(p => ({ ...p, unidade: true }))
-            }}
-            onBlur={() => setTouched(p => ({ ...p, unidade: true }))}
-            options={[
-              { value: '', label: 'Selecione...' },
-              ...UNIDADE_OPTS,
-            ]}
-            error={errUnidade}
-            disabled={submitting}
-          />
-        </div>
-
-        {/* Botões */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3] }}>
-          <Button variant="secondary" onClick={onBack} disabled={submitting}>
-            Cancelar
-          </Button>
-          <Button
-            variant="primary"
-            icon={<Save size={13} />}
-            onClick={handleSubmit}
-            loading={submitting}
-            disabled={!isValid || submitting}
-          >
-            Salvar
-          </Button>
-        </div>
-      </div>
-
+      </PageCard>
     </PageContainer>
   )
 }

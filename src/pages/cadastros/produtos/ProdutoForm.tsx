@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }      from '../../../components/ui/PageContainer'
+import { PageCard }           from '../../../components/ui/PageCard'
 import { Button }             from '../../../components/ui/Button'
 import { FormPageHeader }     from '../../../components/ui/FormPageHeader'
 import { FormField }          from '../../../components/ui/FormField'
@@ -200,17 +201,34 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
   const unidOpts = [{ value: '', label: 'Selecione...' }, ...UNIDADE_PRODUTO_OPTS]
 
   return (
-    <PageContainer>
+    <PageContainer style={{ paddingBottom: 0 }}>
+      <PageCard
+        footer={
+          <>
+            <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
+            <Button
+              variant="primary"
+              icon={<Save size={13} />}
+              onClick={handleSubmit}
+              loading={submitting}
+              disabled={!isValid || submitting}
+            >
+              Salvar
+            </Button>
+          </>
+        }
+      >
 
-      {/* Header */}
-      <FormPageHeader
-        title={isEdit ? 'Editar Produto' : 'Novo Produto'}
-        subtitle={isEdit ? `Editando: ${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-        onBack={onBack}
-      />
+        {/* Header */}
+        <FormPageHeader
+          title={isEdit ? 'Editar Produto' : 'Novo Produto'}
+          subtitle={isEdit ? `Editando: ${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
+          onBack={onBack}
+          paddingTop={t.space[4]}
+        />
 
-      {/* Formulário */}
-      <div style={{ maxWidth: 800 }}>
+        {/* Formulário */}
+        <div style={{ maxWidth: 800 }}>
 
         {/* ── 1. Identificação ────────────────────────────────────────────────── */}
         <CollapsibleSection title="Identificação" fieldCount={4} defaultOpen>
@@ -449,21 +467,9 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
           </div>
         </CollapsibleSection>
 
-        {/* ── Botões ───────────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[3], marginTop: t.space[4] }}>
-          <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
-          <Button
-            variant="primary"
-            icon={<Save size={13} />}
-            onClick={handleSubmit}
-            loading={submitting}
-            disabled={!isValid || submitting}
-          >
-            Salvar
-          </Button>
         </div>
 
-      </div>
+      </PageCard>
     </PageContainer>
   )
 }

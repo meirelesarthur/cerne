@@ -21,6 +21,7 @@ import DashDepreciacoes  from '../../pages/dashboards/DashDepreciacoes'
 import DashAtivos        from '../../pages/dashboards/DashAtivos'
 import DashUsuarios      from '../../pages/dashboards/DashUsuarios'
 import DashLivroCaixa   from '../../pages/dashboards/DashLivroCaixa'
+import PlanosPage        from '../../pages/planos/PlanosPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
 import { NavigationContext } from '../../context/NavigationContext'
@@ -95,6 +96,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'dash-ati')  return <DashAtivos />
   if (itemId === 'dash-usr')  return <DashUsuarios />
   if (itemId === 'dash-lcx')  return <DashLivroCaixa />
+  if (itemId === 'planos')    return <PlanosPage />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 
@@ -143,6 +145,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const handleItemClick = (id: string) => setActiveItemId(id)
 
+  const handleOpenPlanos = () => {
+    setExpandedModuleId(null)
+    setActiveItemId('planos')
+  }
+
   const handleCloseSecondary = () => {
     setExpandedModuleId(null)
     // Keep activeItemId so current page stays visible after closing secondary nav
@@ -188,6 +195,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         expandedModuleId={expandedModuleId}
         onModuleClick={handleModuleClick}
         onToggle={handleToggleSidebar}
+        onOpenPlanos={handleOpenPlanos}
+        planosActive={activeItemId === 'planos'}
       />
 
       {/* Outer content card */}

@@ -1,4 +1,4 @@
-import { Bell, Settings, ChevronRight, PanelLeftClose, Moon, Sun } from 'lucide-react'
+import { Bell, Settings, ChevronRight, PanelLeftClose, Moon, Sun, Gem } from 'lucide-react'
 import logoFull from '../../assets/Logo.svg'
 import logoFullWhite from '../../assets/Logo-white.svg'
 import logoMin from '../../assets/logo-min.svg'
@@ -15,6 +15,8 @@ interface SidebarProps {
   expandedModuleId: string | null
   onModuleClick: (module: NavModule) => void
   onToggle: () => void
+  onOpenPlanos?: () => void
+  planosActive?: boolean
 }
 
 export default function Sidebar({
@@ -24,6 +26,8 @@ export default function Sidebar({
   expandedModuleId,
   onModuleClick,
   onToggle,
+  onOpenPlanos,
+  planosActive,
 }: SidebarProps) {
   const { colors, isGbMode, toggle } = useTheme()
   const isIconOnly = mode === 'icon-only'
@@ -197,6 +201,16 @@ export default function Sidebar({
             style={{ color: isGbMode ? colors.brand : undefined }}
           >
             {isGbMode ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+        </Tooltip>
+
+        <Tooltip label="Planos">
+          <button
+            className={`nav-icon-btn ${planosActive ? 'active' : ''}`}
+            onClick={(e) => { e.stopPropagation(); onOpenPlanos?.() }}
+            style={{ color: planosActive ? colors.brand : undefined }}
+          >
+            <Gem size={15} />
           </button>
         </Tooltip>
 

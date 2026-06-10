@@ -52,7 +52,7 @@ function ReadOnlyField({ label, value, hint }: { label: string; value: string; h
           </span>
         )}
       </div>
-      <div style={{ height: 38, border: `1.5px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, padding: `0 ${t.space[2]}px`, fontSize: t.font.size.base, fontFamily: t.font.family.sans, color: colors.textMuted, background: colors.surfaceSubtle, display: 'flex', alignItems: 'center', userSelect: 'none' }}>
+      <div style={{ height: t.size.control, border: `1.5px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, padding: `0 ${t.space[2]}px`, fontSize: t.font.size.base, fontFamily: t.font.family.sans, color: colors.textMuted, background: colors.surfaceSubtle, display: 'flex', alignItems: 'center', userSelect: 'none' }}>
         {value || '—'}
       </div>
     </div>

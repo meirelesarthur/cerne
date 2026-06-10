@@ -21,7 +21,7 @@ export function TableSearchInput({
     <div
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[2],
-        height: 38,
+        height: t.size.control,
         border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
         borderRadius: t.radius.DEFAULT,
         padding: `0 ${t.space[2] + 2}px`,
@@ -74,7 +74,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
     <div
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1],
-        height: 38,
+        height: t.size.control,
         background: colors.brandBg,
         border: `1.5px solid ${colors.brand}`,
         borderRadius: t.radius.DEFAULT,
@@ -124,7 +124,7 @@ export function FilterButton({
       onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1] + 2, // 6px
-        height: 38,
+        height: t.size.control,
         background: active    ? colors.brandBg
           : hovered ? colors.surfaceSubtle : colors.surfaceBg,
         border: `1.5px solid ${active ? colors.brand : colors.border}`,

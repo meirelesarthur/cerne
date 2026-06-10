@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { X, SlidersHorizontal } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { Button } from './Button'
 
 interface FilterDrawerProps {
   open: boolean
@@ -140,48 +141,12 @@ export function FilterDrawer({
             gap: t.space[2],
           }}
         >
-          <button
-            type="button"
-            onClick={onClear}
-            style={{
-              flex: 1,
-              height: 38,
-              background: colors.surfaceBg,
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              fontSize: t.font.size.base,
-              fontWeight: t.font.weight.medium,
-              color: colors.textSecondary,
-              cursor: 'pointer',
-              fontFamily: t.font.family.sans,
-              transition: `background ${t.transition.fast}`,
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = colors.surfaceBg }}
-          >
+          <Button variant="secondary" onClick={onClear} style={{ flex: 1 }}>
             Limpar
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              flex: 1,
-              height: 38,
-              background: t.color.brand[600],
-              border: 'none',
-              borderRadius: t.radius.DEFAULT,
-              fontSize: t.font.size.base,
-              fontWeight: t.font.weight.semibold,
-              color: t.color.neutral[0],
-              cursor: 'pointer',
-              fontFamily: t.font.family.sans,
-              transition: `background ${t.transition.fast}`,
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.brand[700] }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = t.color.brand[600] }}
-          >
+          </Button>
+          <Button variant="primary" onClick={onClose} style={{ flex: 1 }}>
             Aplicar
-          </button>
+          </Button>
         </div>
       </div>
     </>

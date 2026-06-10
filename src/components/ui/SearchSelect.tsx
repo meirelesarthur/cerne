@@ -103,7 +103,7 @@ export function SearchSelect({
       <div ref={containerRef} style={{ position: 'relative' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: t.space[1] + 3,
-          height: t.size.control - 2,
+          height: t.size.control,
           border: `1.5px solid ${error ? t.color.error.text : open ? t.color.brand[600] : colors.border}`,
           borderRadius: t.radius.DEFAULT,
           padding: `0 ${t.space[2] + 2}px`,

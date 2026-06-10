@@ -173,7 +173,7 @@ export const size = {
   /** Botões de paginação (quadrados) */
   pageBtn: 32,
   /** Altura fixa da linha de dados das tabelas (não cresce com quebra de texto) */
-  tableRow: 48,
+  tableRow: 42,
   /** Largura do FilterDrawer lateral */
   drawer:  320,
   /** Largura dos botões do StepFooter */

@@ -49,6 +49,50 @@ const MARK_WEDGES: Array<{ d: string; c: string }> = [
   { d: 'M 166.32 40.51 A 92 92 0 0 1 193.06 64.09 L 154.79 89.90 A 46 46 0 0 0 145.50 81.72 Z', c: '#22c55e' },
 ]
 
+// Anéis orbitais (px do diâmetro) com suas partículas. Direções alternadas
+// (fwd/rev) dão o efeito "anéis de Saturno"; ângulos e tamanhos variados
+// deixam a distribuição visualmente aleatória. 6 partículas no total.
+type OrbitDot = { angle: number; size: number; color: string; glow: number }
+type OrbitRing = {
+  size: number
+  border: number
+  dur: number
+  dir: 'fwd' | 'rev'
+  dots: OrbitDot[]
+}
+const ORBIT_RINGS: OrbitRing[] = [
+  {
+    size: 440,
+    border: 0.08,
+    dur: 22,
+    dir: 'fwd',
+    dots: [
+      { angle: 28, size: 5, color: t.color.brand[400], glow: 7 },
+      { angle: 168, size: 3, color: t.color.brand[300], glow: 5 },
+    ],
+  },
+  {
+    size: 320,
+    border: 0.14,
+    dur: 15,
+    dir: 'rev',
+    dots: [
+      { angle: 72, size: 6, color: t.color.brand[400], glow: 9 },
+      { angle: 244, size: 4, color: t.color.brand[500], glow: 6 },
+    ],
+  },
+  {
+    size: 220,
+    border: 0.1,
+    dur: 9,
+    dir: 'fwd',
+    dots: [
+      { angle: 115, size: 5, color: t.color.brand[300], glow: 8 },
+      { angle: 300, size: 3, color: t.color.brand[400], glow: 5 },
+    ],
+  },
+]
+
 const keyframes = `
   @keyframes sp-bg-in {
     from { opacity: 0; }
@@ -127,53 +171,46 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           }}
         />
 
-        {/* Anéis orbitais */}
-        <div aria-hidden="true" style={{ position: 'absolute', width: 440, height: 440 }}>
+        {/* Anéis orbitais — partículas circulando como anéis de Saturno,
+            cada anel numa direção, espalhadas em ângulos/tamanhos variados */}
+        {ORBIT_RINGS.map((ring) => (
           <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              border: '1px solid rgba(5,150,105,0.08)',
-              borderRadius: '50%',
-              animation: 'sp-ring-spin 18s linear infinite',
-            }}
-          />
-        </div>
-        <div aria-hidden="true" style={{ position: 'absolute', width: 320, height: 320 }}>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              border: '1px solid rgba(5,150,105,0.14)',
-              borderRadius: '50%',
-              animation: 'sp-ring-spin 12s linear infinite',
-            }}
+            key={ring.size}
+            aria-hidden="true"
+            style={{ position: 'absolute', width: ring.size, height: ring.size }}
           >
-            {/* Ponto orbital */}
-            <div style={{
-              position: 'absolute',
-              top: -3,
-              left: '50%',
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: t.color.brand[400],
-              transform: 'translateX(-50%)',
-              boxShadow: `0 0 8px ${t.color.brand[400]}`,
-            }} />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                border: `1px solid rgba(5,150,105,${ring.border})`,
+                borderRadius: '50%',
+                animation: `${ring.dir === 'rev' ? 'sp-ring-spin-rev' : 'sp-ring-spin'} ${ring.dur}s linear infinite`,
+              }}
+            >
+              {ring.dots.map((dot, di) => (
+                <div
+                  key={di}
+                  style={{ position: 'absolute', inset: 0, transform: `rotate(${dot.angle}deg)` }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: -dot.size / 2,
+                      left: '50%',
+                      width: dot.size,
+                      height: dot.size,
+                      borderRadius: '50%',
+                      background: dot.color,
+                      transform: 'translateX(-50%)',
+                      boxShadow: `0 0 ${dot.glow}px ${dot.color}`,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div aria-hidden="true" style={{ position: 'absolute', width: 220, height: 220 }}>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              border: '1px solid rgba(5,150,105,0.10)',
-              borderRadius: '50%',
-              animation: 'sp-ring-spin-rev 8s linear infinite',
-            }}
-          />
-        </div>
+        ))}
 
         {/* Marca central + nome */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>

@@ -149,10 +149,16 @@ export const space = {
 // antes soltos em FormField, Button, ToggleSwitch, IconButton, etc.
 
 export const size = {
-  /** Altura de inputs/selects/botões padrão */
+  /** Altura de inputs/selects padrão */
   control:   38,
   controlSm: 30,
   controlLg: 46,
+  /** Alturas dos botões (sm/md/lg) — md é o padrão do sistema */
+  btn: {
+    sm: 32,
+    md: 40,
+    lg: 48,
+  },
   /** Botões apenas-ícone (sm/md/lg) */
   iconBtn: {
     sm: 24,

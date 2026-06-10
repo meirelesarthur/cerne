@@ -19,23 +19,28 @@ const variantBase: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
     background: t.color.brand[600],
     color: t.color.neutral[0],
-    border: 'none',
   },
   secondary: {
     background: t.color.neutral[0],
     color: t.color.neutral[800],
-    border: `1.5px solid ${t.color.neutral[250]}`,
   },
   destructive: {
     background: t.color.neutral[0],
     color: t.color.error.text,
-    border: `1.5px solid ${t.color.error.bg}`,
   },
   ghost: {
     background: 'transparent',
     color: t.color.neutral[600],
-    border: 'none',
   },
+}
+
+// Contorno desenhado POR FORA da caixa (box-shadow, não `border`): a altura
+// interna fica idêntica à do primary e o contorno não consome espaço de layout,
+// então botões preenchidos e contornados alinham perfeitamente lado a lado.
+const RING_W = 1.5
+const variantRing: Partial<Record<ButtonVariant, string>> = {
+  secondary:   t.color.neutral[250],
+  destructive: t.color.error.bg,
 }
 
 const variantHover: Record<ButtonVariant, string> = {
@@ -46,9 +51,9 @@ const variantHover: Record<ButtonVariant, string> = {
 }
 
 const sizeStyle: Record<ButtonSize, React.CSSProperties> = {
-  sm: { height: 32,  padding: `0 ${t.space[3]}px`, fontSize: t.font.size.sm },
-  md: { height: 36,  padding: `0 ${t.space[4]}px`, fontSize: t.font.size.base },
-  lg: { height: 44,  padding: `0 ${t.space[5]}px`, fontSize: t.font.size.md },
+  sm: { height: t.size.btn.sm, padding: `0 ${t.space[3]}px`, fontSize: t.font.size.sm },
+  md: { height: t.size.btn.md, padding: `0 ${t.space[4]}px`, fontSize: t.font.size.base },
+  lg: { height: t.size.btn.lg, padding: `0 ${t.space[5]}px`, fontSize: t.font.size.md },
 }
 
 export function Button({
@@ -87,6 +92,8 @@ export function Button({
         transition: `background ${t.transition.DEFAULT}, opacity ${t.transition.DEFAULT}`,
         whiteSpace: 'nowrap',
         boxSizing: 'border-box',
+        border: 'none',
+        boxShadow: variantRing[variant] ? `0 0 0 ${RING_W}px ${variantRing[variant]}` : undefined,
         ...base,
         ...sz,
         ...style,

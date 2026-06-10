@@ -646,7 +646,6 @@ function FazendaCard({
       >
         <Button
           variant="ghost" size="sm"
-          style={{ height: 28, padding: '0 8px', fontSize: t.font.size.xs }}
           onClick={onEdit}
         >
           <Pencil size={12} style={{ marginRight: 4 }} />
@@ -654,7 +653,6 @@ function FazendaCard({
         </Button>
         <Button
           variant="secondary" size="sm"
-          style={{ height: 28, padding: '0 8px', fontSize: t.font.size.xs }}
           onClick={onView}
         >
           <Eye size={12} style={{ marginRight: 4 }} />

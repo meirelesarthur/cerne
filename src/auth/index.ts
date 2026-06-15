@@ -34,3 +34,7 @@ export {
 
 // ─── SessionExpiredModal ──────────────────────────────────────────────────────
 export { SessionExpiredModal }              from './SessionExpiredModal'
+
+// ─── PlanContext ──────────────────────────────────────────────────────────────
+export { PlanProvider, usePlan, PLAN_FEATURES } from './PlanContext'
+export type { PlanTier, AccountStatus }         from './PlanContext'

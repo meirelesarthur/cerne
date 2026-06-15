@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { t } from '../../../design/tokens'
 import { useTheme } from '../../../context/ThemeContext'
+import { Button } from '../../../components/ui/Button'
 import {
   WEEK_COLORS, COLOR_CYCLE, MONTH_NAMES,
   isCurrentWeek,
@@ -124,27 +125,9 @@ export function WeekCanvas({
           )}
         </div>
         {editable && (
-          <button
-            type="button"
-            onClick={resetCycle}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 5,
-              background: 'none',
-              border: `1px solid ${colors.border}`,
-              borderRadius: t.radius.DEFAULT,
-              padding: '5px 12px',
-              fontSize: t.font.size.sm,
-              color: colors.textSecondary,
-              cursor: 'pointer',
-              fontFamily: t.font.family.sans,
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'none' }}
-          >
-            <RotateCcw size={12} />
+          <Button variant="secondary" size="sm" icon={<RotateCcw size={12} />} onClick={resetCycle}>
             Reiniciar ciclo
-          </button>
+          </Button>
         )}
       </div>
 
@@ -216,30 +199,26 @@ export function WeekCanvas({
             const def = WEEK_COLORS[key]
             const active = selectedColor === key
             return (
-              <button
+              <Button
                 key={key}
-                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setSelectedColor(key)}
+                icon={<span style={{ width: 7, height: 7, borderRadius: '50%', background: def.text === '#ffffff' ? 'rgba(255,255,255,0.7)' : def.text, flexShrink: 0 }} />}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  padding: '4px 10px',
                   background: def.bg,
                   color: def.text,
                   border: `2px solid ${active ? (def.text === '#ffffff' ? 'rgba(255,255,255,0.6)' : '#1e293b') : def.border}`,
                   borderRadius: t.radius.full,
-                  fontSize: t.font.size.xs,
+                  padding: '4px 10px',
                   fontWeight: active ? t.font.weight.semibold : t.font.weight.medium,
-                  cursor: 'pointer',
                   transform: active ? 'scale(1.08)' : 'scale(1)',
                   boxShadow: active ? t.shadow.md : 'none',
                   transition: 'transform 0.1s, box-shadow 0.1s, border-color 0.1s',
-                  fontFamily: t.font.family.sans,
-                  outline: 'none',
                 }}
               >
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: def.text === '#ffffff' ? 'rgba(255,255,255,0.7)' : def.text, flexShrink: 0 }} />
                 {def.label}
-              </button>
+              </Button>
             )
           })}
         </div>

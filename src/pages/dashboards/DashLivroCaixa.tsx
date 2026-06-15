@@ -4,6 +4,8 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { Button } from '../../components/ui/Button'
+import { DataTable, type Column } from '../../components/ui/DataTable'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -182,86 +184,72 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
 
 // ─── Tabela de Movimentações ──────────────────────────────────────────────────
 
-function MovimentacoesTabela({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
-  const [hovIdx, setHovIdx] = useState<number | null>(null)
+type Movimentacao = typeof movimentacoes[number]
 
-  const headerStyle: React.CSSProperties = {
-    fontSize: t.font.size.xs,
-    fontWeight: t.font.weight.semibold,
-    color: colors.textMuted as string,
-    fontFamily: t.font.family.sans,
-    textTransform: 'uppercase',
-    letterSpacing: '0.04em',
-    padding: `${t.space[1]}px ${t.space[2]}px`,
-    textAlign: 'left',
-  }
+const movimentacoesColumns: Column<Movimentacao>[] = [
+  {
+    key: 'data',
+    label: 'Data',
+    render: (row) => <span style={{ color: 'inherit', whiteSpace: 'nowrap' }}>{row.data}</span>,
+  },
+  {
+    key: 'descricao',
+    label: 'Descrição',
+    render: (row) => row.descricao,
+  },
+  {
+    key: 'tipo',
+    label: 'Tipo',
+    render: (row) => {
+      const badge = tipoBadge[row.tipo] ?? tipoBadge['Receita']
+      return (
+        <span style={{
+          fontSize: t.font.size.xs,
+          fontWeight: t.font.weight.medium,
+          color: badge.color,
+          background: badge.bg,
+          borderRadius: t.radius.full,
+          padding: `2px ${t.space[2]}px`,
+          fontFamily: t.font.family.sans,
+          whiteSpace: 'nowrap',
+        }}>
+          {row.tipo}
+        </span>
+      )
+    },
+  },
+  {
+    key: 'conta',
+    label: 'Conta',
+    render: (row) => row.conta,
+  },
+  {
+    key: 'valor',
+    label: 'Valor',
+    align: 'right',
+    render: (row) => {
+      const isPos = row.valor.startsWith('+')
+      const isNeg = row.valor.startsWith('-')
+      return (
+        <span style={{
+          fontWeight: t.font.weight.semibold,
+          color: isPos ? t.color.success.text : isNeg ? t.color.error.text : undefined,
+          whiteSpace: 'nowrap',
+        }}>
+          {row.valor}
+        </span>
+      )
+    },
+  },
+]
 
-  const cellStyle: React.CSSProperties = {
-    fontSize: t.font.size.sm,
-    color: colors.textPrimary as string,
-    fontFamily: t.font.family.sans,
-    padding: `${t.space[2]}px ${t.space[2]}px`,
-    whiteSpace: 'nowrap' as const,
-  }
-
+function MovimentacoesTabela(_: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
-            {['Data', 'Descrição', 'Tipo', 'Conta', 'Valor'].map(col => (
-              <th key={col} style={headerStyle}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {movimentacoes.map((row, i) => {
-            const badge = tipoBadge[row.tipo] ?? tipoBadge['Receita']
-            const isPos = row.valor.startsWith('+')
-            const isNeg = row.valor.startsWith('-')
-            return (
-              <tr
-                key={i}
-                onMouseEnter={() => setHovIdx(i)}
-                onMouseLeave={() => setHovIdx(null)}
-                style={{
-                  background: hovIdx === i
-                    ? (isGbMode ? 'rgba(255,255,255,0.04)' : t.color.neutral[50])
-                    : 'transparent',
-                  transition: 'background 0.15s ease',
-                  borderBottom: `1px solid ${colors.border}`,
-                }}
-              >
-                <td style={{ ...cellStyle, color: colors.textMuted as string }}>{row.data}</td>
-                <td style={cellStyle}>{row.descricao}</td>
-                <td style={cellStyle}>
-                  <span style={{
-                    fontSize: t.font.size.xs,
-                    fontWeight: t.font.weight.medium,
-                    color: badge.color,
-                    background: badge.bg,
-                    borderRadius: t.radius.full,
-                    padding: `2px ${t.space[2]}px`,
-                    fontFamily: t.font.family.sans,
-                  }}>
-                    {row.tipo}
-                  </span>
-                </td>
-                <td style={{ ...cellStyle, color: colors.textSecondary as string }}>{row.conta}</td>
-                <td style={{
-                  ...cellStyle,
-                  fontWeight: t.font.weight.semibold,
-                  color: isPos ? t.color.success.text : isNeg ? t.color.error.text : (colors.textPrimary as string),
-                  textAlign: 'right',
-                }}>
-                  {row.valor}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+    <DataTable<Movimentacao>
+      columns={movimentacoesColumns}
+      data={movimentacoes}
+      keyField="data"
+    />
   )
 }
 
@@ -356,9 +344,9 @@ export default function DashLivroCaixa() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Livro Caixa</span>
-        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
-          Últimos 30 dias <ChevronDown size={11} />
-        </button>
+        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
+          Últimos 30 dias
+        </Button>
       </div>
       <HDivider color={bc} />
 

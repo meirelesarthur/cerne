@@ -4,6 +4,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { Button } from '../../components/ui/Button'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -522,15 +523,9 @@ export default function DashPecuaria() {
         <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
           Pecuária de Corte
         </span>
-        <button style={{
-          display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-          padding: `5px ${t.space[3]}px`, background: 'transparent',
-          cursor: 'pointer', fontSize: t.font.size.sm,
-          color: colors.textSecondary as string, fontFamily: t.font.family.sans,
-        }}>
-          Últimos 30 dias <ChevronDown size={12} />
-        </button>
+        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={12} />}>
+          Últimos 30 dias
+        </Button>
       </div>
       <HDivider color={bc} />
 

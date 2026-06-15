@@ -13,6 +13,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
+import { Button } from '../../components/ui/Button'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -227,15 +228,9 @@ export default function DashSuprimentos() {
             Suprimentos
           </span>
         </div>
-        <button style={{
-          display: 'flex', alignItems: 'center', gap: t.space[1],
-          border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-          padding: `5px ${t.space[3]}px`, background: 'transparent',
-          cursor: 'pointer', fontSize: t.font.size.xs,
-          color: colors.textSecondary as string, fontFamily: t.font.family.sans,
-        }}>
-          Últimos 30 dias <ChevronDown size={11} />
-        </button>
+        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
+          Últimos 30 dias
+        </Button>
       </div>
 
       <HDivider color={bc} />

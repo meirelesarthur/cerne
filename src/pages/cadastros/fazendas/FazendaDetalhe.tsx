@@ -46,26 +46,26 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
     <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
       <div
         style={{
-          fontSize: 10,
+          fontSize: t.font.size.xs,
           fontWeight: 600,
           color: colors.textMuted,
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           marginBottom: 4,
           fontFamily: "'Outfit', sans-serif",
-          transition: 'color 0.2s',
+          transition: `color ${t.transition.smooth}`,
         }}
       >
         {label}
       </div>
       <div
         style={{
-          fontSize: 13,
+          fontSize: t.font.size.base,
           color: colors.textPrimary,
           fontFamily: "'Outfit', sans-serif",
           fontWeight: 400,
           minHeight: 20,
-          transition: 'color 0.2s',
+          transition: `color ${t.transition.smooth}`,
         }}
       >
         {value || <span style={{ color: colors.border }}>—</span>}
@@ -93,7 +93,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        fontSize: 11,
+        fontSize: t.font.size.xs,
         fontWeight: 600,
         color: colors.textMuted,
         textTransform: 'uppercase',
@@ -102,7 +102,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
         fontFamily: "'Outfit', sans-serif",
         paddingBottom: 10,
         borderBottom: `1px solid ${colors.borderSubtle}`,
-        transition: 'color 0.2s, border-color 0.2s',
+        transition: `color ${t.transition.smooth}, border-color ${t.transition.smooth}`,
       }}
     >
       {children}
@@ -118,7 +118,7 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
         ? <CheckCircle2 size={14} color={colors.brand} />
         : <XCircle size={14} color={colors.textMuted} />
       }
-      <span style={{ fontSize: 13, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
+      <span style={{ fontSize: t.font.size.base, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
         {value ? trueLabel : falseLabel}
       </span>
     </div>
@@ -213,8 +213,8 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 5,
-                  color: '#059669',
-                  fontSize: 12,
+                  color: t.color.brand[600],
+                  fontSize: t.font.size.sm,
                   fontWeight: 500,
                   textDecoration: 'none',
                   fontFamily: "'Outfit', sans-serif",
@@ -257,7 +257,7 @@ function TabFinanceiro({ f }: { f: FazendaDetalheData }) {
           <InfoField
             label="Valor Total Estimado"
             value={
-              <span style={{ fontWeight: 600, color: '#059669' }}>{valorTotal}</span>
+              <span style={{ fontWeight: 600, color: t.color.brand[600] }}>{valorTotal}</span>
             }
           />
         </FieldGrid>
@@ -284,7 +284,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Código',
       width: 120,
       render: (row) => (
-        <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#374151' }}>{row.codigo}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: '#374151' }}>{row.codigo}</span>
       ),
     },
     {
@@ -304,17 +304,17 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       width: 110,
       render: (row) => {
         const color =
-          row.condicao === 'Receita' ? '#059669'
-          : row.condicao === 'Despesa' ? '#dc2626'
+          row.condicao === 'Receita' ? t.color.brand[600]
+          : row.condicao === 'Despesa' ? t.color.error.solid
           : '#6366f1'
         const bg =
-          row.condicao === 'Receita' ? '#d1fae5'
-          : row.condicao === 'Despesa' ? '#fee2e2'
+          row.condicao === 'Receita' ? t.color.brand[100]
+          : row.condicao === 'Despesa' ? t.color.error.bg
           : '#ede9fe'
         return (
           <span
             style={{
-              fontSize: 11,
+              fontSize: t.font.size.xs,
               fontWeight: 500,
               color,
               background: bg,
@@ -349,7 +349,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
           <SectionTitle>Observações</SectionTitle>
           <p
             style={{
-              fontSize: 13,
+              fontSize: t.font.size.base,
               color: colors.textSecondary,
               lineHeight: 1.6,
               fontFamily: "'Outfit', sans-serif",
@@ -357,7 +357,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
               borderRadius: 8,
               padding: '12px 14px',
               margin: 0,
-              transition: 'color 0.2s, background 0.2s',
+              transition: `color ${t.transition.smooth}, background ${t.transition.smooth}`,
             }}
           >
             {f.observacao}
@@ -376,20 +376,20 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
     {
       label: 'Área Total',
       value: `${fazenda.areaTotal.toLocaleString('pt-BR')} ha`,
-      icon: <Ruler size={16} color="#059669" />,
-      iconBg: '#d1fae5',
+      icon: <Ruler size={16} color={t.color.brand[600]} />,
+      iconBg: t.color.brand[100],
     },
     {
       label: 'Município',
       value: `${fazenda.cidade} — ${fazenda.uf}`,
-      icon: <MapPin size={16} color="#2563eb" />,
-      iconBg: '#dbeafe',
+      icon: <MapPin size={16} color={t.color.info.text} />,
+      iconBg: t.color.info.border,
     },
     {
       label: 'CNPJ',
       value: fazenda.cpfCnpj,
-      icon: <Building2 size={16} color="#7c3aed" />,
-      iconBg: '#ede9fe',
+      icon: <Building2 size={16} color={t.color.purple.text} />,
+      iconBg: t.color.purple.bg,
     },
     {
       label: 'Valor / ha',
@@ -441,7 +441,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  transition: 'background 0.2s',
+                  transition: `background ${t.transition.smooth}`,
                 }}
               >
                 <div
@@ -459,10 +459,10 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
                   {s.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: 'color 0.2s' }}>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: `color ${t.transition.smooth}` }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, transition: 'color 0.2s' }}>
+                  <div style={{ fontSize: t.font.size.base, fontWeight: 600, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>
                     {s.value}
                   </div>
                 </div>
@@ -479,7 +479,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
               display: 'flex',
               flexDirection: 'column',
               flex: 1,
-              transition: 'background 0.2s',
+              transition: `background ${t.transition.smooth}`,
             }}
           >
             {/* Tab bar */}

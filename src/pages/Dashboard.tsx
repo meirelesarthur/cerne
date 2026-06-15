@@ -119,7 +119,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: t.space[3] }}>
 
         {/* Últimos acessos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Últimos acessos" action="Ver todos" />
           {recentItems.map((item) => (
             <div
@@ -135,8 +135,8 @@ export default function Dashboard() {
               }}
             >
               <div>
-                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: 'color 0.2s' }}>{item.label}</div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 1, transition: 'color 0.2s' }}>{item.module}</div>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>{item.label}</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 1, transition: `color ${t.transition.smooth}` }}>{item.module}</div>
               </div>
               <ExternalLink size={12} color={colors.border} />
             </div>
@@ -144,7 +144,7 @@ export default function Dashboard() {
         </div>
 
         {/* Fazendas */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Fazendas" action="Ver todas" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
             {farms.map((farm) => (
@@ -160,12 +160,12 @@ export default function Dashboard() {
                   borderRadius: t.radius.DEFAULT,
                   cursor: 'pointer',
                   border: `1px solid ${colors.border}`,
-                  transition: 'background 0.2s',
+                  transition: `background ${t.transition.smooth}`,
                 }}
               >
                 <div>
-                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: 'color 0.2s' }}>{farm.name}</div>
-                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 2, transition: 'color 0.2s' }}>{farm.area}</div>
+                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>{farm.name}</div>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 2, transition: `color ${t.transition.smooth}` }}>{farm.area}</div>
                 </div>
                 <span
                   style={{
@@ -195,7 +195,7 @@ export default function Dashboard() {
                 color: colors.textMuted,
                 fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.medium,
-                transition: 'color 0.2s',
+                transition: `color ${t.transition.smooth}`,
               }}
             >
               Nova fazenda
@@ -204,7 +204,7 @@ export default function Dashboard() {
         </div>
 
         {/* Favoritos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: 'background 0.2s' }}>
+        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Favoritos" action="Gerenciar" />
           {favorites.map((fav) => (
             <div
@@ -230,7 +230,7 @@ export default function Dashboard() {
                   justifyContent: 'center',
                   fontSize: t.font.size.base,
                   flexShrink: 0,
-                  transition: 'background 0.2s',
+                  transition: `background ${t.transition.smooth}`,
                 }}
               >
                 {fav.emoji}
@@ -244,7 +244,7 @@ export default function Dashboard() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    transition: 'color 0.2s',
+                    transition: `color ${t.transition.smooth}`,
                   }}
                 >
                   {fav.label}

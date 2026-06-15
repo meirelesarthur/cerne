@@ -46,6 +46,29 @@
   padding: 0;
 }
 
+/* ─── Focus ring acessível (companheiro de t.glow.brand) ────────────────────────
+   O kit aplica foco via estilo inline (JS), onde pseudo-classes não cabem.
+   Esta classe utilitária dá um anel de foco visível APENAS no foco por teclado
+   (:focus-visible), nunca no clique de mouse. Usa `outline` para não conflitar
+   com os `box-shadow` de contorno já existentes (ex.: Button secondary/destructive).
+   Visível em ambos os temas (a cor da marca contrasta em light e GBMode). */
+:root { --gb-focus-color: #059669; }            /* = t.color.brand[600] */
+[data-theme="gbMode"] { --gb-focus-color: #10b981; }
+
+.gb-focusable:focus-visible {
+  outline: 2px solid var(--gb-focus-color);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+.gb-focusable:focus:not(:focus-visible) { outline: none; }
+
+/* Para controles com input nativo oculto (Checkbox, ToggleSwitch): o foco por
+   teclado no input desenha o anel no elemento visual irmão marcado com .gb-focus-target. */
+.gb-focus-input:focus-visible + .gb-focus-target {
+  outline: 2px solid var(--gb-focus-color);
+  outline-offset: 2px;
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;

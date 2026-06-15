@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { useFocusTrap } from './useFocusTrap'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 type ModalSize = 'sm' | 'md' | 'lg'
 
@@ -32,8 +34,10 @@ export function Modal({
   footer,
   closeOnOverlay = true,
 }: ModalProps) {
-  const { colors } = useTheme()
-  const dialogRef  = useRef<HTMLDivElement>(null)
+  const { colors }      = useTheme()
+  const reducedMotion   = usePrefersReducedMotion()
+  // Prende o foco do teclado dentro do dialog enquanto aberto (e restaura ao fechar).
+  const dialogRef       = useFocusTrap<HTMLDivElement>(open)
 
   // ESC to close
   useEffect(() => {
@@ -43,15 +47,6 @@ export function Modal({
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [open, onClose])
-
-  // Focus trap — focus the dialog on open
-  useEffect(() => {
-    if (open) {
-      const prev = document.activeElement as HTMLElement | null
-      dialogRef.current?.focus()
-      return () => { prev?.focus() }
-    }
-  }, [open])
 
   // Prevent scroll on body while open
   useEffect(() => {
@@ -75,7 +70,7 @@ export function Modal({
           zIndex:        t.zIndex.overlay,
           opacity:       open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
-          transition:    `opacity ${t.animation.duration.normal} ${t.animation.easing.easeOut}`,
+          transition:    reducedMotion ? 'none' : `opacity ${t.animation.duration.normal} ${t.animation.easing.easeOut}`,
         }}
       />
 
@@ -111,7 +106,7 @@ export function Modal({
             overflow:     'hidden',
             opacity:      open ? 1 : 0,
             transform:    open ? 'translateY(0) scale(1)' : 'translateY(-12px) scale(0.97)',
-            transition:   `opacity ${t.animation.duration.normal} ${t.animation.easing.easeOut}, transform ${t.animation.duration.normal} ${t.animation.easing.easeOut}`,
+            transition:   reducedMotion ? 'none' : `opacity ${t.animation.duration.normal} ${t.animation.easing.easeOut}, transform ${t.animation.duration.normal} ${t.animation.easing.easeOut}`,
           }}
         >
           {/* Header */}
@@ -157,6 +152,7 @@ export function Modal({
               </div>
               <button
                 type="button"
+                className="gb-focusable"
                 onClick={onClose}
                 aria-label="Fechar modal"
                 style={{

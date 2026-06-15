@@ -3,6 +3,8 @@ import { X, SlidersHorizontal } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
+import { useFocusTrap } from './useFocusTrap'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 interface FilterDrawerProps {
   open: boolean
@@ -21,7 +23,9 @@ export function FilterDrawer({
   children,
   activeCount = 0,
 }: FilterDrawerProps) {
-  const { colors } = useTheme()
+  const { colors }    = useTheme()
+  const reducedMotion = usePrefersReducedMotion()
+  const panelRef      = useFocusTrap<HTMLDivElement>(open)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -40,10 +44,15 @@ export function FilterDrawer({
           zIndex: t.zIndex.overlay,
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
-          transition: `opacity ${t.transition.smooth}`,
+          transition: reducedMotion ? 'none' : `opacity ${t.transition.smooth}`,
         }}
       />
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        tabIndex={-1}
         style={{
           position: 'fixed',
           top: 0,
@@ -55,8 +64,10 @@ export function FilterDrawer({
           zIndex: t.zIndex.drawer,
           display: 'flex',
           flexDirection: 'column',
+          outline: 'none',
+          pointerEvents: open ? 'auto' : 'none',
           transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: `transform ${t.transition.drawer}`,
+          transition: reducedMotion ? 'none' : `transform ${t.transition.drawer}`,
         }}
       >
         {/* Header */}
@@ -99,6 +110,7 @@ export function FilterDrawer({
           </div>
           <button
             type="button"
+            className="gb-focusable"
             onClick={onClose}
             style={{
               background: 'none',

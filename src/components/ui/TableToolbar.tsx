@@ -88,6 +88,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
       {label}
       <button
         type="button"
+        className="gb-focusable"
         onClick={onRemove}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
@@ -119,6 +120,7 @@ export function FilterButton({
   return (
     <button
       type="button"
+      className="gb-focusable"
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

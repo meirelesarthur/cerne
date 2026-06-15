@@ -17,7 +17,7 @@ interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> 
   options: SelectOption[]
 }
 
-export function FormSelect({ label, required, error, hint, options, style, ...selectProps }: FormSelectProps) {
+export function FormSelect({ label, required, error, hint, options, style, className, ...selectProps }: FormSelectProps) {
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -47,6 +47,7 @@ export function FormSelect({ label, required, error, hint, options, style, ...se
       <div style={{ position: 'relative' }}>
         <select
           {...selectProps}
+          className={['gb-focusable', className].filter(Boolean).join(' ')}
           style={{
             width: '100%',
             height: t.size.control,

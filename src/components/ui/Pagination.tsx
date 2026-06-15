@@ -154,6 +154,7 @@ export function Pagination({
           {/* Previous */}
           <button
             type="button"
+            className="gb-focusable"
             disabled={page <= 1}
             onClick={() => page > 1 && onPageChange(page - 1)}
             aria-label="Página anterior"
@@ -190,6 +191,7 @@ export function Pagination({
               <button
                 key={p}
                 type="button"
+                className="gb-focusable"
                 onClick={() => p !== page && onPageChange(p)}
                 aria-label={`Página ${p}`}
                 aria-current={p === page ? 'page' : undefined}
@@ -209,6 +211,7 @@ export function Pagination({
           {/* Next */}
           <button
             type="button"
+            className="gb-focusable"
             disabled={page >= totalPages}
             onClick={() => page < totalPages && onPageChange(page + 1)}
             aria-label="Próxima página"

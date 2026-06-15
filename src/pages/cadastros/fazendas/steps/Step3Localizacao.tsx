@@ -4,6 +4,7 @@ import { FormSection } from '../../../../components/ui/FormSection'
 import { FormField } from '../../../../components/ui/FormField'
 import { FormSelect } from '../../../../components/ui/FormSelect'
 import { StepHeader } from '../../../../components/ui/StepHeader'
+import { t } from '../../../../design/tokens'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step3Props {
@@ -135,40 +136,26 @@ export function Step3Localizacao({ data, errors, onChange }: Step3Props) {
             gap: 8,
           }}
         >
-          <input
-            placeholder="Latitude"
-            value={data.latitude}
-            onChange={(e) => onChange('latitude', e.target.value)}
-            style={{
-              flex: 1,
-              height: 30,
-              border: '1.5px solid #d1fae5',
-              borderRadius: 6,
-              padding: '0 8px',
-              fontSize: 11,
-              fontFamily: "'Outfit', sans-serif",
-              background: 'rgba(255,255,255,0.9)',
-              color: '#1a1a1a',
-              outline: 'none',
-            }}
-          />
-          <input
-            placeholder="Longitude"
-            value={data.longitude}
-            onChange={(e) => onChange('longitude', e.target.value)}
-            style={{
-              flex: 1,
-              height: 30,
-              border: '1.5px solid #d1fae5',
-              borderRadius: 6,
-              padding: '0 8px',
-              fontSize: 11,
-              fontFamily: "'Outfit', sans-serif",
-              background: 'rgba(255,255,255,0.9)',
-              color: '#1a1a1a',
-              outline: 'none',
-            }}
-          />
+          <div style={{ flex: 1 }}>
+            <FormField
+              label="Latitude"
+              placeholder="Latitude"
+              value={data.latitude}
+              onChange={(e) => onChange('latitude', e.target.value)}
+              inputMode="decimal"
+              style={{ height: t.size.controlSm, fontSize: t.font.size.xs }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <FormField
+              label="Longitude"
+              placeholder="Longitude"
+              value={data.longitude}
+              onChange={(e) => onChange('longitude', e.target.value)}
+              inputMode="decimal"
+              style={{ height: t.size.controlSm, fontSize: t.font.size.xs }}
+            />
+          </div>
         </div>
       </div>
 

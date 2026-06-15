@@ -3,8 +3,10 @@ import { HelpCircle } from 'lucide-react'
 import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { applyMask, maskInputMode, type MaskType } from './masks'
 
-interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface FormFieldProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'rows'> {
   label: string
   required?: boolean
   error?: string
@@ -15,9 +17,15 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   iconRight?: React.ReactNode
   /** Estado visual: 'ok' = borda verde, 'err' = borda vermelha */
   status?: 'idle' | 'ok' | 'err'
+  /** Renderiza um <textarea> multi-linha em vez de <input> */
+  multiline?: boolean
+  /** Número de linhas visíveis quando multiline (default 4) */
+  rows?: number
+  /** Máscara de formatação (cpf, cnpj, phone, cep, currency) ou função custom */
+  mask?: MaskType | ((raw: string) => string)
 }
 
-export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function FormField({
+export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, FormFieldProps>(function FormField({
   label,
   required,
   error,
@@ -25,10 +33,23 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
   iconLeft,
   iconRight,
   status,
+  multiline = false,
+  rows = 4,
+  mask,
   style,
   ...inputProps
 }, ref) {
   const { colors } = useTheme()
+
+  // Aplica a máscara no onChange e ajusta inputMode quando for máscara nomeada.
+  const maskedOnChange: React.ChangeEventHandler<HTMLInputElement> | undefined = mask
+    ? (e) => {
+        e.currentTarget.value = applyMask(e.currentTarget.value, mask)
+        inputProps.onChange?.(e)
+      }
+    : inputProps.onChange
+  const maskInputModeValue =
+    mask && typeof mask === 'string' ? maskInputMode[mask] : inputProps.inputMode
 
   const isError = !!error || status === 'err'
   const isOk = !isError && status === 'ok'
@@ -64,8 +85,8 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
         )}
       </div>
 
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-        {iconLeft && (
+      <div style={{ position: 'relative', display: 'flex', alignItems: multiline ? 'flex-start' : 'center' }}>
+        {iconLeft && !multiline && (
           <span
             style={{
               position: 'absolute',
@@ -81,18 +102,11 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
           </span>
         )}
 
-        <input
-          ref={ref}
-          {...inputProps}
-          style={{
+        {(() => {
+          const sharedStyle: React.CSSProperties = {
             width: '100%',
-            height: t.size.control,
             border: `1.5px solid ${borderColor}`,
             borderRadius: t.radius.DEFAULT,
-            paddingTop: 0,
-            paddingBottom: 0,
-            paddingLeft: iconLeft ? 44 : t.space[2] + t.space[1] / 2,
-            paddingRight: iconRight ? 46 : t.space[2] + t.space[1] / 2,
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
             color: colors.textPrimary,
@@ -100,23 +114,70 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
             outline: 'none',
             boxSizing: 'border-box',
             transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
-            ...style,
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.brand
-            e.currentTarget.style.boxShadow = isError
-              ? t.glow.error
-              : t.glow.brand
-            inputProps.onFocus?.(e)
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = borderColor
-            e.currentTarget.style.boxShadow = 'none'
-            inputProps.onBlur?.(e)
-          }}
-        />
+          }
+          const focusHandlers = {
+            onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+              e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.brand
+              e.currentTarget.style.boxShadow = isError ? t.glow.error : t.glow.brand
+              ;(inputProps.onFocus as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>)?.(e)
+            },
+            onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+              e.currentTarget.style.borderColor = borderColor
+              e.currentTarget.style.boxShadow = 'none'
+              ;(inputProps.onBlur as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>)?.(e)
+            },
+          }
+          const a11y = {
+            'aria-invalid': isError || undefined,
+            className: ['gb-focusable', inputProps.className].filter(Boolean).join(' '),
+          }
 
-        {iconRight && (
+          if (multiline) {
+            const { className: _c, ...rest } = inputProps
+            return (
+              <textarea
+                ref={ref as React.Ref<HTMLTextAreaElement>}
+                rows={rows}
+                {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+                {...a11y}
+                style={{
+                  ...sharedStyle,
+                  padding: `${t.space[2]}px ${t.space[2] + t.space[1] / 2}px`,
+                  resize: 'vertical',
+                  minHeight: t.size.control,
+                  lineHeight: t.font.lineHeight.normal,
+                  ...style,
+                }}
+                onFocus={focusHandlers.onFocus}
+                onBlur={focusHandlers.onBlur}
+              />
+            )
+          }
+
+          const { className: _c, ...rest } = inputProps
+          return (
+            <input
+              ref={ref as React.Ref<HTMLInputElement>}
+              {...rest}
+              {...a11y}
+              inputMode={maskInputModeValue}
+              onChange={maskedOnChange}
+              style={{
+                ...sharedStyle,
+                height: t.size.control,
+                paddingTop: 0,
+                paddingBottom: 0,
+                paddingLeft: iconLeft ? 44 : t.space[2] + t.space[1] / 2,
+                paddingRight: iconRight ? 46 : t.space[2] + t.space[1] / 2,
+                ...style,
+              }}
+              onFocus={focusHandlers.onFocus}
+              onBlur={focusHandlers.onBlur}
+            />
+          )
+        })()}
+
+        {iconRight && !multiline && (
           <span
             style={{
               position: 'absolute',
@@ -133,6 +194,8 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
 
       {isError && error && (
         <span
+          role="alert"
+          aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
             color: t.color.error.text,

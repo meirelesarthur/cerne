@@ -19,6 +19,8 @@ import { FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { mockFazendas }  from './fazendas.mock'
@@ -67,7 +69,9 @@ const TIPO_VARIANT: Record<string, BadgeVariant> = {
 export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaProps) {
   const { colors, isGbMode } = useTheme()
 
-  const [data]       = useState<FazendaRow[]>(mockFazendas)
+  const [data, setData] = useState<FazendaRow[]>(mockFazendas)
+  const [deleteTarget, setDeleteTarget] = useState<FazendaRow | null>(null)
+  const { toasts, show, dismiss } = useToast()
   const [viewMode,   setViewMode]   = useState<ViewMode>('list')
   const [search,     setSearch]     = useState('')
   const [filters,    setFilters]    = useState({ tipoExploracao: '', ativo: '' })
@@ -118,6 +122,13 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 
   const activeFilterCount = [filters.tipoExploracao, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipoExploracao: '', ativo: '' })
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return
+    setData((prev) => prev.filter((f) => f.id !== deleteTarget.id))
+    show(`"${deleteTarget.nome}" excluída.`, 'info')
+    setDeleteTarget(null)
+  }
 
   // ── Colunas da tabela ─────────────────────────────────────────────────────
   const columns: Column<FazendaRow>[] = [
@@ -178,7 +189,10 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       sortable: false,
       width: 80,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <IconButton
             icon={<Eye size={13} />}
             aria-label="Visualizar fazenda"
@@ -199,6 +213,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             tooltip="Excluir"
             size="sm"
             danger
+            onClick={() => setDeleteTarget(row)}
           />
         </div>
       ),
@@ -347,6 +362,22 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           onChange={(e) => setFilters((f) => ({ ...f, ativo: e.target.value }))}
         />
       </FilterDrawer>
+
+      {/* ── Confirmação de exclusão ──────────────────────────────────────── */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        title="Excluir fazenda"
+        message={
+          deleteTarget
+            ? `"${deleteTarget.nome}" será excluída permanentemente. Esta ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Excluir"
+      />
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
     </PageContainer>
   )

@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
-interface PaginationProps {
+interface PaginationOffsetProps {
+  mode?:               'offset'
   page:                number
   total:               number
   pageSize:            number
@@ -11,7 +12,30 @@ interface PaginationProps {
   onPageSizeChange?:   (size: number) => void
   pageSizeOptions?:    number[]
   showPageSizeSelector?: boolean
+  // cursor props not used in offset mode
+  hasPrev?:            never
+  hasNext?:            never
+  onPrev?:             never
+  onNext?:             never
 }
+
+interface PaginationCursorProps {
+  mode:    'cursor'
+  hasPrev?: boolean
+  hasNext?: boolean
+  onPrev?:  () => void
+  onNext?:  () => void
+  // offset props not used in cursor mode
+  page?:               never
+  total?:              never
+  pageSize?:           never
+  onPageChange?:       never
+  onPageSizeChange?:   never
+  pageSizeOptions?:    never
+  showPageSizeSelector?: never
+}
+
+type PaginationProps = PaginationOffsetProps | PaginationCursorProps
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50]
 const MAX_VISIBLE_PAGES         = 5
@@ -46,16 +70,61 @@ function buildPageRange(current: number, totalPages: number): (number | '...')[]
   return pages
 }
 
-export function Pagination({
-  page,
-  total,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
-  pageSizeOptions    = DEFAULT_PAGE_SIZE_OPTIONS,
-  showPageSizeSelector = false,
-}: PaginationProps) {
+export function Pagination(props: PaginationProps) {
   const { colors } = useTheme()
+
+  // ── Cursor mode ──────────────────────────────────────────────────────────────
+  if (props.mode === 'cursor') {
+    const { hasPrev = false, hasNext = false, onPrev, onNext } = props
+
+    const btnBase: React.CSSProperties = {
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      height: t.size.pageBtn, padding: `0 ${t.space[3]}px`,
+      borderRadius: t.radius.md, border: `1px solid ${colors.border}`,
+      background: colors.surfaceBg, cursor: 'pointer',
+      fontFamily: t.font.family.sans, fontSize: t.font.size.sm,
+      fontWeight: t.font.weight.medium, color: colors.textSecondary,
+      transition: `background ${t.transition.fast}, color ${t.transition.fast}`,
+      userSelect: 'none',
+    }
+    const btnDisabled: React.CSSProperties = { ...btnBase, opacity: 0.4, cursor: 'not-allowed' }
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+        <button
+          type="button"
+          className="gb-focusable"
+          disabled={!hasPrev}
+          onClick={hasPrev ? onPrev : undefined}
+          aria-label="Página anterior"
+          style={hasPrev ? btnBase : btnDisabled}
+        >
+          <ChevronLeft size={14} /> Anterior
+        </button>
+        <button
+          type="button"
+          className="gb-focusable"
+          disabled={!hasNext}
+          onClick={hasNext ? onNext : undefined}
+          aria-label="Próxima página"
+          style={hasNext ? btnBase : btnDisabled}
+        >
+          Próximo <ChevronRight size={14} />
+        </button>
+      </div>
+    )
+  }
+
+  // ── Offset mode (default) ────────────────────────────────────────────────────
+  const {
+    page,
+    total,
+    pageSize,
+    onPageChange,
+    onPageSizeChange,
+    pageSizeOptions    = DEFAULT_PAGE_SIZE_OPTIONS,
+    showPageSizeSelector = false,
+  } = props
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const from       = total === 0 ? 0 : (page - 1) * pageSize + 1

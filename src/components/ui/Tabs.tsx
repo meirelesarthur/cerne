@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -9,10 +9,16 @@ export interface TabItem {
 }
 
 interface TabsProps {
-  items:    TabItem[]
-  activeId: string
-  onChange: (id: string) => void
-  label?:   string
+  items:      TabItem[]
+  activeId:   string
+  onChange:   (id: string) => void
+  label?:     string
+  /**
+   * Quando definido, sincroniza a aba ativa com `?<syncParam>=<id>` na URL via
+   * history.replaceState (sem reload). Lê o valor inicial da URL ao montar.
+   * Sem esta prop, o comportamento é idêntico ao atual (controlado por activeId/onChange).
+   */
+  syncParam?: string
 }
 
 /**
@@ -20,8 +26,28 @@ interface TabsProps {
  * o mesmo padrão usado nos dashboards. Acessível via role tablist/tab.
  * Substitui as tabs manuais em Pluviometria e dashboards.
  */
-export function Tabs({ items, activeId, onChange, label = 'Abas' }: TabsProps) {
+export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam }: TabsProps) {
   const { colors, isGbMode } = useTheme()
+
+  // On mount: if syncParam is set and URL has a matching search param, drive the parent's onChange
+  useEffect(() => {
+    if (!syncParam) return
+    const params = new URLSearchParams(window.location.search)
+    const urlValue = params.get(syncParam)
+    if (urlValue && urlValue !== activeId && items.some(i => i.id === urlValue)) {
+      onChange(urlValue)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncParam])
+
+  const handleChange = (id: string) => {
+    if (syncParam) {
+      const params = new URLSearchParams(window.location.search)
+      params.set(syncParam, id)
+      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`)
+    }
+    onChange(id)
+  }
 
   return (
     <div
@@ -45,7 +71,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas' }: TabsProps) {
             role="tab"
             type="button"
             aria-selected={active}
-            onClick={() => onChange(item.id)}
+            onClick={() => handleChange(item.id)}
             style={{
               display:        'inline-flex',
               alignItems:     'center',

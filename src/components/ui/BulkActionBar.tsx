@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckSquare, X } from 'lucide-react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 export interface BulkAction {
   label:   string
@@ -23,8 +24,16 @@ interface BulkActionBarProps {
  * ProdutosLista (Lei 1 / Regra A) e centraliza o padrão para outras listas.
  */
 export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }: BulkActionBarProps) {
+  const { isGbMode } = useTheme()
   if (count <= 0) return null
   const plural = count !== 1 ? 's' : ''
+
+  // GBMode: translucent green-tinted surface; light: solid neutral[800]
+  const barBg      = isGbMode ? t.color.gbSurface  : t.color.neutral[800]
+  const barBorder  = isGbMode ? `1px solid ${t.color.brand[700]}` : 'none'
+  const accentColor = isGbMode ? t.color.gbAccent  : t.color.brand[400]
+  const textColor  = t.color.neutral[0]
+  const dividerColor = isGbMode ? t.color.brand[700] : t.color.neutral[600]
 
   return (
     <div
@@ -35,7 +44,8 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
         bottom:       t.space[7],
         left:         '50%',
         transform:    'translateX(-50%)',
-        background:   t.color.neutral[800],
+        background:   barBg,
+        border:       barBorder,
         borderRadius: t.radius.xl,
         padding:      `${t.space[2] + 2}px ${t.space[5]}px`,
         display:      'flex',
@@ -46,17 +56,17 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
         whiteSpace:   'nowrap',
       }}
     >
-      <CheckSquare size={15} color={t.color.brand[400]} aria-hidden="true" />
+      <CheckSquare size={15} color={accentColor} aria-hidden="true" />
       <span style={{
         fontSize:   t.font.size.sm,
         fontWeight: t.font.weight.semibold,
-        color:      t.color.neutral[0],
+        color:      textColor,
         fontFamily: t.font.family.sans,
       }}>
         {count} {noun}{plural}
       </span>
 
-      <span aria-hidden="true" style={{ width: 1, height: t.space[5], background: t.color.neutral[600] }} />
+      <span aria-hidden="true" style={{ width: 1, height: t.space[5], background: dividerColor }} />
 
       {actions.map((a) => (
         <BarButton key={a.label} action={a} />

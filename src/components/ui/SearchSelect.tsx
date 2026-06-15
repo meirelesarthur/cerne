@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useId } from 'react'
+import React, { useRef, useState, useEffect, useId, useCallback } from 'react'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -62,8 +62,10 @@ export function SearchSelect({
 }: SearchSelectProps) {
   const { colors } = useTheme()
   const id = useId()
+  const listboxId = `${id}-listbox`
   const containerRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState<number>(-1)
 
   // Fecha ao clicar fora
   useEffect(() => {
@@ -76,10 +78,43 @@ export function SearchSelect({
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [])
 
+  // Reset active index when dropdown closes or filtered list changes
+  useEffect(() => {
+    if (!open) setActiveIndex(-1)
+  }, [open])
+
   const q = query.trim().toLowerCase()
   const filtered = q
     ? options.filter(o => o.label.toLowerCase().includes(q) || (o.code?.toLowerCase().includes(q) ?? false))
     : options
+
+  const visibleOptions = filtered.slice(0, maxVisible)
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        setOpen(true)
+        e.preventDefault()
+      }
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex(prev => Math.min(prev + 1, visibleOptions.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex(prev => Math.max(prev - 1, 0))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (activeIndex >= 0 && activeIndex < visibleOptions.length) {
+        onSelect(visibleOptions[activeIndex])
+        setOpen(false)
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setOpen(false)
+    }
+  }, [open, activeIndex, visibleOptions, onSelect])
 
   return (
     <div>
@@ -114,10 +149,16 @@ export function SearchSelect({
           <input
             id={id}
             type="text"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listboxId}
+            aria-autocomplete="list"
+            aria-activedescendant={activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
             placeholder={placeholder}
             value={query}
-            onChange={e => { onQueryChange(e.target.value); setOpen(true) }}
+            onChange={e => { onQueryChange(e.target.value); setOpen(true); setActiveIndex(-1) }}
             onFocus={() => setOpen(true)}
+            onKeyDown={handleKeyDown}
             autoComplete="off"
             spellCheck={false}
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
@@ -136,16 +177,19 @@ export function SearchSelect({
         </div>
 
         {open && (
-          <div style={{
-            position: 'absolute', top: '100%', left: 0, right: 0, zIndex: t.zIndex.dropdown,
-            background: colors.surfaceBg,
-            border: `1px solid ${colors.border}`,
-            borderRadius: t.radius.lg,
-            boxShadow: t.shadow.md,
-            maxHeight: 280,
-            overflowY: 'auto',
-            marginTop: 2,
-          }}>
+          <div
+            id={listboxId}
+            role="listbox"
+            style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: t.zIndex.dropdown,
+              background: colors.surfaceBg,
+              border: `1px solid ${colors.border}`,
+              borderRadius: t.radius.lg,
+              boxShadow: t.shadow.md,
+              maxHeight: 280,
+              overflowY: 'auto',
+              marginTop: 2,
+            }}>
             <div style={{ padding: `${t.space[2]}px ${t.space[3]}px ${t.space[1] + 2}px`, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, borderBottom: `1px solid ${colors.borderSubtle}` }}>
               {filtered.length} resultado{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
             </div>
@@ -156,11 +200,13 @@ export function SearchSelect({
               </div>
             )}
 
-            {filtered.slice(0, maxVisible).map(opt => (
+            {visibleOptions.map((opt, idx) => (
               <OptionRow
                 key={opt.id}
+                optionId={`${listboxId}-opt-${idx}`}
                 option={opt}
                 isSelected={selectedId === opt.id}
+                isActive={activeIndex === idx}
                 onSelect={() => { onSelect(opt); setOpen(false) }}
                 colors={colors}
               />
@@ -190,23 +236,29 @@ export function SearchSelect({
   )
 }
 
-function OptionRow({ option, isSelected, onSelect, colors }: {
+function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }: {
   option:     SearchSelectOption
+  optionId:   string
   isSelected: boolean
+  isActive:   boolean
   onSelect:   () => void
   colors:     ReturnType<typeof useTheme>['colors']
 }) {
   const [hov, setHov] = useState(false)
+  const highlighted = isActive || hov
   return (
     <button
+      id={optionId}
       type="button"
+      role="option"
+      aria-selected={isSelected}
       onClick={onSelect}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
         width: '100%',
         padding: `${t.space[2]}px ${t.space[3]}px`,
-        background: isSelected ? colors.brandBg : hov ? colors.surfaceSubtle : 'transparent',
+        background: isSelected ? colors.brandBg : highlighted ? colors.surfaceSubtle : 'transparent',
         border: 'none',
         cursor: 'pointer',
         textAlign: 'left',
@@ -214,6 +266,8 @@ function OptionRow({ option, isSelected, onSelect, colors }: {
         alignItems: 'center',
         gap: t.space[2],
         transition: `background ${t.transition.fast}`,
+        outline: isActive ? `2px solid ${colors.brand}` : 'none',
+        outlineOffset: -2,
       }}
     >
       {option.code && (

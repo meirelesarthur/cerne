@@ -32,6 +32,8 @@ export function Tooltip({ label, children }: TooltipProps) {
       ref={wrapperRef}
       onMouseEnter={show}
       onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
       style={{ display: 'flex', justifyContent: 'center' }}
     >
       {children}

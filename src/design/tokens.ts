@@ -87,6 +87,29 @@ export const color = {
     bg:   '#ecfeff',
     text: '#0891b2',
   },
+
+  /** Estado desabilitado — centraliza valores antes definidos por componente */
+  disabled: {
+    bg:     '#f5f5f5',   // = neutral[100]
+    text:   '#9ca3af',   // = neutral[400]
+    border: '#e5e7eb',   // = neutral[200]
+  },
+  /** Estado somente-leitura (read-only) — superfície sutil, texto legível */
+  readonly: {
+    bg:     '#fafafa',   // = neutral[50]
+    text:   '#404040',   // = neutral[700]
+    border: '#e5e7eb',   // = neutral[200]
+  },
+
+  /** Estados de linha de tabela (hover/selecionada/zebra) — light + GBMode */
+  row: {
+    hover:       '#f5f5f5',                  // light — = neutral[100]
+    hoverGb:     'rgba(255,255,255,0.03)',   // GBMode
+    selected:    '#f0fdf4',                  // light — = brand[50]
+    selectedGb:  'rgba(16,185,129,0.06)',    // GBMode
+    striped:     '#fafafa',                  // light — = neutral[50]
+    stripedGb:   'rgba(255,255,255,0.015)',  // GBMode
+  },
 }
 
 // ─── Tipografia ─────────────────────────────────────────────────────────────
@@ -138,8 +161,10 @@ export const space = {
   6:  24,
   7:  28,
   8:  32,
+  9:  36,
   10: 40,
   12: 48,
+  14: 56,
   16: 64,
   20: 80,
 }
@@ -251,11 +276,23 @@ export const animation = {
     slower: '400ms',
   },
   easing: {
-    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    easeOut:  'cubic-bezier(0, 0, 0.2, 1)',
-    easeIn:   'cubic-bezier(0.4, 0, 1, 1)',
-    spring:   'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    standard:  'cubic-bezier(0.4, 0, 0.2, 1)',
+    easeOut:   'cubic-bezier(0, 0, 0.2, 1)',
+    easeIn:    'cubic-bezier(0.4, 0, 1, 1)',
+    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    spring:    'cubic-bezier(0.34, 1.56, 0.64, 1)',
   },
+}
+
+// ─── Delays de loading ─────────────────────────────────────────────────────────
+// Diretriz de UI: atrasar a exibição do loading evita flash em respostas rápidas;
+// manter um tempo mínimo visível evita flicker. Use estes em spinners/skeletons.
+
+export const delay = {
+  /** Espera antes de exibir o indicador de loading (evita flash) */
+  loadingShow: 225,  // ms — meio da faixa 150–300
+  /** Tempo mínimo que o loading permanece visível (evita flicker) */
+  loadingMin:  400,  // ms — meio da faixa 300–500
 }
 
 // ─── Glow / Focus rings ───────────────────────────────────────────────────────
@@ -290,6 +327,32 @@ export const dashboard = {
 export const chart = {
   revenue: '#3b82f6',  // azul — receitas (equivale a color.info.solid)
   expense: '#ef4444',  // vermelho vivo — despesas
+  /** Paleta categórica para múltiplas séries (até 8) — ordem estável */
+  series: [
+    '#059669',  // 1 — brand
+    '#3b82f6',  // 2 — azul
+    '#f59e0b',  // 3 — âmbar
+    '#7c3aed',  // 4 — roxo
+    '#ef4444',  // 5 — vermelho
+    '#0891b2',  // 6 — ciano
+    '#d97706',  // 7 — laranja
+    '#65a30d',  // 8 — verde-limão
+  ],
+  /** Linhas de grade / eixos dos gráficos */
+  grid: 'rgba(0,0,0,0.06)',
+  gridGb: 'rgba(255,255,255,0.06)',
+}
+
+// ─── Breakpoints ───────────────────────────────────────────────────────────────
+// Larguras de viewport de referência. O app não é mobile-first, mas filtros,
+// auto-zoom de inputs iOS e o ViewportGuard dependem destes pontos.
+
+export const breakpoint = {
+  xs: 360,   // menor alvo de teste
+  sm: 768,   // limite do ViewportGuard / tablet
+  md: 1024,
+  lg: 1280,  // laptop de referência
+  xl: 1920,  // wide de referência
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
@@ -309,5 +372,5 @@ export const layout = {
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, glow, login: loginTheme, dashboard, chart, layout }
+export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, delay, glow, login: loginTheme, dashboard, chart, breakpoint, layout }
 export default t

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import { SplashScreen } from './components/SplashScreen'
 import { ThemeProvider } from './context/ThemeContext'
+import { PermissionProvider, SessionProvider, SessionExpiredModal } from './auth'
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -16,9 +17,17 @@ export default function App() {
       ) : !loggedIn ? (
         <Login onLogin={() => setSplashing(true)} />
       ) : (
-        <AppLayout>
-          <Dashboard />
-        </AppLayout>
+        // Área autenticada: papel padrão 'admin' (substituir pelo papel real do
+        // usuário quando houver auth). SessionProvider expõe expire()/triggerSessionExpire
+        // para a futura camada HTTP chamar em respostas 401.
+        <PermissionProvider>
+          <SessionProvider onRelogin={() => setLoggedIn(false)}>
+            <AppLayout>
+              <Dashboard />
+            </AppLayout>
+            <SessionExpiredModal />
+          </SessionProvider>
+        </PermissionProvider>
       )}
     </ThemeProvider>
   )

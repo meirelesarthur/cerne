@@ -3,6 +3,7 @@ import { FormField } from '../components/ui/FormField'
 import { Checkbox } from '../components/ui/Checkbox'
 import { Divider } from '../components/ui/Divider'
 import { SSOButton } from '../components/ui/SSOButton'
+import { Spinner } from '../components/ui/Spinner'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
@@ -490,7 +491,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                 aria-busy={progressState === 'loading'}
               >
                 {progressState === 'loading' ? (
-                  <span className="lgn-spinner" aria-hidden="true" />
+                  <Spinner size="sm" />
                 ) : progressState === 'success' ? (
                   <>
                     <svg viewBox="0 0 20 20" fill="none" width={18} height={18} aria-hidden="true">
@@ -607,7 +608,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                     style={{ marginTop: t.space[5] }}
                   >
                     {forgotLoading
-                      ? <span className="lgn-spinner" aria-hidden="true" />
+                      ? <Spinner size="sm" />
                       : 'Enviar link de recuperação'}
                   </button>
                 </form>

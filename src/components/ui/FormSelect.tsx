@@ -47,6 +47,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
       <div style={{ position: 'relative' }}>
         <select
           {...selectProps}
+          aria-invalid={!!error || undefined}
           className={['gb-focusable', className].filter(Boolean).join(' ')}
           style={{
             width: '100%',
@@ -58,21 +59,24 @@ export function FormSelect({ label, required, error, hint, options, style, class
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
-            color: colors.textPrimary,
-            background: colors.inputBg,
+            color: selectProps.disabled ? t.color.disabled.text : colors.textPrimary,
+            background: selectProps.disabled ? t.color.disabled.bg : colors.inputBg,
             outline: 'none',
             boxSizing: 'border-box',
             appearance: 'none',
-            cursor: 'pointer',
-            transition: `border-color ${t.transition.DEFAULT}, background 0.2s, color 0.2s`,
+            cursor: selectProps.disabled ? 'not-allowed' : 'pointer',
+            opacity: selectProps.disabled ? 0.7 : 1,
+            transition: `border-color ${t.transition.DEFAULT}, box-shadow ${t.transition.DEFAULT}, background ${t.transition.smooth}, color ${t.transition.smooth}`,
             ...style,
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = error ? t.color.error.text : colors.brand
+            e.currentTarget.style.boxShadow = error ? t.glow.error : t.glow.brand
             selectProps.onFocus?.(e)
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border
+            e.currentTarget.style.boxShadow = 'none'
             selectProps.onBlur?.(e)
           }}
         >
@@ -95,7 +99,11 @@ export function FormSelect({ label, required, error, hint, options, style, class
         />
       </div>
       {error && (
-        <span style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans }}>
+        <span
+          role="alert"
+          aria-live="polite"
+          style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans }}
+        >
           {error}
         </span>
       )}

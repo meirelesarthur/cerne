@@ -36,7 +36,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 2,
+          gap: t.space[1] / 2,
           fontFamily: t.font.family.sans,
           fontWeight: t.font.weight.normal,
           fontSize: t.font.size.sm,

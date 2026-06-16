@@ -131,7 +131,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             width: '100%',
             border: `1.5px solid ${borderColor}`,
             borderRadius: t.radius.DEFAULT,
-            fontSize: t.font.size.base,
+            fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
             color: colors.textPrimary,
             background: isError ? t.color.error.bg : colors.inputBg,

@@ -57,7 +57,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
               : `1.5px solid ${colors.border}`,
             borderRadius: t.radius.DEFAULT,
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
-            fontSize: t.font.size.base,
+            fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
             color: selectProps.disabled ? t.color.disabled.text : colors.textPrimary,
             background: selectProps.disabled ? t.color.disabled.bg : colors.inputBg,

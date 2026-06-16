@@ -44,7 +44,7 @@ export function TableSearchInput({
         onBlur={() => setFocused(false)}
         style={{
           flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.sm, color: colors.textPrimary,
+          fontSize: t.font.size.md, color: colors.textPrimary,
           fontFamily: t.font.family.sans, minWidth: 0,
         }}
       />

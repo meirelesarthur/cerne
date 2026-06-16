@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
 import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
@@ -182,8 +183,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         width: '100vw',
         height: '100vh',
         background: colors.pageBg,
-        padding: 8,
-        gap: 8,
+        padding: t.space[2],
+        gap: t.space[2],
         boxSizing: 'border-box',
         fontFamily: "'Outfit', sans-serif",
         transition: 'background 0.2s ease',
@@ -209,8 +210,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           borderRadius: 16,
           display: 'flex',
           flexDirection: 'column',
-          padding: 8,
-          gap: 8,
+          padding: t.space[2],
+          gap: t.space[2],
           minWidth: 0,
           overflow: 'hidden',
           transition: 'background 0.2s ease',
@@ -218,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       >
         <Topbar expandedModule={expandedModule} activeItemId={activeItemId} />
 
-        <div style={{ flex: 1, display: 'flex', gap: 8, overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -8 : 0 }}>
+        <div style={{ flex: 1, display: 'flex', gap: t.space[2], overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -t.space[2] : 0 }}>
           {hasSecondaryNav && expandedModule && (
             <SecondaryNav
               module={expandedModule}

@@ -14,7 +14,7 @@ function NavHeader({ module }: { module: NavModule }) {
       style={{
         height: 44,
         flexShrink: 0,
-        background: colors.brandBg,
+        background: colors.subnavHeaderBg,
         display: 'flex',
         alignItems: 'center',
         gap: t.space[2],
@@ -22,12 +22,12 @@ function NavHeader({ module }: { module: NavModule }) {
         transition: 'background 0.2s',
       }}
     >
-      <Icon size={16} strokeWidth={2} color={colors.brand} style={{ flexShrink: 0 }} aria-hidden="true" />
+      <Icon size={16} strokeWidth={2} color={colors.subnavHeaderText} style={{ flexShrink: 0 }} aria-hidden="true" />
       <span
         style={{
           fontSize: t.font.size.md,
           fontWeight: t.font.weight.bold,
-          color: colors.brand,
+          color: colors.subnavHeaderText,
           fontFamily: "'Outfit', sans-serif",
           letterSpacing: '-0.1px',
         }}

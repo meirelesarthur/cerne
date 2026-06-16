@@ -12,6 +12,7 @@ import { Button } from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { MapView } from '../../../components/ui/MapView'
 import { EmptyState } from '../../../components/ui/EmptyState'
+import { Divider } from '../../../components/ui/Divider'
 import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
@@ -28,10 +29,9 @@ interface FazendaDetalheProps {
   fazenda?: FazendaDetalheData
 }
 
-type Tab = 'identificacao' | 'documentacao' | 'localizacao' | 'financeiro' | 'centrosCusto'
+type Tab = 'documentacao' | 'localizacao' | 'financeiro' | 'centrosCusto'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'identificacao', label: 'Identificação' },
   { id: 'documentacao',  label: 'Documentação' },
   { id: 'localizacao',   label: 'Localização' },
   { id: 'financeiro',    label: 'Financeiro' },
@@ -123,16 +123,14 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
   )
 }
 
-function TabIdentificacao({ f }: { f: FazendaDetalheData }) {
+function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
   return (
-    <div>
-      <FieldGrid>
-        <InfoField label="Razão Social / Nome" value={f.nome} />
-        <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
-        <InfoField label="Inscrição Estadual" value={f.inscricaoEstadual} />
-        <InfoField label="Telefone" value={f.telefone} />
-      </FieldGrid>
-    </div>
+    <FieldGrid>
+      <InfoField label="Razão Social / Nome" value={f.nome} />
+      <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
+      <InfoField label="Inscrição Estadual" value={f.inscricaoEstadual} />
+      <InfoField label="Telefone" value={f.telefone} />
+    </FieldGrid>
   )
 }
 
@@ -349,11 +347,10 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
 
 export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSantaLuzia }: FazendaDetalheProps) {
   const { colors } = useTheme()
-  const [activeTab, setActiveTab] = useState<Tab>('identificacao')
+  const [activeTab, setActiveTab] = useState<Tab>('documentacao')
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'identificacao': return <TabIdentificacao f={fazenda} />
       case 'documentacao':  return <TabDocumentacao f={fazenda} />
       case 'localizacao':   return <TabLocalizacao f={fazenda} />
       case 'financeiro':    return <TabFinanceiro f={fazenda} />
@@ -380,6 +377,11 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
               </>
             }
           />
+
+          {/* Dados de identificação como cabeçalho fixo */}
+          <IdentificacaoHeader f={fazenda} />
+
+          <Divider />
 
           {/* Tabs + content */}
           <div

@@ -39,7 +39,7 @@ export interface ThemeColors {
 
 const light: ThemeColors = {
   pageBg:        '#f5f5f5',
-  outerCardBg:   '#fafafa',
+  outerCardBg:   '#f0f0f0',
   sidebarBg:     '#ffffff',
   surfaceBg:     '#ffffff',
   surfaceSubtle: '#f5f5f5',

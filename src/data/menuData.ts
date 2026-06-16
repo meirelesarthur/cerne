@@ -122,11 +122,7 @@ export const menuModules: NavModule[] = [
         icon: Users,
         items: [
           { id: 'cad-pes-per', label: 'Perfil de Usuário', path: '/cadastros/perfil' },
-          { id: 'cad-pes-uni', label: 'Pessoas Unificado', path: '/cadastros/pessoas' },
-          { id: 'cad-pes-pro', label: 'Proprietários', path: '/cadastros/proprietarios' },
-          { id: 'cad-pes-fun', label: 'Funcionários', path: '/cadastros/funcionarios' },
-          { id: 'cad-pes-for', label: 'Fornecedores', path: '/cadastros/fornecedores' },
-          { id: 'cad-pes-cli', label: 'Clientes', path: '/cadastros/clientes' },
+          { id: 'cad-pes-uni', label: 'Pessoas', path: '/cadastros/pessoas' },
           { id: 'cad-pes-usr', label: 'Usuários', path: '/cadastros/usuarios' },
           { id: 'cad-pes-aut', label: 'Autorizadores', path: '/cadastros/autorizadores' },
         ],

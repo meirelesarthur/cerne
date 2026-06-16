@@ -12,6 +12,7 @@ import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
 import ArmazensPage      from '../../pages/cadastros/armazens/ArmazensPage'
 import ProdutosPage      from '../../pages/cadastros/produtos/ProdutosPage'
 import EstoquesIniciaisPage from '../../pages/cadastros/estoques-iniciais/EstoquesIniciaisPage'
+import PessoasPage        from '../../pages/cadastros/pessoas/PessoasPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -79,6 +80,7 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
 function renderPage(itemId: string | null, module?: NavModule) {
   if (!itemId) return null
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
+  if (itemId === 'cad-pes-uni') return <PessoasPage />
   if (itemId === 'cad-est-faz') return <FazendasPage />
   if (itemId === 'cad-est-saf') return <SafrasPage />
   if (itemId === 'cad-est-cc')  return <CentrosCustoPage />

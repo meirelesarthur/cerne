@@ -107,14 +107,12 @@ function NavItem({
 function NavGroupSection({
   group,
   open,
-  anyOpen,
   activeItemId,
   onToggle,
   onItemClick,
 }: {
   group: NavGroup
   open: boolean
-  anyOpen: boolean
   activeItemId: string | null
   onToggle: () => void
   onItemClick: (id: string) => void
@@ -132,8 +130,8 @@ function NavGroupSection({
           alignItems: 'center',
           gap: 5,
           fontSize: 10,
-          fontWeight: anyOpen ? 500 : 600,
-          color: anyOpen ? colors.textMuted : colors.textPrimary,
+          fontWeight: 500,
+          color: colors.textMuted,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
           padding: '6px 10px',
@@ -227,8 +225,6 @@ export default function SecondaryNav({
     return initial
   })
 
-  const anyOpen = openGroups.size > 0
-
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => {
       const next = new Set(prev)
@@ -267,7 +263,6 @@ export default function SecondaryNav({
               key={group.id}
               group={group}
               open={openGroups.has(group.id)}
-              anyOpen={anyOpen}
               activeItemId={activeItemId}
               onToggle={() => toggleGroup(group.id)}
               onItemClick={onItemClick}

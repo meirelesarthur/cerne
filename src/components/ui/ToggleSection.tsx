@@ -1,4 +1,5 @@
 import React from 'react'
+import { Check } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { ToggleSwitch } from './ToggleSwitch'
@@ -17,9 +18,16 @@ interface ToggleSectionProps {
   disabled?:    boolean
   /** Mensagem exibida no corpo quando a seção está inativa. */
   inactiveHint?: string
+  /**
+   * Mensagem exibida no corpo quando a seção está ativa **e não há `children`**
+   * (modo cartão de seleção — ex.: ativar papel cuja configuração vive em outra
+   * etapa). Renderizada com destaque verde + ícone de confirmação.
+   */
+  activeHint?:  string
   /** Conteúdo extra à direita do cabeçalho, antes do toggle (ex.: Badge). */
   headerExtra?: React.ReactNode
-  children:     React.ReactNode
+  /** Corpo revelado quando ativo. Opcional no modo cartão de seleção. */
+  children?:    React.ReactNode
 }
 
 /**
@@ -33,7 +41,7 @@ interface ToggleSectionProps {
  */
 export function ToggleSection({
   title, description, icon, active, onToggle, disabled = false,
-  inactiveHint, headerExtra, children,
+  inactiveHint, activeHint, headerExtra, children,
 }: ToggleSectionProps) {
   const { colors } = useTheme()
 
@@ -97,9 +105,27 @@ export function ToggleSection({
 
       {/* Corpo */}
       {active ? (
-        <div style={{ padding: `${t.space[5]}px ${t.space[5]}px` }}>
-          {children}
-        </div>
+        children ? (
+          <div style={{ padding: `${t.space[5]}px ${t.space[5]}px` }}>
+            {children}
+          </div>
+        ) : (
+          activeHint && (
+            <div style={{
+              display:    'flex',
+              alignItems: 'center',
+              gap:        t.space[2],
+              padding:    `${t.space[3]}px ${t.space[4]}px`,
+              fontSize:   t.font.size.sm,
+              fontWeight: t.font.weight.medium,
+              color:      colors.brand,
+              fontFamily: t.font.family.sans,
+            }}>
+              <Check size={14} aria-hidden="true" />
+              {activeHint}
+            </div>
+          )
+        )
       ) : (
         inactiveHint && (
           <div style={{

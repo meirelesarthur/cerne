@@ -49,6 +49,23 @@ export const Default: Story = {
   },
 }
 
+export const SelectionCard: Story = {
+  render: () => {
+    const [active, setActive] = useState(true)
+    return (
+      <ToggleSection
+        title="Proprietário"
+        description="Dono de fazenda — participação por propriedade e inscrições estaduais."
+        icon={<Briefcase size={16} />}
+        active={active}
+        onToggle={setActive}
+        activeHint={'Etapa "Proprietário" adicionada — configure a seguir.'}
+        inactiveHint="Ative para adicionar a etapa de configuração."
+      />
+    )
+  },
+}
+
 export const Disabled: Story = {
   render: () => (
     <ToggleSection

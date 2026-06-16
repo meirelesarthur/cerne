@@ -218,7 +218,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       >
         <Topbar expandedModule={expandedModule} activeItemId={activeItemId} />
 
-        <div style={{ flex: 1, display: 'flex', gap: 8, overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', gap: 8, overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -8 : 0 }}>
           {hasSecondaryNav && expandedModule && (
             <SecondaryNav
               module={expandedModule}

@@ -12,7 +12,6 @@ import { Button } from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { MapView } from '../../../components/ui/MapView'
 import { EmptyState } from '../../../components/ui/EmptyState'
-import { Divider } from '../../../components/ui/Divider'
 import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
 import { mockFazendaSantaLuzia } from './fazendas.mock'
@@ -124,25 +123,32 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
 }
 
 function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
+  const { colors } = useTheme()
   return (
-    <FieldGrid>
-      <InfoField label="Razão Social / Nome" value={f.nome} />
-      <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
-      <InfoField label="Inscrição Estadual" value={f.inscricaoEstadual} />
-      <InfoField label="Telefone" value={f.telefone} />
-    </FieldGrid>
+    <div
+      style={{
+        background: colors.surfaceSubtle,
+        borderRadius: t.radius.xl,
+        padding: `${t.space[5]}px ${t.space[6]}px`,
+        transition: `background ${t.transition.smooth}`,
+      }}
+    >
+      <FieldGrid>
+        <InfoField label="Razão Social / Nome" value={f.nome} />
+        <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
+        <InfoField label="Inscrição Estadual" value={f.inscricaoEstadual} />
+        <InfoField label="Telefone" value={f.telefone} />
+      </FieldGrid>
+    </div>
   )
 }
 
 function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div>
-        <SectionTitle>Tipo de Exploração</SectionTitle>
-        <FieldGrid>
-          <InfoField label="Tipo de Exploração" value={f.tipoExploracao} />
-        </FieldGrid>
-      </div>
+      <FieldGrid>
+        <InfoField label="Tipo de Exploração" value={f.tipoExploracao} />
+      </FieldGrid>
 
       <div>
         <SectionTitle>Registros Ambientais e Fundiários</SectionTitle>
@@ -380,8 +386,6 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
 
           {/* Dados de identificação como cabeçalho fixo */}
           <IdentificacaoHeader f={fazenda} />
-
-          <Divider />
 
           {/* Tabs + content */}
           <div

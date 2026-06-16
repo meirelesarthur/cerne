@@ -38,8 +38,8 @@ export interface ThemeColors {
 // ─── Paletas ─────────────────────────────────────────────────────────────────
 
 const light: ThemeColors = {
-  pageBg:        '#f5f5f5',
-  outerCardBg:   '#f0f0f0',
+  pageBg:        '#f0f0f0',
+  outerCardBg:   '#fafafa',
   sidebarBg:     '#ffffff',
   surfaceBg:     '#ffffff',
   surfaceSubtle: '#f5f5f5',

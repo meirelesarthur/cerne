@@ -10,32 +10,30 @@ function NavHeader({ module }: { module: NavModule }) {
   const { colors } = useTheme()
   const Icon = module.icon
   return (
-    <div style={{ padding: `${t.space[2]}px ${t.space[2]}px 0`, flexShrink: 0 }}>
-      <div
+    <div
+      style={{
+        height: 44,
+        flexShrink: 0,
+        background: colors.brandBg,
+        display: 'flex',
+        alignItems: 'center',
+        gap: t.space[2],
+        padding: `0 ${t.space[4]}px`,
+        transition: 'background 0.2s',
+      }}
+    >
+      <Icon size={16} strokeWidth={2} color={colors.brand} style={{ flexShrink: 0 }} aria-hidden="true" />
+      <span
         style={{
-          height: 44,
-          background: colors.brandBg,
-          borderRadius: t.radius.lg,
-          display: 'flex',
-          alignItems: 'center',
-          gap: t.space[2],
-          padding: `0 ${t.space[3]}px`,
-          transition: 'background 0.2s',
+          fontSize: t.font.size.md,
+          fontWeight: t.font.weight.bold,
+          color: colors.brand,
+          fontFamily: "'Outfit', sans-serif",
+          letterSpacing: '-0.1px',
         }}
       >
-        <Icon size={16} strokeWidth={2} color={colors.brand} style={{ flexShrink: 0 }} aria-hidden="true" />
-        <span
-          style={{
-            fontSize: t.font.size.md,
-            fontWeight: t.font.weight.bold,
-            color: colors.brand,
-            fontFamily: "'Outfit', sans-serif",
-            letterSpacing: '-0.1px',
-          }}
-        >
-          {module.label}
-        </span>
-      </div>
+        {module.label}
+      </span>
     </div>
   )
 }

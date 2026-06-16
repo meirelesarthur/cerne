@@ -2,9 +2,6 @@ import { useState } from 'react'
 import {
   Pencil,
   MapPin,
-  Ruler,
-  Building2,
-  TrendingUp,
   CheckCircle2,
   XCircle,
   ExternalLink,
@@ -129,7 +126,6 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
 function TabIdentificacao({ f }: { f: FazendaDetalheData }) {
   return (
     <div>
-      <SectionTitle>Dados Principais</SectionTitle>
       <FieldGrid>
         <InfoField label="Razão Social / Nome" value={f.nome} />
         <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
@@ -355,33 +351,6 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
   const { colors } = useTheme()
   const [activeTab, setActiveTab] = useState<Tab>('identificacao')
 
-  const stats = [
-    {
-      label: 'Área Total',
-      value: `${fazenda.areaTotal.toLocaleString('pt-BR')} ha`,
-      icon: <Ruler size={16} color={t.color.brand[600]} />,
-      iconBg: t.color.brand[100],
-    },
-    {
-      label: 'Município',
-      value: `${fazenda.cidade} — ${fazenda.uf}`,
-      icon: <MapPin size={16} color={t.color.info.text} />,
-      iconBg: t.color.info.border,
-    },
-    {
-      label: 'CNPJ',
-      value: fazenda.cpfCnpj,
-      icon: <Building2 size={16} color={t.color.purple.text} />,
-      iconBg: t.color.purple.bg,
-    },
-    {
-      label: 'Valor / ha',
-      value: fazenda.valorHa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }),
-      icon: <TrendingUp size={16} color={t.color.warning.text} />,
-      iconBg: t.color.warning.bg,
-    },
-  ]
-
   const renderTab = () => {
     switch (activeTab) {
       case 'identificacao': return <TabIdentificacao f={fazenda} />
@@ -412,47 +381,6 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             }
           />
 
-          {/* Stats strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                style={{
-                  background: colors.surfaceBg,
-                  borderRadius: 10,
-                  padding: '12px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  transition: `background ${t.transition.smooth}`,
-                }}
-              >
-                <div
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 8,
-                    background: s.iconBg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {s.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: `color ${t.transition.smooth}` }}>
-                    {s.label}
-                  </div>
-                  <div style={{ fontSize: t.font.size.base, fontWeight: 600, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>
-                    {s.value}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
           {/* Tabs + content */}
           <div
             style={{
@@ -466,17 +394,13 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             }}
           >
             {/* Tab bar */}
-            <div
-              style={{
-                borderBottom: `1px solid ${colors.border}`,
-                padding: '12px 20px',
-              }}
-            >
+            <div style={{ padding: `${t.space[3]}px ${t.space[5]}px 0` }}>
               <Tabs
                 items={TABS}
                 activeId={activeTab}
                 onChange={(id) => setActiveTab(id as Tab)}
                 label="Seções da fazenda"
+                variant="outline"
               />
             </div>
 

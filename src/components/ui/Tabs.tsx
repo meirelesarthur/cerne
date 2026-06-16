@@ -19,14 +19,21 @@ interface TabsProps {
    * Sem esta prop, o comportamento é idêntico ao atual (controlado por activeId/onChange).
    */
   syncParam?: string
+  /**
+   * Estilo visual das abas:
+   * - `pill` (padrão): pílula ativa sobre fundo sutil — usado em dashboards.
+   * - `outline`: abas "pasta" delineadas sobre uma linha de base — para painéis de detalhe.
+   */
+  variant?:   'pill' | 'outline'
 }
 
 /**
- * Navegação por abas no estilo tab-chip (pílula ativa sobre fundo sutil),
- * o mesmo padrão usado nos dashboards. Acessível via role tablist/tab.
- * Substitui as tabs manuais em Pluviometria e dashboards.
+ * Navegação por abas. Dois estilos via `variant`:
+ * - `pill` (padrão): tab-chip (pílula ativa sobre fundo sutil), o mesmo padrão usado nos dashboards.
+ * - `outline`: abas delineadas estilo "pasta" sobre uma linha de base.
+ * Acessível via role tablist/tab. Substitui as tabs manuais em Pluviometria e dashboards.
  */
-export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam }: TabsProps) {
+export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, variant = 'pill' }: TabsProps) {
   const { colors, isGbMode } = useTheme()
 
   // On mount: if syncParam is set and URL has a matching search param, drive the parent's onChange
@@ -49,19 +56,30 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam }: T
     onChange(id)
   }
 
+  const isOutline = variant === 'outline'
+
   return (
     <div
       role="tablist"
       aria-label={label}
-      style={{
-        display:      'inline-flex',
-        alignItems:   'center',
-        gap:          t.space[1],
-        background:   colors.surfaceSubtle,
-        padding:      t.space[1],
-        borderRadius: t.radius.DEFAULT,
-        border:       `1px solid ${colors.border}`,
-      }}
+      style={
+        isOutline
+          ? {
+              display:      'flex',
+              alignItems:   'stretch',
+              gap:          t.space[1],
+              borderBottom: `1px solid ${colors.border}`,
+            }
+          : {
+              display:      'inline-flex',
+              alignItems:   'center',
+              gap:          t.space[1],
+              background:   colors.surfaceSubtle,
+              padding:      t.space[1],
+              borderRadius: t.radius.DEFAULT,
+              border:       `1px solid ${colors.border}`,
+            }
+      }
     >
       {items.map((item) => {
         const active = item.id === activeId
@@ -72,23 +90,47 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam }: T
             type="button"
             aria-selected={active}
             onClick={() => handleChange(item.id)}
-            style={{
-              display:        'inline-flex',
-              alignItems:     'center',
-              gap:            t.space[1] + t.space[1] / 2,
-              background:     active ? colors.surfaceBg : 'transparent',
-              color:          active ? colors.textPrimary : colors.textMuted,
-              border:         active ? `1px solid ${colors.border}` : '1px solid transparent',
-              boxShadow:      active && !isGbMode ? t.shadow.sm : 'none',
-              fontFamily:     t.font.family.sans,
-              fontSize:       t.font.size.sm,
-              fontWeight:     active ? t.font.weight.semibold : t.font.weight.medium,
-              padding:        `${t.space[1] + 2}px ${t.space[3]}px`,
-              borderRadius:   t.radius.md,
-              cursor:         'pointer',
-              whiteSpace:     'nowrap',
-              transition:     `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
-            }}
+            style={
+              isOutline
+                ? {
+                    display:               'inline-flex',
+                    alignItems:            'center',
+                    gap:                   t.space[1] + t.space[1] / 2,
+                    background:            active ? colors.surfaceBg : 'transparent',
+                    color:                 active ? colors.brand : colors.textMuted,
+                    border:                `1px solid ${active ? colors.border : 'transparent'}`,
+                    borderBottomColor:     active ? colors.surfaceBg : 'transparent',
+                    borderTopLeftRadius:   t.radius.md,
+                    borderTopRightRadius:  t.radius.md,
+                    borderBottomLeftRadius:  0,
+                    borderBottomRightRadius: 0,
+                    marginBottom:          -1,
+                    fontFamily:            t.font.family.sans,
+                    fontSize:              t.font.size.sm,
+                    fontWeight:            active ? t.font.weight.semibold : t.font.weight.medium,
+                    padding:               `${t.space[2]}px ${t.space[3] + t.space[1]}px`,
+                    cursor:                'pointer',
+                    whiteSpace:            'nowrap',
+                    transition:            `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}`,
+                  }
+                : {
+                    display:        'inline-flex',
+                    alignItems:     'center',
+                    gap:            t.space[1] + t.space[1] / 2,
+                    background:     active ? colors.surfaceBg : 'transparent',
+                    color:          active ? colors.textPrimary : colors.textMuted,
+                    border:         active ? `1px solid ${colors.border}` : '1px solid transparent',
+                    boxShadow:      active && !isGbMode ? t.shadow.sm : 'none',
+                    fontFamily:     t.font.family.sans,
+                    fontSize:       t.font.size.sm,
+                    fontWeight:     active ? t.font.weight.semibold : t.font.weight.medium,
+                    padding:        `${t.space[1] + 2}px ${t.space[3]}px`,
+                    borderRadius:   t.radius.md,
+                    cursor:         'pointer',
+                    whiteSpace:     'nowrap',
+                    transition:     `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+                  }
+            }
           >
             {item.icon && <span style={{ display: 'flex', alignItems: 'center' }} aria-hidden="true">{item.icon}</span>}
             {item.label}

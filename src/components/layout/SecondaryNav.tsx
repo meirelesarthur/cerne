@@ -8,30 +8,34 @@ import { t } from '../../design/tokens'
 
 function NavHeader({ module }: { module: NavModule }) {
   const { colors } = useTheme()
+  const Icon = module.icon
   return (
-    <div
-      style={{
-        height: 44,
-        minHeight: 44,
-        background: colors.surfaceSubtle,
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 12px',
-        flexShrink: 0,
-        transition: 'background 0.2s',
-      }}
-    >
-      <span
+    <div style={{ padding: `${t.space[2]}px ${t.space[2]}px 0`, flexShrink: 0 }}>
+      <div
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: colors.textPrimary,
-          fontFamily: "'Outfit', sans-serif",
-          letterSpacing: '-0.1px',
+          height: 44,
+          background: colors.brandBg,
+          borderRadius: t.radius.lg,
+          display: 'flex',
+          alignItems: 'center',
+          gap: t.space[2],
+          padding: `0 ${t.space[3]}px`,
+          transition: 'background 0.2s',
         }}
       >
-        {module.label}
-      </span>
+        <Icon size={16} strokeWidth={2} color={colors.brand} style={{ flexShrink: 0 }} aria-hidden="true" />
+        <span
+          style={{
+            fontSize: t.font.size.md,
+            fontWeight: t.font.weight.bold,
+            color: colors.brand,
+            fontFamily: "'Outfit', sans-serif",
+            letterSpacing: '-0.1px',
+          }}
+        >
+          {module.label}
+        </span>
+      </div>
     </div>
   )
 }

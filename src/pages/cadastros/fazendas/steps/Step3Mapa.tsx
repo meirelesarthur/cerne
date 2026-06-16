@@ -5,6 +5,9 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet-draw'
 import { StepHeader } from '../../../../components/ui/StepHeader'
+import { Button } from '../../../../components/ui/Button'
+import { t } from '../../../../design/tokens'
+import { useTheme } from '../../../../context/ThemeContext'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step3MapaProps {
@@ -14,6 +17,9 @@ interface Step3MapaProps {
 }
 
 const PAISES_SUPORTADOS = ['Brasil', 'Argentina', 'Paraguai', 'Bolívia', 'Uruguai']
+
+// Estilo do polígono da propriedade — tokenizado (Lei 3)
+const POLY_STYLE = { color: t.color.brand[600], fillColor: t.color.brand[600], fillOpacity: 0.15 }
 
 // Geocodificação reversa best-effort: traduz o centróide do perímetro em
 // endereço. Falhas de rede são silenciosas — os campos seguem editáveis.
@@ -49,6 +55,7 @@ async function reverseGeocode(
 }
 
 export function Step3Mapa({ data, onChange }: Step3MapaProps) {
+  const { colors } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const drawnRef = useRef<L.FeatureGroup | null>(null)
@@ -128,7 +135,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
       edit: { featureGroup: drawn },
       draw: {
         polygon: {
-          shapeOptions: { color: '#059669', fillColor: '#059669', fillOpacity: 0.15 },
+          shapeOptions: POLY_STYLE,
           showArea: true,
         },
         rectangle: false,
@@ -160,7 +167,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
       try {
         const geojson = JSON.parse(data.perimetroGeoJSON)
         L.geoJSON(geojson, {
-          style: { color: '#059669', fillColor: '#059669', fillOpacity: 0.15 },
+          style: POLY_STYLE,
         }).eachLayer((layer) => drawn.addLayer(layer))
         if (drawn.getLayers().length > 0) {
           map.fitBounds(drawn.getBounds(), { padding: [24, 24] })
@@ -209,11 +216,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
           .filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng) && lat !== 0)
 
         if (latlngs.length > 2) {
-          const poly = L.polygon(latlngs, {
-            color: '#059669',
-            fillColor: '#059669',
-            fillOpacity: 0.15,
-          })
+          const poly = L.polygon(latlngs, POLY_STYLE)
           drawn.addLayer(poly)
         }
       }
@@ -258,49 +261,36 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            fontSize: 12,
-            color: '#6b7280',
-            fontFamily: "'Outfit', sans-serif",
+            gap: t.space[1] + 2,
+            fontSize: t.font.size.sm,
+            color: colors.textMuted,
+            fontFamily: t.font.family.sans,
           }}
         >
-          <MapPin size={13} color="#059669" />
+          <MapPin size={13} color={colors.brand} />
           Use as ferramentas no mapa para desenhar o polígono da propriedade
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           {data.kmlFileName && (
             <span
               style={{
-                fontSize: 11,
-                color: '#059669',
-                fontFamily: "'Outfit', sans-serif",
+                fontSize: t.font.size.xs,
+                color: colors.brand,
+                fontFamily: t.font.family.sans,
               }}
             >
               📎 {data.kmlFileName}
             </span>
           )}
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<Upload size={12} />}
             onClick={() => fileRef.current?.click()}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              background: 'white',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              padding: '5px 12px',
-              fontSize: 12,
-              fontWeight: 500,
-              fontFamily: "'Outfit', sans-serif",
-              color: '#1a1a1a',
-              cursor: 'pointer',
-            }}
           >
-            <Upload size={12} />
             Importar KML
-          </button>
+          </Button>
           <input
             ref={fileRef}
             type="file"
@@ -316,31 +306,31 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
         ref={containerRef}
         style={{
           height: 460,
-          borderRadius: 12,
-          border: '1px solid #d1fae5',
+          borderRadius: t.radius.xl,
+          border: `1px solid ${colors.border}`,
           overflow: 'hidden',
         }}
       />
 
       {/* Status */}
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: t.space[2] + 2 }}>
         {hasPerimetro ? (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
-              fontSize: 12,
-              color: '#059669',
-              fontFamily: "'Outfit', sans-serif",
+              gap: t.space[1] + 2,
+              fontSize: t.font.size.sm,
+              color: colors.brand,
+              fontFamily: t.font.family.sans,
             }}
           >
             <span
               style={{
                 width: 8,
                 height: 8,
-                borderRadius: 9999,
-                background: '#059669',
+                borderRadius: t.radius.full,
+                background: colors.brand,
                 display: 'inline-block',
               }}
             />
@@ -351,9 +341,9 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
         ) : (
           <div
             style={{
-              fontSize: 12,
-              color: '#9ca3af',
-              fontFamily: "'Outfit', sans-serif",
+              fontSize: t.font.size.sm,
+              color: colors.textMuted,
+              fontFamily: t.font.family.sans,
             }}
           >
             Nenhum perímetro demarcado — você pode avançar e definir depois

@@ -429,7 +429,7 @@ function KpiBar({
     },
   ]
 
-  const cardBg    = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
+  const cardBg    = isGbMode ? t.color.row.hoverGb : colors.surfaceBg
   const border    = colors.border
 
   return (
@@ -441,7 +441,7 @@ function KpiBar({
         border: `1px solid ${border}`,
         borderRadius: t.radius.lg,
         overflow: 'hidden',
-        marginBottom: 16,
+        marginBottom: t.space[4],
       }}
     >
       {items.map((item, idx) => (
@@ -630,8 +630,8 @@ function FazendaCard({
         borderRadius: t.radius.xl,
         padding: t.space[4],
         cursor: 'pointer',
-        transition: 'background 0.15s, border-color 0.15s, box-shadow 0.15s',
-        boxShadow: hovered ? `0 4px 16px rgba(5,150,105,0.10)` : 'none',
+        transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, box-shadow ${t.transition.DEFAULT}`,
+        boxShadow: hovered ? t.shadow.cardHover : 'none',
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[3],

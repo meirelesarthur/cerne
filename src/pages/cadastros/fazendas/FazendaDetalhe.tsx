@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { Badge } from '../../../components/ui/Badge'
+import type { BadgeVariant } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { MapView } from '../../../components/ui/MapView'
@@ -52,7 +53,7 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           marginBottom: 4,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           transition: `color ${t.transition.smooth}`,
         }}
       >
@@ -62,7 +63,7 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
         style={{
           fontSize: t.font.size.base,
           color: colors.textPrimary,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           fontWeight: 400,
           minHeight: 20,
           transition: `color ${t.transition.smooth}`,
@@ -99,7 +100,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
         textTransform: 'uppercase',
         letterSpacing: '0.6px',
         marginBottom: 16,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: t.font.family.sans,
         paddingBottom: 10,
         borderBottom: `1px solid ${colors.borderSubtle}`,
         transition: `color ${t.transition.smooth}, border-color ${t.transition.smooth}`,
@@ -217,7 +218,7 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
                   fontSize: t.font.size.sm,
                   fontWeight: 500,
                   textDecoration: 'none',
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: t.font.family.sans,
                 }}
               >
                 <MapPin size={12} />
@@ -284,7 +285,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Código',
       width: 120,
       render: (row) => (
-        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: '#374151' }}>{row.codigo}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: colors.textSecondary }}>{row.codigo}</span>
       ),
     },
     {
@@ -303,29 +304,11 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Condição',
       width: 110,
       render: (row) => {
-        const color =
-          row.condicao === 'Receita' ? t.color.brand[600]
-          : row.condicao === 'Despesa' ? t.color.error.solid
-          : '#6366f1'
-        const bg =
-          row.condicao === 'Receita' ? t.color.brand[100]
-          : row.condicao === 'Despesa' ? t.color.error.bg
-          : '#ede9fe'
-        return (
-          <span
-            style={{
-              fontSize: t.font.size.xs,
-              fontWeight: 500,
-              color,
-              background: bg,
-              padding: '2px 8px',
-              borderRadius: 9999,
-              fontFamily: "'Outfit', sans-serif",
-            }}
-          >
-            {row.condicao}
-          </span>
-        )
+        const variant: BadgeVariant =
+          row.condicao === 'Receita' ? 'success'
+          : row.condicao === 'Despesa' ? 'danger'
+          : 'purple'
+        return <Badge label={row.condicao} variant={variant} />
       },
     },
   ]
@@ -352,7 +335,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
               fontSize: t.font.size.base,
               color: colors.textSecondary,
               lineHeight: 1.6,
-              fontFamily: "'Outfit', sans-serif",
+              fontFamily: t.font.family.sans,
               background: colors.surfaceSubtle,
               borderRadius: 8,
               padding: '12px 14px',
@@ -394,8 +377,8 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
     {
       label: 'Valor / ha',
       value: fazenda.valorHa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }),
-      icon: <TrendingUp size={16} color="#ea580c" />,
-      iconBg: '#ffedd5',
+      icon: <TrendingUp size={16} color={t.color.warning.text} />,
+      iconBg: t.color.warning.bg,
     },
   ]
 

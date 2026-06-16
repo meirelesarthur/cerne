@@ -76,20 +76,20 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
-              background: '#fffbeb',
-              border: '1px solid #fde68a',
-              borderRadius: 8,
-              padding: '10px 14px',
-              marginBottom: 16,
+              gap: t.space[2] + 2,
+              background: t.color.warning.bg,
+              border: `1px solid ${t.color.warning.border}`,
+              borderRadius: t.radius.DEFAULT,
+              padding: `${t.space[2] + 2}px ${t.space[3] + 2}px`,
+              marginBottom: t.space[4],
             }}
           >
-            <span style={{ fontSize: 14 }}>⚠️</span>
+            <span style={{ fontSize: t.font.size.md }}>⚠️</span>
             <span
               style={{
-                fontSize: 12,
-                color: '#d97706',
-                fontFamily: "'Outfit', sans-serif",
+                fontSize: t.font.size.sm,
+                color: t.color.warning.text,
+                fontFamily: t.font.family.sans,
               }}
             >
               Nenhum centro de custo selecionado. Selecione ao menos um para continuar.

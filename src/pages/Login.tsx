@@ -395,6 +395,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   placeholder="voce@suafazenda.com.br"
                   value={email}
                   autoComplete="email"
+                  allowPasswordManager
                   disabled={isBlocked}
                   onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
                   onBlur={handleEmailBlur}
@@ -430,6 +431,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   placeholder="••••••••••"
                   value={password}
                   autoComplete="current-password"
+                  allowPasswordManager
                   disabled={isBlocked}
                   onChange={e => { setPassword(e.target.value); setPassErr(false) }}
                   onFocus={() => setPassErr(false)}
@@ -590,6 +592,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                     placeholder="voce@suafazenda.com.br"
                     value={forgotEmail}
                     autoComplete="email"
+                    allowPasswordManager
                     onChange={e => setForgotEmail(e.target.value)}
                     style={{ height: t.space[12], borderRadius: t.radius.xl }}
                     iconLeft={

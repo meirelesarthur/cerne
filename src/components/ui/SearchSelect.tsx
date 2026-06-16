@@ -160,6 +160,10 @@ export function SearchSelect({
             onFocus={() => setOpen(true)}
             onKeyDown={handleKeyDown}
             autoComplete="off"
+            data-1p-ignore="true"
+            data-lpignore="true"
+            data-bwignore="true"
+            data-form-type="other"
             spellCheck={false}
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
           />

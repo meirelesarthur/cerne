@@ -23,6 +23,15 @@ interface FormFieldProps
   rows?: number
   /** Máscara de formatação (cpf, cnpj, phone, cep, currency) ou função custom */
   mask?: MaskType | ((raw: string) => string)
+  /**
+   * Permite que gerenciadores de senha (1Password, LastPass, Bitwarden,
+   * Dashlane…) ofereçam preenchimento neste campo. Default `false`: campos de
+   * dados não-credenciais são marcados para serem ignorados por esses
+   * gerenciadores, evitando o ícone/popup de preenchimento sobre nome, CPF,
+   * endereço, etc. Campos `type="password"` nunca são suprimidos (o gerenciador
+   * funciona normalmente). Habilite em telas de login/credenciais.
+   */
+  allowPasswordManager?: boolean
 }
 
 export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, FormFieldProps>(function FormField({
@@ -36,10 +45,25 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   multiline = false,
   rows = 4,
   mask,
+  allowPasswordManager = false,
   style,
   ...inputProps
 }, ref) {
   const { colors } = useTheme()
+
+  // Atributos que sinalizam aos gerenciadores de senha para ignorar o campo.
+  // Aplicados a campos não-credenciais (todos exceto type="password") quando
+  // `allowPasswordManager` é falso — evita o popup de preenchimento de senha
+  // sobre nome, documento, endereço, etc.
+  const suppressPM = !allowPasswordManager && inputProps.type !== 'password'
+  const pmAttrs = suppressPM
+    ? {
+        'data-1p-ignore': 'true',
+        'data-lpignore': 'true',
+        'data-bwignore': 'true',
+        'data-form-type': 'other',
+      }
+    : {}
 
   // Aplica a máscara no onChange e ajusta inputMode quando for máscara nomeada.
   const maskedOnChange: React.ChangeEventHandler<HTMLInputElement> | undefined = mask
@@ -130,6 +154,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           const a11y = {
             'aria-invalid': isError || undefined,
             className: ['gb-focusable', inputProps.className].filter(Boolean).join(' '),
+            ...pmAttrs,
           }
 
           if (multiline) {

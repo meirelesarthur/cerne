@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic --project-token=chpt_4b9cf4cb733face --exit-zero-on-changes"
+    "chromatic": "npx chromatic --project-token=chpt_4b9cf4cb733face --exit-zero-on-changes",
+    "tokens:export": "tsx scripts/export-tokens-dtcg.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.2.0",
@@ -44,6 +45,7 @@
     "postcss": "^8.4.47",
     "storybook": "^10.3.6",
     "tailwindcss": "^3.4.10",
+    "tsx": "^4.22.4",
     "typescript": "^5.5.3",
     "vite": "^5.4.2",
     "vitest": "^4.1.5"

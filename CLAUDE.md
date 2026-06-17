@@ -108,6 +108,30 @@ Após toda mudança concluída, um commit **deve ser criado imediatamente** — 
 - Mensagens de commit seguem o padrão Conventional Commits (`feat:`, `fix:`, `style:`, `refactor:`, `docs:`, etc.)
 - Um commit por unidade lógica de mudança — não acumular alterações não relacionadas no mesmo commit
 
+### Lei 5 — Tokens Interoperáveis no Padrão W3C DTCG
+
+`src/design/tokens.ts` é a **fonte única** dos tokens; sua exportação para o ecossistema de design
+(Figma, Supernova) **deve sempre obedecer ao padrão W3C DTCG** (Design Tokens Community Group).
+A direção do fluxo é **imutável**: o código define, Figma e Supernova consomem — nunca o contrário.
+
+**Pipeline canônico:**
+`tokens.ts` → `npm run tokens:export` → `tokens/tokens.json` (DTCG) → Tokens Studio → Figma Variables → Supernova
+
+- Toda alteração em `tokens.ts` exige rodar `npm run tokens:export` e **commitar o `tokens/tokens.json`
+  regenerado** na mesma unidade lógica — o JSON nunca pode divergir do `.ts`.
+- O exportador (`scripts/export-tokens-dtcg.ts`) só pode emitir `$type` **válidos no DTCG**:
+  `color`, `dimension`, `number`, `fontFamily`, `fontWeight`, `duration`, `cubicBezier`,
+  `strokeStyle`, `border`, `transition`, `shadow`, `gradient`, `typography`. **Proibido** inventar
+  tipos fora dessa lista (ex.: `borderRadius` → use `dimension`).
+- Valores de tipos compostos seguem a forma estrutural do DTCG, **nunca string CSS crua**:
+  `cubicBezier` → array `[x1,y1,x2,y2]`; `duration` → `{ value, unit }`; `shadow` →
+  `{ color, offsetX, offsetY, blur, spread }` (multicamada → array); `transition` →
+  `{ duration, delay, timingFunction }`; `border` → `{ color, width, style }`.
+- Ao adicionar um token novo em `tokens.ts`, **mapeie-o no exportador** com o `$type` correto antes
+  de concluir a mudança — um token sem mapeamento DTCG é entrega incompleta.
+- Ajustes propostos via Figma (Tokens Studio → Push) entram como **PR** que atualiza `tokens.ts`;
+  jamais se edita token direto no Figma como fonte.
+
 ---
 
 ## Padrões de Implementação (Modelo Canônico)

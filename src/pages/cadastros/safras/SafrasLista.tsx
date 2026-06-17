@@ -9,6 +9,7 @@ import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { Badge }           from '../../../components/ui/Badge'
 import { Modal }           from '../../../components/ui/Modal'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
@@ -264,50 +265,20 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
 
       </PageCard>
 
-      {/* ── Modal: Confirmar exclusão ────────────────────────────────────── */}
-      <Modal
+      {/* ── Confirmação de exclusão ──────────────────────────────────────── */}
+      <ConfirmDialog
         open={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        size="sm"
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              <Trash2 size={13} />
-              Excluir Safra…
-            </Button>
-          </>
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+        title="Excluir safra?"
+        message={
+          deleteTarget
+            ? `${deleteTarget.desc} será excluída permanentemente. Esta ação não pode ser desfeita.`
+            : undefined
         }
-      >
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width:          52,
-            height:         52,
-            borderRadius:   '50%',
-            background:     t.color.error.bg,
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            margin:         '0 auto',
-            marginBottom:   t.space[4],
-          }}>
-            <Trash2 size={22} color={t.color.error.solid} />
-          </div>
-          <p style={{
-            fontSize:   t.font.size.base,
-            color:      colors.textSecondary,
-            lineHeight: t.font.lineHeight.relaxed,
-            fontFamily: t.font.family.sans,
-            margin:     0,
-          }}>
-            Tem certeza que deseja excluir{' '}
-            <strong style={{ color: colors.textPrimary }}>{deleteTarget?.desc}</strong>?{' '}
-            Esta ação não pode ser desfeita.
-          </p>
-        </div>
-      </Modal>
+        confirmLabel="Excluir"
+        tone="destructive"
+      />
 
       {/* ── Modal: Saiba Mais ────────────────────────────────────────────── */}
       <Modal

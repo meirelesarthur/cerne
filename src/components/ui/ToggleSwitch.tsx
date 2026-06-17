@@ -15,6 +15,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <button
         type="button"
+        className="gb-focusable"
         role="switch"
         aria-checked={checked}
         disabled={disabled}

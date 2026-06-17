@@ -4,6 +4,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { Button } from '../../components/ui/Button'
 
 // ─── Area Chart — Acessos Diários ─────────────────────────────────────────────
 
@@ -472,9 +473,9 @@ export default function DashUsuarios() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Análise de Usuários</span>
-        <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[3]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
-          Últimos 30 dias <ChevronDown size={11} />
-        </button>
+        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
+          Últimos 30 dias
+        </Button>
       </div>
       <HDivider color={bc} />
 

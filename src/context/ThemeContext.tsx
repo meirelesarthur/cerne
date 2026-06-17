@@ -27,6 +27,8 @@ export interface ThemeColors {
   navItemActive: string
   navItemHover:  string
   navDivider:    string
+  subnavHeaderBg:   string
+  subnavHeaderText: string
   // Brand
   brand:         string
   brandHover:    string
@@ -38,7 +40,7 @@ export interface ThemeColors {
 // ─── Paletas ─────────────────────────────────────────────────────────────────
 
 const light: ThemeColors = {
-  pageBg:        '#f5f5f5',
+  pageBg:        '#f0f0f0',
   outerCardBg:   '#fafafa',
   sidebarBg:     '#ffffff',
   surfaceBg:     '#ffffff',
@@ -55,6 +57,8 @@ const light: ThemeColors = {
   navItemActive: '#f0fdf4',
   navItemHover:  'rgba(0,0,0,0.04)',
   navDivider:    '#f0f0f0',
+  subnavHeaderBg:   '#e6f5f0',
+  subnavHeaderText: '#047857',
   brand:         '#059669',
   brandHover:    '#047857',
   brandBg:       '#f0fdf4',
@@ -80,6 +84,8 @@ const gbMode: ThemeColors = {
   navItemActive: '#0b1e14',
   navItemHover:  'rgba(255,255,255,0.04)',
   navDivider:    'rgba(28,63,44,0.8)',
+  subnavHeaderBg:   'rgba(16,185,129,0.12)',
+  subnavHeaderText: '#10b981',
   brand:         '#10b981',
   brandHover:    '#059669',
   brandBg:       'rgba(16,185,129,0.12)',

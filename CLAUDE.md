@@ -67,7 +67,7 @@ Todo elemento visível na tela é um componente de `src/components/ui/`.
 
 - Ao criar uma nova tela, apenas **importar e chamar** componentes existentes
 - Se o componente necessário não existe no catálogo, criá-lo em `src/components/ui/` **antes** de usá-lo na tela
-- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`, `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`, `FormSection`, `FormSelect`, `Heading`, `IconButton`, `Modal`, `PageCard`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `Skeleton`, `Spinner`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar`, `Tabs`, `Tag`, `ToggleSwitch`, `Tooltip`
+- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `BulkActionBar`, `Button`, `Card`, `ChartCard`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`, `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`, `FormSection`, `FormSelect`, `Heading`, `HeatmapChart`, `IconButton`, `KpiStatCard`, `ListToolbar`, `MapView`, `Modal`, `PageCard`, `PageContainer`, `PageHeader`, `Pagination`, `ProgressBar`, `SankeyFunnel`, `SearchSelect`, `SectionDividers`, `Skeleton`, `SortHeader`, `SparklineArea`, `Spinner`, `SSOButton`, `StepFooter`, `StepHeader`, `Stepper`, `TableToolbar` (exporta `TableSearchInput`, `FilterChip`, `FilterButton`), `Tabs`, `Tag`, `Toast` (`useToast`/`ToastContainer`), `ToggleSwitch`, `Tooltip`
 
 ### Lei 2 — Fonte Única de Verdade (Propagação Global)
 
@@ -190,13 +190,20 @@ permitir "Cancelar" habilitado na 1ª etapa, sem quebrar as telas que dependiam 
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
 literal, procure o token:
 
-- **Tamanhos de controle:** `t.size.control` (38), `controlSm` (30), `controlLg` (46),
-  `iconBtn.{sm,md,lg}`, `toggle.{track,thumb}`, `pageBtn` (32), `drawer` (320), `stepBtn` (180).
+- **Tamanhos de controle:** `t.size.control` (40, = botão md), `controlSm` (32), `controlLg` (48),
+  `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,thumb}`, `pageBtn` (32), `tableRow` (42),
+  `drawer` (320), `stepBtn` (180).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
 - **GBMode:** `t.color.gbSurface` (superfície translúcida de card), `t.color.gbAccent` (verde claro de destaque).
 - **Badge/Tag auxiliares:** `t.color.purple.*`, `t.color.cyan.*`.
+- **Estados de controle:** `t.color.disabled.{bg,text,border}`, `t.color.readonly.{bg,text,border}`.
+- **Linhas de tabela:** `t.color.row.{hover,hoverGb,selected,selectedGb,striped,stripedGb}`.
 - **Transições:** `t.transition.{fast,DEFAULT,smooth,drawer}` — nunca `'0.2s'` solto.
+- **Animação:** `t.animation.duration.{fast,normal,slow,slower}`, `t.animation.easing.{standard,easeOut,easeIn,easeInOut,spring}`.
+- **Delays de loading:** `t.delay.loadingShow` (225 ms, anti-flash) / `t.delay.loadingMin` (400 ms, anti-flicker).
+- **Breakpoints:** `t.breakpoint.{xs,sm,md,lg,xl}` (360/768/1024/1280/1920).
+- **Gráficos:** `t.chart.series[]` (8 cores categóricas), `t.chart.grid` / `gridGb`.
 - **Layout:** `t.layout.contentOffset` (88) — altura do chassi acima/abaixo do conteúdo; base do
   `calc(100vh - …)` usado pelo `PageCard`. Não hardcodar `88` nas telas.
 

@@ -10,6 +10,8 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { Button } from '../../components/ui/Button'
+import { IconButton } from '../../components/ui/IconButton'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -366,33 +368,16 @@ export default function OverviewPanel() {
               {greeting}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <button style={{
-                display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-                padding: `6px ${t.space[3]}px`, background: 'transparent',
-                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
-              }}>
-                Últimos 30 dias <ChevronDown size={11} />
-              </button>
-              <button style={{
-                display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-                padding: `6px ${t.space[3]}px`, background: 'transparent',
-                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
-              }}>
-                <span style={{ fontSize: 11 }}>📅</span> 03/05 – 01/06/2026
-              </button>
-              <button style={{
-                display: 'flex', alignItems: 'center', gap: t.space[1],
-                border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-                padding: `6px ${t.space[3]}px`, background: 'transparent',
-                cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans,
-              }}>
-                <Settings2 size={12} /> Personalizar
-              </button>
-              <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: `6px ${t.space[2]}px`, color: colors.textMuted }}>
-                <MoreHorizontal size={16} />
-              </button>
+              <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
+                Últimos 30 dias
+              </Button>
+              <Button variant="secondary" size="sm" icon={<span style={{ fontSize: 11 }}>📅</span>}>
+                03/05 – 01/06/2026
+              </Button>
+              <Button variant="secondary" size="sm" icon={<Settings2 size={12} />}>
+                Personalizar
+              </Button>
+              <IconButton icon={<MoreHorizontal size={16} />} aria-label="Mais opções" size="sm" />
             </div>
           </div>
 
@@ -455,9 +440,9 @@ export default function OverviewPanel() {
                   <BarChart2 size={13} color={colors.textMuted as string} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Insights</span>
                 </div>
-                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT, padding: `5px ${t.space[2]}px`, background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
-                  <MessageCircle size={11} /> Perguntar
-                </button>
+                <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />}>
+                  Perguntar
+                </Button>
               </div>
               <p style={{ fontSize: t.font.size.lg, color: colors.textMuted, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
                 A margem bruta melhorou{' '}
@@ -472,9 +457,9 @@ export default function OverviewPanel() {
             <div style={{ flex: 1, padding: t.space[5] }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
                 <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Custo de produção</span>
-                <button style={{ display: 'flex', alignItems: 'center', gap: t.space[1], border: 'none', background: 'transparent', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
-                  <Wheat size={11} /> Detalhes
-                </button>
+                <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
+                  Detalhes
+                </Button>
               </div>
               <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, marginBottom: t.space[3] }}>
                 R$ 3,6M
@@ -528,16 +513,9 @@ export default function OverviewPanel() {
               colors={colors}
               isGbMode={isGbMode}
             />
-            <button style={{
-              width: '100%', marginTop: t.space[3],
-              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-              padding: `8px 0`, background: 'transparent',
-              cursor: 'pointer', fontSize: t.font.size.xs,
-              color: colors.textSecondary, fontFamily: t.font.family.sans,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1],
-            }}>
-              Ver detalhe <ArrowRight size={11} />
-            </button>
+            <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[3] }}>
+              Ver detalhe
+            </Button>
           </div>
 
           <HDivider color={bc} />
@@ -601,16 +579,9 @@ export default function OverviewPanel() {
                 </span>
               </div>
             ))}
-            <button style={{
-              width: '100%', marginTop: t.space[1],
-              border: `1px solid ${bc}`, borderRadius: t.radius.DEFAULT,
-              padding: `8px 0`, background: 'transparent',
-              cursor: 'pointer', fontSize: t.font.size.xs,
-              color: colors.textSecondary, fontFamily: t.font.family.sans,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1],
-            }}>
-              Ver detalhes <ArrowRight size={11} />
-            </button>
+            <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[1] }}>
+              Ver detalhes
+            </Button>
           </div>
 
           {/* Needs attention */}

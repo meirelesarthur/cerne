@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
 import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
@@ -12,6 +13,7 @@ import EnderecosPage     from '../../pages/cadastros/enderecos/EnderecosPage'
 import ArmazensPage      from '../../pages/cadastros/armazens/ArmazensPage'
 import ProdutosPage      from '../../pages/cadastros/produtos/ProdutosPage'
 import EstoquesIniciaisPage from '../../pages/cadastros/estoques-iniciais/EstoquesIniciaisPage'
+import PessoasPage        from '../../pages/cadastros/pessoas/PessoasPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -79,6 +81,7 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
 function renderPage(itemId: string | null, module?: NavModule) {
   if (!itemId) return null
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
+  if (itemId === 'cad-pes-uni') return <PessoasPage />
   if (itemId === 'cad-est-faz') return <FazendasPage />
   if (itemId === 'cad-est-saf') return <SafrasPage />
   if (itemId === 'cad-est-cc')  return <CentrosCustoPage />
@@ -180,8 +183,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         width: '100vw',
         height: '100vh',
         background: colors.pageBg,
-        padding: 8,
-        gap: 8,
+        padding: t.space[2],
+        gap: t.space[2],
         boxSizing: 'border-box',
         fontFamily: "'Outfit', sans-serif",
         transition: 'background 0.2s ease',
@@ -207,8 +210,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           borderRadius: 16,
           display: 'flex',
           flexDirection: 'column',
-          padding: 8,
-          gap: 8,
+          padding: t.space[2],
+          gap: t.space[2],
           minWidth: 0,
           overflow: 'hidden',
           transition: 'background 0.2s ease',
@@ -216,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       >
         <Topbar expandedModule={expandedModule} activeItemId={activeItemId} />
 
-        <div style={{ flex: 1, display: 'flex', gap: 8, overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', gap: t.space[2], overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -t.space[2] : 0 }}>
           {hasSecondaryNav && expandedModule && (
             <SecondaryNav
               module={expandedModule}

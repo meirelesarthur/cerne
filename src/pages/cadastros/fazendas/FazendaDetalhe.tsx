@@ -2,14 +2,12 @@ import { useState } from 'react'
 import {
   Pencil,
   MapPin,
-  Ruler,
-  Building2,
-  TrendingUp,
   CheckCircle2,
   XCircle,
   ExternalLink,
 } from 'lucide-react'
 import { Badge } from '../../../components/ui/Badge'
+import type { BadgeVariant } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { MapView } from '../../../components/ui/MapView'
@@ -30,10 +28,9 @@ interface FazendaDetalheProps {
   fazenda?: FazendaDetalheData
 }
 
-type Tab = 'identificacao' | 'documentacao' | 'localizacao' | 'financeiro' | 'centrosCusto'
+type Tab = 'documentacao' | 'localizacao' | 'financeiro' | 'centrosCusto'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'identificacao', label: 'Identificação' },
   { id: 'documentacao',  label: 'Documentação' },
   { id: 'localizacao',   label: 'Localização' },
   { id: 'financeiro',    label: 'Financeiro' },
@@ -46,26 +43,26 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
     <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
       <div
         style={{
-          fontSize: 10,
+          fontSize: t.font.size.xs,
           fontWeight: 600,
           color: colors.textMuted,
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           marginBottom: 4,
-          fontFamily: "'Outfit', sans-serif",
-          transition: 'color 0.2s',
+          fontFamily: t.font.family.sans,
+          transition: `color ${t.transition.smooth}`,
         }}
       >
         {label}
       </div>
       <div
         style={{
-          fontSize: 13,
+          fontSize: t.font.size.base,
           color: colors.textPrimary,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           fontWeight: 400,
           minHeight: 20,
-          transition: 'color 0.2s',
+          transition: `color ${t.transition.smooth}`,
         }}
       >
         {value || <span style={{ color: colors.border }}>—</span>}
@@ -93,16 +90,16 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        fontSize: 11,
+        fontSize: t.font.size.xs,
         fontWeight: 600,
         color: colors.textMuted,
         textTransform: 'uppercase',
         letterSpacing: '0.6px',
         marginBottom: 16,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: t.font.family.sans,
         paddingBottom: 10,
         borderBottom: `1px solid ${colors.borderSubtle}`,
-        transition: 'color 0.2s, border-color 0.2s',
+        transition: `color ${t.transition.smooth}, border-color ${t.transition.smooth}`,
       }}
     >
       {children}
@@ -118,17 +115,24 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
         ? <CheckCircle2 size={14} color={colors.brand} />
         : <XCircle size={14} color={colors.textMuted} />
       }
-      <span style={{ fontSize: 13, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
+      <span style={{ fontSize: t.font.size.base, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
         {value ? trueLabel : falseLabel}
       </span>
     </div>
   )
 }
 
-function TabIdentificacao({ f }: { f: FazendaDetalheData }) {
+function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
+  const { colors } = useTheme()
   return (
-    <div>
-      <SectionTitle>Dados Principais</SectionTitle>
+    <div
+      style={{
+        background: colors.surfaceSubtle,
+        borderRadius: t.radius.xl,
+        padding: `${t.space[5]}px ${t.space[6]}px`,
+        transition: `background ${t.transition.smooth}`,
+      }}
+    >
       <FieldGrid>
         <InfoField label="Razão Social / Nome" value={f.nome} />
         <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
@@ -142,12 +146,9 @@ function TabIdentificacao({ f }: { f: FazendaDetalheData }) {
 function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div>
-        <SectionTitle>Tipo de Exploração</SectionTitle>
-        <FieldGrid>
-          <InfoField label="Tipo de Exploração" value={f.tipoExploracao} />
-        </FieldGrid>
-      </div>
+      <FieldGrid>
+        <InfoField label="Tipo de Exploração" value={f.tipoExploracao} />
+      </FieldGrid>
 
       <div>
         <SectionTitle>Registros Ambientais e Fundiários</SectionTitle>
@@ -213,11 +214,11 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 5,
-                  color: '#059669',
-                  fontSize: 12,
+                  color: t.color.brand[600],
+                  fontSize: t.font.size.sm,
                   fontWeight: 500,
                   textDecoration: 'none',
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: t.font.family.sans,
                 }}
               >
                 <MapPin size={12} />
@@ -257,7 +258,7 @@ function TabFinanceiro({ f }: { f: FazendaDetalheData }) {
           <InfoField
             label="Valor Total Estimado"
             value={
-              <span style={{ fontWeight: 600, color: '#059669' }}>{valorTotal}</span>
+              <span style={{ fontWeight: 600, color: t.color.brand[600] }}>{valorTotal}</span>
             }
           />
         </FieldGrid>
@@ -284,7 +285,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Código',
       width: 120,
       render: (row) => (
-        <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#374151' }}>{row.codigo}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: colors.textSecondary }}>{row.codigo}</span>
       ),
     },
     {
@@ -303,29 +304,11 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Condição',
       width: 110,
       render: (row) => {
-        const color =
-          row.condicao === 'Receita' ? '#059669'
-          : row.condicao === 'Despesa' ? '#dc2626'
-          : '#6366f1'
-        const bg =
-          row.condicao === 'Receita' ? '#d1fae5'
-          : row.condicao === 'Despesa' ? '#fee2e2'
-          : '#ede9fe'
-        return (
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              color,
-              background: bg,
-              padding: '2px 8px',
-              borderRadius: 9999,
-              fontFamily: "'Outfit', sans-serif",
-            }}
-          >
-            {row.condicao}
-          </span>
-        )
+        const variant: BadgeVariant =
+          row.condicao === 'Receita' ? 'success'
+          : row.condicao === 'Despesa' ? 'danger'
+          : 'purple'
+        return <Badge label={row.condicao} variant={variant} />
       },
     },
   ]
@@ -349,15 +332,15 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
           <SectionTitle>Observações</SectionTitle>
           <p
             style={{
-              fontSize: 13,
+              fontSize: t.font.size.base,
               color: colors.textSecondary,
               lineHeight: 1.6,
-              fontFamily: "'Outfit', sans-serif",
+              fontFamily: t.font.family.sans,
               background: colors.surfaceSubtle,
               borderRadius: 8,
               padding: '12px 14px',
               margin: 0,
-              transition: 'color 0.2s, background 0.2s',
+              transition: `color ${t.transition.smooth}, background ${t.transition.smooth}`,
             }}
           >
             {f.observacao}
@@ -370,38 +353,10 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
 
 export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSantaLuzia }: FazendaDetalheProps) {
   const { colors } = useTheme()
-  const [activeTab, setActiveTab] = useState<Tab>('identificacao')
-
-  const stats = [
-    {
-      label: 'Área Total',
-      value: `${fazenda.areaTotal.toLocaleString('pt-BR')} ha`,
-      icon: <Ruler size={16} color="#059669" />,
-      iconBg: '#d1fae5',
-    },
-    {
-      label: 'Município',
-      value: `${fazenda.cidade} — ${fazenda.uf}`,
-      icon: <MapPin size={16} color="#2563eb" />,
-      iconBg: '#dbeafe',
-    },
-    {
-      label: 'CNPJ',
-      value: fazenda.cpfCnpj,
-      icon: <Building2 size={16} color="#7c3aed" />,
-      iconBg: '#ede9fe',
-    },
-    {
-      label: 'Valor / ha',
-      value: fazenda.valorHa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }),
-      icon: <TrendingUp size={16} color="#ea580c" />,
-      iconBg: '#ffedd5',
-    },
-  ]
+  const [activeTab, setActiveTab] = useState<Tab>('documentacao')
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'identificacao': return <TabIdentificacao f={fazenda} />
       case 'documentacao':  return <TabDocumentacao f={fazenda} />
       case 'localizacao':   return <TabLocalizacao f={fazenda} />
       case 'financeiro':    return <TabFinanceiro f={fazenda} />
@@ -429,46 +384,8 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
             }
           />
 
-          {/* Stats strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                style={{
-                  background: colors.surfaceBg,
-                  borderRadius: 10,
-                  padding: '12px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  transition: 'background 0.2s',
-                }}
-              >
-                <div
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 8,
-                    background: s.iconBg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {s.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2, transition: 'color 0.2s' }}>
-                    {s.label}
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary, transition: 'color 0.2s' }}>
-                    {s.value}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Dados de identificação como cabeçalho fixo */}
+          <IdentificacaoHeader f={fazenda} />
 
           {/* Tabs + content */}
           <div
@@ -479,21 +396,17 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
               display: 'flex',
               flexDirection: 'column',
               flex: 1,
-              transition: 'background 0.2s',
+              transition: `background ${t.transition.smooth}`,
             }}
           >
             {/* Tab bar */}
-            <div
-              style={{
-                borderBottom: `1px solid ${colors.border}`,
-                padding: '12px 20px',
-              }}
-            >
+            <div style={{ padding: `${t.space[3]}px ${t.space[5]}px 0` }}>
               <Tabs
                 items={TABS}
                 activeId={activeTab}
                 onChange={(id) => setActiveTab(id as Tab)}
                 label="Seções da fazenda"
+                variant="outline"
               />
             </div>
 

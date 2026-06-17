@@ -3,6 +3,8 @@ import { X, SlidersHorizontal } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
+import { useFocusTrap } from './useFocusTrap'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 interface FilterDrawerProps {
   open: boolean
@@ -21,7 +23,9 @@ export function FilterDrawer({
   children,
   activeCount = 0,
 }: FilterDrawerProps) {
-  const { colors } = useTheme()
+  const { colors }    = useTheme()
+  const reducedMotion = usePrefersReducedMotion()
+  const panelRef      = useFocusTrap<HTMLDivElement>(open)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -40,23 +44,34 @@ export function FilterDrawer({
           zIndex: t.zIndex.overlay,
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
-          transition: `opacity ${t.transition.smooth}`,
+          transition: reducedMotion ? 'none' : `opacity ${t.transition.smooth}`,
         }}
       />
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        tabIndex={-1}
         style={{
           position: 'fixed',
-          top: 0,
-          right: 0,
-          height: '100vh',
+          // Alinhado à altura do menu e do sub-menu: começa abaixo da Topbar e
+          // termina na mesma margem inferior do chassi (bottom fixo).
+          top: t.layout.contentTop,
+          bottom: t.layout.gutter,
+          right: t.layout.gutter,
           width: t.size.drawer,
           background: colors.surfaceBg,
+          borderRadius: t.radius.xl,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.drawer,
           display: 'flex',
           flexDirection: 'column',
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: `transform ${t.transition.drawer}`,
+          overflow: 'hidden',
+          outline: 'none',
+          pointerEvents: open ? 'auto' : 'none',
+          transform: open ? 'translateX(0)' : `translateX(calc(100% + ${t.layout.gutter}px))`,
+          transition: reducedMotion ? 'none' : `transform ${t.transition.drawer}`,
         }}
       >
         {/* Header */}
@@ -99,6 +114,7 @@ export function FilterDrawer({
           </div>
           <button
             type="button"
+            className="gb-focusable"
             onClick={onClose}
             style={{
               background: 'none',

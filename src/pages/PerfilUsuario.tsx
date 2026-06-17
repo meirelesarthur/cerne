@@ -27,7 +27,7 @@ function SubTitle({ children }: { children: React.ReactNode }) {
 
 function Muted({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: 14, color: '#616161', fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
+    <p style={{ fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
       {children}
     </p>
   )
@@ -58,11 +58,11 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
         width: 40,
         height: 20,
         borderRadius: 9999,
-        background: checked ? '#059669' : 'rgba(115,115,115,0.2)',
+        background: checked ? t.color.brand[600] : 'rgba(115,115,115,0.2)',
         position: 'relative',
         cursor: 'pointer',
         flexShrink: 0,
-        transition: 'background 0.2s',
+        transition: `background ${t.transition.smooth}`,
         boxShadow: '0 0 2px rgba(18,18,18,0.08), 0 2px 2px rgba(18,18,18,0.04)',
       }}
     >
@@ -74,8 +74,8 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
           width: 16,
           height: 16,
           borderRadius: '50%',
-          background: '#fafafa',
-          transition: 'left 0.2s',
+          background: t.color.neutral[50],
+          transition: `left ${t.transition.smooth}`,
           boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
         }}
       />
@@ -118,14 +118,14 @@ export default function PerfilUsuario() {
             <FormField
               label="Nome completo"
               defaultValue="Silvio Ventura Abreu"
-              iconRight={<Pencil size={13} color="#9ca3af" />}
+              iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
             />
           </div>
           <div style={{ width: 320 }}>
             <FormField
               label="Usuário"
               defaultValue="silvioventura"
-              iconRight={<Pencil size={13} color="#9ca3af" />}
+              iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
             />
           </div>
           <div style={{ width: '100%' }}>
@@ -231,7 +231,7 @@ export default function PerfilUsuario() {
             alignItems: 'center',
             gap: 12,
             padding: '10px 0',
-            borderBottom: '1px solid #f0f0f0',
+            borderBottom: `1px solid ${t.color.neutral[200]}`,
           }}
         >
           {/* Google G icon */}
@@ -241,8 +241,8 @@ export default function PerfilUsuario() {
             <path d="M3.926 9.884A4.807 4.807 0 0 1 3.675 8.5c0-.48.082-.947.251-1.384V4.999H1.198A8.003 8.003 0 0 0 .5 8.5c0 1.29.31 2.51.698 3.501l2.728-2.117z" fill="#FBBC05"/>
             <path d="M8.5 3.748c1.198 0 2.273.412 3.12 1.22l2.337-2.337C12.549 1.282 10.705.5 8.5.5A8.003 8.003 0 0 0 1.198 4.999L3.926 7.116C4.57 5.185 6.372 3.748 8.5 3.748z" fill="#EA4335"/>
           </svg>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif", width: 60 }}>Google</span>
-          <span style={{ flex: 1, fontSize: 14, color: '#616161', fontFamily: "'Outfit', sans-serif" }}>Conectado</span>
+          <span style={{ fontSize: t.font.size.lg, fontWeight: 700, color: t.color.neutral[800], fontFamily: "'Outfit', sans-serif", width: 60 }}>Google</span>
+          <span style={{ flex: 1, fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>Conectado</span>
           <Button variant="secondary" size="sm">Desconectar</Button>
         </div>
       </Section>
@@ -265,12 +265,12 @@ export default function PerfilUsuario() {
           <SectionTitle>Sessões e dispositivos</SectionTitle>
           <span
             style={{
-              background: '#ececec',
+              background: t.color.neutral[200],
               borderRadius: 9999,
               padding: '2px 10px',
-              fontSize: 12,
+              fontSize: t.font.size.sm,
               fontWeight: 500,
-              color: '#1a1a1a',
+              color: t.color.neutral[800],
               fontFamily: "'Outfit', sans-serif",
               marginTop: -16,
             }}
@@ -280,14 +280,14 @@ export default function PerfilUsuario() {
         </div>
         <Muted>Por motivos de segurança, cada conta é limitada a três dispositivos conectados.</Muted>
 
-        <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', border: '1px solid #e3e3e3' }}>
+        <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', border: `1px solid ${t.color.neutral[200]}` }}>
           {/* header */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto',
-              background: '#fafafa',
-              borderBottom: '1px solid #e3e3e3',
+              background: t.color.neutral[50],
+              borderBottom: `1px solid ${t.color.neutral[200]}`,
             }}
           >
             {['Sistema', 'Navegador', 'Localização', 'Última sessão', ''].map((h) => (
@@ -295,9 +295,9 @@ export default function PerfilUsuario() {
                 key={h}
                 style={{
                   padding: '11px 16px',
-                  fontSize: 12,
+                  fontSize: t.font.size.sm,
                   fontWeight: 500,
-                  color: '#353535',
+                  color: t.color.neutral[700],
                   fontFamily: "'Outfit', sans-serif",
                 }}
               >
@@ -307,18 +307,18 @@ export default function PerfilUsuario() {
           </div>
           {/* row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto', alignItems: 'center' }}>
-            <div style={{ padding: '16px', fontSize: 12, fontWeight: 500, color: '#1a1a1a', fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: "'Outfit', sans-serif" }}>
               Windows 11
             </div>
-            <div style={{ padding: '16px', fontSize: 12, color: '#616161', fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>
               Chrome 145
             </div>
-            <div style={{ padding: '16px', fontSize: 12, color: '#616161', fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>
               179.82.68.233
             </div>
             <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#059669', flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: '#616161', fontFamily: "'Outfit', sans-serif" }}>Este dispositivo</span>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color.brand[600], flexShrink: 0 }} />
+              <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>Este dispositivo</span>
             </div>
             <div style={{ padding: '16px', opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -335,10 +335,10 @@ export default function PerfilUsuario() {
           <div style={{ width: 'fit-content' }}>
             <Button variant="destructive" size="sm">Excluir conta</Button>
           </div>
-          <p style={{ fontSize: 12, color: '#424242', fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
             <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
             Entre em contato com{' '}
-            <span style={{ color: '#059669', fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}
+            <span style={{ color: t.color.brand[600], fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}
             para obter assistência.
           </p>
         </div>

@@ -8,6 +8,7 @@ import {
   BarChart2, Activity, ArrowUpRight,
 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
+import { IconButton } from '../../components/ui/IconButton'
 import { FormField } from '../../components/ui/FormField'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
@@ -646,38 +647,24 @@ export default function Pluviometria() {
                   }}
                 >
                   {area}
-                  <button
-                    onClick={() => removeArea(area)}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      width: 14, height: 14,
-                      border: 'none', background: 'none', cursor: 'pointer', padding: 0,
-                      color: 'inherit', opacity: 0.65, borderRadius: '50%',
-                    }}
+                  <IconButton
+                    icon={<X size={10} />}
                     aria-label={`Remover ${area}`}
-                  >
-                    <X size={10} />
-                  </button>
+                    onClick={() => removeArea(area)}
+                    size="xs"
+                  />
                 </div>
               ))}
             </div>
             {selectedAreas.length < ALL_AREAS.length && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setSelectedAreas(ALL_AREAS)}
-                style={{
-                  marginTop: t.space[2],
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: t.font.size.xs,
-                  color: t.color.brand[600],
-                  fontFamily: t.font.family.sans,
-                  padding: 0,
-                  textDecoration: 'underline',
-                }}
+                style={{ marginTop: t.space[2], padding: 0, color: t.color.brand[600], textDecoration: 'underline' }}
               >
                 Selecionar todas
-              </button>
+              </Button>
             )}
           </div>
         </div>

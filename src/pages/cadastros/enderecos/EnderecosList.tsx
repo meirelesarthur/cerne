@@ -6,13 +6,13 @@ import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { FilterButton } from '../../../components/ui/TableToolbar'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
-import { IconButton }      from '../../../components/ui/IconButton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
@@ -282,26 +282,21 @@ function TreeNode({
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           {/* Toggle ▼/► */}
           {hasChildren ? (
-            <button
-              type="button"
+            <IconButton
+              icon={
+                <ChevronRight
+                  size={13}
+                  style={{
+                    transform: isExpanded ? 'rotate(90deg)' : 'none',
+                    transition: 'transform 0.15s ease',
+                    flexShrink: 0,
+                  }}
+                />
+              }
+              aria-label={isExpanded ? 'Recolher' : 'Expandir'}
               onClick={() => onToggle(node.id)}
-              style={{
-                width: 18, height: 18, flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: colors.textMuted, borderRadius: t.radius.sm,
-                transition: 'color 0.12s',
-              }}
-            >
-              <ChevronRight
-                size={13}
-                style={{
-                  transform: isExpanded ? 'rotate(90deg)' : 'none',
-                  transition: 'transform 0.15s ease',
-                  flexShrink: 0,
-                }}
-              />
-            </button>
+              size="xs"
+            />
           ) : (
             <span style={{ width: 18, height: 18, flexShrink: 0 }} />
           )}

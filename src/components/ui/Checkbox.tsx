@@ -48,6 +48,7 @@ export function Checkbox({
           id={id}
           ref={inputRef}
           type="checkbox"
+          className="gb-focus-input"
           checked={checked}
           disabled={disabled}
           aria-label={!label ? ariaLabel : undefined}
@@ -65,6 +66,7 @@ export function Checkbox({
         />
         {/* Visual custom — aria-hidden pois o nativo já é semântico */}
         <span
+          className="gb-focus-target"
           aria-hidden="true"
           style={{
             position: 'absolute',

@@ -1,5 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { StepHeader } from '../../../../components/ui/StepHeader'
+import { FormField } from '../../../../components/ui/FormField'
+import { Checkbox } from '../../../../components/ui/Checkbox'
+import { t } from '../../../../design/tokens'
+import { useTheme } from '../../../../context/ThemeContext'
 import { mockCentrosCusto } from '../fazendas.mock'
 import type { FazendaFormData } from '../fazendas.types'
 
@@ -11,7 +15,7 @@ interface Step5Props {
 }
 
 export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChange }: Step5Props) {
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+  const { colors, isGbMode } = useTheme()
   const selected = data.centrosCusto
   const allIds = mockCentrosCusto.map((c) => c.id)
   const allSelected = allIds.every((id) => selected.includes(id))
@@ -41,42 +45,28 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
       />
       {/* Observações */}
       <div style={{ position: 'relative' }}>
-          <textarea
-            value={data.observacao}
-            onChange={(e) => onChange('observacao', e.target.value)}
-            maxLength={1000}
-            rows={4}
-            placeholder="Informações adicionais sobre a fazenda..."
-            style={{
-              width: '100%',
-              border: '1.5px solid #e5e5e5',
-              borderRadius: 8,
-              padding: '10px',
-              fontSize: 13,
-              fontFamily: "'Outfit', sans-serif",
-              color: '#1a1a1a',
-              background: 'white',
-              outline: 'none',
-              resize: 'vertical',
-              boxSizing: 'border-box',
-              lineHeight: 1.5,
-            }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = '#059669' }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = '#e5e5e5' }}
-          />
-          <span
-            style={{
-              position: 'absolute',
-              bottom: 8,
-              right: 10,
-              fontSize: 11,
-              color: '#9ca3af',
-              fontFamily: "'Outfit', sans-serif",
-              pointerEvents: 'none',
-            }}
-          >
-            {data.observacao.length}/1000
-          </span>
+        <FormField
+          label="Observações"
+          multiline
+          rows={4}
+          value={data.observacao}
+          onChange={(e) => onChange('observacao', e.target.value)}
+          maxLength={1000}
+          placeholder="Informações adicionais sobre a fazenda..."
+        />
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            right: 10,
+            fontSize: t.font.size.xs,
+            color: colors.textMuted,
+            fontFamily: t.font.family.sans,
+            pointerEvents: 'none',
+          }}
+        >
+          {data.observacao.length}/1000
+        </span>
       </div>
 
       {/* Centro de Custo */}
@@ -86,20 +76,20 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
-              background: '#fffbeb',
-              border: '1px solid #fde68a',
-              borderRadius: 8,
-              padding: '10px 14px',
-              marginBottom: 16,
+              gap: t.space[2] + 2,
+              background: t.color.warning.bg,
+              border: `1px solid ${t.color.warning.border}`,
+              borderRadius: t.radius.DEFAULT,
+              padding: `${t.space[2] + 2}px ${t.space[3] + 2}px`,
+              marginBottom: t.space[4],
             }}
           >
-            <span style={{ fontSize: 14 }}>⚠️</span>
+            <span style={{ fontSize: t.font.size.md }}>⚠️</span>
             <span
               style={{
-                fontSize: 12,
-                color: '#d97706',
-                fontFamily: "'Outfit', sans-serif",
+                fontSize: t.font.size.sm,
+                color: t.color.warning.text,
+                fontFamily: t.font.family.sans,
               }}
             >
               Nenhum centro de custo selecionado. Selecione ao menos um para continuar.
@@ -107,112 +97,144 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
           </div>
         )}
 
-        <div style={{ border: '1px solid #f0f0f0', borderRadius: 8, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: '#fafafa' }}>
-                <th style={{ padding: '8px 12px', width: 36, borderBottom: '1px solid #f0f0f0' }}>
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someSelected
-                    }}
-                    onChange={toggleAll}
-                    style={{ cursor: 'pointer', accentColor: '#059669' }}
+        {/* Grid de centros de custo — 5 colunas: checkbox · código · classe · condição · descrição */}
+        <div
+          style={{
+            border: `1px solid ${colors.border}`,
+            borderRadius: t.radius.DEFAULT,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Cabeçalho */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '36px 1fr 1fr 1fr 2fr',
+              background: isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50],
+              borderBottom: `1px solid ${colors.border}`,
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ padding: `${t.space[2]}px ${t.space[3]}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Checkbox
+                checked={allSelected}
+                indeterminate={someSelected}
+                onChange={toggleAll}
+                aria-label="Selecionar todos os centros de custo"
+              />
+            </div>
+            {(['Código', 'Classe', 'Condição', 'Descrição'] as const).map((h) => (
+              <div
+                key={h}
+                style={{
+                  padding: `${t.space[2]}px ${t.space[2] + t.space[1] / 2}px`,
+                  fontSize: t.font.size.xs,
+                  fontWeight: t.font.weight.semibold,
+                  color: colors.textSecondary,
+                  fontFamily: t.font.family.sans,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {h}
+              </div>
+            ))}
+          </div>
+
+          {/* Linhas */}
+          {mockCentrosCusto.map((cc) => {
+            const isSelected = selected.includes(cc.id)
+            return (
+              <div
+                key={cc.id}
+                role="row"
+                aria-selected={isSelected}
+                onClick={() => toggleRow(cc.id)}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '36px 1fr 1fr 1fr 2fr',
+                  alignItems: 'center',
+                  height: t.size.tableRow,
+                  background: isSelected
+                    ? t.color.row.selected
+                    : colors.surfaceBg,
+                  borderBottom: `1px solid ${colors.borderSubtle}`,
+                  cursor: 'pointer',
+                  transition: `background ${t.transition.fast}`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = isGbMode ? t.color.row.hoverGb : t.color.row.hover
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.background = isSelected ? t.color.row.selected : colors.surfaceBg
+                }}
+              >
+                <div
+                  style={{ padding: `0 ${t.space[3]}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={() => toggleRow(cc.id)}
+                    aria-label={`Selecionar ${cc.codigo}`}
                   />
-                </th>
-                {['Código', 'Classe', 'Condição', 'Descrição'].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: '8px 10px',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: '#616161',
-                      fontFamily: "'Outfit', sans-serif",
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      textAlign: 'left',
-                      borderBottom: '1px solid #f0f0f0',
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {mockCentrosCusto.map((cc) => {
-                const isSelected = selected.includes(cc.id)
-                return (
-                  <tr
-                    key={cc.id}
-                    onMouseEnter={() => setHoveredRow(cc.id)}
-                    onMouseLeave={() => setHoveredRow(null)}
-                    onClick={() => toggleRow(cc.id)}
-                    style={{
-                      background: isSelected ? '#f0fdf4' : hoveredRow === cc.id ? '#fafafa' : 'white',
-                      borderBottom: '1px solid #f9f9f9',
-                      cursor: 'pointer',
-                      height: 36,
-                    }}
-                  >
-                    <td style={{ padding: '0 12px', width: 36 }}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleRow(cc.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ cursor: 'pointer', accentColor: '#059669' }}
-                      />
-                    </td>
-                    <td
-                      style={{
-                        padding: '0 10px',
-                        fontSize: 12,
-                        fontFamily: "'Outfit', sans-serif",
-                        color: '#1a1a1a',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {cc.codigo}
-                    </td>
-                    <td
-                      style={{
-                        padding: '0 10px',
-                        fontSize: 12,
-                        fontFamily: "'Outfit', sans-serif",
-                        color: '#616161',
-                      }}
-                    >
-                      {cc.classe}
-                    </td>
-                    <td
-                      style={{
-                        padding: '0 10px',
-                        fontSize: 12,
-                        fontFamily: "'Outfit', sans-serif",
-                        color: '#616161',
-                      }}
-                    >
-                      {cc.condicao}
-                    </td>
-                    <td
-                      style={{
-                        padding: '0 10px',
-                        fontSize: 12,
-                        fontFamily: "'Outfit', sans-serif",
-                        color: '#1a1a1a',
-                      }}
-                    >
-                      {cc.descricao}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                </div>
+                <div
+                  style={{
+                    padding: `0 ${t.space[2] + t.space[1] / 2}px`,
+                    fontSize: t.font.size.sm,
+                    fontFamily: t.font.family.sans,
+                    color: colors.textPrimary,
+                    fontWeight: t.font.weight.medium,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {cc.codigo}
+                </div>
+                <div
+                  style={{
+                    padding: `0 ${t.space[2] + t.space[1] / 2}px`,
+                    fontSize: t.font.size.sm,
+                    fontFamily: t.font.family.sans,
+                    color: colors.textSecondary,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {cc.classe}
+                </div>
+                <div
+                  style={{
+                    padding: `0 ${t.space[2] + t.space[1] / 2}px`,
+                    fontSize: t.font.size.sm,
+                    fontFamily: t.font.family.sans,
+                    color: colors.textSecondary,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {cc.condicao}
+                </div>
+                <div
+                  style={{
+                    padding: `0 ${t.space[2] + t.space[1] / 2}px`,
+                    fontSize: t.font.size.sm,
+                    fontFamily: t.font.family.sans,
+                    color: colors.textPrimary,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {cc.descricao}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

@@ -55,6 +55,7 @@ export function IconButton({
   return (
     <button
       type="button"
+      className="gb-focusable"
       onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
       title={tooltip}

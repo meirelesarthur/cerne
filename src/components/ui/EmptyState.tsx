@@ -1,7 +1,10 @@
 import React from 'react'
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, SearchX, AlertTriangle } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { Button } from './Button'
+
+type EmptyStateVariant = 'empty' | 'search' | 'error'
 
 interface EmptyStateAction {
   label:   string
@@ -9,22 +12,43 @@ interface EmptyStateAction {
 }
 
 interface EmptyStateProps {
+  /** Tipo do estado: lista vazia, busca sem resultado, ou erro de carga */
+  variant?:     EmptyStateVariant
   message?:     string
   description?: string
+  /** Sobrescreve o ícone padrão da variante */
   icon?:        React.ReactNode
+  /** Ação primária (ex.: "Cadastrar fazenda") */
   action?:      EmptyStateAction
+  /** Em variant="error": handler do botão "Tentar novamente" */
+  onRetry?:     () => void
+  /** Mostra spinner no botão de retry enquanto recarrega */
+  retrying?:    boolean
+}
+
+const defaults: Record<EmptyStateVariant, { icon: React.ReactNode; message: string }> = {
+  empty:  { icon: <FolderOpen size={40} strokeWidth={1.5} />,    message: 'Nenhum registro encontrado.' },
+  search: { icon: <SearchX size={40} strokeWidth={1.5} />,       message: 'Nenhum resultado para sua busca.' },
+  error:  { icon: <AlertTriangle size={40} strokeWidth={1.5} />, message: 'Não foi possível carregar os dados.' },
 }
 
 export function EmptyState({
-  message     = 'Nenhum registro encontrado.',
+  variant = 'empty',
+  message,
   description,
   icon,
   action,
+  onRetry,
+  retrying = false,
 }: EmptyStateProps) {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
+  const preset = defaults[variant]
+  const isError = variant === 'error'
 
   return (
     <div
+      role={isError ? 'alert' : undefined}
+      aria-live={isError ? 'polite' : undefined}
       style={{
         display:        'flex',
         flexDirection:  'column',
@@ -38,14 +62,14 @@ export function EmptyState({
       {/* Ícone */}
       <div
         style={{
-          color:        colors.textMuted,
-          opacity:      0.65,
-          display:      'flex',
-          alignItems:   'center',
+          color:          isError ? t.color.error.text : colors.textMuted,
+          opacity:        isError ? 0.9 : 0.65,
+          display:        'flex',
+          alignItems:     'center',
           justifyContent: 'center',
         }}
       >
-        {icon ?? <FolderOpen size={40} strokeWidth={1.5} />}
+        {icon ?? preset.icon}
       </div>
 
       {/* Mensagem principal */}
@@ -57,7 +81,7 @@ export function EmptyState({
           fontFamily: t.font.family.sans,
         }}
       >
-        {message}
+        {message ?? preset.message}
       </span>
 
       {/* Descrição opcional */}
@@ -75,36 +99,20 @@ export function EmptyState({
         </span>
       )}
 
-      {/* Ação opcional */}
-      {action && (
-        <button
-          type="button"
-          onClick={action.onClick}
-          style={{
-            marginTop:    t.space[1],
-            height:       36,
-            padding:      `0 ${t.space[4]}px`,
-            borderRadius: t.radius.DEFAULT,
-            border:       `1.5px solid ${isGbMode ? t.color.brand[500] : t.color.brand[600]}`,
-            background:   'transparent',
-            color:        isGbMode ? t.color.brand[400] : t.color.brand[600],
-            fontSize:     t.font.size.base,
-            fontWeight:   t.font.weight.semibold,
-            fontFamily:   t.font.family.sans,
-            cursor:       'pointer',
-            transition:   `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = t.color.brand[600]
-            e.currentTarget.style.color      = t.color.neutral[0]
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-            e.currentTarget.style.color      = isGbMode ? t.color.brand[400] : t.color.brand[600]
-          }}
-        >
-          {action.label}
-        </button>
+      {/* Ações */}
+      {(action || (isError && onRetry)) && (
+        <div style={{ display: 'flex', gap: t.space[2], marginTop: t.space[1] }}>
+          {isError && onRetry && (
+            <Button variant="primary" onClick={onRetry} loading={retrying}>
+              Tentar novamente
+            </Button>
+          )}
+          {action && (
+            <Button variant={isError && onRetry ? 'secondary' : 'primary'} onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
+        </div>
       )}
     </div>
   )

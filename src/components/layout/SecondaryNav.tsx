@@ -8,24 +8,26 @@ import { t } from '../../design/tokens'
 
 function NavHeader({ module }: { module: NavModule }) {
   const { colors } = useTheme()
+  const Icon = module.icon
   return (
     <div
       style={{
         height: 44,
-        minHeight: 44,
-        background: colors.surfaceSubtle,
+        flexShrink: 0,
+        background: colors.subnavHeaderBg,
         display: 'flex',
         alignItems: 'center',
-        padding: '0 12px',
-        flexShrink: 0,
+        gap: t.space[1],
+        padding: `0 ${t.space[3]}px`,
         transition: 'background 0.2s',
       }}
     >
+      <Icon size={16} strokeWidth={2} color={colors.subnavHeaderText} style={{ flexShrink: 0 }} aria-hidden="true" />
       <span
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: colors.textPrimary,
+          fontSize: t.font.size.md,
+          fontWeight: t.font.weight.bold,
+          color: colors.subnavHeaderText,
           fontFamily: "'Outfit', sans-serif",
           letterSpacing: '-0.1px',
         }}
@@ -105,14 +107,12 @@ function NavItem({
 function NavGroupSection({
   group,
   open,
-  anyOpen,
   activeItemId,
   onToggle,
   onItemClick,
 }: {
   group: NavGroup
   open: boolean
-  anyOpen: boolean
   activeItemId: string | null
   onToggle: () => void
   onItemClick: (id: string) => void
@@ -128,13 +128,13 @@ function NavGroupSection({
           width: '100%',
           display: 'flex',
           alignItems: 'center',
-          gap: 5,
+          gap: t.space[1],
           fontSize: 10,
-          fontWeight: anyOpen ? 500 : 600,
-          color: anyOpen ? colors.textMuted : colors.textPrimary,
+          fontWeight: 500,
+          color: colors.textMuted,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
-          padding: '6px 10px',
+          padding: `6px 10px 6px ${t.space[1]}px`,
           fontFamily: "'Outfit', sans-serif",
           background: 'transparent',
           border: 'none',
@@ -225,8 +225,6 @@ export default function SecondaryNav({
     return initial
   })
 
-  const anyOpen = openGroups.size > 0
-
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => {
       const next = new Set(prev)
@@ -265,7 +263,6 @@ export default function SecondaryNav({
               key={group.id}
               group={group}
               open={openGroups.has(group.id)}
-              anyOpen={anyOpen}
               activeItemId={activeItemId}
               onToggle={() => toggleGroup(group.id)}
               onItemClick={onItemClick}

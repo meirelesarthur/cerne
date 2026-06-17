@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
 } from 'lucide-react'
@@ -6,7 +6,7 @@ import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
-import { Modal }           from '../../../components/ui/Modal'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
@@ -203,32 +203,20 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
 
       </PageCard>
 
-      {/* Modal exclusão */}
-      <Modal
-        open={deleteTarget !== null}
-        onClose={() => setDeleteTarget(null)}
-        title="Excluir armazém"
-        subtitle="Esta ação não pode ser desfeita."
-        size="sm"
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              <Trash2 size={13} /> Excluir
-            </Button>
-          </>
+      {/* Confirmação de exclusão */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+        title="Excluir armazém?"
+        message={
+          deleteTarget
+            ? `${deleteTarget.sigla} — ${deleteTarget.descricao} será excluído permanentemente. Esta ação não pode ser desfeita.`
+            : undefined
         }
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: t.space[4], padding: `${t.space[1]}px 0` }}>
-          <div style={{ width: 52, height: 52, borderRadius: t.radius.full, background: t.color.error.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Trash2 size={22} color={t.color.error.solid} />
-          </div>
-          <p style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: 1.6, margin: 0, textAlign: 'center' }}>
-            <strong style={{ color: colors.textPrimary }}>{deleteTarget?.sigla} — {deleteTarget?.descricao}</strong>{' '}
-            será excluído permanentemente.
-          </p>
-        </div>
-      </Modal>
+        confirmLabel="Excluir"
+        tone="destructive"
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
 

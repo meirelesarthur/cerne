@@ -1,7 +1,8 @@
-import { Bell, Search, ChevronRight } from 'lucide-react'
+import { Bell, Search } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
+import { Breadcrumb } from '../ui/Breadcrumb'
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -31,34 +32,18 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
         background: 'transparent',
       }}
     >
-      {/* Breadcrumb */}
-      <nav
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          fontFamily: t.font.family.sans,
-          fontWeight: t.font.weight.normal,
-          fontSize: t.font.size.sm,
-          color: colors.textPrimary,
-        }}
-      >
-        <span style={{ color: colors.textSecondary }}>Início</span>
-        {expandedModule && (
-          <>
-            <ChevronRight size={13} style={{ color: colors.border, flexShrink: 0 }} />
-            <span style={{ color: activeItem ? colors.textSecondary : colors.textPrimary }}>
-              {expandedModule.label}
-            </span>
-          </>
-        )}
-        {activeItem && (
-          <>
-            <ChevronRight size={13} style={{ color: colors.border, flexShrink: 0 }} />
-            <span style={{ color: colors.textPrimary, fontWeight: 400 }}>{activeItem.label}</span>
-          </>
-        )}
-      </nav>
+      {/* Breadcrumb (componente do kit). O marginLeft espelha o deslocamento da
+         linha de conteúdo (-t.space[2] quando há submenu), alinhando "Início" ao
+         trilho de ícones do submenu (12px da borda do card). Sem submenu, 0. */}
+      <div style={{ marginLeft: expandedModule ? -t.space[2] : 0 }}>
+        <Breadcrumb
+          items={[
+            { label: 'Início' },
+            ...(expandedModule ? [{ label: expandedModule.label }] : []),
+            ...(activeItem ? [{ label: activeItem.label }] : []),
+          ]}
+        />
+      </div>
 
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

@@ -66,6 +66,7 @@ export function Button({
   children,
   style,
   disabled,
+  className,
   ...props
 }: ButtonProps) {
   const base       = variantBase[variant]
@@ -77,6 +78,7 @@ export function Button({
   return (
     <button
       {...props}
+      className={['gb-focusable', className].filter(Boolean).join(' ')}
       disabled={isDisabled}
       style={{
         display:        'inline-flex',

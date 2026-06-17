@@ -3,6 +3,7 @@ import { FormField } from '../components/ui/FormField'
 import { Checkbox } from '../components/ui/Checkbox'
 import { Divider } from '../components/ui/Divider'
 import { SSOButton } from '../components/ui/SSOButton'
+import { Spinner } from '../components/ui/Spinner'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
@@ -394,6 +395,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   placeholder="voce@suafazenda.com.br"
                   value={email}
                   autoComplete="email"
+                  allowPasswordManager
                   disabled={isBlocked}
                   onChange={e => { setEmail(e.target.value); setEmailStatus('idle') }}
                   onBlur={handleEmailBlur}
@@ -429,6 +431,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   placeholder="••••••••••"
                   value={password}
                   autoComplete="current-password"
+                  allowPasswordManager
                   disabled={isBlocked}
                   onChange={e => { setPassword(e.target.value); setPassErr(false) }}
                   onFocus={() => setPassErr(false)}
@@ -490,7 +493,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                 aria-busy={progressState === 'loading'}
               >
                 {progressState === 'loading' ? (
-                  <span className="lgn-spinner" aria-hidden="true" />
+                  <Spinner size="sm" />
                 ) : progressState === 'success' ? (
                   <>
                     <svg viewBox="0 0 20 20" fill="none" width={18} height={18} aria-hidden="true">
@@ -589,6 +592,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                     placeholder="voce@suafazenda.com.br"
                     value={forgotEmail}
                     autoComplete="email"
+                    allowPasswordManager
                     onChange={e => setForgotEmail(e.target.value)}
                     style={{ height: t.space[12], borderRadius: t.radius.xl }}
                     iconLeft={
@@ -607,7 +611,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                     style={{ marginTop: t.space[5] }}
                   >
                     {forgotLoading
-                      ? <span className="lgn-spinner" aria-hidden="true" />
+                      ? <Spinner size="sm" />
                       : 'Enviar link de recuperação'}
                   </button>
                 </form>

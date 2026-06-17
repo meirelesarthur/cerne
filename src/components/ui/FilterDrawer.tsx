@@ -55,18 +55,22 @@ export function FilterDrawer({
         tabIndex={-1}
         style={{
           position: 'fixed',
-          top: 0,
-          right: 0,
-          height: '100vh',
+          // Alinhado à altura do menu e do sub-menu: começa abaixo da Topbar e
+          // termina na mesma margem inferior do chassi (bottom fixo).
+          top: t.layout.contentTop,
+          bottom: t.layout.gutter,
+          right: t.layout.gutter,
           width: t.size.drawer,
           background: colors.surfaceBg,
+          borderRadius: t.radius.xl,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.drawer,
           display: 'flex',
           flexDirection: 'column',
+          overflow: 'hidden',
           outline: 'none',
           pointerEvents: open ? 'auto' : 'none',
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
+          transform: open ? 'translateX(0)' : `translateX(calc(100% + ${t.layout.gutter}px))`,
           transition: reducedMotion ? 'none' : `transform ${t.transition.drawer}`,
         }}
       >

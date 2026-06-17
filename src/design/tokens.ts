@@ -367,6 +367,19 @@ export const layout = {
    * exatamente a altura da navegação secundária (sub-menu).
    */
   contentOffset: 88,
+  /**
+   * Distância do topo da viewport até o topo da área de conteúdo / navegação
+   * secundária (sub-menu): root pad (8) + card pad (8) + Topbar (48) + gap (8) = 72.
+   * Use como `top` em overlays que devem se alinhar ao menu e ao sub-menu
+   * (sem cobrir a Topbar).
+   */
+  contentTop: 72,
+  /**
+   * Folga externa do chassi (root pad 8 + card pad 8 = 16). Usada nas laterais e
+   * base de overlays alinhados à área de conteúdo, mantendo a mesma margem do
+   * menu e do sub-menu. Observação: contentTop + gutter = contentOffset.
+   */
+  gutter: 16,
 }
 
 // ─── Atalho global ────────────────────────────────────────────────────────────

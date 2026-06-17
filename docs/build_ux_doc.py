@@ -349,7 +349,7 @@ DOC = r"""
     <p class="eyebrow">Documento técnico interno · v2.0</p>
     <h1 class="cover-title">Processo de UX<br>Ponta a Ponta</h1>
     <p class="cover-lead">Code-First, Documentação Viva e Melhoria Contínua</p>
-    <p class="cover-desc">O código permanece como fonte única da verdade — e o ciclo agora se fecha
+    <p class="cover-desc">O código permanece como fonte única da verdade — e o ciclo passa a se fechar
       com documentação automatizada (Supernova&nbsp;+&nbsp;Figma) e medição contínua de uso (PostHog).
       UX deixa de terminar na entrega: vira um circuito.</p>
     [[FIG:01-circuito-nao-fecha-na-entrega|O circuito: a entrega não encerra o processo — alimenta a próxima volta.]]
@@ -366,10 +366,18 @@ DOC = r"""
 <!-- ============================== SEÇÃO 1 ============================== -->
 <section class="page">
   <header class="ph"><span class="sec">Seção 1</span><h2>Sumário Executivo</h2></header>
-  <p>A v1.0 deste documento consolidou o processo <em>code-first</em>: tokens versionados em código no padrão
-    W3C&nbsp;DTCG, componentes núcleo construídos sobre Chakra&nbsp;UI&nbsp;3 e distribuídos via pacote
-    <code>@gb/ui</code>, governança federada e contexto empacotado para IA. Essa arquitetura permanece intacta — a
-    pesquisa de indústria a validou como o padrão consolidado de 2025–2026.</p>
+  <div class="callout"><b>Onde estamos × para onde vamos.</b> <u>Em produção hoje:</u> tokens centralizados em código
+    como fonte única (<code>src/design/tokens.ts</code>), catálogo de componentes em <code>src/components/ui/</code>,
+    Storybook, Tailwind e o contexto para IA (Leis e Regras). <u>Alvo desta v2 (a construir):</u> exportar os tokens
+    no padrão W3C&nbsp;DTCG, reconstruir o núcleo sobre Chakra&nbsp;UI&nbsp;3 com recipes, distribuir os pacotes
+    <code>@gb/tokens</code> / <code>@gb/ui</code> / <code>@gb/lint</code>, documentar no Supernova e instrumentar com
+    PostHog. Os marcos descritos adiante são o <strong>destino arquitetural</strong>, não o estado atual.</div>
+  <p>A v1.0 deste documento consolidou o processo <em>code-first</em>: os tokens como fonte única em código, um
+    catálogo de componentes curados, Storybook e o contexto para IA (as Leis do CERNE). Esse alicerce está em
+    produção. A <strong>formalização</strong> desse núcleo — tokens no padrão W3C&nbsp;DTCG, componentes
+    reconstruídos sobre Chakra&nbsp;UI&nbsp;3 e distribuídos como pacotes <code>@gb/*</code> versionados — é a
+    <strong>arquitetura-alvo</strong> desta v2 (Seções&nbsp;7 e&nbsp;8), validada pela pesquisa de indústria como o
+    padrão consolidado de 2025–2026.</p>
   <p>Esta v2.0 estende o processo nas duas pontas que a v1 deixava em aberto: <strong>o que acontece depois da
     entrega</strong>. A resposta tem três movimentos:</p>
   <table class="t">
@@ -384,8 +392,8 @@ DOC = r"""
   <h3>Os seis pilares do processo</h3>
   [[FIG:02-seis-pilares|Camada sobre camada: os quatro pilares da v1 sustentam os dois novos — documentar e medir.]]
   <ul class="pillars">
-    <li><b>Tokens como constituição</b> — valores de design vivem em código, versionados, no padrão W3C&nbsp;DTCG. Fonte única para todos os produtos da GB.</li>
-    <li><b>Núcleo de componentes <code>@gb/ui</code></b> — primitivas curadas construídas sobre Chakra&nbsp;UI&nbsp;3 (recipes e slot recipes) e distribuídas como pacote npm versionado: uma correção no núcleo propaga para todos os consumidores.</li>
+    <li><b>Tokens como constituição</b> — valores de design vivem em código como fonte única (hoje em <code>tokens.ts</code>); <span class="tag">ALVO</span> versioná-los no padrão W3C&nbsp;DTCG para servir todos os produtos da GB.</li>
+    <li><b>Núcleo de componentes <code>@gb/ui</code></b> <span class="tag">ALVO</span> — primitivas curadas a serem reconstruídas sobre Chakra&nbsp;UI&nbsp;3 (recipes e slot recipes) e distribuídas como pacote npm versionado: uma correção no núcleo propaga para todos os consumidores. Hoje as primitivas vivem em <code>src/components/ui/</code>.</li>
     <li><b>Governança federada</b> — UX é a fonte central dos tokens; devs criam componentes livremente, e os melhores são promovidos ao núcleo com aprovação de UX.</li>
     <li><b>Contexto para IA</b> — Leis e receitas de composição empacotadas como contexto legível por agentes, permitindo construir telas novas com consistência mesmo sem Figma.</li>
     <li><span class="tag">NOVO</span> <b>Documentação viva</b> — Supernova conectado ao código e ao Figma; tokens fluem automaticamente, documentação nasce depois da entrega, sem retrabalho manual.</li>
@@ -567,9 +575,11 @@ DOC = r"""
 <!-- ============================== SEÇÃO 7 ============================== -->
 <section class="page">
   <header class="ph"><span class="sec">Seção 7</span><h2>Arquitetura-Alvo</h2></header>
-  <p>A base do design system proprietário GB é o <b>Chakra&nbsp;UI&nbsp;3</b>: o tema é um <code>SystemConfig</code>
-    alimentado pelos tokens (via <code>defineTokens</code> / <code>defineSemanticTokens</code>), e os componentes do
-    núcleo são construídos com recipes e slot recipes. A distribuição é por pacote npm versionado — o modelo que
+  <p>A base-alvo do design system proprietário GB é o <b>Chakra&nbsp;UI&nbsp;3</b>: o tema passa a ser um
+    <code>SystemConfig</code> alimentado pelos tokens (via <code>defineTokens</code> /
+    <code>defineSemanticTokens</code>) — um esqueleto já existe em <code>src/theme.ts</code> (<code>createSystem</code>) —
+    e os componentes do núcleo passam a ser construídos com recipes e slot recipes. A distribuição é por pacote npm
+    versionado — o modelo que
     melhor serve "uma definição, muitos consumidores": uma correção no núcleo propaga para todos os projetos por
     bump de versão, sem cópias divergentes.</p>
   [[FIG:07-constituicao-que-propaga|A constituição que propaga: o pote de tokens escorre para o núcleo e os projetos; o lint barra o hardcode.]]

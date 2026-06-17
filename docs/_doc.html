@@ -68,7 +68,7 @@ figure.xh figcaption { font-size:9pt; color:#5a6b64; text-align:center; margin-t
     <p class="eyebrow">Documento técnico interno · v2.0</p>
     <h1 class="cover-title">Processo de UX<br>Ponta a Ponta</h1>
     <p class="cover-lead">Code-First, Documentação Viva e Melhoria Contínua</p>
-    <p class="cover-desc">O código permanece como fonte única da verdade — e o ciclo agora se fecha
+    <p class="cover-desc">O código permanece como fonte única da verdade — e o ciclo passa a se fechar
       com documentação automatizada (Supernova&nbsp;+&nbsp;Figma) e medição contínua de uso (PostHog).
       UX deixa de terminar na entrega: vira um circuito.</p>
     <figure class="xh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" role="img"><rect width="1000" height="560" fill="#ffffff"/><defs>
@@ -94,10 +94,18 @@ figure.xh figcaption { font-size:9pt; color:#5a6b64; text-align:center; margin-t
 <!-- ============================== SEÇÃO 1 ============================== -->
 <section class="page">
   <header class="ph"><span class="sec">Seção 1</span><h2>Sumário Executivo</h2></header>
-  <p>A v1.0 deste documento consolidou o processo <em>code-first</em>: tokens versionados em código no padrão
-    W3C&nbsp;DTCG, componentes núcleo construídos sobre Chakra&nbsp;UI&nbsp;3 e distribuídos via pacote
-    <code>@gb/ui</code>, governança federada e contexto empacotado para IA. Essa arquitetura permanece intacta — a
-    pesquisa de indústria a validou como o padrão consolidado de 2025–2026.</p>
+  <div class="callout"><b>Onde estamos × para onde vamos.</b> <u>Em produção hoje:</u> tokens centralizados em código
+    como fonte única (<code>src/design/tokens.ts</code>), catálogo de componentes em <code>src/components/ui/</code>,
+    Storybook, Tailwind e o contexto para IA (Leis e Regras). <u>Alvo desta v2 (a construir):</u> exportar os tokens
+    no padrão W3C&nbsp;DTCG, reconstruir o núcleo sobre Chakra&nbsp;UI&nbsp;3 com recipes, distribuir os pacotes
+    <code>@gb/tokens</code> / <code>@gb/ui</code> / <code>@gb/lint</code>, documentar no Supernova e instrumentar com
+    PostHog. Os marcos descritos adiante são o <strong>destino arquitetural</strong>, não o estado atual.</div>
+  <p>A v1.0 deste documento consolidou o processo <em>code-first</em>: os tokens como fonte única em código, um
+    catálogo de componentes curados, Storybook e o contexto para IA (as Leis do CERNE). Esse alicerce está em
+    produção. A <strong>formalização</strong> desse núcleo — tokens no padrão W3C&nbsp;DTCG, componentes
+    reconstruídos sobre Chakra&nbsp;UI&nbsp;3 e distribuídos como pacotes <code>@gb/*</code> versionados — é a
+    <strong>arquitetura-alvo</strong> desta v2 (Seções&nbsp;7 e&nbsp;8), validada pela pesquisa de indústria como o
+    padrão consolidado de 2025–2026.</p>
   <p>Esta v2.0 estende o processo nas duas pontas que a v1 deixava em aberto: <strong>o que acontece depois da
     entrega</strong>. A resposta tem três movimentos:</p>
   <table class="t">
@@ -121,8 +129,8 @@ figure.xh figcaption { font-size:9pt; color:#5a6b64; text-align:center; margin-t
   </filter>
 </defs><g filter="url(#rough)"><path d="M300,430 h360 v56 h-360 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M320,374 h320 v56 h-320 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M335,318 h290 v56 h-290 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M350,262 h260 v56 h-260 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M368,206 h224 v56 h-224 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M384,150 h192 v56 h-192 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g><text x="480.0" y="467" fill="#15130f" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">tokens</text><text x="480.0" y="411" fill="#15130f" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">@gb/ui — núcleo</text><text x="480.0" y="355" fill="#15130f" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">governança federada</text><text x="480.0" y="299" fill="#15130f" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">contexto p/ IA</text><text x="480.0" y="243" fill="#2f6fc4" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">documentação viva</text><text x="480.0" y="187" fill="#2f6fc4" font-family="Caveat, Segoe Script, cursive" font-size="25" font-weight="400" text-anchor="middle">medição contínua</text><text x="600" y="196" fill="#d83a2c" font-family="Caveat, Segoe Script, cursive" font-size="26" font-weight="400" text-anchor="start" transform="rotate(-8 600 196)">NOVO</text><text x="584" y="140" fill="#d83a2c" font-family="Caveat, Segoe Script, cursive" font-size="26" font-weight="400" text-anchor="start" transform="rotate(-8 584 140)">NOVO</text><g filter="url(#rough)"><path d="M150,470 h70 v18 h-70 Z" fill="none" stroke="#15130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(150 350) scale(1.05 1.05)" filter="url(#rough)"><path d="M43,6 C20,6 13,29 16,58 C18,87 25,111 43,111 C61,111 68,87 70,58 C73,29 66,6 43,6 Z" fill="#15130f"/><circle cx="34" cy="50" r="5.4" fill="#fff"/><circle cx="53" cy="50" r="5.4" fill="#fff"/><path d="M35,109 L31,127" fill="none" stroke="#15130f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M31,127 L40,128" fill="none" stroke="#15130f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M51,109 L55,127" fill="none" stroke="#15130f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M55,127 L64,128" fill="none" stroke="#15130f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M196,378 C235,360 270,300 300,210" fill="none" stroke="#15130f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="120" y="330" fill="#15130f" font-family="Caveat, Segoe Script, cursive" font-size="26" font-weight="400" text-anchor="start">UX empilha</text><text x="700" y="470" fill="#ef8a1f" font-family="Caveat, Segoe Script, cursive" font-size="27" font-weight="400" text-anchor="start" transform="rotate(-2 700 470)">uma definição, muitos consumidores</text></svg><figcaption>Camada sobre camada: os quatro pilares da v1 sustentam os dois novos — documentar e medir.</figcaption></figure>
   <ul class="pillars">
-    <li><b>Tokens como constituição</b> — valores de design vivem em código, versionados, no padrão W3C&nbsp;DTCG. Fonte única para todos os produtos da GB.</li>
-    <li><b>Núcleo de componentes <code>@gb/ui</code></b> — primitivas curadas construídas sobre Chakra&nbsp;UI&nbsp;3 (recipes e slot recipes) e distribuídas como pacote npm versionado: uma correção no núcleo propaga para todos os consumidores.</li>
+    <li><b>Tokens como constituição</b> — valores de design vivem em código como fonte única (hoje em <code>tokens.ts</code>); <span class="tag">ALVO</span> versioná-los no padrão W3C&nbsp;DTCG para servir todos os produtos da GB.</li>
+    <li><b>Núcleo de componentes <code>@gb/ui</code></b> <span class="tag">ALVO</span> — primitivas curadas a serem reconstruídas sobre Chakra&nbsp;UI&nbsp;3 (recipes e slot recipes) e distribuídas como pacote npm versionado: uma correção no núcleo propaga para todos os consumidores. Hoje as primitivas vivem em <code>src/components/ui/</code>.</li>
     <li><b>Governança federada</b> — UX é a fonte central dos tokens; devs criam componentes livremente, e os melhores são promovidos ao núcleo com aprovação de UX.</li>
     <li><b>Contexto para IA</b> — Leis e receitas de composição empacotadas como contexto legível por agentes, permitindo construir telas novas com consistência mesmo sem Figma.</li>
     <li><span class="tag">NOVO</span> <b>Documentação viva</b> — Supernova conectado ao código e ao Figma; tokens fluem automaticamente, documentação nasce depois da entrega, sem retrabalho manual.</li>
@@ -349,9 +357,11 @@ figure.xh figcaption { font-size:9pt; color:#5a6b64; text-align:center; margin-t
 <!-- ============================== SEÇÃO 7 ============================== -->
 <section class="page">
   <header class="ph"><span class="sec">Seção 7</span><h2>Arquitetura-Alvo</h2></header>
-  <p>A base do design system proprietário GB é o <b>Chakra&nbsp;UI&nbsp;3</b>: o tema é um <code>SystemConfig</code>
-    alimentado pelos tokens (via <code>defineTokens</code> / <code>defineSemanticTokens</code>), e os componentes do
-    núcleo são construídos com recipes e slot recipes. A distribuição é por pacote npm versionado — o modelo que
+  <p>A base-alvo do design system proprietário GB é o <b>Chakra&nbsp;UI&nbsp;3</b>: o tema passa a ser um
+    <code>SystemConfig</code> alimentado pelos tokens (via <code>defineTokens</code> /
+    <code>defineSemanticTokens</code>) — um esqueleto já existe em <code>src/theme.ts</code> (<code>createSystem</code>) —
+    e os componentes do núcleo passam a ser construídos com recipes e slot recipes. A distribuição é por pacote npm
+    versionado — o modelo que
     melhor serve "uma definição, muitos consumidores": uma correção no núcleo propaga para todos os projetos por
     bump de versão, sem cópias divergentes.</p>
   <figure class="xh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" role="img"><rect width="1000" height="560" fill="#ffffff"/><defs>

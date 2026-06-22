@@ -47,7 +47,7 @@ export function ToggleSection({
 
   return (
     <div style={{
-      border:       `1px solid ${active ? colors.brand : colors.border}`,
+      border:       `1px solid ${active ? colors.accent.default : colors.border.default}`,
       borderRadius: t.radius.lg,
       overflow:     'hidden',
       marginBottom: t.space[3],
@@ -59,8 +59,8 @@ export function ToggleSection({
         alignItems:     'center',
         gap:            t.space[3],
         padding:        `${t.space[3]}px ${t.space[4]}px`,
-        background:     active ? colors.surfaceSubtle : colors.surfaceBg,
-        borderBottom:   active ? `1px solid ${colors.border}` : 'none',
+        background:     active ? colors.bg.subtle : colors.bg.surface,
+        borderBottom:   active ? `1px solid ${colors.border.default}` : 'none',
         transition:     `background ${t.transition.smooth}`,
       }}>
         {icon && (
@@ -71,8 +71,8 @@ export function ToggleSection({
             width:          t.space[8],
             height:         t.space[8],
             borderRadius:   t.radius.DEFAULT,
-            background:     active ? colors.brandBg : colors.surfaceSubtle,
-            color:          active ? colors.brand : colors.textMuted,
+            background:     active ? colors.accent.subtle : colors.bg.subtle,
+            color:          active ? colors.accent.default : colors.fg.subtle,
             flexShrink:     0,
             transition:     `background ${t.transition.smooth}, color ${t.transition.smooth}`,
           }}>
@@ -83,7 +83,7 @@ export function ToggleSection({
           <div style={{
             fontSize:   t.font.size.md,
             fontWeight: t.font.weight.semibold,
-            color:      disabled ? colors.textMuted : colors.textPrimary,
+            color:      disabled ? colors.fg.subtle : colors.fg.default,
             fontFamily: t.font.family.sans,
           }}>
             {title}
@@ -91,7 +91,7 @@ export function ToggleSection({
           {description && (
             <div style={{
               fontSize:   t.font.size.xs,
-              color:      colors.textMuted,
+              color:      colors.fg.subtle,
               fontFamily: t.font.family.sans,
               marginTop:  2,
             }}>
@@ -118,7 +118,7 @@ export function ToggleSection({
               padding:    `${t.space[3]}px ${t.space[4]}px`,
               fontSize:   t.font.size.sm,
               fontWeight: t.font.weight.medium,
-              color:      colors.brand,
+              color:      colors.accent.default,
               fontFamily: t.font.family.sans,
             }}>
               <Check size={14} aria-hidden="true" />
@@ -131,7 +131,7 @@ export function ToggleSection({
           <div style={{
             padding:    `${t.space[3]}px ${t.space[4]}px`,
             fontSize:   t.font.size.sm,
-            color:      colors.textMuted,
+            color:      colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}>
             {inactiveHint}

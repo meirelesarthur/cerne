@@ -50,7 +50,7 @@ export function SortHeader({
         margin: 0,
         fontSize: t.font.size.xs,
         fontWeight: t.font.weight.semibold,
-        color: isActive ? colors.textPrimary : colors.textMuted,
+        color: isActive ? colors.fg.default : colors.fg.subtle,
         fontFamily: t.font.family.sans,
         textTransform: 'uppercase',
         letterSpacing: '0.05em',

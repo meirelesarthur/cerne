@@ -39,9 +39,9 @@ export function Heading({
   const { colors } = useTheme()
   const Tag = `h${level}` as React.ElementType
   const color =
-    tone === 'muted' ? colors.textMuted
-    : tone === 'secondary' ? colors.textSecondary
-    : colors.textPrimary
+    tone === 'muted' ? colors.fg.subtle
+    : tone === 'secondary' ? colors.fg.muted
+    : colors.fg.default
 
   return (
     <Tag

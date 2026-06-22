@@ -97,10 +97,10 @@ export function Modal({
             width:        sizeWidth[size],
             maxWidth:     `calc(100vw - ${t.space[8]}px)`,
             maxHeight:    `calc(100vh - ${t.space[8]}px)`,
-            background:   colors.surfaceBg,
+            background:   colors.bg.surface,
             borderRadius: t.radius.modal,
             boxShadow:    t.shadow.modal,
-            border:       `1px solid ${colors.border}`,
+            border:       `1px solid ${colors.border.default}`,
             display:      'flex',
             flexDirection:'column',
             overflow:     'hidden',
@@ -117,7 +117,7 @@ export function Modal({
                 alignItems:     'flex-start',
                 justifyContent: 'space-between',
                 padding:        `${t.space[4]}px ${t.space[5]}px`,
-                borderBottom:   `1px solid ${colors.border}`,
+                borderBottom:   `1px solid ${colors.border.default}`,
                 gap:            t.space[3],
               }}
             >
@@ -129,7 +129,7 @@ export function Modal({
                       margin:     0,
                       fontSize:   t.font.size.md,
                       fontWeight: t.font.weight.semibold,
-                      color:      colors.textPrimary,
+                      color:      colors.fg.default,
                       fontFamily: t.font.family.sans,
                       lineHeight: t.font.lineHeight.snug,
                     }}
@@ -142,7 +142,7 @@ export function Modal({
                     style={{
                       margin:     `${t.space[1]}px 0 0`,
                       fontSize:   t.font.size.sm,
-                      color:      colors.textMuted,
+                      color:      colors.fg.subtle,
                       fontFamily: t.font.family.sans,
                     }}
                   >
@@ -159,7 +159,7 @@ export function Modal({
                   background:   'none',
                   border:       'none',
                   cursor:       'pointer',
-                  color:        colors.textMuted,
+                  color:        colors.fg.subtle,
                   display:      'flex',
                   alignItems:   'center',
                   padding:      t.space[1],
@@ -167,7 +167,7 @@ export function Modal({
                   flexShrink:   0,
                   transition:   `background ${t.transition.fast}`,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
               >
                 <X size={16} />
@@ -191,7 +191,7 @@ export function Modal({
             <div
               style={{
                 padding:     `${t.space[4]}px ${t.space[5]}px`,
-                borderTop:   `1px solid ${colors.border}`,
+                borderTop:   `1px solid ${colors.border.default}`,
                 display:     'flex',
                 gap:         t.space[2],
                 alignItems:  'center',

@@ -64,7 +64,7 @@ function SkeletonBlock({
         width:        resolvedWidth,
         height:       resolvedHeight,
         borderRadius: isCircle ? t.radius.full : t.radius.md,
-        background:   colors.border,
+        background:   colors.border.default,
         animation:    `gb-skeleton-pulse ${t.animation.duration.slower} ease-in-out infinite`,
       }}
     />

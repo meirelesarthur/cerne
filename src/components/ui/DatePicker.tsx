@@ -126,7 +126,7 @@ function CalendarGrid({
               textAlign: 'center',
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               fontFamily: t.font.family.sans,
               paddingBottom: t.space[1],
             }}
@@ -164,7 +164,7 @@ function CalendarGrid({
 
           // Cores dinâmicas
           let bg = 'transparent'
-          let textColor = isDisabled ? colors.textMuted : colors.textPrimary
+          let textColor = isDisabled ? colors.fg.subtle : colors.fg.default
           let borderRadius = t.radius.md
 
           if (isSelected) {
@@ -239,8 +239,8 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
         top: 'calc(100% + 4px)',
         left: 0,
         zIndex: t.zIndex.dropdown,
-        background: colors.surfaceBg,
-        border: `1px solid ${colors.border}`,
+        background: colors.bg.surface,
+        border: `1px solid ${colors.border.default}`,
         borderRadius: t.radius.lg,
         boxShadow: t.shadow.md,
         padding: t.space[3],
@@ -260,7 +260,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           style={{
             border: 'none', background: 'transparent', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: colors.textMuted, padding: 4, borderRadius: t.radius.md,
+            color: colors.fg.subtle, padding: 4, borderRadius: t.radius.md,
             transition: `color ${t.transition.fast}`,
           }}
           className="gb-focusable"
@@ -271,7 +271,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
         <span style={{
           fontSize: t.font.size.base,
           fontWeight: t.font.weight.semibold,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
         }}>
           {MONTHS_PT[month]} {year}
@@ -284,7 +284,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           style={{
             border: 'none', background: 'transparent', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: colors.textMuted, padding: 4, borderRadius: t.radius.md,
+            color: colors.fg.subtle, padding: 4, borderRadius: t.radius.md,
             transition: `color ${t.transition.fast}`,
           }}
           className="gb-focusable"
@@ -337,10 +337,10 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         gap: t.space[2],
         paddingLeft: t.space[2] + t.space[1] / 2,
         paddingRight: t.space[2] + t.space[1] / 2,
-        border: `1.5px solid ${open ? colors.brand : borderColor}`,
+        border: `1.5px solid ${open ? colors.accent.default : borderColor}`,
         borderRadius: t.radius.DEFAULT,
-        background: disabled ? t.color.disabled.bg : isError ? t.color.error.bg : colors.inputBg,
-        color: displayValue ? colors.textPrimary : colors.textMuted,
+        background: disabled ? t.color.disabled.bg : isError ? t.color.error.bg : colors.bg.input,
+        color: displayValue ? colors.fg.default : colors.fg.subtle,
         fontSize: t.font.size.base,
         fontFamily: t.font.family.sans,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -359,13 +359,13 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        color: displayValue ? colors.textPrimary : colors.textMuted,
+        color: displayValue ? colors.fg.default : colors.fg.subtle,
       }}>
         {displayValue || placeholder}
       </span>
       <Calendar
         size={15}
-        color={open ? colors.brand : colors.textMuted}
+        color={open ? colors.accent.default : colors.fg.subtle}
         aria-hidden="true"
         style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
       />
@@ -392,7 +392,7 @@ function FieldLabel({ htmlFor, label, required, hint, colors }: FieldLabelProps)
         style={{
           fontSize: t.font.size.sm,
           fontWeight: t.font.weight.medium,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           cursor: 'pointer',
         }}
@@ -473,7 +473,7 @@ export function DatePicker({
   }
 
   const isError = !!error
-  const borderColor = isError ? t.color.error.text : colors.border
+  const borderColor = isError ? t.color.error.text : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -612,7 +612,7 @@ export function DateRangePicker({
   })()
 
   const isError = !!error
-  const borderColor = isError ? t.color.error.text : colors.border
+  const borderColor = isError ? t.color.error.text : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -641,7 +641,7 @@ export function DateRangePicker({
             {/* Instrução contextual */}
             <div style={{
               fontSize: t.font.size.xs,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               fontFamily: t.font.family.sans,
               marginBottom: t.space[2],
               textAlign: 'center',

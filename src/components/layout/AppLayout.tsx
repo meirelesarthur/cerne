@@ -58,19 +58,19 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
           width: 52,
           height: 52,
           borderRadius: 14,
-          background: colors.brandBg,
+          background: colors.accent.subtle,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Construction size={24} color={colors.brand} strokeWidth={1.5} />
+        <Construction size={24} color={colors.accent.default} strokeWidth={1.5} />
       </div>
       <div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: colors.textPrimary, fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: colors.fg.default, fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
           {item?.label ?? 'Funcionalidade'}
         </div>
-        <div style={{ fontSize: 12, color: colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
+        <div style={{ fontSize: 12, color: colors.fg.subtle, fontFamily: "'Outfit', sans-serif" }}>
           Esta tela será implementada em breve.
         </div>
       </div>
@@ -182,7 +182,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         display: 'flex',
         width: '100vw',
         height: '100vh',
-        background: colors.pageBg,
+        background: colors.bg.canvas,
         padding: t.space[2],
         gap: t.space[2],
         boxSizing: 'border-box',
@@ -206,7 +206,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div
         style={{
           flex: 1,
-          background: colors.outerCardBg,
+          background: colors.bg.outer,
           borderRadius: 16,
           display: 'flex',
           flexDirection: 'column',

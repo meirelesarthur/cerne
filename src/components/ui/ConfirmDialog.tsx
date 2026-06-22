@@ -83,7 +83,7 @@ export function ConfirmDialog({
               margin:     0,
               fontSize:   t.font.size.md,
               fontWeight: t.font.weight.semibold,
-              color:      colors.textPrimary,
+              color:      colors.fg.default,
               fontFamily: t.font.family.sans,
               lineHeight: t.font.lineHeight.snug,
             }}
@@ -95,7 +95,7 @@ export function ConfirmDialog({
               style={{
                 margin:     `${t.space[2]}px 0 0`,
                 fontSize:   t.font.size.base,
-                color:      colors.textMuted,
+                color:      colors.fg.subtle,
                 fontFamily: t.font.family.sans,
                 lineHeight: t.font.lineHeight.normal,
               }}

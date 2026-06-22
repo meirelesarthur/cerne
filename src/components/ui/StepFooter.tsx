@@ -46,7 +46,7 @@ export function StepFooter({
       <span
         style={{
           fontSize: t.font.size.sm,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           fontFamily: t.font.family.sans,
           transition: `color ${t.transition.smooth}`,
         }}

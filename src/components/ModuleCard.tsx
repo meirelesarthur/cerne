@@ -40,7 +40,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
         style={{
           fontSize: 13,
           fontWeight: 600,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           marginBottom: 3,
           fontFamily: "'Outfit', sans-serif",
           transition: 'color 0.2s',
@@ -51,7 +51,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
       <div
         style={{
           fontSize: 11,
-          color: colors.textSecondary,
+          color: colors.fg.muted,
           lineHeight: 1.4,
           fontFamily: "'Outfit', sans-serif",
           transition: 'color 0.2s',

@@ -24,7 +24,7 @@ export function StepUsuario({ form, errors, setRole, disabled, isEdit }: Props) 
 
       <div style={{ maxWidth: 760, margin: '0 auto', ...colStack }}>
         {isEdit ? (
-          <div style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans, padding: `${t.space[2]}px ${t.space[3]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT }}>
+          <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, padding: `${t.space[2]}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT }}>
             A senha não é exibida na edição. Use "Redefinir senha" para enviar um novo acesso.
           </div>
         ) : (

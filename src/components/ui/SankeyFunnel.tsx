@@ -143,7 +143,7 @@ export function SankeyFunnel({
               y={H - 4}
               textAnchor="middle"
               fontSize={9}
-              fill={colors.textMuted as string}
+              fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
               style={{ transition: 'opacity 0.18s ease' }}
             >
@@ -157,7 +157,7 @@ export function SankeyFunnel({
                 y={topY[i] - 6}
                 textAnchor="middle"
                 fontSize={8}
-                fill={colors.textMuted as string}
+                fill={colors.fg.subtle as string}
               >
                 {stage.sublabel}
               </text>
@@ -187,14 +187,14 @@ export function SankeyFunnel({
               height={36}
               rx={4}
               fill={isGbMode ? '#0b1e14' : '#ffffff'}
-              stroke={colors.border as string}
+              stroke={colors.border.default as string}
               strokeWidth={0.8}
             />
             <text
               x={ttX + 8}
               y={finalY + 14}
               fontSize={9}
-              fill={colors.textSecondary as string}
+              fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
               fontWeight={600}
             >

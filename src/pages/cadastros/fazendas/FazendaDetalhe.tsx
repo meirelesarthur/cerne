@@ -45,7 +45,7 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
         style={{
           fontSize: t.font.size.xs,
           fontWeight: 600,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           marginBottom: 4,
@@ -58,14 +58,14 @@ function InfoField({ label, value, full }: { label: string; value: React.ReactNo
       <div
         style={{
           fontSize: t.font.size.base,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           fontWeight: 400,
           minHeight: 20,
           transition: `color ${t.transition.smooth}`,
         }}
       >
-        {value || <span style={{ color: colors.border }}>—</span>}
+        {value || <span style={{ color: colors.border.default }}>—</span>}
       </div>
     </div>
   )
@@ -92,13 +92,13 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
       style={{
         fontSize: t.font.size.xs,
         fontWeight: 600,
-        color: colors.textMuted,
+        color: colors.fg.subtle,
         textTransform: 'uppercase',
         letterSpacing: '0.6px',
         marginBottom: 16,
         fontFamily: t.font.family.sans,
         paddingBottom: 10,
-        borderBottom: `1px solid ${colors.borderSubtle}`,
+        borderBottom: `1px solid ${colors.border.subtle}`,
         transition: `color ${t.transition.smooth}, border-color ${t.transition.smooth}`,
       }}
     >
@@ -112,10 +112,10 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       {value
-        ? <CheckCircle2 size={14} color={colors.brand} />
-        : <XCircle size={14} color={colors.textMuted} />
+        ? <CheckCircle2 size={14} color={colors.accent.default} />
+        : <XCircle size={14} color={colors.fg.subtle} />
       }
-      <span style={{ fontSize: t.font.size.base, color: value ? colors.brand : colors.textMuted, fontFamily: "'Outfit', sans-serif" }}>
+      <span style={{ fontSize: t.font.size.base, color: value ? colors.accent.default : colors.fg.subtle, fontFamily: "'Outfit', sans-serif" }}>
         {value ? trueLabel : falseLabel}
       </span>
     </div>
@@ -127,7 +127,7 @@ function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
   return (
     <div
       style={{
-        background: colors.surfaceSubtle,
+        background: colors.bg.subtle,
         borderRadius: t.radius.xl,
         padding: `${t.space[5]}px ${t.space[6]}px`,
         transition: `background ${t.transition.smooth}`,
@@ -285,7 +285,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       label: 'Código',
       width: 120,
       render: (row) => (
-        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: colors.textSecondary }}>{row.codigo}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: t.font.size.sm, color: colors.fg.muted }}>{row.codigo}</span>
       ),
     },
     {
@@ -317,7 +317,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
         <SectionTitle>Centros de Custo Vinculados</SectionTitle>
-        <div style={{ background: colors.surfaceSubtle, borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: colors.bg.subtle, borderRadius: 10, overflow: 'hidden' }}>
           <DataTable<CCRow>
             columns={columns}
             data={f.centrosCusto}
@@ -333,10 +333,10 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
           <p
             style={{
               fontSize: t.font.size.base,
-              color: colors.textSecondary,
+              color: colors.fg.muted,
               lineHeight: 1.6,
               fontFamily: t.font.family.sans,
-              background: colors.surfaceSubtle,
+              background: colors.bg.subtle,
               borderRadius: 8,
               padding: '12px 14px',
               margin: 0,
@@ -390,7 +390,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
           {/* Tabs + content */}
           <div
             style={{
-              background: colors.surfaceBg,
+              background: colors.bg.surface,
               borderRadius: 12,
               overflow: 'hidden',
               display: 'flex',

@@ -41,7 +41,7 @@ export function FormPageHeader({
             margin:        0,
             fontSize:      t.font.size['2xl'],
             fontWeight:    t.font.weight.bold,
-            color:         colors.textPrimary,
+            color:         colors.fg.default,
             fontFamily:    t.font.family.sans,
             letterSpacing: '-0.3px',
           }}
@@ -53,7 +53,7 @@ export function FormPageHeader({
             style={{
               margin:     `${t.space[1]}px 0 0`,
               fontSize:   t.font.size.sm,
-              color:      colors.textMuted,
+              color:      colors.fg.subtle,
               fontFamily: t.font.family.sans,
             }}
           >

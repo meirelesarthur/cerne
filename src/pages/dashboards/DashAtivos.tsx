@@ -70,7 +70,7 @@ function HorizontalGroupedBar() {
               style={{ cursor: 'pointer', transition: 'opacity 0.18s ease', opacity: isDim ? 0.35 : 1 }}
             >
               {/* Category label */}
-              <text x={PL - 8} y={y + ROW_H / 2 - 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.textSecondary as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
+              <text x={PL - 8} y={y + ROW_H / 2 - 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.muted as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
                 {cat.label}
               </text>
 
@@ -97,10 +97,10 @@ function HorizontalGroupedBar() {
               />
 
               {/* Value labels */}
-              <text x={PL + toBarW(cat.total) + 5} y={y + 7} fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
+              <text x={PL + toBarW(cat.total) + 5} y={y + 7} fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
                 {cat.total}
               </text>
-              <text x={PL + toBarW(cat.op) + 5} y={y + 25} fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
+              <text x={PL + toBarW(cat.op) + 5} y={y + 25} fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
                 {cat.op}
               </text>
             </g>
@@ -114,11 +114,11 @@ function HorizontalGroupedBar() {
           left: tooltip.x + 12,
           top: tooltip.y - 30,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -128,12 +128,12 @@ function HorizontalGroupedBar() {
           <div style={{ fontWeight: t.font.weight.semibold, marginBottom: 2 }}>{tooltip.label}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[600] }} />
-            <span style={{ color: colors.textSecondary as string }}>Total:</span>
+            <span style={{ color: colors.fg.muted as string }}>Total:</span>
             <span style={{ fontWeight: t.font.weight.medium }}>{tooltip.total}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[200] }} />
-            <span style={{ color: colors.textSecondary as string }}>Em operação:</span>
+            <span style={{ color: colors.fg.muted as string }}>Em operação:</span>
             <span style={{ fontWeight: t.font.weight.medium }}>{tooltip.op}</span>
           </div>
         </div>
@@ -143,11 +143,11 @@ function HorizontalGroupedBar() {
       <div style={{ display: 'flex', gap: t.space[3], marginTop: t.space[3] }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[600] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Total</span>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Total</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[200] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Em Operação</span>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Em Operação</span>
         </div>
       </div>
     </div>
@@ -187,15 +187,15 @@ function StatusCards() {
           style={{
             padding: `${t.space[2]}px ${t.space[3]}px`,
             borderRadius: t.radius.lg,
-            border: `1px solid ${colors.border}`,
+            border: `1px solid ${colors.border.default}`,
             background: isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50],
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
-            <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>{item.label}</span>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans }}>{item.label}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{item.pct}%</span>
-              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>{item.count}</span>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.pct}%</span>
+              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>{item.count}</span>
             </div>
           </div>
           <div style={{
@@ -258,11 +258,11 @@ function ManutChart() {
       <div style={{ display: 'flex', gap: t.space[3], marginBottom: t.space[2] }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[600] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Preventivas</span>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Preventivas</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.error.text }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Corretivas</span>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Corretivas</span>
         </div>
       </div>
 
@@ -273,9 +273,9 @@ function ManutChart() {
           const y = PT + chartH - r * chartH
           return (
             <g key={i}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border as string} strokeWidth={1} strokeDasharray="4 4" />
+              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border.default as string} strokeWidth={1} strokeDasharray="4 4" />
               {v > 0 && (
-                <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>{v}</text>
+                <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>{v}</text>
               )}
             </g>
           )
@@ -317,7 +317,7 @@ function ManutChart() {
                 fill={t.color.error.text}
               />
               <rect x={xBase} y={PT} width={colW} height={chartH} fill="transparent" />
-              <text x={xBase + colW / 2} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+              <text x={xBase + colW / 2} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][i]}
               </text>
             </g>
@@ -331,11 +331,11 @@ function ManutChart() {
           left: tooltip.x + 12,
           top: tooltip.y + 10,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -347,12 +347,12 @@ function ManutChart() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[600] }} />
-            <span style={{ color: colors.textSecondary as string }}>Preventivas:</span>
+            <span style={{ color: colors.fg.muted as string }}>Preventivas:</span>
             <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].prev}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.error.text }} />
-            <span style={{ color: colors.textSecondary as string }}>Corretivas:</span>
+            <span style={{ color: colors.fg.muted as string }}>Corretivas:</span>
             <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].cor}</span>
           </div>
         </div>
@@ -379,12 +379,12 @@ export default function DashAtivos() {
     return () => clearTimeout(id)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -400,7 +400,7 @@ export default function DashAtivos() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Ativos</span>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Ativos</span>
         <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
           Últimos 30 dias
         </Button>
@@ -412,8 +412,8 @@ export default function DashAtivos() {
         {ATIVOS_KPIS.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
           </div>,
         ])}
@@ -423,12 +423,12 @@ export default function DashAtivos() {
       {/* Row 2 — Grouped H-bar + Status */}
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
           <HorizontalGroupedBar />
         </div>
         <VDivider color={bc} />
         <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
           <StatusCards />
         </div>
       </div>
@@ -436,7 +436,7 @@ export default function DashAtivos() {
 
       {/* Row 3 — Manutenções */}
       <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
+        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
         <ManutChart />
       </div>
     </div>

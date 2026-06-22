@@ -76,7 +76,7 @@ export function StepDadosBasicos({ form, errors, set, onToggleRole, disabled }: 
         {/* Papéis */}
         <div style={{ marginTop: t.space[2] }}>
           <FieldGroupLabel>Papéis desta pessoa</FieldGroupLabel>
-          <p style={{ margin: `${t.space[1]}px 0 ${t.space[3]}px`, fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          <p style={{ margin: `${t.space[1]}px 0 ${t.space[3]}px`, fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
             Ative os papéis aplicáveis — cada um adiciona uma etapa de configuração a seguir.
           </p>
           {ROLES.map((r) => (

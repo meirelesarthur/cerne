@@ -60,7 +60,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
             bottom: 8,
             right: 10,
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             pointerEvents: 'none',
           }}
@@ -100,7 +100,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
         {/* Grid de centros de custo — 5 colunas: checkbox · código · classe · condição · descrição */}
         <div
           style={{
-            border: `1px solid ${colors.border}`,
+            border: `1px solid ${colors.border.default}`,
             borderRadius: t.radius.DEFAULT,
             overflow: 'hidden',
           }}
@@ -111,7 +111,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
               display: 'grid',
               gridTemplateColumns: '36px 1fr 1fr 1fr 2fr',
               background: isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50],
-              borderBottom: `1px solid ${colors.border}`,
+              borderBottom: `1px solid ${colors.border.default}`,
               alignItems: 'center',
             }}
           >
@@ -130,7 +130,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                   padding: `${t.space[2]}px ${t.space[2] + t.space[1] / 2}px`,
                   fontSize: t.font.size.xs,
                   fontWeight: t.font.weight.semibold,
-                  color: colors.textSecondary,
+                  color: colors.fg.muted,
                   fontFamily: t.font.family.sans,
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
@@ -157,8 +157,8 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                   height: t.size.tableRow,
                   background: isSelected
                     ? t.color.row.selected
-                    : colors.surfaceBg,
-                  borderBottom: `1px solid ${colors.borderSubtle}`,
+                    : colors.bg.surface,
+                  borderBottom: `1px solid ${colors.border.subtle}`,
                   cursor: 'pointer',
                   transition: `background ${t.transition.fast}`,
                 }}
@@ -166,7 +166,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                   if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = isGbMode ? t.color.row.hoverGb : t.color.row.hover
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.background = isSelected ? t.color.row.selected : colors.surfaceBg
+                  (e.currentTarget as HTMLDivElement).style.background = isSelected ? t.color.row.selected : colors.bg.surface
                 }}
               >
                 <div
@@ -184,7 +184,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                     padding: `0 ${t.space[2] + t.space[1] / 2}px`,
                     fontSize: t.font.size.sm,
                     fontFamily: t.font.family.sans,
-                    color: colors.textPrimary,
+                    color: colors.fg.default,
                     fontWeight: t.font.weight.medium,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -198,7 +198,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                     padding: `0 ${t.space[2] + t.space[1] / 2}px`,
                     fontSize: t.font.size.sm,
                     fontFamily: t.font.family.sans,
-                    color: colors.textSecondary,
+                    color: colors.fg.muted,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -211,7 +211,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                     padding: `0 ${t.space[2] + t.space[1] / 2}px`,
                     fontSize: t.font.size.sm,
                     fontFamily: t.font.family.sans,
-                    color: colors.textSecondary,
+                    color: colors.fg.muted,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -224,7 +224,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                     padding: `0 ${t.space[2] + t.space[1] / 2}px`,
                     fontSize: t.font.size.sm,
                     fontFamily: t.font.family.sans,
-                    color: colors.textPrimary,
+                    color: colors.fg.default,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',

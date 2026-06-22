@@ -95,8 +95,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
     show(`Safra "${deleteTarget.desc}" excluída.`, 'info')
   }
 
-  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
-  const border  = colors.border
+  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface
+  const border  = colors.border.default
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -203,7 +203,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         ) : (
           <>
             <div style={{
-              background:   colors.surfaceBg,
+              background:   colors.bg.surface,
               border:       `1px solid ${border}`,
               borderRadius: t.radius.lg,
               overflow:     'hidden',
@@ -213,14 +213,14 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
                 display:         'grid',
                 gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
                 padding:         `${t.space[2] + 2}px ${t.space[4]}px`,
-                background:      colors.surfaceSubtle,
+                background:      colors.bg.subtle,
                 borderBottom:    `1px solid ${border}`,
               }}>
                 {['Descrição', 'Dt. Início', 'Dt. Fim', 'Status', 'Semanas', ''].map((h, i) => (
                   <span key={i} style={{
                     fontSize:      t.font.size.xs,
                     fontWeight:    t.font.weight.semibold,
-                    color:         colors.textMuted,
+                    color:         colors.fg.subtle,
                     fontFamily:    t.font.family.sans,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -250,7 +250,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
               <div style={{
                 marginTop:  t.space[4],
                 paddingTop: t.space[4],
-                borderTop:  `1px solid ${colors.borderSubtle}`,
+                borderTop:  `1px solid ${colors.border.subtle}`,
               }}>
                 <Pagination
                   page={page}
@@ -306,7 +306,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           }}>
             <Info size={22} color={t.color.info.text} />
           </div>
-          <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, lineHeight: t.font.lineHeight.relaxed, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: t.space[2] + 2 }}>
+          <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, lineHeight: t.font.lineHeight.relaxed, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: t.space[2] + 2 }}>
             <p style={{ margin: 0 }}>
               Uma <strong>Safra</strong> é o período agrícola de referência que serve como eixo temporal de toda a gestão da fazenda, definindo o intervalo no qual produção, movimentação de rebanho, custos e receitas são contabilizados.
             </p>
@@ -376,7 +376,7 @@ function SafraRow({
         padding:         `0 ${t.space[4]}px`,
         height:          t.size.tableRow,
         borderBottom:    isLast ? 'none' : `1px solid ${border}`,
-        background:      hovered ? colors.surfaceSubtle : 'transparent',
+        background:      hovered ? colors.bg.subtle : 'transparent',
         transition:      `background ${t.transition.fast}`,
         cursor:          'pointer',
         alignItems:      'center',
@@ -386,17 +386,17 @@ function SafraRow({
       onClick={() => onView(safra.id)}
     >
       {/* Descrição */}
-      <span title={safra.desc} style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.brand, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={safra.desc} style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.accent.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {safra.desc}
       </span>
 
       {/* Dt. Início */}
-      <span title={fmtYMDtoDMY(safra.ini)} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={fmtYMDtoDMY(safra.ini)} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtYMDtoDMY(safra.ini)}
       </span>
 
       {/* Dt. Fim */}
-      <span title={fmtYMDtoDMY(safra.fim)} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={fmtYMDtoDMY(safra.fim)} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {fmtYMDtoDMY(safra.fim)}
       </span>
 
@@ -406,7 +406,7 @@ function SafraRow({
       </div>
 
       {/* Semanas */}
-      <span title={`${safra.weeks.length} sem.`} style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={`${safra.weeks.length} sem.`} style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {safra.weeks.length} sem.
       </span>
 
@@ -444,13 +444,13 @@ function KpiCard({
       flexDirection: 'column',
       gap:         t.space[1],
     }}>
-      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textMuted, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.subtle, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         {label}
       </span>
       <span style={{
         fontSize:   compact ? t.font.size.md : t.font.size['3xl'],
         fontWeight: t.font.weight.bold,
-        color:      accent ?? colors.textPrimary,
+        color:      accent ?? colors.fg.default,
         fontFamily: t.font.family.sans,
         lineHeight: 1.1,
         wordBreak:  'break-word',
@@ -458,7 +458,7 @@ function KpiCard({
         {value}
       </span>
       {sub && (
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
           {sub}
         </span>
       )}

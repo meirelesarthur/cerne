@@ -54,7 +54,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filters.unidade])
 
-  const border  = colors.border
+  const border  = colors.border.default
   const activeFilterCount = [filters.unidade].filter(Boolean).length
   const clearFilters = () => setFilters({ unidade: '' })
 
@@ -134,7 +134,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
         ) : (
           <>
             <div style={{
-              background: colors.surfaceBg,
+              background: colors.bg.surface,
               border: `1px solid ${border}`,
               borderRadius: t.radius.lg,
               overflow: 'hidden',
@@ -144,7 +144,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
                 display: 'grid',
                 gridTemplateColumns: '1fr 140px 160px 96px',
                 padding: '10px 16px',
-                background: colors.surfaceSubtle,
+                background: colors.bg.subtle,
                 borderBottom: `1px solid ${border}`,
               }}>
                 {/* Descrição — ordenável */}
@@ -158,7 +158,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
                 {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
                   <span key={h} style={{
                     fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                    color: colors.textMuted, fontFamily: t.font.family.sans,
+                    color: colors.fg.subtle, fontFamily: t.font.family.sans,
                     textTransform: 'uppercase', letterSpacing: '0.05em',
                     textAlign: i === 2 ? 'right' : 'left',
                   }}>
@@ -185,7 +185,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
               <div style={{
                 marginTop: t.space[4],
                 paddingTop: t.space[4],
-                borderTop: `1px solid ${colors.borderSubtle}`,
+                borderTop: `1px solid ${colors.border.subtle}`,
               }}>
                 <Pagination
                   page={page}
@@ -263,7 +263,7 @@ function EmbalagemRow({
         padding: '0 16px',
         height: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        background: hovered ? colors.surfaceSubtle : 'transparent',
+        background: hovered ? colors.bg.subtle : 'transparent',
         transition: 'background 0.12s',
         alignItems: 'center',
       }}
@@ -272,21 +272,21 @@ function EmbalagemRow({
     >
       <span title={emb.descricao} style={{
         fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
-        color: colors.brand, fontFamily: t.font.family.sans,
+        color: colors.accent.default, fontFamily: t.font.family.sans,
         minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {emb.descricao}
       </span>
 
       <span title={fmtQtd(emb.quantidade)} style={{
-        fontSize: t.font.size.sm, color: colors.textSecondary,
+        fontSize: t.font.size.sm, color: colors.fg.muted,
         fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums',
         minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {fmtQtd(emb.quantidade)}
       </span>
 
-      <span title={unidadeLabel} style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={unidadeLabel} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {unidadeLabel}
       </span>
 

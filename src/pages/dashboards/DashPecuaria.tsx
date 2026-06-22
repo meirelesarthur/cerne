@@ -84,7 +84,7 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
         {PEC_SERIES.map(s => (
           <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
             <div style={{ width: 12, height: 3, borderRadius: 2, background: s.color }} />
-            <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans }}>
               {s.label}
             </span>
           </div>
@@ -107,9 +107,9 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={W - padR} y2={y}
-                stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="4,4" />
+                stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="4,4" />
               <text x={padL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {tick.toLocaleString('pt-BR')}
               </text>
             </g>
@@ -119,7 +119,7 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
         {/* Month labels */}
         {monthLabels.map((label, i) => (
           <text key={i} x={xOf(i)} y={H - 8} textAnchor="middle" fontSize={t.font.size.base}
-            fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+            fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             {label}
           </text>
         ))}
@@ -155,7 +155,7 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
         {/* Vertical crosshair */}
         {hovIdx !== null && (
           <line x1={xOf(hovIdx)} y1={padT} x2={xOf(hovIdx)} y2={padT + chartH}
-            stroke={colors.border as string} strokeWidth={1} strokeDasharray="3,3"
+            stroke={colors.border.default as string} strokeWidth={1} strokeDasharray="3,3"
             style={{ pointerEvents: 'none' }} />
         )}
 
@@ -182,7 +182,7 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
           left: tooltip.x + 14,
           top: tooltip.y + 4,
           background: isGbMode ? '#0b1e14' : '#ffffff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.lg,
           padding: `${t.space[2]}px ${t.space[3]}px`,
           fontFamily: t.font.family.sans,
@@ -191,14 +191,14 @@ function AreaChartRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useT
           pointerEvents: 'none',
           minWidth: 140,
         }}>
-          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, marginBottom: t.space[1] }}>
+          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, marginBottom: t.space[1] }}>
             {monthLabels[hovIdx]}
           </div>
           {PEC_SERIES.map((s, si) => (
             <div key={si} style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: s.color, flexShrink: 0 }} />
-              <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary as string }}>{s.label}:</span>
-              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string }}>{s.label}:</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
                 {s.data[hovIdx].toLocaleString('pt-BR')}
               </span>
             </div>
@@ -270,12 +270,12 @@ function DonutRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useTheme
         ))}
         <text x={cx} y={cy - 5} textAnchor="middle" fontSize={17}
           fontWeight={t.font.weight.bold}
-          fill={colors.textPrimary as string}
+          fill={colors.fg.default as string}
           fontFamily={t.font.family.sans}>
           {totalLabel}
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle" fontSize={t.font.size.sm}
-          fill={colors.textMuted as string}
+          fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}>
           {subLabel}
         </text>
@@ -298,10 +298,10 @@ function DonutRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useTheme
             }}
           >
             <div style={{ width: 10, height: 10, borderRadius: 2, background: d.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans, flex: 1 }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans, flex: 1 }}>
               {d.label}
             </span>
-            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
               {d.pct}%
             </span>
           </div>
@@ -359,7 +359,7 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
         {BAR_SERIES.map(s => (
           <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
             <div style={{ width: 10, height: 10, borderRadius: 2, background: s.color }} />
-            <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans }}>
               {s.label}
             </span>
           </div>
@@ -373,9 +373,9 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={W - padR} y2={y}
-                stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="4,4" />
+                stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="4,4" />
               <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>{tick}</text>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>{tick}</text>
             </g>
           )
         })}
@@ -437,7 +437,7 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
               />
 
               <text x={gx} y={H - 10} textAnchor="middle" fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {label}
               </text>
             </g>
@@ -452,7 +452,7 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
           left: tooltip.x + 12,
           top: tooltip.y - 8,
           background: isGbMode ? '#0b1e14' : '#ffffff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.lg,
           padding: `${t.space[2]}px ${t.space[3]}px`,
           fontFamily: t.font.family.sans,
@@ -461,14 +461,14 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
           pointerEvents: 'none',
           minWidth: 130,
         }}>
-          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, marginBottom: t.space[1] }}>
+          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, marginBottom: t.space[1] }}>
             {monthLabels[hovMonth]}
           </div>
           {BAR_SERIES.map((s, si) => (
             <div key={si} style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: s.color, flexShrink: 0 }} />
-              <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary as string }}>{s.label}:</span>
-              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string }}>{s.label}:</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
                 {s.data[hovMonth]}
               </span>
             </div>
@@ -497,12 +497,12 @@ export default function DashPecuaria() {
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode
@@ -520,7 +520,7 @@ export default function DashPecuaria() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
           Pecuária de Corte
         </span>
         <Button variant="secondary" size="sm" iconRight={<ChevronDown size={12} />}>
@@ -534,10 +534,10 @@ export default function DashPecuaria() {
         {PEC_KPIS.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, marginBottom: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             <span style={{ fontSize: t.font.size.sm, color: kpi.up ? t.color.success.text : t.color.error.text }}>
@@ -551,14 +551,14 @@ export default function DashPecuaria() {
       {/* Row 2 — Area chart + Donut */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string, marginBottom: t.space[4] }}>
+          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
             Evolução do Rebanho
           </div>
           <AreaChartRebanho colors={colors} isGbMode={isGbMode} />
         </div>
         <VDivider color={bc} />
         <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string, marginBottom: t.space[4] }}>
+          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
             Composição do Rebanho
           </div>
           <DonutRebanho colors={colors} isGbMode={isGbMode} />
@@ -568,7 +568,7 @@ export default function DashPecuaria() {
 
       {/* Row 3 — Manejos */}
       <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string, marginBottom: t.space[4] }}>
+        <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
           Manejos por Mês
         </div>
         <ManejosBars colors={colors} isGbMode={isGbMode} />

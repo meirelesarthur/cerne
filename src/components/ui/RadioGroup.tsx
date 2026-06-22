@@ -54,7 +54,7 @@ export function RadioGroup({
             style={{
               fontSize: t.font.size.sm,
               fontWeight: t.font.weight.medium,
-              color: colors.textPrimary,
+              color: colors.fg.default,
               fontFamily: t.font.family.sans,
               transition: `color ${t.transition.smooth}`,
             }}
@@ -73,7 +73,7 @@ export function RadioGroup({
             <span
               style={{
                 fontSize: t.font.size.xs,
-                color: colors.textMuted,
+                color: colors.fg.subtle,
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -161,7 +161,7 @@ function RadioOption({
     ? t.color.error.text
     : isSelected
     ? t.color.brand[600]
-    : colors.border
+    : colors.border.default
 
   return (
     <label
@@ -217,7 +217,7 @@ function RadioOption({
             inset: 0,
             border: `1.5px solid ${ringColor}`,
             borderRadius: t.radius.full,
-            background: colors.inputBg,
+            background: colors.bg.input,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -257,7 +257,7 @@ function RadioOption({
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
             fontWeight: t.font.weight.normal,
-            color: colors.textPrimary,
+            color: colors.fg.default,
             lineHeight: t.font.lineHeight.tight,
             transition: `color ${t.transition.smooth}`,
           }}
@@ -270,7 +270,7 @@ function RadioOption({
             style={{
               fontSize: t.font.size.xs,
               fontFamily: t.font.family.sans,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               lineHeight: t.font.lineHeight.normal,
             }}
           >

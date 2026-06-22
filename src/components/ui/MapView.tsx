@@ -90,7 +90,7 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
       style={{
         height,
         borderRadius: t.radius.lg,
-        border: `1px solid ${colors.border}`,
+        border: `1px solid ${colors.border.default}`,
         overflow: 'hidden',
       }}
     />

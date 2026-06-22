@@ -53,7 +53,7 @@ export default function EnderecosList({
   const activeFilterCount = [filters.tipo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipo: '' })
 
-  const border = colors.border
+  const border = colors.border.default
 
   const tree = useMemo(() => buildTree(enderecos), [enderecos])
 
@@ -144,7 +144,7 @@ export default function EnderecosList({
           )
         ) : (
           <div style={{
-            background: colors.surfaceBg,
+            background: colors.bg.surface,
             border: `1px solid ${border}`,
             borderRadius: t.radius.lg,
             overflow: 'hidden',
@@ -154,13 +154,13 @@ export default function EnderecosList({
               display: 'grid',
               gridTemplateColumns: '1fr 120px 104px',
               padding: '10px 16px',
-              background: colors.surfaceSubtle,
+              background: colors.bg.subtle,
               borderBottom: `1px solid ${border}`,
             }}>
               {['Descrição', 'Tipo', 'Ações'].map((h, i) => (
                 <span key={h} style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                  color: colors.textMuted, fontFamily: t.font.family.sans,
+                  color: colors.fg.subtle, fontFamily: t.font.family.sans,
                   textTransform: 'uppercase', letterSpacing: '0.05em',
                   textAlign: i === 2 ? 'right' : 'left',
                 }}>
@@ -270,7 +270,7 @@ function TreeNode({
           paddingLeft: 16 + indent,
           height: t.size.tableRow,
           borderBottom: isLastRow && depth === 0 ? 'none' : `1px solid ${border}`,
-          background: hovered ? colors.surfaceSubtle : 'transparent',
+          background: hovered ? colors.bg.subtle : 'transparent',
           transition: 'background 0.12s',
           alignItems: 'center',
           boxSizing: 'border-box',
@@ -303,7 +303,7 @@ function TreeNode({
           <span title={node.descricao} style={{
             fontSize: t.font.size.base,
             fontWeight: depth === 0 ? t.font.weight.semibold : t.font.weight.medium,
-            color: depth === 0 ? colors.brand : colors.textPrimary,
+            color: depth === 0 ? colors.accent.default : colors.fg.default,
             fontFamily: t.font.family.sans,
             minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>

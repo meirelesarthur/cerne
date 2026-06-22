@@ -68,9 +68,9 @@ function StackedBarChart() {
           return (
             <g key={i}>
               <line x1={PL} y1={y} x2={W - PR} y2={y}
-                stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="4 4" />
+                stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="4 4" />
               <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {formatK(gl)}
               </text>
             </g>
@@ -125,7 +125,7 @@ function StackedBarChart() {
               {/* Month label */}
               <text x={x + barW / 2} y={H - 10} textAnchor="middle"
                 fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {MONTHS_SHORT[i]}
               </text>
             </g>
@@ -140,11 +140,11 @@ function StackedBarChart() {
           left: tooltip.x + 12,
           top: tooltip.y + 10,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.lg,
           padding: `${t.space[2]}px ${t.space[3]}px`,
           fontSize: t.font.size.sm,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -159,7 +159,7 @@ function StackedBarChart() {
             return (
               <div key={si} style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
                 <div style={{ width: 8, height: 8, borderRadius: 2, background: CAT_COLORS[si], flexShrink: 0 }} />
-                <span style={{ color: colors.textSecondary as string }}>{label}:</span>
+                <span style={{ color: colors.fg.muted as string }}>{label}:</span>
                 <span style={{ fontWeight: t.font.weight.medium }}>R$ {(vals[si] / 1000).toFixed(1)}K</span>
               </div>
             )
@@ -179,7 +179,7 @@ function StackedLegend() {
       {CAT_LABELS.map((label, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
           <div style={{ width: 10, height: 10, borderRadius: 2, background: CAT_COLORS[i] }} />
-          <span style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>
+          <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
             {label}
           </span>
         </div>
@@ -258,12 +258,12 @@ function DonutChart() {
         {/* Center */}
         <text x={cx} y={cy - 6} textAnchor="middle" fontSize={t.font.size.xl}
           fontWeight={t.font.weight.bold}
-          fill={isGbMode ? t.color.brand[400] : colors.textPrimary as string}
+          fill={isGbMode ? t.color.brand[400] : colors.fg.default as string}
           fontFamily={t.font.family.sans}>
           R$8,4M
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle" fontSize={t.font.size.sm}
-          fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+          fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
           total
         </text>
       </svg>
@@ -283,13 +283,13 @@ function DonutChart() {
             onMouseLeave={() => setHovSeg(null)}
           >
             <div style={{ width: 10, height: 10, borderRadius: 2, background: seg.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans, flex: 1 }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans, flex: 1 }}>
               {seg.label}
             </span>
-            <span style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
               {seg.pct}%
             </span>
-            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans, minWidth: 64, textAlign: 'right' }}>
+            <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans, minWidth: 64, textAlign: 'right' }}>
               R$ {(DONUT_VALUES[i] / 1_000_000).toFixed(1)}M
             </span>
           </div>
@@ -361,9 +361,9 @@ function ProjectionChart() {
           return (
             <g key={i}>
               <line x1={PL} y1={y} x2={W - PR} y2={y}
-                stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="4 4" />
+                stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="4 4" />
               <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.base}
-                fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                 {(v / 1_000_000).toFixed(1)}M
               </text>
             </g>
@@ -410,7 +410,7 @@ function ProjectionChart() {
         {PROJ_VALUES.map((_, i) => i % 4 === 0 && (
           <text key={i} x={toX(i)} y={H - 8} textAnchor="middle"
             fontSize={t.font.size.base}
-            fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+            fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             M{i + 1}
           </text>
         ))}
@@ -423,7 +423,7 @@ function ProjectionChart() {
           left: tooltip.x + 12,
           top: tooltip.y - 44,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.lg,
           padding: `${t.space[2]}px ${t.space[3]}px`,
           fontFamily: t.font.family.sans,
@@ -432,10 +432,10 @@ function ProjectionChart() {
           pointerEvents: 'none',
           whiteSpace: 'nowrap',
         }}>
-          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
             Mês {hovPt + 1}{hovPt > CURRENT_MONTH ? ' (projeção)' : ''}
           </div>
-          <div style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, marginTop: 2 }}>
+          <div style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, marginTop: 2 }}>
             R$ {(PROJ_VALUES[hovPt] / 1_000_000).toFixed(2)}M
           </div>
         </div>
@@ -462,12 +462,12 @@ export default function DashDepreciacoes() {
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode
@@ -485,7 +485,7 @@ export default function DashDepreciacoes() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
           Depreciações
         </span>
         <Button variant="secondary" size="sm" iconRight={<ChevronDown size={12} />}>
@@ -499,10 +499,10 @@ export default function DashDepreciacoes() {
         {DEP_KPIS.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, marginBottom: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             {kpi.trend && (
@@ -518,7 +518,7 @@ export default function DashDepreciacoes() {
       {/* Stacked bar — full width */}
       <div style={{ padding: t.space[5] }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string }}>
+          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
             Depreciação por Categoria — 12 Meses
           </div>
           <StackedLegend />
@@ -530,7 +530,7 @@ export default function DashDepreciacoes() {
       {/* Donut + Projection */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string, marginBottom: t.space[4] }}>
+          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
             Composição por Tipo de Bem
           </div>
           <DonutChart />
@@ -538,17 +538,17 @@ export default function DashDepreciacoes() {
         <VDivider color={bc} />
         <div style={{ flex: 1, padding: t.space[5] }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-            <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.textSecondary as string }}>
+            <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
               Projeção Próximos 24 Meses
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4] }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                 <div style={{ width: 16, height: 2, background: t.color.brand[600], borderRadius: 1 }} />
-                <span style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Realizado</span>
+                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Realizado</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                 <svg width={16} height={2}><line x1="0" y1="1" x2="16" y2="1" stroke={t.color.brand[400]} strokeWidth="2" strokeDasharray="4 2" /></svg>
-                <span style={{ fontSize: t.font.size.sm, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>Projeção</span>
+                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Projeção</span>
               </div>
             </div>
           </div>

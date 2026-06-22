@@ -61,7 +61,7 @@ export function UpgradePrompt({
           gap:        t.space[2],
           padding:    `${t.space[2]}px ${t.space[3]}px`,
           background: isGbMode ? 'rgba(16,185,129,0.06)' : t.color.brand[50],
-          border:     `1px solid ${isGbMode ? colors.brand : t.color.brand[200]}`,
+          border:     `1px solid ${isGbMode ? colors.accent.default : t.color.brand[200]}`,
           borderRadius: t.radius.md,
           fontFamily: t.font.family.sans,
         }}
@@ -69,12 +69,12 @@ export function UpgradePrompt({
         <Lock
           size={14}
           aria-hidden="true"
-          style={{ color: colors.brand, flexShrink: 0 }}
+          style={{ color: colors.accent.default, flexShrink: 0 }}
         />
         <span
           style={{
             fontSize:   t.font.size.sm,
-            color:      colors.textSecondary,
+            color:      colors.fg.muted,
             lineHeight: t.font.lineHeight.normal,
             flex:       1,
             minWidth:   0,
@@ -93,8 +93,8 @@ export function UpgradePrompt({
 
   // ─── Variante card (padrão) ───────────────────────────────────────────────
 
-  const cardBg     = isGbMode ? t.color.gbSurface      : colors.surfaceBg
-  const cardBorder = isGbMode ? colors.border           : t.color.brand[100]
+  const cardBg     = isGbMode ? t.color.gbSurface      : colors.bg.surface
+  const cardBorder = isGbMode ? colors.border.default           : t.color.brand[100]
 
   return (
     <div
@@ -122,7 +122,7 @@ export function UpgradePrompt({
           height:         48,
           borderRadius:   t.radius.full,
           background:     isGbMode ? 'rgba(16,185,129,0.10)' : t.color.brand[50],
-          color:          colors.brand,
+          color:          colors.accent.default,
           flexShrink:     0,
         }}
       >
@@ -134,7 +134,7 @@ export function UpgradePrompt({
         style={{
           fontSize:   t.font.size.md,
           fontWeight: t.font.weight.semibold,
-          color:      colors.textPrimary,
+          color:      colors.fg.default,
           lineHeight: t.font.lineHeight.snug,
           maxWidth:   320,
         }}
@@ -146,7 +146,7 @@ export function UpgradePrompt({
       <span
         style={{
           fontSize:   t.font.size.sm,
-          color:      colors.textMuted,
+          color:      colors.fg.subtle,
           lineHeight: t.font.lineHeight.normal,
           maxWidth:   360,
         }}
@@ -164,10 +164,10 @@ export function UpgradePrompt({
             padding:      `${t.space[1]}px ${t.space[3]}px`,
             borderRadius: t.radius.full,
             background:   isGbMode ? 'rgba(16,185,129,0.08)' : t.color.brand[50],
-            border:       `1px solid ${isGbMode ? colors.border : t.color.brand[200]}`,
+            border:       `1px solid ${isGbMode ? colors.border.default : t.color.brand[200]}`,
             fontSize:     t.font.size.xs,
             fontWeight:   t.font.weight.semibold,
-            color:        colors.brand,
+            color:        colors.accent.default,
           }}
         >
           <Lock size={10} aria-hidden="true" />

@@ -48,10 +48,10 @@ export function Card({
       className={className}
       onClick={onClick}
       style={{
-        background:   colors.surfaceBg,
+        background:   colors.bg.surface,
         borderRadius: radiusValues[radius],
         boxShadow:    shadowValues[shadow],
-        border:       border ? `1px solid ${colors.border}` : 'none',
+        border:       border ? `1px solid ${colors.border.default}` : 'none',
         padding:      padding,
         cursor:       onClick ? 'pointer' : undefined,
         boxSizing:    'border-box',

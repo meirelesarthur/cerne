@@ -148,14 +148,14 @@ export default function CentroCustoCadastro({
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '10px 14px',
-              background: colors.surfaceSubtle,
+              background: colors.bg.subtle,
               borderRadius: t.radius.lg,
-              border: `1px solid ${colors.borderSubtle}`,
+              border: `1px solid ${colors.border.subtle}`,
             }}>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Código gerado:
               </span>
-              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.fg.default, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
                 {codigoPreview}
               </span>
               <span style={{
@@ -287,20 +287,20 @@ function CategoriasSection({
 
   return (
     <div style={{
-      border: `1px solid ${colors.border}`,
+      border: `1px solid ${colors.border.default}`,
       borderRadius: t.radius.xl,
       overflow: 'hidden',
     }}>
       {/* Header da seção */}
       <div style={{
         padding: '14px 18px',
-        borderBottom: `1px solid ${colors.border}`,
-        background: colors.surfaceSubtle,
+        borderBottom: `1px solid ${colors.border.default}`,
+        background: colors.bg.subtle,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <span style={{
           fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-          color: colors.textPrimary, fontFamily: t.font.family.sans,
+          color: colors.fg.default, fontFamily: t.font.family.sans,
         }}>
           Categorias Financeiras
           {selected.length > 0 && (
@@ -308,7 +308,7 @@ function CategoriasSection({
               marginLeft: 8,
               fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
               padding: '1px 7px', borderRadius: t.radius.full,
-              background: colors.brandBg, color: colors.brand,
+              background: colors.accent.subtle, color: colors.accent.default,
             }}>
               {selected.length} selecionada{selected.length !== 1 ? 's' : ''}
             </span>
@@ -343,7 +343,7 @@ function CategoriasSection({
                   cursor: 'pointer',
                   transition: 'background 0.12s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
+                onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                 onClick={() => setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] }))}
               >
@@ -355,14 +355,14 @@ function CategoriasSection({
                 />
                 <span style={{
                   flex: 1, fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-                  color: colors.textPrimary, fontFamily: t.font.family.sans,
+                  color: colors.fg.default, fontFamily: t.font.family.sans,
                   letterSpacing: '0.01em',
                 }}>
                   {cat.label}
                 </span>
                 <ChevronDown
                   size={14}
-                  color={colors.textMuted}
+                  color={colors.fg.subtle}
                   style={{
                     transform: isOpen ? 'rotate(180deg)' : 'none',
                     transition: 'transform 0.15s',
@@ -384,7 +384,7 @@ function CategoriasSection({
                         cursor: 'pointer',
                         transition: 'background 0.12s',
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
+                      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       onClick={() => toggleItem(child.id)}
                     >
@@ -394,7 +394,7 @@ function CategoriasSection({
                         aria-label={child.label}
                       />
                       <span style={{
-                        fontSize: t.font.size.sm, color: colors.textSecondary,
+                        fontSize: t.font.size.sm, color: colors.fg.muted,
                         fontFamily: t.font.family.sans,
                       }}>
                         {child.label}

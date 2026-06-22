@@ -39,7 +39,7 @@ export default function Sidebar({
       style={{
         width: w,
         minWidth: w,
-        background: colors.sidebarBg,
+        background: colors.bg.sidebar,
         borderRadius: t.radius['2xl'],
         display: 'flex',
         flexDirection: 'column',
@@ -79,19 +79,19 @@ export default function Sidebar({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: colors.textMuted,
+                  color: colors.fg.subtle,
                   flexShrink: 0,
                   transition: 'background 0.1s, color 0.1s',
                 }}
                 onMouseEnter={(e) => {
                   const b = e.currentTarget
-                  b.style.background = colors.navItemHover
-                  b.style.color = colors.navTextActive
+                  b.style.background = colors.nav.itemHover
+                  b.style.color = colors.nav.textActive
                 }}
                 onMouseLeave={(e) => {
                   const b = e.currentTarget
                   b.style.background = 'transparent'
-                  b.style.color = colors.textMuted
+                  b.style.color = colors.fg.subtle
                 }}
               >
                 <PanelLeftClose size={15} strokeWidth={1.8} />
@@ -140,7 +140,7 @@ export default function Sidebar({
                   size={13}
                   style={{
                     flexShrink: 0,
-                    color: highlighted ? colors.brand : colors.textMuted,
+                    color: highlighted ? colors.accent.default : colors.fg.subtle,
                     transform: isExpanded ? 'rotate(90deg)' : 'none',
                     transition: 'transform 0.15s ease',
                   }}
@@ -152,7 +152,7 @@ export default function Sidebar({
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: colors.navDivider, margin: `${t.space[2]}px 4px`, transition: 'background 0.2s' }} />
+      <div style={{ height: 1, background: colors.nav.divider, margin: `${t.space[2]}px 4px`, transition: 'background 0.2s' }} />
 
       {/* Bottom actions — sempre param propagação */}
       <div
@@ -198,7 +198,7 @@ export default function Sidebar({
           <button
             className="nav-icon-btn"
             onClick={(e) => { e.stopPropagation(); toggle() }}
-            style={{ color: isGbMode ? colors.brand : undefined }}
+            style={{ color: isGbMode ? colors.accent.default : undefined }}
           >
             {isGbMode ? <Sun size={15} /> : <Moon size={15} />}
           </button>
@@ -208,7 +208,7 @@ export default function Sidebar({
           <button
             className={`nav-icon-btn ${planosActive ? 'active' : ''}`}
             onClick={(e) => { e.stopPropagation(); onOpenPlanos?.() }}
-            style={{ color: planosActive ? colors.brand : undefined }}
+            style={{ color: planosActive ? colors.accent.default : undefined }}
           >
             <Gem size={15} />
           </button>

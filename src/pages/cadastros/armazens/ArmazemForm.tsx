@@ -153,13 +153,13 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
           </div>
 
           {/* Ativo */}
-          <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border}` }}>
+          <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border.default}` }}>
             <ToggleSwitch checked={ativo} onChange={setAtivo} disabled={submitting} />
             <div>
-              <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+              <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
                 Armazém ativo
               </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                 {ativo ? 'Disponível para movimentações de estoque.' : 'Indisponível para novas movimentações.'}
               </div>
             </div>

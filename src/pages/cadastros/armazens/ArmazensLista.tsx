@@ -102,11 +102,11 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
     setDeleteTarget(null)
   }
 
-  const border = colors.border
+  const border = colors.border.default
 
   const colStyle: React.CSSProperties = {
     fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-    color: colors.textMuted, fontFamily: t.font.family.sans,
+    color: colors.fg.subtle, fontFamily: t.font.family.sans,
     textTransform: 'uppercase', letterSpacing: '0.05em',
   }
 
@@ -161,9 +161,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
           />
         ) : (
           <>
-            <div style={{ background: colors.surfaceBg, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+            <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
               {/* Cabeçalho */}
-              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.surfaceSubtle, borderBottom: `1px solid ${border}` }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}` }}>
                 <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
                 <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
                 <span style={colStyle}>Tipo</span>
@@ -188,7 +188,7 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
               <div style={{
                 marginTop: t.space[4],
                 paddingTop: t.space[4],
-                borderTop: `1px solid ${colors.borderSubtle}`,
+                borderTop: `1px solid ${colors.border.subtle}`,
               }}>
                 <Pagination
                   page={page}
@@ -265,14 +265,14 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.surfaceSubtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <span title={arm.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.brand, fontFamily: t.font.family.sans, letterSpacing: '0.02em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={arm.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.accent.default, fontFamily: t.font.family.sans, letterSpacing: '0.02em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {arm.sigla}
       </span>
-      <span title={arm.descricao} style={{ fontSize: t.font.size.base, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span title={arm.descricao} style={{ fontSize: t.font.size.base, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {arm.descricao}
       </span>
       <span style={{ display: 'inline-flex' }}>

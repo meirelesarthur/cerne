@@ -104,10 +104,10 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 function KpiTop({ label, value, trend, up, colors }: { label: string; value: string; trend: string; up: boolean; colors: ThemeColors }) {
   return (
     <div style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-      <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[1] }}>
+      <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[1] }}>
         {label}
       </div>
-      <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, fontFamily: t.font.family.sans, lineHeight: 1.1, marginBottom: t.space[2] }}>
+      <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, fontFamily: t.font.family.sans, lineHeight: 1.1, marginBottom: t.space[2] }}>
         {value}
       </div>
       <Trend value={trend} up={up} />
@@ -171,9 +171,9 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
         {yVals.map((yl, i) => (
           <g key={i}>
             <line x1={PL} y1={yl.y} x2={W - PR} y2={yl.y}
-              stroke={colors.border} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
+              stroke={colors.border.default} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
             <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={9}
-              fill={colors.textMuted as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
+              fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
           </g>
         ))}
 
@@ -192,7 +192,7 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
           return (
             <g key={i}>
               <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={9}
-                fill={isH ? (colors.textPrimary as string) : (colors.textMuted as string)}
+                fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
                 fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
                 {d.month}
               </text>
@@ -202,9 +202,9 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
               {/* Hover dot + line */}
               {isH && (
                 <g>
-                  <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border} strokeWidth={1} strokeDasharray="3 2" />
-                  <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.surfaceBg} strokeWidth={2} />
-                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.error.solid} stroke={colors.surfaceBg} strokeWidth={2} />
+                  <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border.default} strokeWidth={1} strokeDasharray="3 2" />
+                  <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.bg.surface} strokeWidth={2} />
+                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
                 </g>
               )}
             </g>
@@ -248,9 +248,9 @@ function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
         {/* Center icon + text */}
         <foreignObject x={cx - 56} y={cy - 42} width={112} height={84}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontFamily: t.font.family.sans }}>
-            <BarChart2 size={18} color={colors.textMuted as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
-            <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.bold, color: colors.textPrimary }}>{value}</span>
+            <BarChart2 size={18} color={colors.fg.subtle as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+            <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.bold, color: colors.fg.default }}>{value}</span>
           </div>
         </foreignObject>
       </svg>
@@ -262,7 +262,7 @@ function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
         ].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: item.dot, flexShrink: 0, display: 'inline-block' }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>{item.label}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>{item.label}</span>
           </div>
         ))}
       </div>
@@ -287,7 +287,7 @@ function SegmentedBar({ segments, colors }: {
         {segments.map((s, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, flexShrink: 0, display: 'inline-block' }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>{s.label}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>{s.label}</span>
           </div>
         ))}
       </div>
@@ -298,7 +298,7 @@ function SegmentedBar({ segments, colors }: {
 // ─── Divider ──────────────────────────────────────────────────────────────────
 
 function Div({ colors }: { colors: ThemeColors }) {
-  return <div style={{ height: 1, background: colors.border }} />
+  return <div style={{ height: 1, background: colors.border.default }} />
 }
 
 // ─── Overview Panel ───────────────────────────────────────────────────────────
@@ -309,12 +309,12 @@ export default function OverviewPanel() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode
@@ -364,7 +364,7 @@ export default function OverviewPanel() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px`,
           }}>
-            <span style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary }}>
+            <span style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default }}>
               {greeting}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
@@ -404,10 +404,10 @@ export default function OverviewPanel() {
             {/* MRR header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
               <div>
-                <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1 }}>
+                <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1 }}>
                   R$ 18,9M
                 </div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[1] }}>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[1] }}>
                   Receitas mensais realizadas
                 </div>
               </div>
@@ -421,7 +421,7 @@ export default function OverviewPanel() {
               ].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{s.label}</span>
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
                 </div>
               ))}
             </div>
@@ -437,16 +437,16 @@ export default function OverviewPanel() {
             <div style={{ flex: 1, padding: t.space[5] }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                  <BarChart2 size={13} color={colors.textMuted as string} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Insights</span>
+                  <BarChart2 size={13} color={colors.fg.subtle as string} />
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Insights</span>
                 </div>
                 <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />}>
                   Perguntar
                 </Button>
               </div>
-              <p style={{ fontSize: t.font.size.lg, color: colors.textMuted, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
+              <p style={{ fontSize: t.font.size.lg, color: colors.fg.subtle, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
                 A margem bruta melhorou{' '}
-                <strong style={{ color: colors.textPrimary, fontWeight: t.font.weight.bold }}>3,5% neste mês</strong>{' '}
+                <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>3,5% neste mês</strong>{' '}
                 em relação ao burn dos últimos 30 dias.
               </p>
             </div>
@@ -456,12 +456,12 @@ export default function OverviewPanel() {
             {/* Budget / COE usage */}
             <div style={{ flex: 1, padding: t.space[5] }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Custo de produção</span>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Custo de produção</span>
                 <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
                   Detalhes
                 </Button>
               </div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, marginBottom: t.space[3] }}>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, marginBottom: t.space[3] }}>
                 R$ 3,6M
               </div>
               <SegmentedBar
@@ -481,17 +481,17 @@ export default function OverviewPanel() {
           {/* Bottom metric */}
           <div style={{ padding: `${t.space[4]}px ${t.space[5]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1 }}>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1 }}>
                 19.648
               </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 3 }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 3 }}>
                 Produção total (ton)
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <Trend value="9,8% nos últimos 30 dias" up />
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: 3 }}>
-                Pico <strong style={{ color: colors.textPrimary }}>21,73 ton/ha</strong> em Mai
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 3 }}>
+                Pico <strong style={{ color: colors.fg.default }}>21,73 ton/ha</strong> em Mai
               </div>
             </div>
           </div>
@@ -523,10 +523,10 @@ export default function OverviewPanel() {
           {/* Realizado progress */}
           <div style={{ padding: `${t.space[4]}px ${t.space[4]}px` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Receitas realizadas</span>
-              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>78%</span>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Receitas realizadas</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>78%</span>
             </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary, lineHeight: 1, marginBottom: t.space[3] }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1, marginBottom: t.space[3] }}>
               18.993
             </div>
             {/* Segmented ticks */}
@@ -547,7 +547,7 @@ export default function OverviewPanel() {
               ].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{s.label}</span>
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
                 </div>
               ))}
             </div>
@@ -558,7 +558,7 @@ export default function OverviewPanel() {
           {/* Cost summary card */}
           <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
                 <TrendingUp size={11} color={t.color.brand[600]} style={{ marginRight: 4 }} />
                 Margem — última apuração
               </span>
@@ -569,11 +569,11 @@ export default function OverviewPanel() {
               { label: 'Margem líquida', value: 'R$ 790.978' },
               { label: 'Status',         value: 'Concluído', green: true },
             ].map(row => (
-              <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: t.space[2], marginBottom: t.space[2], borderBottom: `1px solid ${colors.border}` }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{row.label}:</span>
+              <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: t.space[2], marginBottom: t.space[2], borderBottom: `1px solid ${colors.border.default}` }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{row.label}:</span>
                 <span style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                  color: row.green ? t.color.success.text : colors.textPrimary,
+                  color: row.green ? t.color.success.text : colors.fg.default,
                 }}>
                   {row.value}
                 </span>
@@ -588,14 +588,14 @@ export default function OverviewPanel() {
           <div style={{ padding: `${t.space[3]}px ${t.space[4]}px` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[2] }}>
               <TrendingDown size={11} color={t.color.error.text} />
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>Requer atenção</span>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Requer atenção</span>
             </div>
             {[
               { label: 'Saldo atrasado', value: 'R$ 1.940,73', color: t.color.error.text },
               { label: 'Desp. previstas', value: 'R$ 82.339,92', color: t.color.warning.text },
             ].map(item => (
               <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[1] }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted }}>{item.label}</span>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{item.label}</span>
                 <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: item.color }}>{item.value}</span>
               </div>
             ))}

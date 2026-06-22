@@ -61,7 +61,7 @@ export function FilterDrawer({
           bottom: t.layout.gutter,
           right: t.layout.gutter,
           width: t.size.drawer,
-          background: colors.surfaceBg,
+          background: colors.bg.surface,
           borderRadius: t.radius.xl,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.drawer,
@@ -81,7 +81,7 @@ export function FilterDrawer({
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: `${t.space[4]}px ${t.space[5]}px`,
-            borderBottom: `1px solid ${colors.border}`,
+            borderBottom: `1px solid ${colors.border.default}`,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
@@ -90,7 +90,7 @@ export function FilterDrawer({
               style={{
                 fontSize: t.font.size.md,
                 fontWeight: t.font.weight.semibold,
-                color: colors.textPrimary,
+                color: colors.fg.default,
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -120,14 +120,14 @@ export function FilterDrawer({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               display: 'flex',
               alignItems: 'center',
               padding: t.space[1],
               borderRadius: t.radius.md,
               transition: `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
           >
             <X size={16} />
@@ -152,7 +152,7 @@ export function FilterDrawer({
         <div
           style={{
             padding: `${t.space[3] + t.space[1] / 2}px ${t.space[5]}px`,
-            borderTop: `1px solid ${colors.border}`,
+            borderTop: `1px solid ${colors.border.default}`,
             display: 'flex',
             gap: t.space[2],
           }}

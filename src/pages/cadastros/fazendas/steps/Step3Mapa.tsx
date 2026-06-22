@@ -263,11 +263,11 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
             alignItems: 'center',
             gap: t.space[1] + 2,
             fontSize: t.font.size.sm,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}
         >
-          <MapPin size={13} color={colors.brand} />
+          <MapPin size={13} color={colors.accent.default} />
           Use as ferramentas no mapa para desenhar o polígono da propriedade
         </div>
 
@@ -276,7 +276,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
             <span
               style={{
                 fontSize: t.font.size.xs,
-                color: colors.brand,
+                color: colors.accent.default,
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -307,7 +307,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
         style={{
           height: 460,
           borderRadius: t.radius.xl,
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           overflow: 'hidden',
         }}
       />
@@ -321,7 +321,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
               alignItems: 'center',
               gap: t.space[1] + 2,
               fontSize: t.font.size.sm,
-              color: colors.brand,
+              color: colors.accent.default,
               fontFamily: t.font.family.sans,
             }}
           >
@@ -330,7 +330,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
                 width: 8,
                 height: 8,
                 borderRadius: t.radius.full,
-                background: colors.brand,
+                background: colors.accent.default,
                 display: 'inline-block',
               }}
             />
@@ -342,7 +342,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
           <div
             style={{
               fontSize: t.font.size.sm,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               fontFamily: t.font.family.sans,
             }}
           >

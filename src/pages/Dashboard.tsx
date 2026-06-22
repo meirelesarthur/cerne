@@ -55,7 +55,7 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
           icon={<ArrowRight size={11} />}
           style={{
             fontSize: t.font.size.xs,
-            color: colors.brand,
+            color: colors.accent.default,
             fontWeight: t.font.weight.medium,
             height: 'auto',
             padding: `${t.space[1]}px ${t.space[2]}px`,
@@ -119,7 +119,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr', gap: t.space[3] }}>
 
         {/* Últimos acessos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
+        <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Últimos acessos" action="Ver todos" />
           {recentItems.map((item) => (
             <div
@@ -130,21 +130,21 @@ export default function Dashboard() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '9px 0',
-                borderBottom: `1px solid ${colors.borderSubtle}`,
+                borderBottom: `1px solid ${colors.border.subtle}`,
                 cursor: 'pointer',
               }}
             >
               <div>
-                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>{item.label}</div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 1, transition: `color ${t.transition.smooth}` }}>{item.module}</div>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, transition: `color ${t.transition.smooth}` }}>{item.label}</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[0] + 1, transition: `color ${t.transition.smooth}` }}>{item.module}</div>
               </div>
-              <ExternalLink size={12} color={colors.border} />
+              <ExternalLink size={12} color={colors.border.default} />
             </div>
           ))}
         </div>
 
         {/* Fazendas */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
+        <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Fazendas" action="Ver todas" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
             {farms.map((farm) => (
@@ -156,16 +156,16 @@ export default function Dashboard() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: `10px ${t.space[3]}px`,
-                  background: colors.surfaceSubtle,
+                  background: colors.bg.subtle,
                   borderRadius: t.radius.DEFAULT,
                   cursor: 'pointer',
-                  border: `1px solid ${colors.border}`,
+                  border: `1px solid ${colors.border.default}`,
                   transition: `background ${t.transition.smooth}`,
                 }}
               >
                 <div>
-                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, transition: `color ${t.transition.smooth}` }}>{farm.name}</div>
-                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginTop: t.space[0] + 2, transition: `color ${t.transition.smooth}` }}>{farm.area}</div>
+                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, transition: `color ${t.transition.smooth}` }}>{farm.name}</div>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[0] + 2, transition: `color ${t.transition.smooth}` }}>{farm.area}</div>
                 </div>
                 <span
                   style={{
@@ -190,9 +190,9 @@ export default function Dashboard() {
                 width: '100%',
                 justifyContent: 'center',
                 padding: '9px',
-                border: `1px dashed ${colors.border}`,
+                border: `1px dashed ${colors.border.default}`,
                 borderRadius: t.radius.DEFAULT,
-                color: colors.textMuted,
+                color: colors.fg.subtle,
                 fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.medium,
                 transition: `color ${t.transition.smooth}`,
@@ -204,7 +204,7 @@ export default function Dashboard() {
         </div>
 
         {/* Favoritos */}
-        <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
+        <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 18, transition: `background ${t.transition.smooth}` }}>
           <SectionHeader title="Favoritos" action="Gerenciar" />
           {favorites.map((fav) => (
             <div
@@ -215,7 +215,7 @@ export default function Dashboard() {
                 alignItems: 'center',
                 gap: t.space[2] + 2, // ~10px
                 padding: `${t.space[2]}px 0`,
-                borderBottom: `1px solid ${colors.borderSubtle}`,
+                borderBottom: `1px solid ${colors.border.subtle}`,
                 cursor: 'pointer',
               }}
             >
@@ -223,7 +223,7 @@ export default function Dashboard() {
                 style={{
                   width: 26,
                   height: 26,
-                  background: colors.surfaceSubtle,
+                  background: colors.bg.subtle,
                   borderRadius: t.radius.md,
                   display: 'flex',
                   alignItems: 'center',
@@ -240,7 +240,7 @@ export default function Dashboard() {
                   style={{
                     fontSize: t.font.size.sm,
                     fontWeight: t.font.weight.medium,
-                    color: colors.textPrimary,
+                    color: colors.fg.default,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -250,7 +250,7 @@ export default function Dashboard() {
                   {fav.label}
                 </div>
               </div>
-              <ArrowRight size={12} color={colors.border} style={{ flexShrink: 0 }} />
+              <ArrowRight size={12} color={colors.border.default} style={{ flexShrink: 0 }} />
             </div>
           ))}
         </div>

@@ -57,7 +57,7 @@ export function SessionExpiredModal() {
           margin:     0,
           fontSize:   t.font.size.base,
           lineHeight: t.font.lineHeight.relaxed,
-          color:      colors.textSecondary,
+          color:      colors.fg.muted,
           fontFamily: t.font.family.sans,
         }}
       >

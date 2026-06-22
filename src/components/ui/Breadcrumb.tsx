@@ -39,7 +39,7 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
         return (
           <Fragment key={`${item.label}-${i}`}>
             {i > 0 && (
-              <ChevronRight size={13} style={{ color: colors.border, flexShrink: 0 }} aria-hidden="true" />
+              <ChevronRight size={13} style={{ color: colors.border.default, flexShrink: 0 }} aria-hidden="true" />
             )}
             {interactive ? (
               <a
@@ -48,13 +48,13 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
                   if (item.onClick) { e.preventDefault(); item.onClick() }
                 }}
                 style={{
-                  color:          colors.textSecondary,
+                  color:          colors.fg.muted,
                   textDecoration: 'none',
                   fontWeight:     t.font.weight.normal,
                   transition:     `color ${t.transition.DEFAULT}`,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = colors.brand }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = colors.textSecondary }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = colors.accent.default }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = colors.fg.muted }}
               >
                 {item.label}
               </a>
@@ -62,7 +62,7 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
               <span
                 aria-current={isLast ? 'page' : undefined}
                 style={{
-                  color:      isLast ? colors.textPrimary : colors.textSecondary,
+                  color:      isLast ? colors.fg.default : colors.fg.muted,
                   fontWeight: t.font.weight.normal,
                 }}
               >

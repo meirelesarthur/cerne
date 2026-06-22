@@ -81,7 +81,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
     ? t.color.error.text
     : isOk
     ? t.color.success.text
-    : colors.border
+    : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -90,7 +90,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           style={{
             fontSize: t.font.size.sm,
             fontWeight: t.font.weight.medium,
-            color: colors.textPrimary,
+            color: colors.fg.default,
             fontFamily: t.font.family.sans,
             transition: 'color 0.2s',
           }}
@@ -133,15 +133,15 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             borderRadius: t.radius.DEFAULT,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
-            color: colors.textPrimary,
-            background: isError ? t.color.error.bg : colors.inputBg,
+            color: colors.fg.default,
+            background: isError ? t.color.error.bg : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
             transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
           }
           const focusHandlers = {
             onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-              e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.brand
+              e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.accent.default
               e.currentTarget.style.boxShadow = isError ? t.glow.error : t.glow.brand
               ;(inputProps.onFocus as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>)?.(e)
             },

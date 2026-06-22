@@ -193,7 +193,7 @@ const notaRodapeStyle = (colors: ReturnType<typeof useTheme>['colors']): React.C
   marginTop: t.space[4],
   textAlign: 'center',
   fontSize: t.font.size.xs,
-  color: colors.textMuted,
+  color: colors.fg.subtle,
   fontFamily: t.font.family.sans,
   lineHeight: t.font.lineHeight.relaxed,
 })
@@ -257,7 +257,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             style={{
               fontSize: t.font.size.base,
               fontWeight: t.font.weight.medium,
-              color: colors.textSecondary,
+              color: colors.fg.muted,
               fontFamily: t.font.family.sans,
               marginRight: t.space[1],
             }}
@@ -279,7 +279,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
               fontSize: t.font.size['2xl'],
               fontWeight: t.font.weight.bold,
               fontFamily: t.font.family.sans,
-              color: colors.textPrimary,
+              color: colors.fg.default,
               userSelect: 'none',
             }}
           >
@@ -297,7 +297,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             <span
               style={{
                 fontSize: t.font.size.xs,
-                color: colors.textMuted,
+                color: colors.fg.subtle,
                 fontFamily: t.font.family.sans,
                 marginLeft: t.space[1],
               }}
@@ -312,7 +312,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
           <span style={{
             fontSize: t.font.size.sm,
             fontWeight: t.font.weight.medium,
-            color: !anual ? colors.textPrimary : colors.textMuted,
+            color: !anual ? colors.fg.default : colors.fg.subtle,
             fontFamily: t.font.family.sans,
             transition: `color ${t.transition.DEFAULT}`,
           }}>
@@ -322,7 +322,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
           <span style={{
             fontSize: t.font.size.sm,
             fontWeight: t.font.weight.medium,
-            color: anual ? colors.textPrimary : colors.textMuted,
+            color: anual ? colors.fg.default : colors.fg.subtle,
             fontFamily: t.font.family.sans,
             transition: `color ${t.transition.DEFAULT}`,
           }}>
@@ -356,7 +356,7 @@ function BlocoPreco({
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
         <Heading level={4} size="4xl" weight="extrabold">{formatBRL(preco)}</Heading>
-        <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
           /usuário/mês
         </span>
       </div>
@@ -366,7 +366,7 @@ function BlocoPreco({
             display: 'block',
             marginTop: t.space[1],
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}
         >
@@ -392,13 +392,13 @@ function BlocoTotal({
   return (
     <div
       style={{
-        background: colors.brandBg,
+        background: colors.accent.subtle,
         borderRadius: t.radius.lg,
         padding: `${t.space[3]}px ${t.space[4]}px`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
           {nUsuarios} {nUsuarios === 1 ? 'usuário' : 'usuários'}
         </span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: t.space[1] }}>
@@ -407,12 +407,12 @@ function BlocoTotal({
               fontSize: t.font.size['2xl'],
               fontWeight: t.font.weight.extrabold,
               fontFamily: t.font.family.sans,
-              color: colors.brand,
+              color: colors.accent.default,
             }}
           >
             {formatBRL(totalMes)}
           </span>
-          <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
             /mês
           </span>
         </div>
@@ -423,7 +423,7 @@ function BlocoTotal({
             display: 'block',
             marginTop: t.space[1],
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             textAlign: 'right',
           }}
@@ -465,7 +465,7 @@ function PlanoCard({
         flexDirection: 'column',
         border: atual
           ? `1.5px solid ${t.color.brand[600]}`
-          : `1px solid ${colors.border}`,
+          : `1px solid ${colors.border.default}`,
       }}
     >
       {/* Header */}
@@ -478,7 +478,7 @@ function PlanoCard({
         style={{
           margin: `${t.space[1]}px 0 0`,
           fontSize: t.font.size.sm,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           fontFamily: t.font.family.sans,
           lineHeight: t.font.lineHeight.snug,
           minHeight: 32,
@@ -550,7 +550,7 @@ function PlanoCard({
               alignItems: 'flex-start',
               gap: t.space[2],
               fontSize: t.font.size.base,
-              color: colors.textPrimary,
+              color: colors.fg.default,
               fontFamily: t.font.family.sans,
             }}
           >
@@ -658,7 +658,7 @@ function PlanoDetalhe({
         style={{
           position: 'relative',
           marginTop: t.space[6],
-          border: ehAtual ? `1.5px solid ${t.color.brand[600]}` : `1px solid ${colors.border}`,
+          border: ehAtual ? `1.5px solid ${t.color.brand[600]}` : `1px solid ${colors.border.default}`,
         }}
       >
         <div
@@ -738,7 +738,7 @@ function PlanoDetalhe({
             marginTop: t.space[6],
             padding: `${t.space[3]}px ${t.space[4]}px`,
             borderRadius: t.radius.lg,
-            background: colors.brandBg,
+            background: colors.accent.subtle,
             border: `1px solid ${t.color.brand[200]}`,
           }}
         >
@@ -746,12 +746,12 @@ function PlanoDetalhe({
           <span
             style={{
               fontSize: t.font.size.base,
-              color: colors.textSecondary,
+              color: colors.fg.muted,
               fontFamily: t.font.family.sans,
               lineHeight: t.font.lineHeight.snug,
             }}
           >
-            Quer ir além? O plano <strong style={{ color: colors.brand }}>{planoAcima.nome}</strong>{' '}
+            Quer ir além? O plano <strong style={{ color: colors.accent.default }}>{planoAcima.nome}</strong>{' '}
             desbloqueia ainda mais recursos para a sua operação crescer.
           </span>
         </div>
@@ -794,7 +794,7 @@ function PlanoDetalhe({
 const abaHelperStyle = (colors: ReturnType<typeof useTheme>['colors']): React.CSSProperties => ({
   margin: `${t.space[2]}px 0 ${t.space[5]}px`,
   fontSize: t.font.size.base,
-  color: colors.textMuted,
+  color: colors.fg.subtle,
   fontFamily: t.font.family.sans,
   lineHeight: t.font.lineHeight.snug,
 })
@@ -819,7 +819,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
     fontSize: t.font.size.sm,
     fontWeight: t.font.weight.semibold,
     fontFamily: t.font.family.sans,
-    color: colors.textSecondary,
+    color: colors.fg.muted,
   }
 
   return (
@@ -846,8 +846,8 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
               style={{
                 display: 'grid',
                 gridTemplateColumns: gridCols,
-                background: colors.surfaceSubtle,
-                borderBottom: `1px solid ${colors.border}`,
+                background: colors.bg.subtle,
+                borderBottom: `1px solid ${colors.border.default}`,
               }}
             >
               <div style={headerCell}>Duração do contrato</div>
@@ -869,8 +869,8 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                   style={{
                     display: 'grid',
                     gridTemplateColumns: gridCols,
-                    borderTop: `1px solid ${colors.borderSubtle}`,
-                    background: selecionada ? colors.brandBg : undefined,
+                    borderTop: `1px solid ${colors.border.subtle}`,
+                    background: selecionada ? colors.accent.subtle : undefined,
                   }}
                 >
                   {/* Duração */}
@@ -880,7 +880,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                         style={{
                           fontSize: t.font.size.base,
                           fontWeight: t.font.weight.semibold,
-                          color: colors.textPrimary,
+                          color: colors.fg.default,
                           fontFamily: t.font.family.sans,
                         }}
                       >
@@ -893,7 +893,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                         display: 'block',
                         marginTop: 2,
                         fontSize: t.font.size.xs,
-                        color: colors.textMuted,
+                        color: colors.fg.subtle,
                         fontFamily: t.font.family.sans,
                       }}
                     >
@@ -914,7 +914,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                       style={{
                         fontSize: t.font.size.lg,
                         fontWeight: t.font.weight.bold,
-                        color: colors.textPrimary,
+                        color: colors.fg.default,
                         fontFamily: t.font.family.sans,
                       }}
                     >
@@ -935,13 +935,13 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                       style={{
                         fontSize: t.font.size.base,
                         fontWeight: t.font.weight.semibold,
-                        color: colors.textPrimary,
+                        color: colors.fg.default,
                         fontFamily: t.font.family.sans,
                       }}
                     >
                       {formatBRL(total)}
                     </span>
-                    <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                       {sufixoPeriodo[d.id]}
                     </span>
                   </div>
@@ -958,7 +958,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
                     {economia > 0 ? (
                       <Badge label={`−${economia}%`} variant="success" />
                     ) : (
-                      <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                      <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                         Base
                       </span>
                     )}
@@ -983,7 +983,7 @@ function AbaPreRequisitos({ plano, colors }: { plano: Plano; colors: ReturnType<
         O que você precisa para começar a usar o plano {plano.nome}.
       </p>
 
-      <Card radius="xl" shadow="sm" padding={t.space[6]} style={{ border: `1px solid ${colors.border}` }}>
+      <Card radius="xl" shadow="sm" padding={t.space[6]} style={{ border: `1px solid ${colors.border.default}` }}>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
           {plano.preRequisitos.map((req) => (
             <li
@@ -993,7 +993,7 @@ function AbaPreRequisitos({ plano, colors }: { plano: Plano; colors: ReturnType<
                 alignItems: 'flex-start',
                 gap: t.space[2],
                 fontSize: t.font.size.base,
-                color: colors.textPrimary,
+                color: colors.fg.default,
                 fontFamily: t.font.family.sans,
                 lineHeight: t.font.lineHeight.snug,
               }}
@@ -1068,7 +1068,7 @@ function SecaoAddOns({ nUsuarios, colors }: SecaoAddOnsProps) {
         style={{
           margin: `${t.space[2]}px 0 0`,
           fontSize: t.font.size.base,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           fontFamily: t.font.family.sans,
         }}
       >
@@ -1111,7 +1111,7 @@ function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCa
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[3],
-        border: `1px solid ${colors.border}`,
+        border: `1px solid ${colors.border.default}`,
       }}
     >
       <Heading level={3} size="lg" weight="semibold">{addon.nome}</Heading>
@@ -1119,7 +1119,7 @@ function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCa
         style={{
           margin: 0,
           fontSize: t.font.size.sm,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           fontFamily: t.font.family.sans,
           lineHeight: t.font.lineHeight.snug,
           flex: 1,
@@ -1134,17 +1134,17 @@ function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCa
             fontSize: t.font.size['2xl'],
             fontWeight: t.font.weight.bold,
             fontFamily: t.font.family.sans,
-            color: colors.textPrimary,
+            color: colors.fg.default,
           }}
         >
           {formatBRL(addon.precoUsuarioMesAnual)}
         </span>
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
           /usuário/mês
         </span>
       </div>
 
-      <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+      <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
         Total para {nUsuarios} usuários: {formatBRL(totalMes)}/mês
       </span>
 
@@ -1193,7 +1193,7 @@ function CelulaComparacao({
     return (
       <span
         aria-label="Não incluído"
-        style={{ fontSize: t.font.size.lg, color: colors.textMuted, fontFamily: t.font.family.sans, lineHeight: 1 }}
+        style={{ fontSize: t.font.size.lg, color: colors.fg.subtle, fontFamily: t.font.family.sans, lineHeight: 1 }}
       >
         —
       </span>
@@ -1203,7 +1203,7 @@ function CelulaComparacao({
     return <Tag label="Add-on" variant="brand" />
   }
   return (
-    <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+    <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
       {value}
     </span>
   )
@@ -1217,13 +1217,13 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
     fontSize: t.font.size.sm,
     fontWeight: t.font.weight.semibold,
     fontFamily: t.font.family.sans,
-    color: colors.textSecondary,
+    color: colors.fg.muted,
   }
 
   const featureCell: React.CSSProperties = {
     padding: `${t.space[3]}px ${t.space[4]}px`,
     fontSize: t.font.size.base,
-    color: colors.textSecondary,
+    color: colors.fg.muted,
     fontFamily: t.font.family.sans,
   }
 
@@ -1240,8 +1240,8 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
             style={{
               display: 'grid',
               gridTemplateColumns: gridCols,
-              background: colors.surfaceSubtle,
-              borderBottom: `1px solid ${colors.border}`,
+              background: colors.bg.subtle,
+              borderBottom: `1px solid ${colors.border.default}`,
             }}
           >
             <div style={headerCell}>Recurso</div>
@@ -1258,9 +1258,9 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
                     justifyContent: 'center',
                     gap: t.space[1],
                     textAlign: 'center',
-                    borderLeft: `1px solid ${colors.border}`,
-                    background: col.destacar ? colors.brandBg : undefined,
-                    color: col.destacar ? colors.brand : colors.textPrimary,
+                    borderLeft: `1px solid ${colors.border.default}`,
+                    background: col.destacar ? colors.accent.subtle : undefined,
+                    color: col.destacar ? colors.accent.default : colors.fg.default,
                   }}
                 >
                   {plano.nome}
@@ -1282,7 +1282,7 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
                   color: t.color.brand[600],
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
-                  background: colors.surfaceSubtle,
+                  background: colors.bg.subtle,
                   borderTop: `2px solid ${t.color.brand[600]}`,
                 }}
               >
@@ -1295,7 +1295,7 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
                   style={{
                     display: 'grid',
                     gridTemplateColumns: gridCols,
-                    borderTop: `1px solid ${colors.borderSubtle}`,
+                    borderTop: `1px solid ${colors.border.subtle}`,
                   }}
                 >
                   <div style={featureCell}>{linha.feature}</div>
@@ -1307,8 +1307,8 @@ function TabelaComparacao({ titulo, colunas, colors }: TabelaComparacaoProps) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderLeft: `1px solid ${colors.borderSubtle}`,
-                        background: col.destacar ? colors.brandBg : undefined,
+                        borderLeft: `1px solid ${colors.border.subtle}`,
+                        background: col.destacar ? colors.accent.subtle : undefined,
                       }}
                     >
                       <CelulaComparacao value={linha[col.planoId]} colors={colors} />

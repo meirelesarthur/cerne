@@ -80,10 +80,10 @@ export function Pagination(props: PaginationProps) {
     const btnBase: React.CSSProperties = {
       display: 'inline-flex', alignItems: 'center', gap: 4,
       height: t.size.pageBtn, padding: `0 ${t.space[3]}px`,
-      borderRadius: t.radius.md, border: `1px solid ${colors.border}`,
-      background: colors.surfaceBg, cursor: 'pointer',
+      borderRadius: t.radius.md, border: `1px solid ${colors.border.default}`,
+      background: colors.bg.surface, cursor: 'pointer',
       fontFamily: t.font.family.sans, fontSize: t.font.size.sm,
-      fontWeight: t.font.weight.medium, color: colors.textSecondary,
+      fontWeight: t.font.weight.medium, color: colors.fg.muted,
       transition: `background ${t.transition.fast}, color ${t.transition.fast}`,
       userSelect: 'none',
     }
@@ -138,13 +138,13 @@ export function Pagination(props: PaginationProps) {
     width:          t.size.pageBtn,
     height:         t.size.pageBtn,
     borderRadius:   t.radius.md,
-    border:         `1px solid ${colors.border}`,
-    background:     colors.surfaceBg,
+    border:         `1px solid ${colors.border.default}`,
+    background:     colors.bg.surface,
     cursor:         'pointer',
     fontFamily:     t.font.family.sans,
     fontSize:       t.font.size.sm,
     fontWeight:     t.font.weight.medium,
-    color:          colors.textSecondary,
+    color:          colors.fg.muted,
     transition:     `background ${t.transition.fast}, color ${t.transition.fast}, border-color ${t.transition.fast}`,
     userSelect:     'none',
   }
@@ -177,7 +177,7 @@ export function Pagination(props: PaginationProps) {
       <span
         style={{
           fontSize:   t.font.size.sm,
-          color:      colors.textMuted,
+          color:      colors.fg.subtle,
           fontFamily: t.font.family.sans,
           whiteSpace: 'nowrap',
         }}
@@ -192,7 +192,7 @@ export function Pagination(props: PaginationProps) {
         {/* Seletor de linhas por página */}
         {showPageSizeSelector && onPageSizeChange && (
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-            <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
               Linhas:
             </span>
             <select
@@ -201,10 +201,10 @@ export function Pagination(props: PaginationProps) {
               style={{
                 height:       t.size.pageBtn,
                 padding:      `0 ${t.space[2]}px`,
-                border:       `1px solid ${colors.border}`,
+                border:       `1px solid ${colors.border.default}`,
                 borderRadius: t.radius.md,
-                background:   colors.surfaceBg,
-                color:        colors.textPrimary,
+                background:   colors.bg.surface,
+                color:        colors.fg.default,
                 fontSize:     t.font.size.sm,
                 fontFamily:   t.font.family.sans,
                 cursor:       'pointer',
@@ -229,10 +229,10 @@ export function Pagination(props: PaginationProps) {
             aria-label="Página anterior"
             style={page <= 1 ? btnDisabled : btnBase}
             onMouseEnter={(e) => {
-              if (page > 1) e.currentTarget.style.background = colors.surfaceSubtle
+              if (page > 1) e.currentTarget.style.background = colors.bg.subtle
             }}
             onMouseLeave={(e) => {
-              if (page > 1) e.currentTarget.style.background = colors.surfaceBg
+              if (page > 1) e.currentTarget.style.background = colors.bg.surface
             }}
           >
             <ChevronLeft size={14} />
@@ -249,7 +249,7 @@ export function Pagination(props: PaginationProps) {
                   alignItems:     'center',
                   justifyContent: 'center',
                   fontSize:       t.font.size.sm,
-                  color:          colors.textMuted,
+                  color:          colors.fg.subtle,
                   fontFamily:     t.font.family.sans,
                   userSelect:     'none',
                 }}
@@ -266,10 +266,10 @@ export function Pagination(props: PaginationProps) {
                 aria-current={p === page ? 'page' : undefined}
                 style={p === page ? btnActive : btnBase}
                 onMouseEnter={(e) => {
-                  if (p !== page) e.currentTarget.style.background = colors.surfaceSubtle
+                  if (p !== page) e.currentTarget.style.background = colors.bg.subtle
                 }}
                 onMouseLeave={(e) => {
-                  if (p !== page) e.currentTarget.style.background = colors.surfaceBg
+                  if (p !== page) e.currentTarget.style.background = colors.bg.surface
                 }}
               >
                 {p}
@@ -286,10 +286,10 @@ export function Pagination(props: PaginationProps) {
             aria-label="Próxima página"
             style={page >= totalPages ? btnDisabled : btnBase}
             onMouseEnter={(e) => {
-              if (page < totalPages) e.currentTarget.style.background = colors.surfaceSubtle
+              if (page < totalPages) e.currentTarget.style.background = colors.bg.subtle
             }}
             onMouseLeave={(e) => {
-              if (page < totalPages) e.currentTarget.style.background = colors.surfaceBg
+              if (page < totalPages) e.currentTarget.style.background = colors.bg.surface
             }}
           >
             <ChevronRight size={14} />

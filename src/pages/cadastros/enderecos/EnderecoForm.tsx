@@ -123,21 +123,21 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
               display: 'flex', alignItems: 'center', gap: 8,
               marginBottom: t.space[5],
               padding: `${t.space[3]}px ${t.space[4]}px`,
-              background: colors.surfaceSubtle,
+              background: colors.bg.subtle,
               borderRadius: t.radius.DEFAULT,
-              border: `1px solid ${colors.border}`,
+              border: `1px solid ${colors.border.default}`,
             }}>
-              <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                 📍 Endereçamento pai:
               </span>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
                 {TIPO_LABEL[parentNode.tipo]} — {parentNode.descricao}
               </span>
             </div>
           )}
 
           {/* Divisor */}
-          <div style={{ height: 1, background: colors.border, marginBottom: t.space[5] }} />
+          <div style={{ height: 1, background: colors.border.default, marginBottom: t.space[5] }} />
 
           {/* Descrição */}
           <div style={{ marginBottom: t.space[6] }}>

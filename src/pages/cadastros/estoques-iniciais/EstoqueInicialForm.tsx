@@ -208,13 +208,13 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
 
   const hintText: React.CSSProperties = {
     fontSize: t.font.size.xs,
-    color: colors.textMuted,
+    color: colors.fg.subtle,
     fontFamily: t.font.family.sans,
     marginTop: 4,
   }
 
   const computedFieldStyle: React.CSSProperties = {
-    background: colors.surfaceSubtle,
+    background: colors.bg.subtle,
     cursor: 'not-allowed',
   }
 
@@ -355,8 +355,8 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
               label="Unidade de Medida"
               value={form.unidade || '—'}
               readOnly
-              iconRight={<Lock size={12} color={colors.textMuted} />}
-              style={{ background: colors.surfaceSubtle, cursor: 'not-allowed' }}
+              iconRight={<Lock size={12} color={colors.fg.subtle} />}
+              style={{ background: colors.bg.subtle, cursor: 'not-allowed' }}
             />
             <p style={hintText}>Preenchida automaticamente a partir do produto selecionado</p>
           </div>
@@ -443,7 +443,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
                 <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.warning.text, fontFamily: t.font.family.sans, marginBottom: 4 }}>
                   Já existe um saldo inicial para este produto neste armazém.
                 </div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.textSecondary, fontFamily: t.font.family.sans }}>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
                   Deseja substituir ou adicionar novo lançamento?
                 </div>
               </div>

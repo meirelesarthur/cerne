@@ -120,14 +120,14 @@ export function SearchSelect({
     <div>
       {label && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
-          <label htmlFor={id} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+          <label htmlFor={id} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
             {label}{required && <span style={{ color: t.color.error.text }}> *</span>}
           </label>
           {headerAction && (
             <button
               type="button"
               onClick={headerAction.onClick}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.brand, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, display: 'flex', alignItems: 'center', gap: 3 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.xs, color: colors.accent.default, fontFamily: t.font.family.sans, fontWeight: t.font.weight.semibold, display: 'flex', alignItems: 'center', gap: 3 }}
             >
               {headerAction.icon}{headerAction.label}
             </button>
@@ -139,13 +139,13 @@ export function SearchSelect({
         <div style={{
           display: 'flex', alignItems: 'center', gap: t.space[1] + 3,
           height: t.size.control,
-          border: `1.5px solid ${error ? t.color.error.text : open ? t.color.brand[600] : colors.border}`,
+          border: `1.5px solid ${error ? t.color.error.text : open ? t.color.brand[600] : colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `0 ${t.space[2] + 2}px`,
-          background: colors.surfaceBg,
+          background: colors.bg.surface,
           transition: `border-color ${t.transition.DEFAULT}`,
         }}>
-          <Search size={13} color={open ? t.color.brand[600] : colors.textMuted} style={{ flexShrink: 0 }} aria-hidden="true" />
+          <Search size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} aria-hidden="true" />
           <input
             id={id}
             type="text"
@@ -165,19 +165,19 @@ export function SearchSelect({
             data-bwignore="true"
             data-form-type="other"
             spellCheck={false}
-            style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.md, color: colors.textPrimary, fontFamily: t.font.family.sans, minWidth: 0 }}
+            style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.md, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0 }}
           />
           {query && onClear && (
             <button
               type="button"
               aria-label="Limpar seleção"
               onClick={() => { onClear(); setOpen(false) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.textMuted }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.fg.subtle }}
             >
               <X size={11} />
             </button>
           )}
-          <ChevronDown size={12} color={colors.textMuted} aria-hidden="true" />
+          <ChevronDown size={12} color={colors.fg.subtle} aria-hidden="true" />
         </div>
 
         {open && (
@@ -186,20 +186,20 @@ export function SearchSelect({
             role="listbox"
             style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: t.zIndex.dropdown,
-              background: colors.surfaceBg,
-              border: `1px solid ${colors.border}`,
+              background: colors.bg.surface,
+              border: `1px solid ${colors.border.default}`,
               borderRadius: t.radius.lg,
               boxShadow: t.shadow.md,
               maxHeight: 280,
               overflowY: 'auto',
               marginTop: 2,
             }}>
-            <div style={{ padding: `${t.space[2]}px ${t.space[3]}px ${t.space[1] + 2}px`, fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, borderBottom: `1px solid ${colors.borderSubtle}` }}>
+            <div style={{ padding: `${t.space[2]}px ${t.space[3]}px ${t.space[1] + 2}px`, fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, borderBottom: `1px solid ${colors.border.subtle}` }}>
               {filtered.length} resultado{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
             </div>
 
             {filtered.length === 0 && (
-              <div style={{ padding: `${t.space[3]}px`, fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+              <div style={{ padding: `${t.space[3]}px`, fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                 {emptyText}
               </div>
             )}
@@ -217,11 +217,11 @@ export function SearchSelect({
             ))}
 
             {footerAction && (
-              <div style={{ borderTop: `1px solid ${colors.borderSubtle}` }}>
+              <div style={{ borderTop: `1px solid ${colors.border.subtle}` }}>
                 <button
                   type="button"
                   onClick={() => { setOpen(false); footerAction.onClick() }}
-                  style={{ width: '100%', padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.sm, color: colors.brand, fontFamily: t.font.family.sans, fontWeight: t.font.weight.bold, textAlign: 'left', display: 'flex', alignItems: 'center', gap: t.space[1] + 2 }}
+                  style={{ width: '100%', padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: 'none', border: 'none', cursor: 'pointer', fontSize: t.font.size.sm, color: colors.accent.default, fontFamily: t.font.family.sans, fontWeight: t.font.weight.bold, textAlign: 'left', display: 'flex', alignItems: 'center', gap: t.space[1] + 2 }}
                 >
                   {footerAction.icon}{footerAction.label}
                 </button>
@@ -262,7 +262,7 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }:
       style={{
         width: '100%',
         padding: `${t.space[2]}px ${t.space[3]}px`,
-        background: isSelected ? colors.brandBg : highlighted ? colors.surfaceSubtle : 'transparent',
+        background: isSelected ? colors.accent.subtle : highlighted ? colors.bg.subtle : 'transparent',
         border: 'none',
         cursor: 'pointer',
         textAlign: 'left',
@@ -270,16 +270,16 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }:
         alignItems: 'center',
         gap: t.space[2],
         transition: `background ${t.transition.fast}`,
-        outline: isActive ? `2px solid ${colors.brand}` : 'none',
+        outline: isActive ? `2px solid ${colors.accent.default}` : 'none',
         outlineOffset: -2,
       }}
     >
       {option.code && (
-        <span style={{ fontSize: t.font.size.xs, color: colors.brand, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, minWidth: 52 }}>
+        <span style={{ fontSize: t.font.size.xs, color: colors.accent.default, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, minWidth: 52 }}>
           {option.code}
         </span>
       )}
-      <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {option.label}
       </span>
     </button>

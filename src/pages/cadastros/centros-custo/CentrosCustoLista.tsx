@@ -91,8 +91,8 @@ export default function CentrosCustoLista({
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.surfaceBg
-  const border = colors.border
+  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface
+  const border = colors.border.default
 
   // ── Confirmar exclusão ────────────────────────────────────────────────────
   const handleConfirmDelete = () => {
@@ -177,7 +177,7 @@ export default function CentrosCustoLista({
                 <span style={{
                   fontSize: t.font.size.xs,
                   fontWeight: t.font.weight.medium,
-                  color: colors.textMuted,
+                  color: colors.fg.subtle,
                   fontFamily: t.font.family.sans,
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
@@ -188,7 +188,7 @@ export default function CentrosCustoLista({
                   <span style={{
                     fontSize: t.font.size['3xl'],
                     fontWeight: t.font.weight.bold,
-                    color: colors.textPrimary,
+                    color: colors.fg.default,
                     fontFamily: t.font.family.sans,
                     lineHeight: 1,
                   }}>
@@ -199,8 +199,8 @@ export default function CentrosCustoLista({
                       display: 'inline-flex', alignItems: 'center', gap: 3,
                       fontSize: t.font.size.xs,
                       fontWeight: t.font.weight.semibold,
-                      color: item.trend === 'up' ? t.color.success.text : item.trend === 'down' ? t.color.error.text : colors.textMuted,
-                      background: item.trend === 'up' ? t.color.success.bg : item.trend === 'down' ? t.color.error.bg : colors.surfaceSubtle,
+                      color: item.trend === 'up' ? t.color.success.text : item.trend === 'down' ? t.color.error.text : colors.fg.subtle,
+                      background: item.trend === 'up' ? t.color.success.bg : item.trend === 'down' ? t.color.error.bg : colors.bg.subtle,
                       padding: '2px 6px', borderRadius: t.radius.full,
                     }}>
                       {item.trend === 'up'   && <TrendingUp  size={10} />}
@@ -209,7 +209,7 @@ export default function CentrosCustoLista({
                     </span>
                   )}
                   {'sub' in item && item.sub && (
-                    <span style={{ fontSize: t.font.size.sm, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+                    <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
                       {item.sub}
                     </span>
                   )}
@@ -257,7 +257,7 @@ export default function CentrosCustoLista({
           ) : (
             <>
               <div style={{
-                background: colors.surfaceBg,
+                background: colors.bg.surface,
                 border: `1px solid ${border}`,
                 borderRadius: t.radius.lg,
                 overflow: 'hidden',
@@ -268,7 +268,7 @@ export default function CentrosCustoLista({
                   gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
                   padding: '10px 16px',
                   borderBottom: `1px solid ${border}`,
-                  background: colors.surfaceSubtle,
+                  background: colors.bg.subtle,
                 }}>
                   {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
                     <div
@@ -276,7 +276,7 @@ export default function CentrosCustoLista({
                       style={{
                         fontSize: t.font.size.xs,
                         fontWeight: t.font.weight.semibold,
-                        color: colors.textMuted,
+                        color: colors.fg.subtle,
                         fontFamily: t.font.family.sans,
                         letterSpacing: '0.06em',
                         textAlign: i >= 4 ? 'center' : 'left',
@@ -306,7 +306,7 @@ export default function CentrosCustoLista({
                 <div style={{
                   marginTop: t.space[4],
                   paddingTop: t.space[4],
-                  borderTop: `1px solid ${colors.borderSubtle}`,
+                  borderTop: `1px solid ${colors.border.subtle}`,
                 }}>
                   <Pagination
                     page={page}
@@ -347,18 +347,18 @@ export default function CentrosCustoLista({
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
             <div style={{
               width: t.space[10], height: t.space[10], borderRadius: t.radius.xl,
-              background: colors.brandBg,
+              background: colors.accent.subtle,
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <HelpCircle size={22} color={colors.brand} />
+              <HelpCircle size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">
               Centros de Custo
             </Heading>
           </div>
-          <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
+          <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
             <p style={{ margin: `0 0 ${t.space[3]}px` }}>
-              Os <strong style={{ color: colors.textPrimary }}>Centros de Custo</strong> são unidades organizacionais
+              Os <strong style={{ color: colors.fg.default }}>Centros de Custo</strong> são unidades organizacionais
               utilizadas para apropriar receitas e despesas, permitindo análises por área, atividade ou projeto.
             </p>
             <ul style={{ margin: 0, padding: `0 0 0 ${t.space[5]}px`, display: 'flex', flexDirection: 'column', gap: t.space[2] - 2 }}>
@@ -443,14 +443,14 @@ function CCRow({
         alignItems: 'center',
         transition: 'background 0.12s',
       }}
-      onMouseEnter={e => { e.currentTarget.style.background = colors.surfaceSubtle }}
+      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
     >
       {/* Código */}
       <span title={cc.codigo} style={{
         fontSize: t.font.size.sm,
         fontWeight: t.font.weight.semibold,
-        color: colors.textPrimary,
+        color: colors.fg.default,
         fontFamily: t.font.family.sans,
         fontVariantNumeric: 'tabular-nums',
         minWidth: 0,
@@ -477,7 +477,7 @@ function CCRow({
       {/* Condição */}
       <span title={CONDICAO_LABEL[cc.condicao]} style={{
         fontSize: t.font.size.sm,
-        color: colors.textSecondary,
+        color: colors.fg.muted,
         fontFamily: t.font.family.sans,
         minWidth: 0,
         overflow: 'hidden',
@@ -490,7 +490,7 @@ function CCRow({
       {/* Descrição */}
       <span title={cc.descricao} style={{
         fontSize: t.font.size.base,
-        color: colors.textPrimary,
+        color: colors.fg.default,
         fontFamily: t.font.family.sans,
         paddingLeft: cc.antecessorId !== null ? 16 : 0,
         minWidth: 0,

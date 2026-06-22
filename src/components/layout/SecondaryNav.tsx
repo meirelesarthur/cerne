@@ -14,7 +14,7 @@ function NavHeader({ module }: { module: NavModule }) {
       style={{
         height: 44,
         flexShrink: 0,
-        background: colors.subnavHeaderBg,
+        background: colors.nav.headerBg,
         display: 'flex',
         alignItems: 'center',
         gap: t.space[1],
@@ -22,12 +22,12 @@ function NavHeader({ module }: { module: NavModule }) {
         transition: 'background 0.2s',
       }}
     >
-      <Icon size={16} strokeWidth={2} color={colors.subnavHeaderText} style={{ flexShrink: 0 }} aria-hidden="true" />
+      <Icon size={16} strokeWidth={2} color={colors.nav.headerText} style={{ flexShrink: 0 }} aria-hidden="true" />
       <span
         style={{
           fontSize: t.font.size.md,
           fontWeight: t.font.weight.bold,
-          color: colors.subnavHeaderText,
+          color: colors.nav.headerText,
           fontFamily: "'Outfit', sans-serif",
           letterSpacing: '-0.1px',
         }}
@@ -80,7 +80,7 @@ function NavItem({
               flexShrink: 0,
               transform: expanded ? 'rotate(90deg)' : 'none',
               transition: 'transform 0.15s ease',
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               marginLeft: 4,
             }}
           />
@@ -131,7 +131,7 @@ function NavGroupSection({
           gap: t.space[1],
           fontSize: 10,
           fontWeight: 500,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
           padding: `6px 10px 6px ${t.space[1]}px`,
@@ -142,7 +142,7 @@ function NavGroupSection({
           borderRadius: 6,
           transition: 'background 0.1s, color 0.15s',
         }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = colors.navItemHover }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = colors.nav.itemHover }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
       >
         <GroupIcon size={10} strokeWidth={2} style={{ flexShrink: 0 }} />
@@ -240,7 +240,7 @@ export default function SecondaryNav({
       style={{
         width: 224,
         minWidth: 224,
-        background: colors.surfaceBg,
+        background: colors.bg.surface,
         borderRadius: 12,
         display: 'flex',
         flexDirection: 'column',

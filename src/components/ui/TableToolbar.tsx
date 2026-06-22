@@ -22,17 +22,17 @@ export function TableSearchInput({
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[2],
         height: t.size.control,
-        border: `1.5px solid ${focused ? t.color.brand[600] : colors.border}`,
+        border: `1.5px solid ${focused ? t.color.brand[600] : colors.border.default}`,
         borderRadius: t.radius.DEFAULT,
         padding: `0 ${t.space[2] + 2}px`,
-        background: colors.surfaceBg,
+        background: colors.bg.surface,
         transition: `border-color ${t.transition.DEFAULT}`,
         minWidth: 220,
       }}
     >
       <Search
         size={13}
-        color={focused ? t.color.brand[600] : colors.textMuted}
+        color={focused ? t.color.brand[600] : colors.fg.subtle}
         style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
       />
       <input
@@ -44,7 +44,7 @@ export function TableSearchInput({
         onBlur={() => setFocused(false)}
         style={{
           flex: 1, border: 'none', background: 'transparent', outline: 'none',
-          fontSize: t.font.size.md, color: colors.textPrimary,
+          fontSize: t.font.size.md, color: colors.fg.default,
           fontFamily: t.font.family.sans, minWidth: 0,
         }}
       />
@@ -56,7 +56,7 @@ export function TableSearchInput({
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
             padding: 0, display: 'flex', alignItems: 'center',
-            color: colors.textMuted,
+            color: colors.fg.subtle,
           }}
         >
           <X size={11} />
@@ -75,12 +75,12 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1],
         height: t.size.control,
-        background: colors.brandBg,
-        border: `1.5px solid ${colors.brand}`,
+        background: colors.accent.subtle,
+        border: `1.5px solid ${colors.accent.default}`,
         borderRadius: t.radius.DEFAULT,
         padding: `0 ${t.space[2]}px 0 ${t.space[2] + 2}px`,
         fontSize: t.font.size.sm,
-        color: colors.brand,
+        color: colors.accent.default,
         fontFamily: t.font.family.sans,
         fontWeight: t.font.weight.medium,
       }}
@@ -92,7 +92,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
         onClick={onRemove}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          color: colors.brand, display: 'flex', alignItems: 'center', padding: 0,
+          color: colors.accent.default, display: 'flex', alignItems: 'center', padding: 0,
         }}
       >
         <X size={11} />
@@ -127,15 +127,15 @@ export function FilterButton({
       style={{
         display: 'flex', alignItems: 'center', gap: t.space[1] + 2, // 6px
         height: t.size.control,
-        background: active    ? colors.brandBg
-          : hovered ? colors.surfaceSubtle : colors.surfaceBg,
-        border: `1.5px solid ${active ? colors.brand : colors.border}`,
+        background: active    ? colors.accent.subtle
+          : hovered ? colors.bg.subtle : colors.bg.surface,
+        border: `1.5px solid ${active ? colors.accent.default : colors.border.default}`,
         borderRadius: t.radius.DEFAULT,
         padding: `0 ${t.space[3] + 2}px`, // 14px
         fontSize: t.font.size.base,
         fontWeight: t.font.weight.medium,
         fontFamily: t.font.family.sans,
-        color: active ? colors.brand : colors.textSecondary,
+        color: active ? colors.accent.default : colors.fg.muted,
         cursor: 'pointer',
         transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
       }}
@@ -145,7 +145,7 @@ export function FilterButton({
       {active && (
         <span
           style={{
-            background: colors.brand, color: 'white',
+            background: colors.accent.default, color: 'white',
             fontSize: 10, fontWeight: 700,
             padding: '1px 6px', borderRadius: 9999,
           }}

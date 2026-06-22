@@ -30,7 +30,7 @@ function InfoField({ label, value }: { label: string; value: React.ReactNode }) 
       <div style={{
         fontSize: 10,
         fontWeight: t.font.weight.semibold,
-        color: colors.textMuted,
+        color: colors.fg.subtle,
         textTransform: 'uppercase',
         letterSpacing: '0.5px',
         marginBottom: 4,
@@ -40,12 +40,12 @@ function InfoField({ label, value }: { label: string; value: React.ReactNode }) 
       </div>
       <div style={{
         fontSize: t.font.size.base,
-        color: colors.textPrimary,
+        color: colors.fg.default,
         fontFamily: t.font.family.sans,
         fontWeight: t.font.weight.normal,
         minHeight: 20,
       }}>
-        {value || <span style={{ color: colors.border }}>—</span>}
+        {value || <span style={{ color: colors.border.default }}>—</span>}
       </div>
     </div>
   )
@@ -143,7 +143,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
               <div
                 key={s.label}
                 style={{
-                  background: colors.surfaceBg,
+                  background: colors.bg.surface,
                   borderRadius: t.radius.lg,
                   padding: '12px 14px',
                   display: 'flex',
@@ -161,10 +161,10 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
                   {s.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
+                  <div style={{ fontSize: 10, color: colors.fg.subtle, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
+                  <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
                     {s.value}
                   </div>
                 </div>
@@ -173,16 +173,16 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
           </div>
 
           {/* ── Dados gerais ─────────────────────────────────────────────────── */}
-          <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
+          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
             <div style={{
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               textTransform: 'uppercase',
               letterSpacing: '0.6px',
               marginBottom: 16,
               paddingBottom: 10,
-              borderBottom: `1px solid ${colors.borderSubtle}`,
+              borderBottom: `1px solid ${colors.border.subtle}`,
               fontFamily: t.font.family.sans,
             }}>
               Dados Gerais
@@ -196,16 +196,16 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
           </div>
 
           {/* ── Canvas de semanas (read-only) ─────────────────────────────────── */}
-          <div style={{ background: colors.surfaceBg, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
+          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
             <div style={{
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               textTransform: 'uppercase',
               letterSpacing: '0.6px',
               marginBottom: 16,
               paddingBottom: 10,
-              borderBottom: `1px solid ${colors.borderSubtle}`,
+              borderBottom: `1px solid ${colors.border.subtle}`,
               fontFamily: t.font.family.sans,
             }}>
               Código Visual de Semanas

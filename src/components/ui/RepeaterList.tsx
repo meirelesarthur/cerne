@@ -41,10 +41,10 @@ export function RepeaterList<T>({
       {items.length === 0 && emptyText && (
         <div style={{
           padding:    `${t.space[3]}px ${t.space[4]}px`,
-          border:     `1px dashed ${colors.border}`,
+          border:     `1px dashed ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           fontSize:   t.font.size.sm,
-          color:      colors.textMuted,
+          color:      colors.fg.subtle,
           fontFamily: t.font.family.sans,
           textAlign:  'center',
         }}>
@@ -84,7 +84,7 @@ export function RepeaterList<T>({
           icon={<Plus size={14} />}
           onClick={onAdd}
           disabled={disabled}
-          style={{ color: colors.brand }}
+          style={{ color: colors.accent.default }}
         >
           {addLabel}
         </Button>

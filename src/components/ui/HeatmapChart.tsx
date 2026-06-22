@@ -41,7 +41,7 @@ export function HeatmapChart({
         {colLabels.map(label => (
           <div key={label} style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted as string,
+            color: colors.fg.subtle as string,
             textAlign: 'center',
             lineHeight: 1,
           }}>
@@ -63,7 +63,7 @@ export function HeatmapChart({
         >
           <div style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted as string,
+            color: colors.fg.subtle as string,
             display: 'flex',
             alignItems: 'center',
             lineHeight: 1,
@@ -95,7 +95,7 @@ export function HeatmapChart({
 
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginTop: t.space[3] }}>
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Menor</span>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>Menor</span>
         {[0.12, 0.3, 0.5, 0.7, 1.0].map((op, i) => (
           <div
             key={i}
@@ -108,7 +108,7 @@ export function HeatmapChart({
             }}
           />
         ))}
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Maior</span>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>Maior</span>
       </div>
     </div>
   )

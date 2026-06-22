@@ -48,14 +48,14 @@ export function DataTable<T extends object>({
   }
 
   // Derived colors
-  const borderColor   = colors.border
-  const borderSubtle  = colors.borderSubtle
+  const borderColor   = colors.border.default
+  const borderSubtle  = colors.border.subtle
   const theadBg       = isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50]
-  const rowBg         = colors.surfaceBg
+  const rowBg         = colors.bg.surface
   const rowHoverBg    = isGbMode ? 'rgba(16,185,129,0.06)' : t.color.neutral[50]
-  const textHead      = colors.textSecondary
-  const textCell      = colors.textPrimary
-  const emptyColor    = colors.textMuted
+  const textHead      = colors.fg.muted
+  const textCell      = colors.fg.default
+  const emptyColor    = colors.fg.subtle
 
   return (
     <div

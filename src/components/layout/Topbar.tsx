@@ -56,10 +56,10 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             gap: 6,
             padding: `0 ${t.space[3]}px`,
             borderRadius: t.radius.DEFAULT,
-            border: `1px solid ${colors.border}`,
-            background: colors.surfaceBg,
+            border: `1px solid ${colors.border.default}`,
+            background: colors.bg.surface,
             cursor: 'pointer',
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontSize: t.font.size.sm,
             fontFamily: t.font.family.sans,
             transition: 'background 0.15s',
@@ -70,11 +70,11 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           <kbd
             style={{
               fontSize: t.font.size.xs - 1, // ~10px (abaixo do mínimo do token)
-              background: colors.surfaceSubtle,
-              border: `1px solid ${colors.border}`,
+              background: colors.bg.subtle,
+              border: `1px solid ${colors.border.default}`,
               borderRadius: t.radius.sm,
               padding: '1px 4px',
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               fontFamily: 'monospace',
             }}
           >
@@ -95,10 +95,10 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: colors.textSecondary,
+            color: colors.fg.muted,
             transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = colors.navItemHover }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = colors.nav.itemHover }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
         >
           <Bell size={16} />
@@ -129,7 +129,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             width: 34,
             height: 34,
             borderRadius: t.radius.full,
-            background: `linear-gradient(135deg, ${colors.brand}, ${t.color.brand[300]})`,
+            background: `linear-gradient(135deg, ${colors.accent.default}, ${t.color.brand[300]})`,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',

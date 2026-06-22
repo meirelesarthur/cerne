@@ -128,7 +128,7 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
         ) : (
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1,
-            border: `1px solid ${colors.border}`, borderRadius: t.radius.lg,
+            border: `1px solid ${colors.border.default}`, borderRadius: t.radius.lg,
             overflow: 'hidden', marginBottom: t.space[4],
           }}>
             {[
@@ -139,20 +139,20 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             ].map((item, idx, arr) => (
               <div key={item.label} style={{
                 padding: `${t.space[4]}px ${t.space[5]}px`,
-                background: colors.surfaceBg,
-                borderRight: idx < arr.length - 1 ? `1px solid ${colors.border}` : undefined,
+                background: colors.bg.surface,
+                borderRight: idx < arr.length - 1 ? `1px solid ${colors.border.default}` : undefined,
                 display: 'flex', flexDirection: 'column', gap: 6,
               }}>
                 <span style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                  color: colors.textMuted, fontFamily: t.font.family.sans,
+                  color: colors.fg.subtle, fontFamily: t.font.family.sans,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}>
                   {item.label}
                 </span>
                 <span style={{
                   fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold,
-                  color: colors.textPrimary, fontFamily: t.font.family.sans, lineHeight: 1,
+                  color: colors.fg.default, fontFamily: t.font.family.sans, lineHeight: 1,
                 }}>
                   {item.value}
                 </span>
@@ -194,19 +194,19 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
         ) : (
           <>
             <div style={{
-              background: colors.surfaceBg, border: `1px solid ${colors.border}`,
+              background: colors.bg.surface, border: `1px solid ${colors.border.default}`,
               borderRadius: t.radius.lg, overflow: 'hidden',
             }}>
               {/* Cabeçalho */}
               <div style={{
                 display: 'grid', gridTemplateColumns: GRID,
-                padding: '10px 16px', borderBottom: `1px solid ${colors.border}`,
-                background: colors.surfaceSubtle,
+                padding: '10px 16px', borderBottom: `1px solid ${colors.border.default}`,
+                background: colors.bg.subtle,
               }}>
                 {['NOME', 'CPF / CNPJ', 'E-MAIL', 'ENTIDADES', 'AÇÃO'].map((h, i) => (
                   <div key={h} style={{
                     fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                    color: colors.textMuted, fontFamily: t.font.family.sans,
+                    color: colors.fg.subtle, fontFamily: t.font.family.sans,
                     letterSpacing: '0.06em', textAlign: i === 4 ? 'center' : 'left',
                   }}>
                     {h}
@@ -230,7 +230,7 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             </div>
 
             {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[4], paddingTop: t.space[4], borderTop: `1px solid ${colors.borderSubtle}` }}>
+              <div style={{ marginTop: t.space[4], paddingTop: t.space[4], borderTop: `1px solid ${colors.border.subtle}` }}>
                 <Pagination page={safePage} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
               </div>
             )}
@@ -262,15 +262,15 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
             <div style={{
               width: t.space[10], height: t.space[10], borderRadius: t.radius.xl,
-              background: colors.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              background: colors.accent.subtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <Users size={22} color={colors.brand} />
+              <Users size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">Pessoas Unificado</Heading>
           </div>
-          <div style={{ fontSize: t.font.size.base, color: colors.textSecondary, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
+          <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
             <p style={{ margin: `0 0 ${t.space[3]}px` }}>
-              Uma <strong style={{ color: colors.textPrimary }}>Pessoa</strong> é a identidade única do sistema.
+              Uma <strong style={{ color: colors.fg.default }}>Pessoa</strong> é a identidade única do sistema.
               Cada cadastro pode acumular até cinco papéis simultâneos — não é mais necessário recadastrar
               a mesma pessoa em Proprietários, Funcionários, Fornecedores e Clientes.
             </p>
@@ -327,10 +327,10 @@ function PessoaRow({
       style={{
         display: 'grid', gridTemplateColumns: GRID,
         padding: '0 16px', minHeight: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${colors.border}`,
+        borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
         alignItems: 'center', transition: `background ${t.transition.fast}`,
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = colors.surfaceSubtle }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
     >
       {/* Nome + Avatar */}
@@ -339,13 +339,13 @@ function PessoaRow({
         <div style={{ minWidth: 0 }}>
           <div style={{
             fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
-            color: colors.textPrimary, fontFamily: t.font.family.sans,
+            color: colors.fg.default, fontFamily: t.font.family.sans,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {pessoa.name}
           </div>
           <div style={{
-            fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans,
+            fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {cidadeLabel(pessoa.cityId)}
@@ -355,7 +355,7 @@ function PessoaRow({
 
       {/* CPF / CNPJ */}
       <span style={{
-        fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans,
+        fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {maskNif(pessoa.nif)}
@@ -363,7 +363,7 @@ function PessoaRow({
 
       {/* E-mail */}
       <span title={pessoa.email} style={{
-        fontSize: t.font.size.sm, color: colors.textSecondary, fontFamily: t.font.family.sans,
+        fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans,
         minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: t.space[3],
       }}>
         {pessoa.email || '—'}

@@ -34,11 +34,11 @@ export function KpiStatCard({
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? t.color.gbSurface : colors.surfaceBg,
+        background: isGbMode ? t.color.gbSurface : colors.bg.surface,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius.xl,
-        border: `1px solid ${hov ? `${ac}55` : colors.border}`,
+        border: `1px solid ${hov ? `${ac}55` : colors.border.default}`,
         borderTop: `2px solid ${ac}`,
         boxShadow: hov
           ? (isGbMode ? t.shadow.cardDarkHover : t.shadow.cardHover)
@@ -74,7 +74,7 @@ export function KpiStatCard({
         <span
           style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             fontWeight: t.font.weight.medium,
             letterSpacing: '0.04em',
@@ -107,7 +107,7 @@ export function KpiStatCard({
         style={{
           fontSize: isLong ? t.font.size.lg : t.font.size['3xl'],
           fontWeight: t.font.weight.bold,
-          color: isGbMode ? t.color.gbAccent : colors.textPrimary,
+          color: isGbMode ? t.color.gbAccent : colors.fg.default,
           fontFamily: t.font.family.sans,
           lineHeight: 1.1,
           textShadow: isGbMode ? `0 0 24px ${ac}55` : undefined,
@@ -121,7 +121,7 @@ export function KpiStatCard({
         <span
           style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}
         >

@@ -52,7 +52,7 @@ export function PageCard({
   return (
     <div
       style={{
-        background:    colors.surfaceBg,
+        background:    colors.bg.surface,
         borderRadius:  t.radius.xl,
         boxShadow:     isGbMode ? t.shadow.cardDark : t.shadow.card,
         display:       'flex',
@@ -80,7 +80,7 @@ export function PageCard({
             footerBare
               ? {
                   padding:    `0 ${t.space[6]}px`,
-                  borderTop:  `1px solid ${colors.borderSubtle}`,
+                  borderTop:  `1px solid ${colors.border.subtle}`,
                   flexShrink: 0,
                 }
               : {
@@ -89,7 +89,7 @@ export function PageCard({
                   justifyContent: footerJustify,
                   gap:            t.space[3],
                   padding:        `${t.space[3]}px ${t.space[6]}px`,
-                  borderTop:      `1px solid ${colors.borderSubtle}`,
+                  borderTop:      `1px solid ${colors.border.subtle}`,
                   flexShrink:     0,
                 }
           }

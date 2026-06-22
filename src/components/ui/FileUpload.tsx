@@ -222,8 +222,8 @@ export function FileUpload({
   const dropzoneBorder = hasError
     ? t.color.error.text
     : dragover
-    ? colors.brand
-    : colors.border
+    ? colors.accent.default
+    : colors.border.default
 
   const dropzoneBg = dragover
     ? (isGbMode ? 'rgba(16,185,129,0.08)' : t.color.brand[50])
@@ -231,13 +231,13 @@ export function FileUpload({
     ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.error.bg)
     : disabled
     ? (isGbMode ? 'rgba(255,255,255,0.02)' : t.color.disabled.bg)
-    : (isGbMode ? colors.inputBg : colors.surfaceBg)
+    : (isGbMode ? colors.bg.input : colors.bg.surface)
 
   const iconColor = dragover
-    ? colors.brand
+    ? colors.accent.default
     : disabled
-    ? colors.textMuted
-    : colors.textMuted
+    ? colors.fg.subtle
+    : colors.fg.subtle
 
   return (
     <div
@@ -260,7 +260,7 @@ export function FileUpload({
               style={{
                 fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.medium,
-                color: colors.textPrimary,
+                color: colors.fg.default,
               }}
             >
               {label}
@@ -270,7 +270,7 @@ export function FileUpload({
             <span
               style={{
                 fontSize: t.font.size.xs,
-                color: colors.textMuted,
+                color: colors.fg.subtle,
               }}
             >
               {hint}
@@ -349,7 +349,7 @@ export function FileUpload({
               margin: 0,
               fontSize:   t.font.size.sm,
               fontWeight: t.font.weight.medium,
-              color:      dragover ? colors.brand : colors.textPrimary,
+              color:      dragover ? colors.accent.default : colors.fg.default,
               transition: `color ${t.transition.DEFAULT}`,
             }}
           >
@@ -360,7 +360,7 @@ export function FileUpload({
               style={{
                 margin:     `${t.space[1]}px 0 0`,
                 fontSize:   t.font.size.xs,
-                color:      colors.textMuted,
+                color:      colors.fg.subtle,
               }}
             >
               {[
@@ -411,13 +411,13 @@ export function FileUpload({
                 flexDirection: 'column',
                 gap:          0,
                 padding:      `${t.space[2]}px ${t.space[3]}px`,
-                border:       `1px solid ${file.status === 'error' ? t.color.error.border : colors.border}`,
+                border:       `1px solid ${file.status === 'error' ? t.color.error.border : colors.border.default}`,
                 borderRadius: t.radius.DEFAULT,
                 background:   file.status === 'error'
                   ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.error.bg)
                   : file.status === 'done'
                   ? (isGbMode ? 'rgba(5,150,105,0.06)' : t.color.success.bg)
-                  : (isGbMode ? colors.surfaceBg : colors.surfaceSubtle),
+                  : (isGbMode ? colors.bg.surface : colors.bg.subtle),
                 transition:   `background ${t.transition.smooth}, border-color ${t.transition.DEFAULT}`,
               }}
             >
@@ -448,7 +448,7 @@ export function FileUpload({
                     style={{
                       fontSize:     t.font.size.sm,
                       fontWeight:   t.font.weight.medium,
-                      color:        colors.textPrimary,
+                      color:        colors.fg.default,
                       overflow:     'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace:   'nowrap',
@@ -460,7 +460,7 @@ export function FileUpload({
                   <span
                     style={{
                       fontSize: t.font.size.xs,
-                      color:    colors.textMuted,
+                      color:    colors.fg.subtle,
                     }}
                   >
                     {formatSize(file.size)}

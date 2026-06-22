@@ -78,8 +78,8 @@ function AreaChart() {
           const y = toY(gv)
           return (
             <g key={i}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border as string} strokeWidth={1} strokeDasharray="4 4" />
-              <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>{gv}</text>
+              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border.default as string} strokeWidth={1} strokeDasharray="4 4" />
+              <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>{gv}</text>
             </g>
           )
         })}
@@ -112,7 +112,7 @@ function AreaChart() {
 
         {/* X labels every 5 days */}
         {DAILY_VALUES.map((_, i) => (i % 5 === 0 || i === DAILY_VALUES.length - 1) && (
-          <text key={i} x={toX(i)} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+          <text key={i} x={toX(i)} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             D{i + 1}
           </text>
         ))}
@@ -124,11 +124,11 @@ function AreaChart() {
           left: tooltip.x + 14,
           top: tooltip.y - 44,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -136,7 +136,7 @@ function AreaChart() {
           whiteSpace: 'nowrap',
         }}>
           <div style={{ fontWeight: t.font.weight.semibold }}>Dia {hovPt + 1}</div>
-          <div style={{ color: colors.textSecondary as string }}>{DAILY_VALUES[hovPt]} sessões</div>
+          <div style={{ color: colors.fg.muted as string }}>{DAILY_VALUES[hovPt]} sessões</div>
         </div>
       )}
     </div>
@@ -227,10 +227,10 @@ function DonutModulos() {
             />
           )
         })}
-        <text x={cx} y={cy - 6} textAnchor="middle" fontSize={t.font.size.xl} fontWeight={t.font.weight.bold} fill={isGbMode ? '#4ade80' : colors.textPrimary as string} fontFamily={t.font.family.sans}>
+        <text x={cx} y={cy - 6} textAnchor="middle" fontSize={t.font.size.xl} fontWeight={t.font.weight.bold} fill={isGbMode ? '#4ade80' : colors.fg.default as string} fontFamily={t.font.family.sans}>
           183
         </text>
-        <text x={cx} y={cy + 11} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+        <text x={cx} y={cy + 11} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
           sessões
         </text>
       </svg>
@@ -241,11 +241,11 @@ function DonutModulos() {
           left: tooltip.x + 10,
           top: tooltip.y - 36,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -253,7 +253,7 @@ function DonutModulos() {
           whiteSpace: 'nowrap',
         }}>
           <div style={{ fontWeight: t.font.weight.semibold }}>{MODULOS[hovSeg].label}</div>
-          <div style={{ color: colors.textSecondary as string }}>{MODULOS[hovSeg].pct}% · {MODULOS[hovSeg].acessos} acessos</div>
+          <div style={{ color: colors.fg.muted as string }}>{MODULOS[hovSeg].pct}% · {MODULOS[hovSeg].acessos} acessos</div>
         </div>
       )}
 
@@ -275,9 +275,9 @@ function DonutModulos() {
             onMouseLeave={() => setHovSeg(null)}
           >
             <div style={{ width: 9, height: 9, borderRadius: 2, background: seg.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans, flex: 1 }}>{seg.label}</span>
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{seg.pct}%</span>
-            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>{seg.acessos}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string, fontFamily: t.font.family.sans, flex: 1 }}>{seg.label}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{seg.pct}%</span>
+            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>{seg.acessos}</span>
           </div>
         ))}
       </div>
@@ -336,7 +336,7 @@ function HourlyStackedChart() {
         {(['Web', 'Mobile', 'API'] as const).map((lbl, li) => (
           <div key={li} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
             <div style={{ width: 9, height: 9, borderRadius: 2, background: seriesColors[li] }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{lbl}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{lbl}</span>
           </div>
         ))}
       </div>
@@ -348,8 +348,8 @@ function HourlyStackedChart() {
           const y = PT + chartH - r * chartH
           return (
             <g key={i}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border as string} strokeWidth={1} strokeDasharray="3 3" />
-              {v > 0 && <text x={PL - 5} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>{v}</text>}
+              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border.default as string} strokeWidth={1} strokeDasharray="3 3" />
+              {v > 0 && <text x={PL - 5} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>{v}</text>}
             </g>
           )
         })}
@@ -390,7 +390,7 @@ function HourlyStackedChart() {
               })}
               <rect x={x} y={PT} width={colW} height={chartH} fill="transparent" />
               {(i % 3 === 0) && (
-                <text x={x + colW / 2} y={H - 6} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+                <text x={x + colW / 2} y={H - 6} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
                   {String(i).padStart(2, '0')}h
                 </text>
               )}
@@ -405,11 +405,11 @@ function HourlyStackedChart() {
           left: tooltip.x + 12,
           top: tooltip.y + 8,
           background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1] + 2}px ${t.space[2]}px`,
           fontSize: t.font.size.xs,
-          color: colors.textPrimary as string,
+          color: colors.fg.default as string,
           fontFamily: t.font.family.sans,
           boxShadow: t.shadow.lg,
           zIndex: t.zIndex.toast,
@@ -422,7 +422,7 @@ function HourlyStackedChart() {
             return (
               <div key={li} style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
                 <div style={{ width: 7, height: 7, borderRadius: 2, background: seriesColors[li], flexShrink: 0 }} />
-                <span style={{ color: colors.textSecondary as string }}>{lbl}:</span>
+                <span style={{ color: colors.fg.muted as string }}>{lbl}:</span>
                 <span style={{ fontWeight: t.font.weight.medium }}>{vals[li]}</span>
               </div>
             )
@@ -451,12 +451,12 @@ export default function DashUsuarios() {
     return () => clearTimeout(id)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -472,7 +472,7 @@ export default function DashUsuarios() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Análise de Usuários</span>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Análise de Usuários</span>
         <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
           Últimos 30 dias
         </Button>
@@ -484,8 +484,8 @@ export default function DashUsuarios() {
         {USR_KPIS.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             {kpi.trend && (
               <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
             )}
@@ -497,12 +497,12 @@ export default function DashUsuarios() {
       {/* Row 2 — Area chart + Donut */}
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Acessos Diários</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Acessos Diários</div>
           <AreaChart />
         </div>
         <VDivider color={bc} />
         <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Módulos Mais Acessados</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Módulos Mais Acessados</div>
           <DonutModulos />
         </div>
       </div>
@@ -510,7 +510,7 @@ export default function DashUsuarios() {
 
       {/* Row 3 — Hourly stacked */}
       <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Picos de Acesso por Hora</div>
+        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Picos de Acesso por Hora</div>
         <HourlyStackedChart />
       </div>
     </div>

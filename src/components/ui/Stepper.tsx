@@ -51,12 +51,12 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   height: circleSize,
                   borderRadius: t.radius.full,
                   flexShrink: 0,
-                  background: isCompleted ? t.color.brand[600] : colors.surfaceBg,
+                  background: isCompleted ? t.color.brand[600] : colors.bg.surface,
                   border: isCompleted
                     ? 'none'
                     : isActive
                     ? `2px solid ${t.color.brand[600]}`
-                    : `1.5px solid ${colors.border}`,
+                    : `1.5px solid ${colors.border.default}`,
                   transition: t.transition.smooth,
                   boxSizing: 'border-box',
                 }}
@@ -66,7 +66,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   fontSize: t.font.size.xs,
                   fontWeight: isActive ? t.font.weight.semibold : t.font.weight.normal,
                   fontFamily: t.font.family.sans,
-                  color: isCompleted || isActive ? t.color.brand[600] : colors.textMuted,
+                  color: isCompleted || isActive ? t.color.brand[600] : colors.fg.subtle,
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.1px',
                 }}
@@ -81,7 +81,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   flex: 1,
                   height: 1.5,
                   marginBottom: 19,
-                  background: isCompleted ? t.color.brand[600] : colors.border,
+                  background: isCompleted ? t.color.brand[600] : colors.border.default,
                   transition: t.transition.smooth,
                 }}
               />

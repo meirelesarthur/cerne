@@ -100,10 +100,10 @@ function HBarChart({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['
         return (
           <div key={i} onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} style={{ cursor: 'default' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.sm, color: colors.textSecondary as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
+              <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
                 {cat.label}
               </span>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
                 R$ {(cat.value / 1000).toFixed(0)}K
               </span>
             </div>
@@ -142,15 +142,15 @@ function FornecedoresList({ colors, isGbMode }: { colors: ReturnType<typeof useT
             }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
               <div>
-                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
                   {f.nome}
                 </div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
                   {f.categoria}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-                <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+                <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
                   {f.valor}
                 </span>
                 <span style={{
@@ -183,13 +183,13 @@ export default function DashSuprimentos() {
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex',
     flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode
@@ -223,8 +223,8 @@ export default function DashSuprimentos() {
         padding: `${t.space[4]}px ${t.space[5]}px`,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.textMuted as string} />
-          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+          <BarChart2 size={13} color={colors.fg.subtle as string} />
+          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
             Suprimentos
           </span>
         </div>
@@ -240,10 +240,10 @@ export default function DashSuprimentos() {
         {kpis.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             <Trend value={kpi.trend} up={kpi.up} />
@@ -260,10 +260,10 @@ export default function DashSuprimentos() {
       <div style={{ padding: `${t.space[5]}px` }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
           <div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1 }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
               284
             </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginTop: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
               Solicitações → Recebimentos — Funil de suprimentos
             </div>
           </div>
@@ -290,10 +290,10 @@ export default function DashSuprimentos() {
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
               {funnelMeta.map((meta, j) => (
                 <div key={j}>
-                  <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
                     {meta.label}
                   </div>
-                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
                     {meta.values[i]}
                   </div>
                 </div>
@@ -310,8 +310,8 @@ export default function DashSuprimentos() {
 
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.textMuted as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
+            <BarChart2 size={12} color={colors.fg.subtle as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
               Gastos por Categoria
             </span>
           </div>
@@ -322,8 +322,8 @@ export default function DashSuprimentos() {
 
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Users size={12} color={colors.textMuted as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
+            <Users size={12} color={colors.fg.subtle as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
               Top Fornecedores
             </span>
           </div>

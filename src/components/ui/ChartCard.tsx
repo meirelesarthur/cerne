@@ -26,11 +26,11 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? t.color.gbSurface : colors.surfaceBg,
+        background: isGbMode ? t.color.gbSurface : colors.bg.surface,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius['2xl'],
-        border: `1px solid ${colors.border}`,
+        border: `1px solid ${colors.border.default}`,
         boxShadow: hov
           ? (isGbMode ? t.shadow.cardDarkHover : t.shadow.cardHover)
           : (isGbMode ? t.shadow.cardDark     : t.shadow.card),
@@ -59,12 +59,12 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
             padding: `${t.space[1]}px ${t.space[2] + 2}px`,
           }}
         >
-          <Icon size={12} color={colors.textMuted as string} />
+          <Icon size={12} color={colors.fg.subtle as string} />
           <span
             style={{
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.medium,
-              color: colors.textSecondary,
+              color: colors.fg.muted,
               fontFamily: t.font.family.sans,
               letterSpacing: '0.01em',
             }}
@@ -83,7 +83,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
               width: 28,
               height: 28,
               borderRadius: t.radius.DEFAULT,
-              border: `1px solid ${colors.border}`,
+              border: `1px solid ${colors.border.default}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -95,7 +95,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
               opacity: hov ? 1 : 0.5,
             }}
           >
-            <ArrowUpRight size={13} color={colors.textMuted as string} />
+            <ArrowUpRight size={13} color={colors.fg.subtle as string} />
           </div>
         </div>
       </div>

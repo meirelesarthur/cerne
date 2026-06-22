@@ -60,11 +60,11 @@ function glassCard(
   extra?: React.CSSProperties,
 ): React.CSSProperties {
   return {
-    background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.surfaceBg,
+    background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.bg.surface,
     backdropFilter: isGbMode ? 'blur(20px)' : undefined,
     WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
     borderRadius: t.radius['2xl'],
-    border: `1px solid ${colors.border}`,
+    border: `1px solid ${colors.border.default}`,
     boxShadow: isGbMode
       ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
       : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -91,11 +91,11 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.surfaceBg,
+        background: isGbMode ? 'rgba(14, 42, 29, 0.55)' : colors.bg.surface,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius['2xl'],
-        border: `1px solid ${colors.border}`,
+        border: `1px solid ${colors.border.default}`,
         boxShadow: hov
           ? (isGbMode
               ? '0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4)'
@@ -116,11 +116,11 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
           borderRadius: t.radius.DEFAULT,
           padding: `${t.space[1]}px ${t.space[2] + 2}px`,
         }}>
-          <Icon size={12} color={colors.textMuted as string} />
+          <Icon size={12} color={colors.fg.subtle as string} />
           <span style={{
             fontSize: t.font.size.xs,
             fontWeight: t.font.weight.medium,
-            color: colors.textSecondary,
+            color: colors.fg.muted,
             fontFamily: t.font.family.sans,
           }}>
             {title}
@@ -134,7 +134,7 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
             style={{
               width: 28, height: 28,
               borderRadius: t.radius.DEFAULT,
-              border: `1px solid ${colors.border}`,
+              border: `1px solid ${colors.border.default}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
               background: btnHov ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100]) : 'transparent',
@@ -142,7 +142,7 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
               opacity: hov ? 1 : 0.5,
             }}
           >
-            <ArrowUpRight size={13} color={colors.textMuted as string} />
+            <ArrowUpRight size={13} color={colors.fg.subtle as string} />
           </div>
         </div>
       </div>
@@ -184,7 +184,7 @@ function KpiCard({ icon: Icon, label, value, sub, trend, trendUp, accent = 'gree
     red:   '#ef4444',
   }
   const accentBgs: Record<KpiAccent, string> = {
-    green: isGbMode ? 'rgba(16,185,129,0.1)'  : colors.brandBg,
+    green: isGbMode ? 'rgba(16,185,129,0.1)'  : colors.accent.subtle,
     amber: isGbMode ? 'rgba(245,158,11,0.1)'  : '#fefce8',
     red:   isGbMode ? 'rgba(239,68,68,0.1)'   : '#fee2e2',
   }
@@ -244,7 +244,7 @@ function KpiCard({ icon: Icon, label, value, sub, trend, trendUp, accent = 'gree
         <span
           style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             fontWeight: t.font.weight.medium,
             letterSpacing: '0.04em',
@@ -271,7 +271,7 @@ function KpiCard({ icon: Icon, label, value, sub, trend, trendUp, accent = 'gree
           {value}
         </div>
         {sub && (
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginTop: t.space[1] }}>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginTop: t.space[1] }}>
             {sub}
           </div>
         )}
@@ -371,7 +371,7 @@ function PluvioBarChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: b
                 fill={gray} opacity={dim ? 0.3 : 1}
                 style={{ transition: 'opacity 0.18s ease' }} />
               <text x={cx} y={baseY + 16} textAnchor="middle" fontSize={9}
-                fill={isH ? colors.brand : axis} fontFamily="Outfit, sans-serif"
+                fill={isH ? colors.accent.default : axis} fontFamily="Outfit, sans-serif"
                 fontWeight={isH ? 600 : 400}
                 style={{ transition: 'fill 0.15s ease' }}>{d.month}</text>
 
@@ -494,7 +494,7 @@ function VolumeAreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: 
                 fill={line} stroke={isGbMode ? '#051008' : '#fff'} strokeWidth={1.5}
                 filter={isGbMode && isH ? 'url(#dotGlow)' : undefined} />
               <text x={p.x} y={PT + cH + 18} textAnchor="middle" fontSize={8}
-                fill={isH ? colors.brand : axis} fontFamily="Outfit, sans-serif">{VOLUME_LABELS[i]}</text>
+                fill={isH ? colors.accent.default : axis} fontFamily="Outfit, sans-serif">{VOLUME_LABELS[i]}</text>
 
               {isH && (
                 <g>
@@ -546,9 +546,9 @@ export default function Pluviometria() {
   return (
     <div style={{
       margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.surfaceBg,
+      background: colors.bg.surface,
       borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border}`,
+      border: `1px solid ${colors.border.default}`,
       boxShadow: isGbMode
         ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)'
         : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -568,9 +568,9 @@ export default function Pluviometria() {
       <PageHeader
         title="Pluviômetro"
         breadcrumb={
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans }}>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
             Dashboards /{' '}
-            <span style={{ color: colors.brand }}>Pluviometria</span>
+            <span style={{ color: colors.accent.default }}>Pluviometria</span>
           </span>
         }
         actions={
@@ -578,9 +578,9 @@ export default function Pluviometria() {
             {isGbMode && (
               <span style={{
                 fontSize: t.font.size.xs,
-                color: colors.brand,
+                color: colors.accent.default,
                 fontFamily: t.font.family.sans,
-                background: colors.brandBg,
+                background: colors.accent.subtle,
                 border: `1px solid rgba(16,185,129,0.25)`,
                 borderRadius: t.radius.full,
                 padding: `${t.space[1]}px ${t.space[3]}px`,
@@ -755,21 +755,21 @@ export default function Pluviometria() {
           <div style={{ ...glassCard(colors, isGbMode), padding: `${t.space[4]}px ${t.space[3]}px`, flex: 1, boxSizing: 'border-box' }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1], paddingInline: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
                 Previsão da Semana
               </span>
               <span style={{
                 fontSize: t.font.size.xs,
-                color: colors.brand,
+                color: colors.accent.default,
                 fontFamily: t.font.family.sans,
-                background: colors.brandBg,
+                background: colors.accent.subtle,
                 borderRadius: t.radius.full,
                 padding: `2px ${t.space[2]}px`,
               }}>
                 Open-Meteo
               </span>
             </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontFamily: t.font.family.sans, marginBottom: t.space[3], paddingInline: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[3], paddingInline: t.space[1] }}>
               Prata (MG)
             </div>
 
@@ -803,7 +803,7 @@ export default function Pluviometria() {
                       fontSize: 10,
                       fontFamily: t.font.family.sans,
                       fontWeight: isToday ? t.font.weight.semibold : t.font.weight.normal,
-                      color: isToday ? colors.brand : colors.textMuted,
+                      color: isToday ? colors.accent.default : colors.fg.subtle,
                       letterSpacing: '0.03em',
                       lineHeight: 1,
                     }}>
@@ -820,7 +820,7 @@ export default function Pluviometria() {
                       fontWeight: t.font.weight.semibold,
                       color: isToday
                         ? (isGbMode ? t.color.brand[400] : t.color.brand[600])
-                        : colors.textPrimary,
+                        : colors.fg.default,
                       lineHeight: 1,
                     }}>
                       {f.max}°
@@ -830,7 +830,7 @@ export default function Pluviometria() {
                     <span style={{
                       fontSize: 10,
                       fontFamily: t.font.family.sans,
-                      color: colors.textMuted,
+                      color: colors.fg.subtle,
                       lineHeight: 1,
                     }}>
                       {f.min}°
@@ -857,7 +857,7 @@ export default function Pluviometria() {
                           {f.rain}
                         </span>
                       ) : (
-                        <span style={{ fontSize: 9, color: colors.borderSubtle, fontFamily: t.font.family.sans }}>—</span>
+                        <span style={{ fontSize: 9, color: colors.border.subtle, fontFamily: t.font.family.sans }}>—</span>
                       )}
                     </div>
                   </div>

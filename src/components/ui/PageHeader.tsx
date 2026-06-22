@@ -37,7 +37,7 @@ export function PageHeader({ title, description, actions, count, breadcrumb }: P
             style={{
               fontSize: t.font.size['2xl'],
               fontWeight: t.font.weight.bold,
-              color: colors.textPrimary,
+              color: colors.fg.default,
               fontFamily: t.font.family.sans,
               lineHeight: 1.2,
               transition: 'color 0.2s',
@@ -48,8 +48,8 @@ export function PageHeader({ title, description, actions, count, breadcrumb }: P
           {count !== undefined && (
             <span
               style={{
-                background: colors.surfaceSubtle,
-                color: colors.textMuted,
+                background: colors.bg.subtle,
+                color: colors.fg.subtle,
                 fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.medium,
                 fontFamily: t.font.family.sans,
@@ -67,7 +67,7 @@ export function PageHeader({ title, description, actions, count, breadcrumb }: P
           <span
             style={{
               fontSize: t.font.size.sm,
-              color: colors.textMuted,
+              color: colors.fg.subtle,
               fontFamily: t.font.family.sans,
               transition: 'color 0.2s',
             }}

@@ -100,8 +100,8 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
         const y = yOf(tick)
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="3,3" />
-            <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={9} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+            <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="3,3" />
+            <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
               {tick >= 1000000 ? `${(tick / 1000000).toFixed(1)}M` : `${(tick / 1000).toFixed(0)}K`}
             </text>
           </g>
@@ -109,7 +109,7 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
       })}
 
       {monthLabels.map((label, i) => (
-        <text key={i} x={xOf(i)} y={H - 6} textAnchor="middle" fontSize={9} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+        <text key={i} x={xOf(i)} y={H - 6} textAnchor="middle" fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
           {label}
         </text>
       ))}
@@ -157,10 +157,10 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
             height={58}
             rx={t.radius.DEFAULT}
             fill={tooltipFill}
-            stroke={colors.border as string}
+            stroke={colors.border.default as string}
             strokeWidth={0.8}
           />
-          <text x={Math.min(xOf(hovIdx) + 6, W - padR - 130) + 8} y={padT + 14} fontSize={9} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+          <text x={Math.min(xOf(hovIdx) + 6, W - padR - 130) + 8} y={padT + 14} fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             {monthLabels[hovIdx]}
           </text>
           {series.map((s, si) => (
@@ -278,7 +278,7 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.sm, color: colors.textPrimary as string, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
+              <span style={{ fontSize: t.font.size.sm, color: colors.fg.default as string, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
                 {conta.nome}
               </span>
               <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: t.color.brand[600], fontFamily: t.font.family.sans }}>
@@ -322,12 +322,12 @@ export default function DashLivroCaixa() {
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex', flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
@@ -343,7 +343,7 @@ export default function DashLivroCaixa() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>Livro Caixa</span>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Livro Caixa</span>
         <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
           Últimos 30 dias
         </Button>
@@ -355,8 +355,8 @@ export default function DashLivroCaixa() {
         {LC_KPIS.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             {kpi.trend && (
               <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
             )}
@@ -368,7 +368,7 @@ export default function DashLivroCaixa() {
       {/* Row 2 — Fluxo area chart full width */}
       <div style={{ padding: t.space[5] }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>Fluxo de Caixa — Realizado</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>Fluxo de Caixa — Realizado</div>
           <div style={{ display: 'flex', gap: t.space[5] }}>
             {[
               { label: 'Entradas', color: t.color.brand[600], dashed: false },
@@ -379,7 +379,7 @@ export default function DashLivroCaixa() {
                 <svg width={16} height={4} style={{ display: 'block' }}>
                   <line x1={0} y1={2} x2={16} y2={2} stroke={item.color} strokeWidth={2} strokeDasharray={item.dashed ? '4,3' : undefined} strokeLinecap="round" />
                 </svg>
-                <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{item.label}</span>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.label}</span>
               </div>
             ))}
           </div>
@@ -391,12 +391,12 @@ export default function DashLivroCaixa() {
       {/* Row 3 — Movimentações + Saldo por Conta */}
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
           <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
         </div>
         <VDivider color={bc} />
         <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />
         </div>
       </div>

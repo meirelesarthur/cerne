@@ -33,7 +33,7 @@ export const onlyDigits = (v: string) => v.replace(/\D/g, '')
 export function FieldGroupLabel({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme()
   return (
-    <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+    <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
       {children}
     </span>
   )
@@ -46,13 +46,13 @@ export function ToggleRow({ checked, onChange, label, hint, disabled }: {
 }) {
   const { colors } = useTheme()
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: colors.surfaceSubtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border}` }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border.default}` }}>
       <ToggleSwitch checked={checked} onChange={onChange} disabled={disabled} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary, fontFamily: t.font.family.sans }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
         {label}
         {hint && (
           <Tooltip label={hint}>
-            <span style={{ display: 'flex' }}><Info size={12} color={colors.textMuted} /></span>
+            <span style={{ display: 'flex' }}><Info size={12} color={colors.fg.subtle} /></span>
           </Tooltip>
         )}
       </div>
@@ -71,7 +71,7 @@ export function MultiCheck({ label, options, selected, onToggle, disabled }: {
       <FieldGroupLabel>{label}</FieldGroupLabel>
       <div style={{
         display: 'flex', flexWrap: 'wrap', gap: `${t.space[2]}px ${t.space[4]}px`,
-        padding: `${t.space[3]}px`, border: `1px solid ${colors.border}`, borderRadius: t.radius.DEFAULT, background: colors.surfaceBg,
+        padding: `${t.space[3]}px`, border: `1px solid ${colors.border.default}`, borderRadius: t.radius.DEFAULT, background: colors.bg.surface,
       }}>
         {options.map((o) => (
           <Checkbox key={o.value} label={o.label} checked={selected.includes(o.value)} onChange={() => onToggle(o.value)} disabled={disabled} />
@@ -97,7 +97,7 @@ export function BankFields({ bankId, accountType, agency, account, pixType, pix,
   const { colors } = useTheme()
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
-      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.textMuted, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.fg.subtle, fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         Dados Bancários
       </span>
       <div style={grid2}>

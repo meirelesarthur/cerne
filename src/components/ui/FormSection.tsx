@@ -18,10 +18,10 @@ export function FormSection({ title, subtitle, columns = 1, children }: FormSect
         style={{
           fontSize: t.font.size.base,
           fontWeight: t.font.weight.semibold,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           paddingBottom: t.space[2] + t.space[1] / 2,
-          borderBottom: `1px solid ${colors.border}`,
+          borderBottom: `1px solid ${colors.border.default}`,
           marginBottom: subtitle ? t.space[1] : 0,
         }}
       >
@@ -31,7 +31,7 @@ export function FormSection({ title, subtitle, columns = 1, children }: FormSect
         <div
           style={{
             fontSize: t.font.size.sm,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}
         >

@@ -18,7 +18,7 @@ export function CollapsibleSection({
 
   return (
     <div style={{
-      border: `1px solid ${colors.border}`,
+      border: `1px solid ${colors.border.default}`,
       borderRadius: t.radius.lg,
       overflow: 'hidden',
       marginBottom: t.space[3],
@@ -33,22 +33,22 @@ export function CollapsibleSection({
           alignItems: 'center',
           gap: 8,
           padding: `${t.space[3]}px ${t.space[4]}px`,
-          background: open ? colors.surfaceSubtle : colors.surfaceBg,
+          background: open ? colors.bg.subtle : colors.bg.surface,
           border: 'none',
           cursor: 'pointer',
           transition: 'background 0.15s',
-          borderBottom: open ? `1px solid ${colors.border}` : 'none',
+          borderBottom: open ? `1px solid ${colors.border.default}` : 'none',
         }}
         onMouseEnter={e => {
-          if (!open) (e.currentTarget as HTMLButtonElement).style.background = colors.surfaceSubtle
+          if (!open) (e.currentTarget as HTMLButtonElement).style.background = colors.bg.subtle
         }}
         onMouseLeave={e => {
-          if (!open) (e.currentTarget as HTMLButtonElement).style.background = colors.surfaceBg
+          if (!open) (e.currentTarget as HTMLButtonElement).style.background = colors.bg.surface
         }}
       >
         <ChevronRight
           size={13}
-          color={colors.textMuted}
+          color={colors.fg.subtle}
           style={{
             flexShrink: 0,
             transform: open ? 'rotate(90deg)' : 'none',
@@ -60,7 +60,7 @@ export function CollapsibleSection({
           textAlign: 'left',
           fontSize: t.font.size.xs,
           fontWeight: t.font.weight.bold,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           textTransform: 'uppercase',
           letterSpacing: '0.06em',
@@ -70,7 +70,7 @@ export function CollapsibleSection({
         {!open && fieldCount !== undefined && (
           <span style={{
             fontSize: t.font.size.xs,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             fontWeight: t.font.weight.normal,
           }}>

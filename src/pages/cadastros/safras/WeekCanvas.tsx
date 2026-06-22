@@ -101,7 +101,7 @@ export function WeekCanvas({
 
   if (weeks.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px 0', color: colors.textMuted, fontFamily: t.font.family.sans, fontSize: t.font.size.base }}>
+      <div style={{ textAlign: 'center', padding: '40px 0', color: colors.fg.subtle, fontFamily: t.font.family.sans, fontSize: t.font.size.base }}>
         Nenhuma semana gerada. Verifique as datas de início e fim.
       </div>
     )
@@ -114,12 +114,12 @@ export function WeekCanvas({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
           {desc && (
-            <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.textPrimary }}>
+            <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
               {desc}
             </span>
           )}
           {iniLabel && fimLabel && (
-            <span style={{ fontSize: t.font.size.sm, color: colors.textMuted }}>
+            <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle }}>
               {iniLabel} — {fimLabel} · {weeks.length} semanas
             </span>
           )}
@@ -133,7 +133,7 @@ export function WeekCanvas({
 
       {/* ── Visão geral (strip) ──────────────────────────────────────────── */}
       <div>
-        <div style={{ fontSize: t.font.size.xs, color: colors.textMuted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: t.font.weight.medium }}>
+        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: t.font.weight.medium }}>
           Visão geral — como aparecerá nos relatórios e calendários
         </div>
         <div style={{ height: 28 }}>
@@ -175,7 +175,7 @@ export function WeekCanvas({
                   position: 'absolute',
                   left: `${m.pct}%`,
                   fontSize: 9,
-                  color: colors.textMuted,
+                  color: colors.fg.subtle,
                   whiteSpace: 'nowrap',
                   transform: 'translateX(-50%)',
                   fontFamily: t.font.family.sans,
@@ -191,8 +191,8 @@ export function WeekCanvas({
 
       {/* ── Paleta (somente edit) ─────────────────────────────────────────── */}
       {editable && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', padding: '10px 14px', background: colors.surfaceSubtle, borderRadius: t.radius.lg }}>
-          <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontWeight: t.font.weight.semibold, marginRight: 4, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', padding: '10px 14px', background: colors.bg.subtle, borderRadius: t.radius.lg }}>
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontWeight: t.font.weight.semibold, marginRight: 4, whiteSpace: 'nowrap' }}>
             Pintar com:
           </span>
           {(Object.keys(WEEK_COLORS) as WeekColor[]).map(key => {
@@ -232,9 +232,9 @@ export function WeekCanvas({
               <div style={{
                 fontSize: t.font.size.sm,
                 fontWeight: t.font.weight.semibold,
-                color: colors.textPrimary,
+                color: colors.fg.default,
                 padding: '10px 0 6px',
-                borderBottom: `1px solid ${colors.border}`,
+                borderBottom: `1px solid ${colors.border.default}`,
                 marginBottom: 10,
               }}>
                 {yg.year}
@@ -248,7 +248,7 @@ export function WeekCanvas({
                     flexShrink: 0,
                     fontSize: t.font.size.xs,
                     fontWeight: t.font.weight.semibold,
-                    color: colors.textMuted,
+                    color: colors.fg.subtle,
                     textAlign: 'right',
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
@@ -347,9 +347,9 @@ export function WeekCanvas({
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
         paddingTop: 12,
-        borderTop: `1px solid ${colors.borderSubtle}`,
+        borderTop: `1px solid ${colors.border.subtle}`,
       }}>
-        <span style={{ fontSize: t.font.size.xs, color: colors.textMuted, fontWeight: t.font.weight.medium }}>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontWeight: t.font.weight.medium }}>
           Distribuição:
         </span>
         {(Object.keys(WEEK_COLORS) as WeekColor[])

@@ -62,7 +62,7 @@ export function EmptyState({
       {/* Ícone */}
       <div
         style={{
-          color:          isError ? t.color.error.text : colors.textMuted,
+          color:          isError ? t.color.error.text : colors.fg.subtle,
           opacity:        isError ? 0.9 : 0.65,
           display:        'flex',
           alignItems:     'center',
@@ -77,7 +77,7 @@ export function EmptyState({
         style={{
           fontSize:   t.font.size.md,
           fontWeight: t.font.weight.medium,
-          color:      colors.textSecondary,
+          color:      colors.fg.muted,
           fontFamily: t.font.family.sans,
         }}
       >
@@ -89,7 +89,7 @@ export function EmptyState({
         <span
           style={{
             fontSize:   t.font.size.sm,
-            color:      colors.textMuted,
+            color:      colors.fg.subtle,
             fontFamily: t.font.family.sans,
             maxWidth:   360,
             lineHeight: t.font.lineHeight.normal,

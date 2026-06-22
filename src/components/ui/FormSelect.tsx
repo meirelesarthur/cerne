@@ -26,7 +26,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
           style={{
             fontSize: t.font.size.sm,
             fontWeight: t.font.weight.medium,
-            color: colors.textPrimary,
+            color: colors.fg.default,
             fontFamily: t.font.family.sans,
             transition: 'color 0.2s',
           }}
@@ -54,13 +54,13 @@ export function FormSelect({ label, required, error, hint, options, style, class
             height: t.size.control,
             border: error
               ? `1.5px solid ${t.color.error.text}`
-              : `1.5px solid ${colors.border}`,
+              : `1.5px solid ${colors.border.default}`,
             borderRadius: t.radius.DEFAULT,
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
-            color: selectProps.disabled ? t.color.disabled.text : colors.textPrimary,
-            background: selectProps.disabled ? t.color.disabled.bg : colors.inputBg,
+            color: selectProps.disabled ? t.color.disabled.text : colors.fg.default,
+            background: selectProps.disabled ? t.color.disabled.bg : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
             appearance: 'none',
@@ -70,12 +70,12 @@ export function FormSelect({ label, required, error, hint, options, style, class
             ...style,
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.brand
+            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.accent.default
             e.currentTarget.style.boxShadow = error ? t.glow.error : t.glow.brand
             selectProps.onFocus?.(e)
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border
+            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border.default
             e.currentTarget.style.boxShadow = 'none'
             selectProps.onBlur?.(e)
           }}

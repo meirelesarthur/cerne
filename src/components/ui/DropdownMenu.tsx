@@ -63,17 +63,17 @@ export function DropdownMenu({
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'center',
-          background:     open ? colors.brandBg : 'transparent',
-          border:         `1px solid ${open ? colors.brand : 'transparent'}`,
+          background:     open ? colors.accent.subtle : 'transparent',
+          border:         `1px solid ${open ? colors.accent.default : 'transparent'}`,
           borderRadius:   t.radius.DEFAULT,
           cursor:         'pointer',
-          color:          open ? colors.brand : colors.textSecondary,
+          color:          open ? colors.accent.default : colors.fg.muted,
           transition:     `background ${t.transition.fast}, border-color ${t.transition.fast}`,
         }}
         onMouseEnter={(e) => {
           if (!open) {
-            e.currentTarget.style.background = colors.surfaceSubtle
-            e.currentTarget.style.borderColor = colors.border
+            e.currentTarget.style.background = colors.bg.subtle
+            e.currentTarget.style.borderColor = colors.border.default
           }
         }}
         onMouseLeave={(e) => {
@@ -93,8 +93,8 @@ export function DropdownMenu({
             position:     'absolute',
             top:          'calc(100% + 4px)',
             [align]:      0,
-            background:   colors.surfaceBg,
-            border:       `1px solid ${colors.border}`,
+            background:   colors.bg.surface,
+            border:       `1px solid ${colors.border.default}`,
             borderRadius: t.radius.lg,
             boxShadow:    isGbMode ? t.shadow.cardDarkHover : t.shadow.lg,
             zIndex:       t.zIndex.dropdown,
@@ -105,7 +105,7 @@ export function DropdownMenu({
           {items.map((item, i) => (
             <React.Fragment key={item.id}>
               {item.divider && i > 0 && (
-                <div style={{ height: 1, background: colors.borderSubtle }} />
+                <div style={{ height: 1, background: colors.border.subtle }} />
               )}
               <DropdownRow
                 item={item}
@@ -145,11 +145,11 @@ function DropdownRow({
         border:     'none',
         cursor:     'pointer',
         background:  hov
-          ? (danger ? t.color.error.bg : colors.surfaceSubtle)
+          ? (danger ? t.color.error.bg : colors.bg.subtle)
           : 'transparent',
         color: danger
-          ? (hov ? t.color.error.text : colors.textSecondary)
-          : (hov ? colors.textPrimary : colors.textSecondary),
+          ? (hov ? t.color.error.text : colors.fg.muted)
+          : (hov ? colors.fg.default : colors.fg.muted),
         fontSize:   t.font.size.sm,
         fontFamily: t.font.family.sans,
         fontWeight: t.font.weight.medium,

@@ -18,14 +18,14 @@ export function Divider({ label }: DividerProps) {
     >
       <div
         aria-hidden="true"
-        style={{ flex: 1, height: 1, background: colors.border }}
+        style={{ flex: 1, height: 1, background: colors.border.default }}
       />
       {label && (
         <span
           style={{
             fontSize: t.font.size.xs,
             fontFamily: t.font.family.sans,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             whiteSpace: 'nowrap',
             flexShrink: 0,
           }}
@@ -35,7 +35,7 @@ export function Divider({ label }: DividerProps) {
       )}
       <div
         aria-hidden="true"
-        style={{ flex: 1, height: 1, background: colors.border }}
+        style={{ flex: 1, height: 1, background: colors.border.default }}
       />
     </div>
   )

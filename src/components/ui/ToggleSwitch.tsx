@@ -25,7 +25,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
           width: t.size.toggle.track,
           height: 22,
           borderRadius: t.radius.full,
-          background: checked ? t.color.brand[600] : colors.border,
+          background: checked ? t.color.brand[600] : colors.border.default,
           border: 'none',
           cursor: disabled ? 'not-allowed' : 'pointer',
           transition: `background ${t.transition.smooth}`,
@@ -52,7 +52,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
         <span style={{
           fontSize: t.font.size.sm,
           fontWeight: t.font.weight.medium,
-          color: disabled ? colors.textMuted : colors.textPrimary,
+          color: disabled ? colors.fg.subtle : colors.fg.default,
           fontFamily: t.font.family.sans,
           transition: 'color 0.2s',
         }}>

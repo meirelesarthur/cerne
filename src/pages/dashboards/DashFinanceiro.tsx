@@ -128,9 +128,9 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
         return (
           <g key={i}>
             <line x1={padL} y1={y} x2={W - padR} y2={y}
-              stroke={colors.border as string} strokeWidth={0.5} strokeDasharray="3,3" />
+              stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="3,3" />
             <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={9}
-              fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+              fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
               {tick >= 1000000 ? `${(tick / 1000000).toFixed(1)}M` : `${(tick / 1000).toFixed(0)}K`}
             </text>
           </g>
@@ -139,7 +139,7 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
 
       {monthLabels.map((label, i) => (
         <text key={i} x={xOf(i)} y={H - 6} textAnchor="middle" fontSize={9}
-          fill={hovIdx === i ? (colors.textPrimary as string) : (colors.textMuted as string)}
+          fill={hovIdx === i ? (colors.fg.default as string) : (colors.fg.subtle as string)}
           fontFamily={t.font.family.sans} fontWeight={hovIdx === i ? 600 : 400}>
           {label}
         </text>
@@ -168,9 +168,9 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
       {hovIdx !== null && (
         <g>
           <rect x={Math.min(xOf(hovIdx) - 4, W - padR - 110)} y={padT} width={108} height={46}
-            rx={t.radius.DEFAULT} fill={tooltipFill} stroke={colors.border as string} strokeWidth={0.8} />
+            rx={t.radius.DEFAULT} fill={tooltipFill} stroke={colors.border.default as string} strokeWidth={0.8} />
           <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 14}
-            fontSize={9} fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+            fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             {monthLabels[hovIdx]}
           </text>
           <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 27}
@@ -216,11 +216,11 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
         <path d={describeArc(startAng, startAng + fillPct * 180)} fill="none"
           stroke={t.color.brand[600]} strokeWidth={sw} strokeLinecap="round" />
         <text x={cx} y={cy - 14} textAnchor="middle" fontSize={22} fontWeight={700}
-          fill={isGbMode ? '#4ade80' : colors.textPrimary as string} fontFamily={t.font.family.sans}>
+          fill={isGbMode ? '#4ade80' : colors.fg.default as string} fontFamily={t.font.family.sans}>
           68%
         </text>
         <text x={cx} y={cy} textAnchor="middle" fontSize={10}
-          fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+          fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
           R$ 6,12M / R$ 9,0M
         </text>
       </svg>
@@ -228,7 +228,7 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
         {[{ label: 'Realizado', color: t.color.brand[600] }, { label: 'Disponível', color: t.color.neutral[300] }].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
             <div style={{ width: 8, height: 8, borderRadius: t.radius.full, background: item.color }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>{item.label}</span>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.label}</span>
           </div>
         ))}
       </div>
@@ -282,11 +282,11 @@ function DonutChart({ colors }: { colors: ReturnType<typeof useTheme>['colors'] 
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
         ))}
         <text x={cx} y={cy - 4} textAnchor="middle" fontSize={12} fontWeight={700}
-          fill={colors.textPrimary as string} fontFamily={t.font.family.sans}>
+          fill={colors.fg.default as string} fontFamily={t.font.family.sans}>
           {hovIdx !== null ? `${donutData[hovIdx].pct}%` : '100%'}
         </text>
         <text x={cx} y={cy + 12} textAnchor="middle" fontSize={9}
-          fill={colors.textMuted as string} fontFamily={t.font.family.sans}>
+          fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
           {hovIdx !== null ? donutData[hovIdx].label : 'Total'}
         </text>
       </svg>
@@ -294,10 +294,10 @@ function DonutChart({ colors }: { colors: ReturnType<typeof useTheme>['colors'] 
         {donutData.map((d, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
             <div style={{ width: 10, height: 10, borderRadius: 2, background: d.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textSecondary as string, fontFamily: t.font.family.sans }}>
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string, fontFamily: t.font.family.sans }}>
               {d.label}
             </span>
-            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans, marginLeft: 'auto' }}>
+            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans, marginLeft: 'auto' }}>
               {d.pct}%
             </span>
           </div>
@@ -326,15 +326,15 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
               transition: 'background 0.15s ease', cursor: 'default',
             }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+              <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
                 {item.nome}
               </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, fontFamily: t.font.family.sans }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
                 Vence {item.data}
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string, fontFamily: t.font.family.sans }}>
+              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
                 {item.valor}
               </span>
               <span style={{
@@ -364,13 +364,13 @@ export default function DashFinanceiro() {
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border as string
+  const bc = colors.border.default as string
 
   const cardStyle: React.CSSProperties = {
     margin: `${t.space[5]}px ${t.space[6]}px`,
     display: 'flex',
     flexDirection: 'column',
-    background: colors.surfaceBg,
+    background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
     boxShadow: isGbMode
@@ -404,8 +404,8 @@ export default function DashFinanceiro() {
         padding: `${t.space[4]}px ${t.space[5]}px`,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.textMuted as string} />
-          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.textPrimary as string }}>
+          <BarChart2 size={13} color={colors.fg.subtle as string} />
+          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
             Financeiro
           </span>
         </div>
@@ -421,10 +421,10 @@ export default function DashFinanceiro() {
         {kpis.flatMap((kpi, i) => [
           i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[1] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
             <Trend value={kpi.trend} up={kpi.up} />
@@ -441,10 +441,10 @@ export default function DashFinanceiro() {
         <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[3] }}>
             <div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.textPrimary as string, lineHeight: 1 }}>
+              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
                 R$ 892K
               </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginTop: t.space[1] }}>
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
                 Receitas vs Despesas — 12 meses
               </div>
             </div>
@@ -452,7 +452,7 @@ export default function DashFinanceiro() {
               {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.error.solid, label: 'Despesas' }].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 8, height: 2, borderRadius: 1, background: s.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>{s.label}</span>
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>{s.label}</span>
                 </div>
               ))}
             </div>
@@ -465,14 +465,14 @@ export default function DashFinanceiro() {
         {/* Donut + Gauge stacked */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[3] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[3] }}>
               Despesas por Categoria
             </div>
             <DonutChart colors={colors} />
           </div>
           <HDivider color={bc} />
           <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.textMuted as string, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[2] }}>
               Orçamento Anual
             </div>
             <ArcGauge colors={colors} isGbMode={isGbMode} />
@@ -488,8 +488,8 @@ export default function DashFinanceiro() {
         {/* Heatmap */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.textMuted as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
+            <BarChart2 size={12} color={colors.fg.subtle as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
               Atividade de Receita por Hora
             </span>
           </div>
@@ -507,8 +507,8 @@ export default function DashFinanceiro() {
         {/* Vencimentos */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Clock size={12} color={colors.textMuted as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.textMuted as string }}>
+            <Clock size={12} color={colors.fg.subtle as string} />
+            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
               Vencimentos Próximos — 30 dias
             </span>
           </div>

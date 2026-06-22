@@ -141,14 +141,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'cpfCnpj',
       label: 'CPF / CNPJ',
       render: (row) => (
-        <span style={{ color: colors.textSecondary, fontSize: 12 }}>{row.cpfCnpj}</span>
+        <span style={{ color: colors.fg.muted, fontSize: 12 }}>{row.cpfCnpj}</span>
       ),
     },
     {
       key: 'cidadeUf',
       label: 'Cidade / UF',
       render: (row) => (
-        <span style={{ color: colors.textSecondary }}>
+        <span style={{ color: colors.fg.muted }}>
           {row.cidade} — {row.uf}
         </span>
       ),
@@ -268,7 +268,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           actions={
             <>
               <ViewToggle value={viewMode} onChange={setViewMode} colors={colors} />
-              <div style={{ width: 1, height: 22, background: colors.border, flexShrink: 0 }} />
+              <div style={{ width: 1, height: 22, background: colors.border.default, flexShrink: 0 }} />
               <FilterButton
                 active={activeFilterCount > 0}
                 count={activeFilterCount}
@@ -303,7 +303,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               <div style={{
                 marginTop: t.space[4],
                 paddingTop: t.space[4],
-                borderTop: `1px solid ${colors.borderSubtle}`,
+                borderTop: `1px solid ${colors.border.subtle}`,
               }}>
                 <Pagination
                   page={page}
@@ -326,7 +326,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               <div style={{
                 marginTop: t.space[4],
                 paddingTop: t.space[4],
-                borderTop: `1px solid ${colors.borderSubtle}`,
+                borderTop: `1px solid ${colors.border.subtle}`,
               }}>
                 <Pagination
                   page={page}
@@ -429,8 +429,8 @@ function KpiBar({
     },
   ]
 
-  const cardBg    = isGbMode ? t.color.row.hoverGb : colors.surfaceBg
-  const border    = colors.border
+  const cardBg    = isGbMode ? t.color.row.hoverGb : colors.bg.surface
+  const border    = colors.border.default
 
   return (
     <div
@@ -459,7 +459,7 @@ function KpiBar({
           <span style={{
             fontSize: t.font.size.xs,
             fontWeight: t.font.weight.medium,
-            color: colors.textMuted,
+            color: colors.fg.subtle,
             fontFamily: t.font.family.sans,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
@@ -471,7 +471,7 @@ function KpiBar({
             <span style={{
               fontSize: t.font.size['3xl'],
               fontWeight: t.font.weight.bold,
-              color: colors.textPrimary,
+              color: colors.fg.default,
               fontFamily: t.font.family.sans,
               lineHeight: 1,
             }}>
@@ -489,12 +489,12 @@ function KpiBar({
                   ? t.color.success.text
                   : item.trend === 'down'
                     ? t.color.error.text
-                    : colors.textMuted,
+                    : colors.fg.subtle,
                 background: item.trend === 'up'
                   ? t.color.success.bg
                   : item.trend === 'down'
                     ? t.color.error.bg
-                    : colors.surfaceSubtle,
+                    : colors.bg.subtle,
                 padding: '2px 6px',
                 borderRadius: t.radius.full,
               }}>
@@ -507,7 +507,7 @@ function KpiBar({
             {item.sub && (
               <span style={{
                 fontSize: t.font.size.sm,
-                color: colors.textMuted,
+                color: colors.fg.subtle,
                 fontFamily: t.font.family.sans,
               }}>
                 {item.sub}
@@ -539,7 +539,7 @@ function ViewToggle({
   return (
     <div style={{
       display: 'inline-flex',
-      border: `1.5px solid ${colors.border}`,
+      border: `1.5px solid ${colors.border.default}`,
       borderRadius: t.radius.DEFAULT,
       overflow: 'hidden',
       flexShrink: 0,
@@ -555,10 +555,10 @@ function ViewToggle({
             onClick={() => onChange(item.mode)}
             aria-pressed={active}
             style={{
-              borderRight:  idx < items.length - 1 ? `1.5px solid ${colors.border}` : undefined,
+              borderRight:  idx < items.length - 1 ? `1.5px solid ${colors.border.default}` : undefined,
               borderRadius: 0,
-              background:   active ? colors.brandBg   : colors.surfaceBg,
-              color:        active ? colors.brand      : colors.textSecondary,
+              background:   active ? colors.accent.subtle   : colors.bg.surface,
+              color:        active ? colors.accent.default      : colors.fg.muted,
               fontWeight:   active ? t.font.weight.semibold : t.font.weight.medium,
               height:       34,
               padding:      `0 ${t.space[3]}px`,
@@ -625,8 +625,8 @@ function FazendaCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: hovered ? colors.surfaceSubtle : colors.surfaceBg,
-        border: `1.5px solid ${hovered ? t.color.brand[300] : colors.border}`,
+        background: hovered ? colors.bg.subtle : colors.bg.surface,
+        border: `1.5px solid ${hovered ? t.color.brand[300] : colors.border.default}`,
         borderRadius: t.radius.xl,
         padding: t.space[4],
         cursor: 'pointer',
@@ -642,7 +642,7 @@ function FazendaCard({
         <span style={{
           fontSize: t.font.size.md,
           fontWeight: t.font.weight.semibold,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           lineHeight: 1.3,
           flex: 1,
@@ -654,21 +654,21 @@ function FazendaCard({
 
       {/* Infos */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] + 2 }}>
-        <InfoRow icon={<MapPin size={12} />} color={colors.textMuted}>
+        <InfoRow icon={<MapPin size={12} />} color={colors.fg.subtle}>
           {row.cidade} — {row.uf}
         </InfoRow>
-        <InfoRow icon={<Layers size={12} />} color={colors.textMuted}>
+        <InfoRow icon={<Layers size={12} />} color={colors.fg.subtle}>
           <Badge label={row.tipoExploracao} variant={tipoVariant} />
         </InfoRow>
-        <InfoRow icon={<Ruler size={12} />} color={colors.textMuted}>
-          <strong style={{ color: colors.textPrimary, fontWeight: t.font.weight.semibold }}>
+        <InfoRow icon={<Ruler size={12} />} color={colors.fg.subtle}>
+          <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.semibold }}>
             {row.areaTotal.toLocaleString('pt-BR')} ha
           </strong>
         </InfoRow>
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: colors.borderSubtle }} />
+      <div style={{ height: 1, background: colors.border.subtle }} />
 
       {/* Footer actions */}
       <div

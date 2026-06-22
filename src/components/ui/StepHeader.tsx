@@ -16,7 +16,7 @@ export function StepHeader({ title, subtitle }: StepHeaderProps) {
         style={{
           fontSize: t.font.size['2xl'],
           fontWeight: t.font.weight.bold,
-          color: colors.textPrimary,
+          color: colors.fg.default,
           fontFamily: t.font.family.sans,
           margin: `0 0 ${t.space[2]}px`,
           letterSpacing: '-0.4px',
@@ -29,7 +29,7 @@ export function StepHeader({ title, subtitle }: StepHeaderProps) {
       <p
         style={{
           fontSize: t.font.size.base,
-          color: colors.textMuted,
+          color: colors.fg.subtle,
           fontFamily: t.font.family.sans,
           margin: 0,
           lineHeight: t.font.lineHeight.normal,

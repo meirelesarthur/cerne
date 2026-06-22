@@ -136,7 +136,7 @@ function FornecedoresList({ colors, isGbMode }: { colors: ReturnType<typeof useT
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
               transition: 'background 0.15s ease', cursor: 'default',
             }}>

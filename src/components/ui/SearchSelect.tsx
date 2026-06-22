@@ -140,10 +140,10 @@ export function SearchSelect({
           display: 'flex', alignItems: 'center', gap: t.space[1] + 3,
           height: t.size.control,
           border: `1.5px solid ${error ? t.color.feedback.error.text : open ? t.color.brand[600] : colors.border.default}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.base,
           padding: `0 ${t.space[2] + 2}px`,
           background: colors.bg.surface,
-          transition: `border-color ${t.transition.DEFAULT}`,
+          transition: `border-color ${t.transition.base}`,
         }}>
           <Search size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} aria-hidden="true" />
           <input

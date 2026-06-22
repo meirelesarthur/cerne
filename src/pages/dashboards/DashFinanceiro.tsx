@@ -168,7 +168,7 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
       {hovIdx !== null && (
         <g>
           <rect x={Math.min(xOf(hovIdx) - 4, W - padR - 110)} y={padT} width={108} height={46}
-            rx={t.radius.DEFAULT} fill={tooltipFill} stroke={colors.border.default as string} strokeWidth={0.8} />
+            rx={t.radius.base} fill={tooltipFill} stroke={colors.border.default as string} strokeWidth={0.8} />
           <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 14}
             fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
             {monthLabels[hovIdx]}
@@ -321,7 +321,7 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
               transition: 'background 0.15s ease', cursor: 'default',
             }}>

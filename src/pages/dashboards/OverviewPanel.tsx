@@ -332,7 +332,7 @@ export default function OverviewPanel() {
         <div style={{
           position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
           display: 'flex', alignItems: 'center', gap: t.space[1],
-          background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.DEFAULT,
+          background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.base,
           padding: `5px ${t.space[2]}px`, backdropFilter: 'blur(4px)',
           boxShadow: t.shadow.sm, cursor: 'pointer',
         }}>

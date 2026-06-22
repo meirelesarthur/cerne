@@ -314,7 +314,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             fontWeight: t.font.weight.medium,
             color: !anual ? colors.fg.default : colors.fg.subtle,
             fontFamily: t.font.family.sans,
-            transition: `color ${t.transition.DEFAULT}`,
+            transition: `color ${t.transition.base}`,
           }}>
             Mensal
           </span>
@@ -324,7 +324,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             fontWeight: t.font.weight.medium,
             color: anual ? colors.fg.default : colors.fg.subtle,
             fontFamily: t.font.family.sans,
-            transition: `color ${t.transition.DEFAULT}`,
+            transition: `color ${t.transition.base}`,
           }}>
             Anual
           </span>

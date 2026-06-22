@@ -42,7 +42,7 @@ export function RepeaterList<T>({
         <div style={{
           padding:    `${t.space[3]}px ${t.space[4]}px`,
           border:     `1px dashed ${colors.border.default}`,
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.base,
           fontSize:   t.font.size.sm,
           color:      colors.fg.subtle,
           fontFamily: t.font.family.sans,

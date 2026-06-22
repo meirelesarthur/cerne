@@ -130,14 +130,14 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           const sharedStyle: React.CSSProperties = {
             width: '100%',
             border: `1.5px solid ${borderColor}`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.base,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
             color: colors.fg.default,
             background: isError ? t.color.feedback.error.bg : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
-            transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
+            transition: `border-color ${t.transition.base}, background ${t.transition.smooth}`,
           }
           const focusHandlers = {
             onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {

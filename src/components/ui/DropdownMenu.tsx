@@ -65,7 +65,7 @@ export function DropdownMenu({
           justifyContent: 'center',
           background:     open ? colors.accent.subtle : 'transparent',
           border:         `1px solid ${open ? colors.accent.default : 'transparent'}`,
-          borderRadius:   t.radius.DEFAULT,
+          borderRadius:   t.radius.base,
           cursor:         'pointer',
           color:          open ? colors.accent.default : colors.fg.muted,
           transition:     `background ${t.transition.fast}, border-color ${t.transition.fast}`,

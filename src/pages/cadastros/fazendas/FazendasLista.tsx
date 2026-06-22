@@ -540,7 +540,7 @@ function ViewToggle({
     <div style={{
       display: 'inline-flex',
       border: `1.5px solid ${colors.border.default}`,
-      borderRadius: t.radius.DEFAULT,
+      borderRadius: t.radius.base,
       overflow: 'hidden',
       flexShrink: 0,
     }}>
@@ -630,7 +630,7 @@ function FazendaCard({
         borderRadius: t.radius.xl,
         padding: t.space[4],
         cursor: 'pointer',
-        transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, box-shadow ${t.transition.DEFAULT}`,
+        transition: `background ${t.transition.base}, border-color ${t.transition.base}, box-shadow ${t.transition.base}`,
         boxShadow: hovered ? t.shadow.cardHover : 'none',
         display: 'flex',
         flexDirection: 'column',

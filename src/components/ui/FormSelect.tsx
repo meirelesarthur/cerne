@@ -55,7 +55,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
             border: error
               ? `1.5px solid ${t.color.feedback.error.text}`
               : `1.5px solid ${colors.border.default}`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.base,
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
@@ -66,7 +66,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
             appearance: 'none',
             cursor: selectProps.disabled ? 'not-allowed' : 'pointer',
             opacity: selectProps.disabled ? 0.7 : 1,
-            transition: `border-color ${t.transition.DEFAULT}, box-shadow ${t.transition.DEFAULT}, background ${t.transition.smooth}, color ${t.transition.smooth}`,
+            transition: `border-color ${t.transition.base}, box-shadow ${t.transition.base}, background ${t.transition.smooth}, color ${t.transition.smooth}`,
             ...style,
           }}
           onFocus={(e) => {

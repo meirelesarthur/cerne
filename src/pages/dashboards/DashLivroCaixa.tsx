@@ -155,7 +155,7 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
             y={padT}
             width={122}
             height={58}
-            rx={t.radius.DEFAULT}
+            rx={t.radius.base}
             fill={tooltipFill}
             stroke={colors.border.default as string}
             strokeWidth={0.8}
@@ -270,7 +270,7 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
             onMouseLeave={() => setHovIdx(null)}
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               background: hovIdx === i
                 ? (isGbMode ? 'rgba(255,255,255,0.04)' : t.color.neutral[50])
                 : 'transparent',

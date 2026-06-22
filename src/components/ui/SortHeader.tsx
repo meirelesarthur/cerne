@@ -55,7 +55,7 @@ export function SortHeader({
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
         justifyContent: align === 'right' ? 'flex-end' : align === 'center' ? 'center' : 'flex-start',
-        transition: `color ${t.transition.DEFAULT}`,
+        transition: `color ${t.transition.base}`,
       }}
     >
       {label}

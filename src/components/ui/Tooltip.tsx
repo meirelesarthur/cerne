@@ -54,7 +54,7 @@ export function Tooltip({ label, children }: TooltipProps) {
               fontWeight: t.font.weight.medium,
               letterSpacing: '0.1px',
               padding: `${t.space[1] + 2}px ${t.space[3] - 1}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
               zIndex: t.zIndex.toast,

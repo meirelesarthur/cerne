@@ -153,7 +153,7 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
           </div>
 
           {/* Ativo */}
-          <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border.default}` }}>
+          <div style={{ marginBottom: t.space[6], display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[3]}px ${t.space[4]}px`, background: colors.bg.subtle, borderRadius: t.radius.base, border: `1px solid ${colors.border.default}` }}>
             <ToggleSwitch checked={ativo} onChange={setAtivo} disabled={submitting} />
             <div>
               <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>

@@ -57,7 +57,7 @@ export function StepFornecedor({ form, errors, setRole, disabled }: StepProps) {
               onAdd={() => setRole('provider', { branches: [...p.branches, { nif: '', stateRegistration: '', zipCode: '', address: '', cityId: '' }] })}
               onRemove={(i) => setRole('provider', { branches: p.branches.filter((_, idx) => idx !== i) })}
               renderRow={(b, i) => (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], padding: t.space[3], border: `1px solid ${colors.border.default}`, borderRadius: t.radius.DEFAULT, background: colors.bg.subtle }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], padding: t.space[3], border: `1px solid ${colors.border.default}`, borderRadius: t.radius.base, background: colors.bg.subtle }}>
                   <div style={grid2}>
                     <FormField label="CNPJ da Filial" mask="cnpj" inputMode="numeric" value={b.nif} onChange={(e) => setRole('provider', { branches: p.branches.map((x, idx) => idx === i ? { ...x, nif: e.target.value } : x) })} disabled={disabled} />
                     <FormField label="Inscrição Estadual" value={b.stateRegistration} onChange={(e) => setRole('provider', { branches: p.branches.map((x, idx) => idx === i ? { ...x, stateRegistration: e.target.value } : x) })} disabled={disabled} />

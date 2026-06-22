@@ -76,7 +76,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, var
               gap:          t.space[1],
               background:   colors.bg.subtle,
               padding:      t.space[1],
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               border:       `1px solid ${colors.border.default}`,
             }
       }
@@ -111,7 +111,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, var
                     padding:               `${t.space[2]}px ${t.space[3] + t.space[1]}px`,
                     cursor:                'pointer',
                     whiteSpace:            'nowrap',
-                    transition:            `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}`,
+                    transition:            `background ${t.transition.base}, color ${t.transition.base}, border-color ${t.transition.base}`,
                   }
                 : {
                     display:        'inline-flex',
@@ -128,7 +128,7 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, var
                     borderRadius:   t.radius.md,
                     cursor:         'pointer',
                     whiteSpace:     'nowrap',
-                    transition:     `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+                    transition:     `background ${t.transition.base}, color ${t.transition.base}`,
                   }
             }
           >

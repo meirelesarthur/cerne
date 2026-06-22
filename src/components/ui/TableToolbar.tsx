@@ -23,17 +23,17 @@ export function TableSearchInput({
         display: 'flex', alignItems: 'center', gap: t.space[2],
         height: t.size.control,
         border: `1.5px solid ${focused ? t.color.brand[600] : colors.border.default}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.base,
         padding: `0 ${t.space[2] + 2}px`,
         background: colors.bg.surface,
-        transition: `border-color ${t.transition.DEFAULT}`,
+        transition: `border-color ${t.transition.base}`,
         minWidth: 220,
       }}
     >
       <Search
         size={13}
         color={focused ? t.color.brand[600] : colors.fg.subtle}
-        style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
+        style={{ flexShrink: 0, transition: `color ${t.transition.base}` }}
       />
       <input
         type="search"
@@ -77,7 +77,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
         height: t.size.control,
         background: colors.accent.subtle,
         border: `1.5px solid ${colors.accent.default}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.base,
         padding: `0 ${t.space[2]}px 0 ${t.space[2] + 2}px`,
         fontSize: t.font.size.sm,
         color: colors.accent.default,
@@ -130,14 +130,14 @@ export function FilterButton({
         background: active    ? colors.accent.subtle
           : hovered ? colors.bg.subtle : colors.bg.surface,
         border: `1.5px solid ${active ? colors.accent.default : colors.border.default}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.base,
         padding: `0 ${t.space[3] + 2}px`, // 14px
         fontSize: t.font.size.base,
         fontWeight: t.font.weight.medium,
         fontFamily: t.font.family.sans,
         color: active ? colors.accent.default : colors.fg.muted,
         cursor: 'pointer',
-        transition: `background ${t.transition.DEFAULT}, border-color ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+        transition: `background ${t.transition.base}, border-color ${t.transition.base}, color ${t.transition.base}`,
       }}
     >
       <SlidersHorizontal size={13} />

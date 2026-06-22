@@ -18,7 +18,7 @@ interface CardProps {
 
 const shadowValues: Record<ShadowKey, string> = {
   sm:      t.shadow.sm,
-  DEFAULT: t.shadow.DEFAULT,
+  DEFAULT: t.shadow.base,
   md:      t.shadow.md,
   lg:      t.shadow.lg,
   none:    'none',

@@ -339,7 +339,7 @@ function CategoriasSection({
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '7px 6px',
-                  borderRadius: t.radius.DEFAULT,
+                  borderRadius: t.radius.base,
                   cursor: 'pointer',
                   transition: 'background 0.12s',
                 }}
@@ -380,7 +380,7 @@ function CategoriasSection({
                       style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         padding: '5px 6px',
-                        borderRadius: t.radius.DEFAULT,
+                        borderRadius: t.radius.base,
                         cursor: 'pointer',
                         transition: 'background 0.12s',
                       }}

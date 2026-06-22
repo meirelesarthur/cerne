@@ -46,7 +46,7 @@ export function ToggleRow({ checked, onChange, label, hint, disabled }: {
 }) {
   const { colors } = useTheme()
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT, border: `1px solid ${colors.border.default}` }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], padding: `${t.space[2] + 2}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.base, border: `1px solid ${colors.border.default}` }}>
       <ToggleSwitch checked={checked} onChange={onChange} disabled={disabled} />
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
         {label}
@@ -71,7 +71,7 @@ export function MultiCheck({ label, options, selected, onToggle, disabled }: {
       <FieldGroupLabel>{label}</FieldGroupLabel>
       <div style={{
         display: 'flex', flexWrap: 'wrap', gap: `${t.space[2]}px ${t.space[4]}px`,
-        padding: `${t.space[3]}px`, border: `1px solid ${colors.border.default}`, borderRadius: t.radius.DEFAULT, background: colors.bg.surface,
+        padding: `${t.space[3]}px`, border: `1px solid ${colors.border.default}`, borderRadius: t.radius.base, background: colors.bg.surface,
       }}>
         {options.map((o) => (
           <Checkbox key={o.value} label={o.label} checked={selected.includes(o.value)} onChange={() => onToggle(o.value)} disabled={disabled} />

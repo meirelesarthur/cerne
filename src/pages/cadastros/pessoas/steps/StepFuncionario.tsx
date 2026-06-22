@@ -43,7 +43,7 @@ export function StepFuncionario({ form, errors, setRole, disabled }: StepProps) 
             <FormField label="Salário Meta" mask="currency" inputMode="numeric" placeholder="R$ 0,00" value={e.goalSalary} onChange={(ev) => setRole('employee', { goalSalary: ev.target.value })} disabled={disabled} />
           </div>
         ) : (
-          <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, padding: `${t.space[2]}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.DEFAULT }}>
+          <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, padding: `${t.space[2]}px ${t.space[3]}px`, background: colors.bg.subtle, borderRadius: t.radius.base }}>
             Dados salariais ocultos — requer permissão <code>pessoa.salary_view</code>.
           </div>
         )}

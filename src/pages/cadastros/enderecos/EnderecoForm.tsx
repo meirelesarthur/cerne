@@ -105,7 +105,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
             marginBottom: t.space[5],
             padding: `${t.space[3]}px ${t.space[4]}px`,
             background: tipoColor.bg,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.base,
             border: `1px solid ${tipoColor.text}22`,
           }}>
             <MapPin size={14} color={tipoColor.text} />
@@ -124,7 +124,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
               marginBottom: t.space[5],
               padding: `${t.space[3]}px ${t.space[4]}px`,
               background: colors.bg.subtle,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               border: `1px solid ${colors.border.default}`,
             }}>
               <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>

@@ -70,7 +70,7 @@ export function ToggleSection({
             justifyContent: 'center',
             width:          t.space[8],
             height:         t.space[8],
-            borderRadius:   t.radius.DEFAULT,
+            borderRadius:   t.radius.base,
             background:     active ? colors.accent.subtle : colors.bg.subtle,
             color:          active ? colors.accent.default : colors.fg.subtle,
             flexShrink:     0,

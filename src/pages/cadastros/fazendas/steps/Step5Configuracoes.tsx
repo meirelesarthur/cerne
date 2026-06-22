@@ -79,7 +79,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
               gap: t.space[2] + 2,
               background: t.color.feedback.warning.bg,
               border: `1px solid ${t.color.feedback.warning.border}`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               padding: `${t.space[2] + 2}px ${t.space[3] + 2}px`,
               marginBottom: t.space[4],
             }}
@@ -101,7 +101,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
         <div
           style={{
             border: `1px solid ${colors.border.default}`,
-            borderRadius: t.radius.DEFAULT,
+            borderRadius: t.radius.base,
             overflow: 'hidden',
           }}
         >

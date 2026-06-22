@@ -113,7 +113,7 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
         <div style={{
           display: 'flex', alignItems: 'center', gap: t.space[2],
           background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100],
-          borderRadius: t.radius.DEFAULT,
+          borderRadius: t.radius.base,
           padding: `${t.space[1]}px ${t.space[2] + 2}px`,
         }}>
           <Icon size={12} color={colors.fg.subtle as string} />
@@ -133,7 +133,7 @@ function ChartCard({ icon: Icon, title, action, children, colors, isGbMode }: Ch
             onMouseLeave={() => setBtnHov(false)}
             style={{
               width: 28, height: 28,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               border: `1px solid ${colors.border.default}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',

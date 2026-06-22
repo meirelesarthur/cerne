@@ -106,7 +106,7 @@ function BarButton({ action }: { action: BulkAction }) {
       onMouseLeave={() => setHov(false)}
       style={{
         padding:      `${t.space[1]}px ${t.space[3]}px`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.base,
         border:       'none',
         cursor:       'pointer',
         fontSize:     t.font.size.xs,
@@ -114,7 +114,7 @@ function BarButton({ action }: { action: BulkAction }) {
         fontFamily:   t.font.family.sans,
         background:   bg,
         color,
-        transition:   `background ${t.transition.DEFAULT}, color ${t.transition.DEFAULT}`,
+        transition:   `background ${t.transition.base}, color ${t.transition.base}`,
       }}
     >
       {label}

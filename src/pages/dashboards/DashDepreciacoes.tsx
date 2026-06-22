@@ -274,7 +274,7 @@ function DonutChart() {
             style={{
               display: 'flex', alignItems: 'center', gap: t.space[2],
               padding: `${t.space[1]}px ${t.space[2]}px`,
-              borderRadius: t.radius.DEFAULT,
+              borderRadius: t.radius.base,
               background: hovSeg === i ? (isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[50]) : 'transparent',
               opacity: hovSeg !== null && hovSeg !== i ? 0.4 : 1,
               transition: 'background 0.15s ease, opacity 0.18s ease',

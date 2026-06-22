@@ -137,7 +137,7 @@ export function WeekCanvas({
           Visão geral — como aparecerá nos relatórios e calendários
         </div>
         <div style={{ height: 28 }}>
-          <div style={{ display: 'flex', height: 24, borderRadius: t.radius.DEFAULT, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', height: 24, borderRadius: t.radius.base, overflow: 'hidden' }}>
             {weeks.map((w, i) => {
               const def = WEEK_COLORS[w.color]
               return (

@@ -338,7 +338,7 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         paddingLeft: t.space[2] + t.space[1] / 2,
         paddingRight: t.space[2] + t.space[1] / 2,
         border: `1.5px solid ${open ? colors.accent.default : borderColor}`,
-        borderRadius: t.radius.DEFAULT,
+        borderRadius: t.radius.base,
         background: disabled ? t.color.state.disabled.bg : isError ? t.color.feedback.error.bg : colors.bg.input,
         color: displayValue ? colors.fg.default : colors.fg.subtle,
         fontSize: t.font.size.base,
@@ -347,8 +347,8 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         textAlign: 'left',
         boxShadow: open ? t.glow.brand : 'none',
         transition: [
-          `border-color ${t.transition.DEFAULT}`,
-          `box-shadow ${t.transition.DEFAULT}`,
+          `border-color ${t.transition.base}`,
+          `box-shadow ${t.transition.base}`,
           `background ${t.transition.smooth}`,
         ].join(', '),
         outline: 'none',
@@ -367,7 +367,7 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         size={15}
         color={open ? colors.accent.default : colors.fg.subtle}
         aria-hidden="true"
-        style={{ flexShrink: 0, transition: `color ${t.transition.DEFAULT}` }}
+        style={{ flexShrink: 0, transition: `color ${t.transition.base}` }}
       />
     </button>
   )

@@ -315,11 +315,11 @@ export function FileUpload({
           gap:            t.space[2],
           padding:        `${t.space[6]}px ${t.space[4]}px`,
           border:         `1.5px dashed ${dropzoneBorder}`,
-          borderRadius:   t.radius.DEFAULT,
+          borderRadius:   t.radius.base,
           background:     dropzoneBg,
           cursor:         disabled ? 'not-allowed' : 'pointer',
           opacity:        disabled ? 0.6 : 1,
-          transition:     `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
+          transition:     `border-color ${t.transition.base}, background ${t.transition.smooth}`,
           outline:        'none',
           userSelect:     'none',
           WebkitUserSelect: 'none',
@@ -336,7 +336,7 @@ export function FileUpload({
             background:      dragover
               ? (isGbMode ? 'rgba(16,185,129,0.15)' : t.color.brand[100])
               : (isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100]),
-            transition:      `background ${t.transition.DEFAULT}`,
+            transition:      `background ${t.transition.base}`,
           }}
           aria-hidden="true"
         >
@@ -350,7 +350,7 @@ export function FileUpload({
               fontSize:   t.font.size.sm,
               fontWeight: t.font.weight.medium,
               color:      dragover ? colors.accent.default : colors.fg.default,
-              transition: `color ${t.transition.DEFAULT}`,
+              transition: `color ${t.transition.base}`,
             }}
           >
             {dragover ? 'Solte os arquivos aqui' : 'Arraste arquivos ou clique para selecionar'}
@@ -412,13 +412,13 @@ export function FileUpload({
                 gap:          0,
                 padding:      `${t.space[2]}px ${t.space[3]}px`,
                 border:       `1px solid ${file.status === 'error' ? t.color.feedback.error.border : colors.border.default}`,
-                borderRadius: t.radius.DEFAULT,
+                borderRadius: t.radius.base,
                 background:   file.status === 'error'
                   ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.feedback.error.bg)
                   : file.status === 'done'
                   ? (isGbMode ? 'rgba(5,150,105,0.06)' : t.color.feedback.success.bg)
                   : (isGbMode ? colors.bg.surface : colors.bg.subtle),
-                transition:   `background ${t.transition.smooth}, border-color ${t.transition.DEFAULT}`,
+                transition:   `background ${t.transition.smooth}, border-color ${t.transition.base}`,
               }}
             >
               {/* Linha principal ─────────────────────────────────────── */}

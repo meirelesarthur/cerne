@@ -405,7 +405,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         {/* Row 2: Computed fields */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: t.space[4] }}>
           <div>
-            <div key={`vt-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.DEFAULT }}>
+            <div key={`vt-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.base }}>
               <FormField
                 label="Valor Total"
                 value={`R$ ${valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
@@ -416,7 +416,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             <p style={hintText}>= Qtde. × Vl. Unit.</p>
           </div>
           <div>
-            <div key={`cm-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.DEFAULT }}>
+            <div key={`cm-${flashKey}`} className="flash-computed" style={{ borderRadius: t.radius.base }}>
               <FormField
                 label="Custo Médio Unitário"
                 value={`R$ ${custoMedioUnit.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`}
@@ -518,7 +518,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         }
       >
         {/* Info banner */}
-        <div style={{ background: t.color.feedback.info.bg, border: `1px solid ${t.color.feedback.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.feedback.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <div style={{ background: t.color.feedback.info.bg, border: `1px solid ${t.color.feedback.info.border}`, borderRadius: t.radius.base, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.feedback.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 14 }}>ℹ</span>
           <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
         </div>

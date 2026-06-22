@@ -429,7 +429,7 @@ function KpiBar({
     },
   ]
 
-  const cardBg    = isGbMode ? t.color.row.hoverGb : colors.bg.surface
+  const cardBg    = isGbMode ? t.color.state.row.hoverGb : colors.bg.surface
   const border    = colors.border.default
 
   return (
@@ -486,14 +486,14 @@ function KpiBar({
                 fontSize: t.font.size.xs,
                 fontWeight: t.font.weight.semibold,
                 color: item.trend === 'up'
-                  ? t.color.success.text
+                  ? t.color.feedback.success.text
                   : item.trend === 'down'
-                    ? t.color.error.text
+                    ? t.color.feedback.error.text
                     : colors.fg.subtle,
                 background: item.trend === 'up'
-                  ? t.color.success.bg
+                  ? t.color.feedback.success.bg
                   : item.trend === 'down'
-                    ? t.color.error.bg
+                    ? t.color.feedback.error.bg
                     : colors.bg.subtle,
                 padding: '2px 6px',
                 borderRadius: t.radius.full,

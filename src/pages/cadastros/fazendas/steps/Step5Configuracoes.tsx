@@ -77,8 +77,8 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
               display: 'flex',
               alignItems: 'center',
               gap: t.space[2] + 2,
-              background: t.color.warning.bg,
-              border: `1px solid ${t.color.warning.border}`,
+              background: t.color.feedback.warning.bg,
+              border: `1px solid ${t.color.feedback.warning.border}`,
               borderRadius: t.radius.DEFAULT,
               padding: `${t.space[2] + 2}px ${t.space[3] + 2}px`,
               marginBottom: t.space[4],
@@ -88,7 +88,7 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
             <span
               style={{
                 fontSize: t.font.size.sm,
-                color: t.color.warning.text,
+                color: t.color.feedback.warning.text,
                 fontFamily: t.font.family.sans,
               }}
             >
@@ -156,17 +156,17 @@ export function Step5Configuracoes({ data, errors, onChange, onCentrosCustoChang
                   alignItems: 'center',
                   height: t.size.tableRow,
                   background: isSelected
-                    ? t.color.row.selected
+                    ? t.color.state.row.selected
                     : colors.bg.surface,
                   borderBottom: `1px solid ${colors.border.subtle}`,
                   cursor: 'pointer',
                   transition: `background ${t.transition.fast}`,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = isGbMode ? t.color.row.hoverGb : t.color.row.hover
+                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.background = isSelected ? t.color.row.selected : colors.bg.surface
+                  (e.currentTarget as HTMLDivElement).style.background = isSelected ? t.color.state.row.selected : colors.bg.surface
                 }}
               >
                 <div

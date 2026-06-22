@@ -165,8 +165,8 @@ interface StatusItem {
 
 const STATUS_ITEMS: StatusItem[] = [
   { label: 'Operacional',          count: 298, pct: 87.1, color: t.color.brand[600] },
-  { label: 'Manutenção Preventiva', count: 13,  pct: 3.8,  color: t.color.notification },
-  { label: 'Corretiva / Parado',   count: 18,  pct: 5.3,  color: t.color.error.text },
+  { label: 'Manutenção Preventiva', count: 13,  pct: 3.8,  color: t.color.feedback.notice },
+  { label: 'Corretiva / Parado',   count: 18,  pct: 5.3,  color: t.color.feedback.error.text },
   { label: 'Aposentado / Baixa',   count: 13,  pct: 3.8,  color: t.color.neutral[400] },
 ]
 
@@ -261,7 +261,7 @@ function ManutChart() {
           <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Preventivas</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.error.text }} />
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.feedback.error.text }} />
           <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Corretivas</span>
         </div>
       </div>
@@ -314,7 +314,7 @@ function ManutChart() {
                 width={barW}
                 height={corH}
                 rx={3}
-                fill={t.color.error.text}
+                fill={t.color.feedback.error.text}
               />
               <rect x={xBase} y={PT} width={colW} height={chartH} fill="transparent" />
               <text x={xBase + colW / 2} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
@@ -351,7 +351,7 @@ function ManutChart() {
             <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].prev}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.error.text }} />
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.feedback.error.text }} />
             <span style={{ color: colors.fg.muted as string }}>Corretivas:</span>
             <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].cor}</span>
           </div>
@@ -414,7 +414,7 @@ export default function DashAtivos() {
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+            <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
           </div>,
         ])}
       </div>

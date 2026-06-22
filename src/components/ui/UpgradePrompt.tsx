@@ -93,7 +93,7 @@ export function UpgradePrompt({
 
   // ─── Variante card (padrão) ───────────────────────────────────────────────
 
-  const cardBg     = isGbMode ? t.color.gbSurface      : colors.bg.surface
+  const cardBg     = isGbMode ? t.color.gb.surface      : colors.bg.surface
   const cardBorder = isGbMode ? colors.border.default           : t.color.brand[100]
 
   return (

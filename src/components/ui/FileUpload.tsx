@@ -85,9 +85,9 @@ function InlineProgress({ value }: { value: number }) {
 function FileStatusIcon({ status }: { status?: UploadedFile['status'] }) {
   switch (status) {
     case 'done':
-      return <CheckCircle size={14} color={t.color.success.text} />
+      return <CheckCircle size={14} color={t.color.feedback.success.text} />
     case 'error':
-      return <AlertCircle size={14} color={t.color.error.text} />
+      return <AlertCircle size={14} color={t.color.feedback.error.text} />
     case 'uploading':
       return (
         <span
@@ -220,7 +220,7 @@ export function FileUpload({
   // ─── Derivação de estilos da dropzone ────────────────────────────────────
 
   const dropzoneBorder = hasError
-    ? t.color.error.text
+    ? t.color.feedback.error.text
     : dragover
     ? colors.accent.default
     : colors.border.default
@@ -228,9 +228,9 @@ export function FileUpload({
   const dropzoneBg = dragover
     ? (isGbMode ? 'rgba(16,185,129,0.08)' : t.color.brand[50])
     : hasError
-    ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.error.bg)
+    ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.feedback.error.bg)
     : disabled
-    ? (isGbMode ? 'rgba(255,255,255,0.02)' : t.color.disabled.bg)
+    ? (isGbMode ? 'rgba(255,255,255,0.02)' : t.color.state.disabled.bg)
     : (isGbMode ? colors.bg.input : colors.bg.surface)
 
   const iconColor = dragover
@@ -382,7 +382,7 @@ export function FileUpload({
           aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
-            color:    t.color.error.text,
+            color:    t.color.feedback.error.text,
           }}
         >
           {displayError}
@@ -411,12 +411,12 @@ export function FileUpload({
                 flexDirection: 'column',
                 gap:          0,
                 padding:      `${t.space[2]}px ${t.space[3]}px`,
-                border:       `1px solid ${file.status === 'error' ? t.color.error.border : colors.border.default}`,
+                border:       `1px solid ${file.status === 'error' ? t.color.feedback.error.border : colors.border.default}`,
                 borderRadius: t.radius.DEFAULT,
                 background:   file.status === 'error'
-                  ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.error.bg)
+                  ? (isGbMode ? 'rgba(220,38,38,0.06)' : t.color.feedback.error.bg)
                   : file.status === 'done'
-                  ? (isGbMode ? 'rgba(5,150,105,0.06)' : t.color.success.bg)
+                  ? (isGbMode ? 'rgba(5,150,105,0.06)' : t.color.feedback.success.bg)
                   : (isGbMode ? colors.bg.surface : colors.bg.subtle),
                 transition:   `background ${t.transition.smooth}, border-color ${t.transition.DEFAULT}`,
               }}

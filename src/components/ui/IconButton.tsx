@@ -38,9 +38,9 @@ export function IconButton({
   const dim = sizeValues[size]
 
   const hoverBg: Record<IconButtonVariant, string> = {
-    ghost:   danger ? t.color.error.bg   : colors.bg.subtle,
-    outline: danger ? t.color.error.bg   : colors.bg.subtle,
-    subtle:  danger ? t.color.error.bg   : colors.bg.surface,
+    ghost:   danger ? t.color.feedback.error.bg   : colors.bg.subtle,
+    outline: danger ? t.color.feedback.error.bg   : colors.bg.subtle,
+    subtle:  danger ? t.color.feedback.error.bg   : colors.bg.surface,
   }
 
   const defaultBg: Record<IconButtonVariant, string> = {
@@ -49,8 +49,8 @@ export function IconButton({
     subtle:  colors.bg.subtle,
   }
 
-  const defaultColor = danger ? t.color.error.text : colors.fg.muted
-  const hoverColor   = danger ? t.color.error.text : colors.fg.default
+  const defaultColor = danger ? t.color.feedback.error.text : colors.fg.muted
+  const hoverColor   = danger ? t.color.feedback.error.text : colors.fg.default
 
   return (
     <button
@@ -70,7 +70,7 @@ export function IconButton({
         height:         dim,
         borderRadius:   t.radius.md,
         border:         variant === 'outline'
-          ? `1px solid ${hovered && !disabled ? (danger ? t.color.error.border : colors.border.default) : colors.border.default}`
+          ? `1px solid ${hovered && !disabled ? (danger ? t.color.feedback.error.border : colors.border.default) : colors.border.default}`
           : 'none',
         background:     disabled ? 'transparent' : (hovered ? hoverBg[variant] : defaultBg[variant]),
         color:          disabled ? colors.fg.subtle : (hovered ? hoverColor : defaultColor),

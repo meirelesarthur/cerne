@@ -64,7 +64,7 @@ export function RadioGroup({
           {required && (
             <span
               aria-hidden="true"
-              style={{ color: t.color.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}
+              style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}
             >
               *
             </span>
@@ -120,7 +120,7 @@ export function RadioGroup({
           aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
-            color: t.color.error.text,
+            color: t.color.feedback.error.text,
             fontFamily: t.font.family.sans,
           }}
         >
@@ -158,7 +158,7 @@ function RadioOption({
 
   // Cor do anel/borda do círculo visual
   const ringColor = hasError
-    ? t.color.error.text
+    ? t.color.feedback.error.text
     : isSelected
     ? t.color.brand[600]
     : colors.border.default

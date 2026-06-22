@@ -9,13 +9,13 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, { background: string; color: string }> = {
-  success: { background: t.color.success.bg,   color: t.color.success.text },
-  danger:  { background: t.color.error.bg,     color: t.color.error.text },
-  warning: { background: t.color.warning.bg,   color: t.color.warning.text },
+  success: { background: t.color.feedback.success.bg,   color: t.color.feedback.success.text },
+  danger:  { background: t.color.feedback.error.bg,     color: t.color.feedback.error.text },
+  warning: { background: t.color.feedback.warning.bg,   color: t.color.feedback.warning.text },
   neutral: { background: t.color.neutral[100], color: t.color.neutral[500] },
-  info:    { background: t.color.info.bg,      color: t.color.info.text },
-  purple:  { background: t.color.purple.bg,    color: t.color.purple.text },
-  cyan:    { background: t.color.cyan.bg,      color: t.color.cyan.text },
+  info:    { background: t.color.feedback.info.bg,      color: t.color.feedback.info.text },
+  purple:  { background: t.color.accent.purple.bg,    color: t.color.accent.purple.text },
+  cyan:    { background: t.color.accent.cyan.bg,      color: t.color.accent.cyan.text },
 }
 
 export function Badge({ label, variant }: BadgeProps) {

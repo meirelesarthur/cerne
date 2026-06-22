@@ -31,9 +31,9 @@ const vencimentos = [
 
 const donutData = [
   { label: 'Suprimentos', pct: 35, color: t.color.brand[600] },
-  { label: 'RH',          pct: 25, color: t.color.info.solid },
-  { label: 'Frota',       pct: 18, color: t.color.notification },
-  { label: 'Impostos',    pct: 14, color: t.color.error.solid },
+  { label: 'RH',          pct: 25, color: t.color.feedback.info.solid },
+  { label: 'Frota',       pct: 18, color: t.color.feedback.notice },
+  { label: 'Impostos',    pct: 14, color: t.color.feedback.error.solid },
   { label: 'Outros',      pct: 8,  color: t.color.neutral[400] },
 ]
 
@@ -57,12 +57,12 @@ function Trend({ value, up }: { value: string; up: boolean }) {
       display: 'inline-flex', alignItems: 'center', gap: 4,
       fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
       fontFamily: t.font.family.sans,
-      color: up ? t.color.success.text : t.color.error.text,
+      color: up ? t.color.feedback.success.text : t.color.feedback.error.text,
     }}>
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 14, height: 14, borderRadius: t.radius.full,
-        background: up ? t.color.success.bg : t.color.error.bg,
+        background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
         fontSize: 9,
       }}>
         {up ? '▲' : '▼'}
@@ -118,8 +118,8 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
           <stop offset="100%" stopColor={t.color.brand[600]} stopOpacity={0.02} />
         </linearGradient>
         <linearGradient id="finGradExp" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={t.color.error.solid} stopOpacity={isGbMode ? 0.20 : 0.12} />
-          <stop offset="100%" stopColor={t.color.error.solid} stopOpacity={0.02} />
+          <stop offset="0%" stopColor={t.color.feedback.error.solid} stopOpacity={isGbMode ? 0.20 : 0.12} />
+          <stop offset="100%" stopColor={t.color.feedback.error.solid} stopOpacity={0.02} />
         </linearGradient>
       </defs>
 
@@ -148,7 +148,7 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
       <path d={closedPath(revenueData)} fill="url(#finGradRev)" />
       <path d={closedPath(expenseData)} fill="url(#finGradExp)" />
       <path d={bezier(revenueData)} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <path d={bezier(expenseData)} fill="none" stroke={t.color.error.solid} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={bezier(expenseData)} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
 
       {revenueData.map((v, i) => (
         <circle key={`r${i}`} cx={xOf(i)} cy={yOf(v)} r={hovIdx === i ? 5 : 3}
@@ -159,8 +159,8 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
       ))}
       {expenseData.map((v, i) => (
         <circle key={`e${i}`} cx={xOf(i)} cy={yOf(v)} r={hovIdx === i ? 5 : 3}
-          fill={hovIdx === i ? t.color.error.solid : '#fff'}
-          stroke={t.color.error.solid} strokeWidth={1.5}
+          fill={hovIdx === i ? t.color.feedback.error.solid : '#fff'}
+          stroke={t.color.feedback.error.solid} strokeWidth={1.5}
           style={{ cursor: 'pointer', transition: 'r 0.12s ease' }}
           onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
       ))}
@@ -178,7 +178,7 @@ function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
             Rec: R$ {(revenueData[hovIdx] / 1000).toFixed(0)}K
           </text>
           <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 39}
-            fontSize={9} fill={t.color.error.solid} fontFamily={t.font.family.sans} fontWeight={600}>
+            fontSize={9} fill={t.color.feedback.error.solid} fontFamily={t.font.family.sans} fontWeight={600}>
             Desp: R$ {(expenseData[hovIdx] / 1000).toFixed(0)}K
           </text>
         </g>
@@ -205,7 +205,7 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
   const segments = [
     { label: 'Realizado', pct: 0.68, color: t.color.brand[600] },
     { label: 'Previsto',  pct: 0.20, color: t.color.brand[200] },
-    { label: 'Atrasado',  pct: 0.12, color: t.color.error.solid },
+    { label: 'Atrasado',  pct: 0.12, color: t.color.feedback.error.solid },
   ]
 
   return (
@@ -339,8 +339,8 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
               </span>
               <span style={{
                 fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                color: isAtrasado ? t.color.error.text : t.color.warning.text,
-                background: isAtrasado ? t.color.error.bg : t.color.warning.bg,
+                color: isAtrasado ? t.color.feedback.error.text : t.color.feedback.warning.text,
+                background: isAtrasado ? t.color.feedback.error.bg : t.color.feedback.warning.bg,
                 borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`, fontFamily: t.font.family.sans,
               }}>
                 {item.status}
@@ -449,7 +449,7 @@ export default function DashFinanceiro() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: t.space[4] }}>
-              {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.error.solid, label: 'Despesas' }].map(s => (
+              {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.feedback.error.solid, label: 'Despesas' }].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 8, height: 2, borderRadius: 1, background: s.color, display: 'inline-block' }} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>{s.label}</span>

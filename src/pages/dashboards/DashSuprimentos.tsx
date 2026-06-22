@@ -57,9 +57,9 @@ const fornecedores = [
 
 type Badge = 'Excelente' | 'Bom' | 'Regular'
 const badgeStyle: Record<Badge, { color: string; bg: string }> = {
-  Excelente: { color: t.color.success.text, bg: t.color.success.bg },
-  Bom:       { color: t.color.info.text,    bg: t.color.info.bg },
-  Regular:   { color: t.color.warning.text, bg: t.color.warning.bg },
+  Excelente: { color: t.color.feedback.success.text, bg: t.color.feedback.success.bg },
+  Bom:       { color: t.color.feedback.info.text,    bg: t.color.feedback.info.bg },
+  Regular:   { color: t.color.feedback.warning.text, bg: t.color.feedback.warning.bg },
 }
 
 // ─── Trend badge ──────────────────────────────────────────────────────────────
@@ -70,12 +70,12 @@ function Trend({ value, up }: { value: string; up: boolean }) {
       display: 'inline-flex', alignItems: 'center', gap: 4,
       fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
       fontFamily: t.font.family.sans,
-      color: up ? t.color.success.text : t.color.error.text,
+      color: up ? t.color.feedback.success.text : t.color.feedback.error.text,
     }}>
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 14, height: 14, borderRadius: t.radius.full,
-        background: up ? t.color.success.bg : t.color.error.bg,
+        background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
         fontSize: 9,
       }}>
         {up ? '▲' : '▼'}
@@ -248,7 +248,7 @@ export default function DashSuprimentos() {
             </div>
             <Trend value={kpi.trend} up={kpi.up} />
             <div style={{ marginTop: t.space[3], height: 40 }}>
-              <SparklineArea data={kpiSparklines[kpi.label]} color={kpi.up ? t.color.brand[600] : t.color.error.solid} height={40} />
+              <SparklineArea data={kpiSparklines[kpi.label]} color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid} height={40} />
             </div>
           </div>,
         ])}
@@ -268,8 +268,8 @@ export default function DashSuprimentos() {
             </div>
           </div>
           <div style={{
-            fontSize: t.font.size.xs, color: t.color.success.text,
-            background: t.color.success.bg, borderRadius: t.radius.full,
+            fontSize: t.font.size.xs, color: t.color.feedback.success.text,
+            background: t.color.feedback.success.bg, borderRadius: t.radius.full,
             padding: `3px ${t.space[2]}px`, fontWeight: t.font.weight.medium,
           }}>
             13,4% taxa final

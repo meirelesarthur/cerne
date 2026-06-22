@@ -149,7 +149,7 @@ const MODULOS = [
   { label: 'Financeiro',      pct: 28, acessos: 51, color: t.color.brand[700] },
   { label: 'Dashboards',      pct: 22, acessos: 40, color: t.color.brand[500] },
   { label: 'Cadastros',       pct: 18, acessos: 33, color: t.color.brand[300] },
-  { label: 'Fiscal',          pct: 14, acessos: 26, color: t.color.info.solid },
+  { label: 'Fiscal',          pct: 14, acessos: 26, color: t.color.feedback.info.solid },
   { label: 'Administrativo',  pct: 11, acessos: 20, color: t.color.neutral[400] },
   { label: 'Outros',          pct:  7, acessos: 13, color: t.color.neutral[300] },
 ]
@@ -487,7 +487,7 @@ export default function DashUsuarios() {
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             {kpi.trend && (
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
             )}
           </div>,
         ])}

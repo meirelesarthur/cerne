@@ -84,12 +84,12 @@ function Trend({ value, up }: { value: string; up: boolean }) {
       display: 'inline-flex', alignItems: 'center', gap: 4,
       fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
       fontFamily: t.font.family.sans,
-      color: up ? t.color.success.text : t.color.error.text,
+      color: up ? t.color.feedback.success.text : t.color.feedback.error.text,
     }}>
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 14, height: 14, borderRadius: t.radius.full,
-        background: up ? t.color.success.bg : t.color.error.bg,
+        background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
         fontSize: 9, lineHeight: 1,
       }}>
         {up ? '▲' : '▼'}
@@ -162,8 +162,8 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
             <stop offset="100%" stopColor={t.color.brand[600]} stopOpacity={0} />
           </linearGradient>
           <linearGradient id={dspGradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={t.color.error.solid} stopOpacity={isGbMode ? 0.25 : 0.10} />
-            <stop offset="100%" stopColor={t.color.error.solid} stopOpacity={0} />
+            <stop offset="0%" stopColor={t.color.feedback.error.solid} stopOpacity={isGbMode ? 0.25 : 0.10} />
+            <stop offset="100%" stopColor={t.color.feedback.error.solid} stopOpacity={0} />
           </linearGradient>
         </defs>
 
@@ -183,7 +183,7 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
 
         {/* Lines */}
         <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        <path d={dspPath} fill="none" stroke={t.color.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
+        <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
 
         {/* X labels */}
         {AREA_DATA.map((d, i) => {
@@ -204,7 +204,7 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
                 <g>
                   <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border.default} strokeWidth={1} strokeDasharray="3 2" />
                   <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.bg.surface} strokeWidth={2} />
-                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
+                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.feedback.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
                 </g>
               )}
             </g>
@@ -417,7 +417,7 @@ export default function OverviewPanel() {
             <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[3] }}>
               {[
                 { color: t.color.brand[600], label: 'Receitas' },
-                { color: t.color.error.solid, label: 'Despesas' },
+                { color: t.color.feedback.error.solid, label: 'Despesas' },
               ].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
@@ -573,7 +573,7 @@ export default function OverviewPanel() {
                 <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{row.label}:</span>
                 <span style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                  color: row.green ? t.color.success.text : colors.fg.default,
+                  color: row.green ? t.color.feedback.success.text : colors.fg.default,
                 }}>
                   {row.value}
                 </span>
@@ -587,12 +587,12 @@ export default function OverviewPanel() {
           {/* Needs attention */}
           <div style={{ padding: `${t.space[3]}px ${t.space[4]}px` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[2] }}>
-              <TrendingDown size={11} color={t.color.error.text} />
+              <TrendingDown size={11} color={t.color.feedback.error.text} />
               <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Requer atenção</span>
             </div>
             {[
-              { label: 'Saldo atrasado', value: 'R$ 1.940,73', color: t.color.error.text },
-              { label: 'Desp. previstas', value: 'R$ 82.339,92', color: t.color.warning.text },
+              { label: 'Saldo atrasado', value: 'R$ 1.940,73', color: t.color.feedback.error.text },
+              { label: 'Desp. previstas', value: 'R$ 82.339,92', color: t.color.feedback.warning.text },
             ].map(item => (
               <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[1] }}>
                 <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{item.label}</span>

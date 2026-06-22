@@ -411,7 +411,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   }
                   iconRight={emailStatus === 'ok' ? (
                     <span
-                      style={{ color: t.color.success.text, display: 'flex', alignItems: 'center' }}
+                      style={{ color: t.color.feedback.success.text, display: 'flex', alignItems: 'center' }}
                       aria-label="E-mail válido"
                     >
                       <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">

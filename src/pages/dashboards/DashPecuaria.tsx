@@ -540,7 +540,7 @@ export default function DashPecuaria() {
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
               {kpi.value}
             </div>
-            <span style={{ fontSize: t.font.size.sm, color: kpi.up ? t.color.success.text : t.color.error.text }}>
+            <span style={{ fontSize: t.font.size.sm, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>
               {kpi.up ? '▲' : '▼'} {kpi.trend}
             </span>
           </div>,

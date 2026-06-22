@@ -121,7 +121,7 @@ export function SearchSelect({
       {label && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
           <label htmlFor={id} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
-            {label}{required && <span style={{ color: t.color.error.text }}> *</span>}
+            {label}{required && <span style={{ color: t.color.feedback.error.text }}> *</span>}
           </label>
           {headerAction && (
             <button
@@ -139,7 +139,7 @@ export function SearchSelect({
         <div style={{
           display: 'flex', alignItems: 'center', gap: t.space[1] + 3,
           height: t.size.control,
-          border: `1.5px solid ${error ? t.color.error.text : open ? t.color.brand[600] : colors.border.default}`,
+          border: `1.5px solid ${error ? t.color.feedback.error.text : open ? t.color.brand[600] : colors.border.default}`,
           borderRadius: t.radius.DEFAULT,
           padding: `0 ${t.space[2] + 2}px`,
           background: colors.bg.surface,
@@ -232,7 +232,7 @@ export function SearchSelect({
       </div>
 
       {error && (
-        <span style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans, marginTop: t.space[1], display: 'block' }}>
+        <span style={{ fontSize: t.font.size.xs, color: t.color.feedback.error.text, fontFamily: t.font.family.sans, marginTop: t.space[1], display: 'block' }}>
           {error}
         </span>
       )}

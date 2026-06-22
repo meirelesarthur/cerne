@@ -23,10 +23,10 @@ export interface ToastItem {
 // ─── Design config ────────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<ToastType, { bg: string; Icon: React.ElementType }> = {
-  success: { bg: t.color.success.solid, Icon: CheckCircle2 },
-  error:   { bg: t.color.error.solid,   Icon: XCircle      },
-  info:    { bg: t.color.info.solid,    Icon: Info          },
-  warning: { bg: t.color.warning.solid, Icon: AlertTriangle },
+  success: { bg: t.color.feedback.success.solid, Icon: CheckCircle2 },
+  error:   { bg: t.color.feedback.error.solid,   Icon: XCircle      },
+  info:    { bg: t.color.feedback.info.solid,    Icon: Info          },
+  warning: { bg: t.color.feedback.warning.solid, Icon: AlertTriangle },
 }
 
 // ─── Keyframe injection (once) ────────────────────────────────────────────────

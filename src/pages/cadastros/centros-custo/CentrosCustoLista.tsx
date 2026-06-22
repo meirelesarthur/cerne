@@ -199,8 +199,8 @@ export default function CentrosCustoLista({
                       display: 'inline-flex', alignItems: 'center', gap: 3,
                       fontSize: t.font.size.xs,
                       fontWeight: t.font.weight.semibold,
-                      color: item.trend === 'up' ? t.color.success.text : item.trend === 'down' ? t.color.error.text : colors.fg.subtle,
-                      background: item.trend === 'up' ? t.color.success.bg : item.trend === 'down' ? t.color.error.bg : colors.bg.subtle,
+                      color: item.trend === 'up' ? t.color.feedback.success.text : item.trend === 'down' ? t.color.feedback.error.text : colors.fg.subtle,
+                      background: item.trend === 'up' ? t.color.feedback.success.bg : item.trend === 'down' ? t.color.feedback.error.bg : colors.bg.subtle,
                       padding: '2px 6px', borderRadius: t.radius.full,
                     }}>
                       {item.trend === 'up'   && <TrendingUp  size={10} />}

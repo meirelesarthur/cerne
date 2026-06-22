@@ -62,7 +62,7 @@ export function EmptyState({
       {/* Ícone */}
       <div
         style={{
-          color:          isError ? t.color.error.text : colors.fg.subtle,
+          color:          isError ? t.color.feedback.error.text : colors.fg.subtle,
           opacity:        isError ? 0.9 : 0.65,
           display:        'flex',
           alignItems:     'center',

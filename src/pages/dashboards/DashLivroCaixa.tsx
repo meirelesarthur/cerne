@@ -34,9 +34,9 @@ const contas = [
 ]
 
 const tipoBadge: Record<string, { color: string; bg: string }> = {
-  Receita:      { color: t.color.success.text, bg: t.color.success.bg },
-  Despesa:      { color: t.color.error.text, bg: t.color.error.bg },
-  Transferência: { color: t.color.info.text, bg: t.color.info.bg },
+  Receita:      { color: t.color.feedback.success.text, bg: t.color.feedback.success.bg },
+  Despesa:      { color: t.color.feedback.error.text, bg: t.color.feedback.error.bg },
+  Transferência: { color: t.color.feedback.info.text, bg: t.color.feedback.info.bg },
 }
 
 // ─── Area Chart (Fluxo de Caixa) ─────────────────────────────────────────────
@@ -81,7 +81,7 @@ function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useThe
 
   const series = [
     { data: entradasData, color: t.color.brand[600], label: 'Entradas', gradId: 'gradEnt' },
-    { data: saidasData, color: t.color.error.solid, label: 'Saídas', gradId: 'gradSai' },
+    { data: saidasData, color: t.color.feedback.error.solid, label: 'Saídas', gradId: 'gradSai' },
     { data: saldoData, color: t.color.neutral[500], label: 'Saldo', gradId: 'gradSal', dashed: true },
   ]
 
@@ -233,7 +233,7 @@ const movimentacoesColumns: Column<Movimentacao>[] = [
       return (
         <span style={{
           fontWeight: t.font.weight.semibold,
-          color: isPos ? t.color.success.text : isNeg ? t.color.error.text : undefined,
+          color: isPos ? t.color.feedback.success.text : isNeg ? t.color.feedback.error.text : undefined,
           whiteSpace: 'nowrap',
         }}>
           {row.valor}
@@ -358,7 +358,7 @@ export default function DashLivroCaixa() {
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             {kpi.trend && (
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.success.text : t.color.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
             )}
           </div>,
         ])}
@@ -372,7 +372,7 @@ export default function DashLivroCaixa() {
           <div style={{ display: 'flex', gap: t.space[5] }}>
             {[
               { label: 'Entradas', color: t.color.brand[600], dashed: false },
-              { label: 'Saídas',   color: t.color.error.solid, dashed: false },
+              { label: 'Saídas',   color: t.color.feedback.error.solid, dashed: false },
               { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
             ].map(item => (
               <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>

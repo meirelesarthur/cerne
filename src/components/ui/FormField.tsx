@@ -78,9 +78,9 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   const isError = !!error || status === 'err'
   const isOk = !isError && status === 'ok'
   const borderColor = isError
-    ? t.color.error.text
+    ? t.color.feedback.error.text
     : isOk
-    ? t.color.success.text
+    ? t.color.feedback.success.text
     : colors.border.default
 
   return (
@@ -98,7 +98,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           {label}
         </span>
         {required && (
-          <span style={{ color: t.color.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+          <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
         )}
         {hint && (
           <Tooltip label={hint}>
@@ -134,14 +134,14 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
             color: colors.fg.default,
-            background: isError ? t.color.error.bg : colors.bg.input,
+            background: isError ? t.color.feedback.error.bg : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
             transition: `border-color ${t.transition.DEFAULT}, background ${t.transition.smooth}`,
           }
           const focusHandlers = {
             onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-              e.currentTarget.style.borderColor = isError ? t.color.error.text : colors.accent.default
+              e.currentTarget.style.borderColor = isError ? t.color.feedback.error.text : colors.accent.default
               e.currentTarget.style.boxShadow = isError ? t.glow.error : t.glow.brand
               ;(inputProps.onFocus as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>)?.(e)
             },
@@ -223,7 +223,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
-            color: t.color.error.text,
+            color: t.color.feedback.error.text,
             fontFamily: t.font.family.sans,
           }}
         >

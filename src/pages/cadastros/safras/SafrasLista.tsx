@@ -148,7 +148,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
               sub=""
               bg={cardBg}
               border={border}
-              accent={t.color.success.text}
+              accent={t.color.feedback.success.text}
               hasBorderRight
             />
             <KpiCard
@@ -298,13 +298,13 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             width:          52,
             height:         52,
             borderRadius:   '50%',
-            background:     t.color.info.bg,
+            background:     t.color.feedback.info.bg,
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'center',
             margin:         '0 auto',
           }}>
-            <Info size={22} color={t.color.info.text} />
+            <Info size={22} color={t.color.feedback.info.text} />
           </div>
           <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, lineHeight: t.font.lineHeight.relaxed, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: t.space[2] + 2 }}>
             <p style={{ margin: 0 }}>

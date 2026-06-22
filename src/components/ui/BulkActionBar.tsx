@@ -29,9 +29,9 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
   const plural = count !== 1 ? 's' : ''
 
   // GBMode: translucent green-tinted surface; light: solid neutral[800]
-  const barBg      = isGbMode ? t.color.gbSurface  : t.color.neutral[800]
+  const barBg      = isGbMode ? t.color.gb.surface  : t.color.neutral[800]
   const barBorder  = isGbMode ? `1px solid ${t.color.brand[700]}` : 'none'
-  const accentColor = isGbMode ? t.color.gbAccent  : t.color.brand[400]
+  const accentColor = isGbMode ? t.color.gb.accent  : t.color.brand[400]
   const textColor  = t.color.neutral[0]
   const dividerColor = isGbMode ? t.color.brand[700] : t.color.neutral[600]
 
@@ -94,9 +94,9 @@ function BarButton({ action }: { action: BulkAction }) {
   const { label, onClick, danger } = action
 
   const bg = hov
-    ? (danger ? t.color.error.solid : t.color.brand[600])
-    : (danger ? t.color.error.solid + '33' : t.color.neutral[700])
-  const color = danger && !hov ? t.color.error.border : t.color.neutral[0]
+    ? (danger ? t.color.feedback.error.solid : t.color.brand[600])
+    : (danger ? t.color.feedback.error.solid + '33' : t.color.neutral[700])
+  const color = danger && !hov ? t.color.feedback.error.border : t.color.neutral[0]
 
   return (
     <button

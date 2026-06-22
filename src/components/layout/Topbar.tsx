@@ -107,7 +107,7 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
               position: 'absolute',
               top: 5,
               right: 5,
-              background: t.color.notification,
+              background: t.color.feedback.notice,
               color: 'white',
               borderRadius: t.radius.full,
               width: 14,

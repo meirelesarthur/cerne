@@ -177,7 +177,7 @@ export default function Sidebar({
                 position: 'absolute',
                 top: 4,
                 right: 4,
-                background: t.color.notification,
+                background: t.color.feedback.notice,
                 color: 'white',
                 borderRadius: t.radius.full,
                 width: 13,

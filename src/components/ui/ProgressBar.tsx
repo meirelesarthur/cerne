@@ -32,7 +32,7 @@ export function ProgressBar({ state }: ProgressBarProps) {
 
   const fillBg =
     state === 'error'
-      ? t.color.error.solid
+      ? t.color.feedback.error.solid
       : `linear-gradient(90deg, ${t.color.brand[600]}, ${t.color.brand[400]})`
 
   return (

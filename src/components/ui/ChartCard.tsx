@@ -26,7 +26,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: isGbMode ? t.color.gbSurface : colors.bg.surface,
+        background: isGbMode ? t.color.gb.surface : colors.bg.surface,
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius['2xl'],

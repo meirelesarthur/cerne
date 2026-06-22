@@ -14,12 +14,12 @@ interface TagProps {
 const variantStyle: Record<TagVariant, { bg: string; color: string }> = {
   neutral: { bg: t.color.neutral[100],  color: t.color.neutral[700] },
   brand:   { bg: t.color.brand[50],     color: t.color.brand[700]   },
-  success: { bg: t.color.success.bg,    color: t.color.success.text },
-  danger:  { bg: t.color.error.bg,      color: t.color.error.text   },
-  warning: { bg: t.color.warning.bg,    color: t.color.warning.text },
-  info:    { bg: t.color.info.bg,       color: t.color.info.text    },
-  purple:  { bg: t.color.purple.bg,     color: t.color.purple.text  },
-  cyan:    { bg: t.color.cyan.bg,       color: t.color.cyan.text    },
+  success: { bg: t.color.feedback.success.bg,    color: t.color.feedback.success.text },
+  danger:  { bg: t.color.feedback.error.bg,      color: t.color.feedback.error.text   },
+  warning: { bg: t.color.feedback.warning.bg,    color: t.color.feedback.warning.text },
+  info:    { bg: t.color.feedback.info.bg,       color: t.color.feedback.info.text    },
+  purple:  { bg: t.color.accent.purple.bg,     color: t.color.accent.purple.text  },
+  cyan:    { bg: t.color.accent.cyan.bg,       color: t.color.accent.cyan.text    },
 }
 
 /**

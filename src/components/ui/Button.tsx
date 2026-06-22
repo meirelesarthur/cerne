@@ -26,7 +26,7 @@ const variantBase: Record<ButtonVariant, React.CSSProperties> = {
   },
   destructive: {
     background: t.color.neutral[0],
-    color: t.color.error.text,
+    color: t.color.feedback.error.text,
   },
   ghost: {
     background: 'transparent',
@@ -40,13 +40,13 @@ const variantBase: Record<ButtonVariant, React.CSSProperties> = {
 const RING_W = 1.5
 const variantRing: Partial<Record<ButtonVariant, string>> = {
   secondary:   t.color.neutral[250],
-  destructive: t.color.error.bg,
+  destructive: t.color.feedback.error.bg,
 }
 
 const variantHover: Record<ButtonVariant, string> = {
   primary:     t.color.brand[700],
   secondary:   t.color.neutral[50],
-  destructive: t.color.error.bg,
+  destructive: t.color.feedback.error.bg,
   ghost:       t.color.neutral[100],
 }
 

@@ -36,8 +36,8 @@ interface Props {
 
 const TIPO_COLORS: Record<TipoArmazem, { bg: string; text: string }> = {
   insumos:    { bg: t.color.brand[50],   text: t.color.brand[600] },
-  formulacao: { bg: t.color.info.bg,     text: t.color.info.text },
-  producao:   { bg: t.color.warning.bg,  text: t.color.warning.text },
+  formulacao: { bg: t.color.feedback.info.bg,     text: t.color.feedback.info.text },
+  producao:   { bg: t.color.feedback.warning.bg,  text: t.color.feedback.warning.text },
 }
 
 type SortField = 'sigla' | 'descricao'

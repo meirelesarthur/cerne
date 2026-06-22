@@ -44,8 +44,8 @@ interface Props {
 
 const TIPO_COLORS: Record<TipoProduto, { bg: string; text: string }> = {
   insumo:     { bg: t.color.brand[50],   text: t.color.brand[600] },
-  producao:   { bg: t.color.info.bg,     text: t.color.info.text },
-  subproduto: { bg: t.color.warning.bg,  text: t.color.warning.text },
+  producao:   { bg: t.color.feedback.info.bg,     text: t.color.feedback.info.text },
+  subproduto: { bg: t.color.feedback.warning.bg,  text: t.color.feedback.warning.text },
   servico:    { bg: t.color.neutral[100], text: t.color.neutral[500] },
 }
 

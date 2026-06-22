@@ -145,10 +145,10 @@ function DropdownRow({
         border:     'none',
         cursor:     'pointer',
         background:  hov
-          ? (danger ? t.color.error.bg : colors.bg.subtle)
+          ? (danger ? t.color.feedback.error.bg : colors.bg.subtle)
           : 'transparent',
         color: danger
-          ? (hov ? t.color.error.text : colors.fg.muted)
+          ? (hov ? t.color.feedback.error.text : colors.fg.muted)
           : (hov ? colors.fg.default : colors.fg.muted),
         fontSize:   t.font.size.sm,
         fontFamily: t.font.family.sans,

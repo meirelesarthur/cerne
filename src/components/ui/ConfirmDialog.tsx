@@ -36,7 +36,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const { colors } = useTheme()
   const isDestructive = tone === 'destructive'
-  const accent = isDestructive ? t.color.error : t.color.info
+  const accent = isDestructive ? t.color.feedback.error : t.color.feedback.info
   const Icon = isDestructive ? AlertTriangle : Info
 
   return (

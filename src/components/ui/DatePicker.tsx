@@ -171,8 +171,8 @@ function CalendarGrid({
             bg = t.color.brand[600]
             textColor = '#ffffff'
           } else if (inRange) {
-            bg = isGbMode ? t.color.row.selectedGb : t.color.brand[50]
-            textColor = isGbMode ? t.color.gbAccent : t.color.brand[700]
+            bg = isGbMode ? t.color.state.row.selectedGb : t.color.brand[50]
+            textColor = isGbMode ? t.color.gb.accent : t.color.brand[700]
           }
 
           const fullLabel = new Date(year, month, day)
@@ -339,7 +339,7 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         paddingRight: t.space[2] + t.space[1] / 2,
         border: `1.5px solid ${open ? colors.accent.default : borderColor}`,
         borderRadius: t.radius.DEFAULT,
-        background: disabled ? t.color.disabled.bg : isError ? t.color.error.bg : colors.bg.input,
+        background: disabled ? t.color.state.disabled.bg : isError ? t.color.feedback.error.bg : colors.bg.input,
         color: displayValue ? colors.fg.default : colors.fg.subtle,
         fontSize: t.font.size.base,
         fontFamily: t.font.family.sans,
@@ -400,7 +400,7 @@ function FieldLabel({ htmlFor, label, required, hint, colors }: FieldLabelProps)
         {label}
       </label>
       {required && (
-        <span style={{ color: t.color.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+        <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
       )}
       {hint && (
         <Tooltip label={hint}>
@@ -473,7 +473,7 @@ export function DatePicker({
   }
 
   const isError = !!error
-  const borderColor = isError ? t.color.error.text : colors.border.default
+  const borderColor = isError ? t.color.feedback.error.text : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -518,7 +518,7 @@ export function DatePicker({
           aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
-            color: t.color.error.text,
+            color: t.color.feedback.error.text,
             fontFamily: t.font.family.sans,
           }}
         >
@@ -612,7 +612,7 @@ export function DateRangePicker({
   })()
 
   const isError = !!error
-  const borderColor = isError ? t.color.error.text : colors.border.default
+  const borderColor = isError ? t.color.feedback.error.text : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -673,7 +673,7 @@ export function DateRangePicker({
           aria-live="polite"
           style={{
             fontSize: t.font.size.xs,
-            color: t.color.error.text,
+            color: t.color.feedback.error.text,
             fontFamily: t.font.family.sans,
           }}
         >

@@ -737,7 +737,7 @@ export default function Pluviometria() {
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.notification, fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
+            <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.feedback.notice, fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
               Janela de Aplicação
             </div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: isGbMode ? '#fbbf24' : '#92400e', fontFamily: t.font.family.sans, marginBottom: t.space[2], textShadow: isGbMode ? '0 0 20px rgba(251,191,36,0.4)' : undefined }}>
@@ -746,7 +746,7 @@ export default function Pluviometria() {
             <div style={{ fontSize: t.font.size.sm, color: isGbMode ? 'rgba(251,191,36,0.65)' : '#78350f', fontFamily: t.font.family.sans, lineHeight: 1.65, marginBottom: t.space[2] }}>
               Vento em 2.4km/h e probabilidade de chuva de 4% para as próximas 8 horas.
             </div>
-            <div style={{ fontSize: t.font.size.xs, color: t.color.notification, fontFamily: t.font.family.sans, opacity: 0.65 }}>
+            <div style={{ fontSize: t.font.size.xs, color: t.color.feedback.notice, fontFamily: t.font.family.sans, opacity: 0.65 }}>
               Fonte: Open-Meteo · Prata (MG)
             </div>
           </div>

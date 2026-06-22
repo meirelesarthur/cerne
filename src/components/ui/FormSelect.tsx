@@ -34,7 +34,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
           {label}
         </span>
         {required && (
-          <span style={{ color: t.color.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+          <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
         )}
         {hint && (
           <Tooltip label={hint}>
@@ -53,14 +53,14 @@ export function FormSelect({ label, required, error, hint, options, style, class
             width: '100%',
             height: t.size.control,
             border: error
-              ? `1.5px solid ${t.color.error.text}`
+              ? `1.5px solid ${t.color.feedback.error.text}`
               : `1.5px solid ${colors.border.default}`,
             borderRadius: t.radius.DEFAULT,
             padding: `0 ${t.space[8]}px 0 ${t.space[2] + t.space[1] / 2}px`,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
-            color: selectProps.disabled ? t.color.disabled.text : colors.fg.default,
-            background: selectProps.disabled ? t.color.disabled.bg : colors.bg.input,
+            color: selectProps.disabled ? t.color.state.disabled.text : colors.fg.default,
+            background: selectProps.disabled ? t.color.state.disabled.bg : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
             appearance: 'none',
@@ -70,12 +70,12 @@ export function FormSelect({ label, required, error, hint, options, style, class
             ...style,
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.accent.default
+            e.currentTarget.style.borderColor = error ? t.color.feedback.error.text : colors.accent.default
             e.currentTarget.style.boxShadow = error ? t.glow.error : t.glow.brand
             selectProps.onFocus?.(e)
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = error ? t.color.error.text : colors.border.default
+            e.currentTarget.style.borderColor = error ? t.color.feedback.error.text : colors.border.default
             e.currentTarget.style.boxShadow = 'none'
             selectProps.onBlur?.(e)
           }}
@@ -102,7 +102,7 @@ export function FormSelect({ label, required, error, hint, options, style, class
         <span
           role="alert"
           aria-live="polite"
-          style={{ fontSize: t.font.size.xs, color: t.color.error.text, fontFamily: t.font.family.sans }}
+          style={{ fontSize: t.font.size.xs, color: t.color.feedback.error.text, fontFamily: t.font.family.sans }}
         >
           {error}
         </span>

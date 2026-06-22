@@ -432,15 +432,15 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         {showDuplicateAlert && (
           <div style={{
             marginTop: t.space[4],
-            background: t.color.warning.bg,
-            border: `1px solid ${t.color.warning.border}`,
+            background: t.color.feedback.warning.bg,
+            border: `1px solid ${t.color.feedback.warning.border}`,
             borderRadius: t.radius.lg,
             padding: `${t.space[4]}px`,
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: t.space[3], marginBottom: t.space[3] }}>
-              <AlertTriangle size={18} color={t.color.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
+              <AlertTriangle size={18} color={t.color.feedback.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
               <div>
-                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.warning.text, fontFamily: t.font.family.sans, marginBottom: 4 }}>
+                <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.feedback.warning.text, fontFamily: t.font.family.sans, marginBottom: 4 }}>
                   Já existe um saldo inicial para este produto neste armazém.
                 </div>
                 <div style={{ fontSize: t.font.size.xs, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
@@ -518,7 +518,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         }
       >
         {/* Info banner */}
-        <div style={{ background: t.color.info.bg, border: `1px solid ${t.color.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <div style={{ background: t.color.feedback.info.bg, border: `1px solid ${t.color.feedback.info.border}`, borderRadius: t.radius.DEFAULT, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.feedback.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 14 }}>ℹ</span>
           <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
         </div>

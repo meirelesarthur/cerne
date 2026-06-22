@@ -506,7 +506,7 @@ export default function DashDepreciacoes() {
               {kpi.value}
             </div>
             {kpi.trend && (
-              <span style={{ fontSize: t.font.size.sm, color: kpi.up ? t.color.success.text : t.color.error.text }}>
+              <span style={{ fontSize: t.font.size.sm, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>
                 {kpi.up ? '▲' : '▼'} {kpi.trend}
               </span>
             )}

@@ -159,22 +159,46 @@ de pastas no painel de estilos.
 
 ### 6.1 Color Styles
 
+Os tokens vivem em **sets** (espelhando `tokens/tokens.json` / Tokens Studio):
+`core` (primitivos + fundação) · `semantic` (papéis theme-agnostic) ·
+`light` / `gbMode` (papéis de tela por tema) · `component`.
+
+**Primitivos** — set `core` (rampas cruas, sem papel):
+
 ```
-color/brand/50 … color/brand/900          (600 = principal, 700 = hover)
-color/neutral/0 … color/neutral/950
-color/semantic/success/{bg,border,text,solid}
-color/semantic/error/{bg,border,text,solid}
-color/semantic/warning/{bg,border,text,solid}
-color/semantic/info/{bg,border,text,solid}
-color/accent/purple/{bg,text}
-color/accent/cyan/{bg,text}
-color/overlay/modal · color/overlay/drawer
-color/gb/accent · color/gb/surface         (exclusivos do GBMode)
+core/color/brand/50 … 900          (600 = principal, 700 = hover)
+core/color/neutral/0 … 950
+core/color/red/50 … 900            (base do feedback negativo)
+core/color/amber/50 … 900          (base de warning / notificação)
+core/color/blue/50 … 900           (base de informação)
 ```
 
-- Para o tema, prefixe a coleção: `Light/color/...` e `GBMode/color/...`,
-  ou use **Variable Modes** do Figma (modo `Light` / `GBMode`) sobre a mesma
-  variável — preferível, pois troca o tema sem renomear camadas.
+**Semântico theme-agnostic** — set `semantic` (alias → `core`):
+
+```
+semantic/color/feedback/{success,error,warning,info}/{bg,border,text,solid}
+semantic/color/feedback/notice
+semantic/color/accent/{purple,cyan}/{bg,text}
+semantic/color/state/{disabled,readonly}/{bg,text,border}
+semantic/color/state/row/{hover,selected,striped}(+Gb)
+semantic/color/overlay/{modal,drawer}
+semantic/color/gb/{accent,surface}            (exclusivos do GBMode)
+```
+
+**Semântico theme-aware** — sets `light` / `gbMode` (papéis de tela, alias → `core`):
+
+```
+{light|gbMode}/fg/{default,muted,subtle,onAccent}
+{light|gbMode}/bg/{canvas,outer,surface,subtle,input,sidebar}
+{light|gbMode}/border/{default,subtle}
+{light|gbMode}/accent/{default,hover,subtle}
+{light|gbMode}/nav/{text,textActive,textMuted,itemActive,itemHover,divider,headerBg,headerText}
+{light|gbMode}/shadow
+```
+
+- No Figma, os temas `light`/`gbMode` viram **Variable Modes** sobre a mesma
+  variável (preferível, pois troca o tema sem renomear camadas) — o exportador
+  já emite `$themes` (Light/GBMode) prontos para o Tokens Studio.
 
 ### 6.2 Text Styles
 
@@ -207,7 +231,7 @@ Como **Variables** numéricas (não cabe em estilo nativo):
 
 ```
 space/0 1 2 3 4 5 6 7 8 10 12 16 20     (base 4px → space/4 = 16)
-radius/sm md DEFAULT lg xl 2xl 3xl 4xl modal full
+radius/sm md base lg xl 2xl 3xl 4xl modal full   (base = raio padrão de inputs/botões)
 size/control · size/control-sm · size/control-lg
 size/icon-btn/{sm,md,lg} · size/page-btn · size/drawer · size/step-btn
 ```

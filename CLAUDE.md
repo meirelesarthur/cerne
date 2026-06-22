@@ -219,11 +219,12 @@ literal, procure o token:
   `drawer` (320), `stepBtn` (180).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
-- **GBMode:** `t.color.gbSurface` (superfície translúcida de card), `t.color.gbAccent` (verde claro de destaque).
-- **Badge/Tag auxiliares:** `t.color.purple.*`, `t.color.cyan.*`.
-- **Estados de controle:** `t.color.disabled.{bg,text,border}`, `t.color.readonly.{bg,text,border}`.
-- **Linhas de tabela:** `t.color.row.{hover,hoverGb,selected,selectedGb,striped,stripedGb}`.
-- **Transições:** `t.transition.{fast,DEFAULT,smooth,drawer}` — nunca `'0.2s'` solto.
+- **GBMode:** `t.color.gb.surface` (superfície translúcida de card), `t.color.gb.accent` (verde claro de destaque).
+- **Feedback semântico:** `t.color.feedback.{success,error,warning,info}.{bg,border,text,solid}` · `t.color.feedback.notice` (aviso pontual).
+- **Badge/Tag auxiliares:** `t.color.accent.purple.{bg,text}`, `t.color.accent.cyan.{bg,text}`.
+- **Estados de controle:** `t.color.state.disabled.{bg,text,border}`, `t.color.state.readonly.{bg,text,border}`.
+- **Linhas de tabela:** `t.color.state.row.{hover,hoverGb,selected,selectedGb,striped,stripedGb}`.
+- **Transições:** `t.transition.{fast,base,smooth,drawer}` — nunca `'0.2s'` solto.
 - **Animação:** `t.animation.duration.{fast,normal,slow,slower}`, `t.animation.easing.{standard,easeOut,easeIn,easeInOut,spring}`.
 - **Delays de loading:** `t.delay.loadingShow` (225 ms, anti-flash) / `t.delay.loadingMin` (400 ms, anti-flicker).
 - **Breakpoints:** `t.breakpoint.{xs,sm,md,lg,xl}` (360/768/1024/1280/1920).

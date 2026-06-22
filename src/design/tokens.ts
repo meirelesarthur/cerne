@@ -548,48 +548,12 @@ export const component = {
   },
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ALIASES DE COMPATIBILIDADE (temporários — removidos na Fase 5 da migração)
-// Mantêm os nomes antigos funcionando enquanto as chamadas migram para os
-// novos. NÃO USE em código novo.
-// ═══════════════════════════════════════════════════════════════════════════
-
-/** @deprecated use `color.feedback.*` / `color.accent.*` / `color.state.*` / `color.gb.*` */
-const colorCompat = {
-  success:      feedback.success,
-  error:        feedback.error,
-  warning:      feedback.warning,
-  info:         feedback.info,
-  notification: feedback.notice,
-  purple:       accent.purple,
-  cyan:         accent.cyan,
-  disabled:     state.disabled,
-  readonly:     state.readonly,
-  row:          state.row,
-  gbAccent:     gb.accent,
-  gbSurface:    gb.surface,
-}
-
-/** @deprecated use `component.dashboardTile` */
-export const dashboard = component.dashboardTile
-/** @deprecated use `component.login` */
-export const loginTheme = component.login
-
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
 export const t = {
-  color: { ...color, ...colorCompat },
-  font, space, size,
-  radius:     { ...radius, DEFAULT: radius.base },
-  shadow:     { ...shadow, DEFAULT: shadow.base },
-  border:     { ...border, DEFAULT: border.base },
-  transition: { ...transition, DEFAULT: transition.base },
+  color, font, space, size, radius, shadow, border, transition,
   zIndex, animation, delay, glow,
-  breakpoint, layout, chart, component,
-  themePalette,
-  // aliases de compat (removidos na Fase 5)
-  login:     component.login,
-  dashboard: component.dashboardTile,
+  breakpoint, layout, chart, component, themePalette,
 }
 export default t

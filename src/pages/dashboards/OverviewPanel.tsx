@@ -12,6 +12,7 @@ import type { ThemeColors } from '../../context/ThemeContext'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
+import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,39 @@ const AREA_DATA = [
   { month: 'Mar', receitas: 940,  despesas: 500 },
   { month: 'Abr', receitas: 1320, despesas: 840 },
   { month: 'Mai', receitas: 1180, despesas: 660 },
+]
+
+// Cor de margem (3ª série do gráfico de área) — distinta de receita/despesa.
+const MARGEM_COLOR = t.color.accent.purple.text
+
+// ─── Cruzamentos derivados ──────────────────────────────────────────────────
+// Em vez de "produção total" solta, cruzamos os talhões em distribuição de área
+// por cultura (ha × cultura). Cores estáveis por cultura.
+
+const CROP_COLOR: Record<string, string> = {
+  'Soja':           t.color.brand[600],
+  'Milho':          t.color.feedback.warning.solid,
+  'Cana-de-açúcar': t.color.accent.purple.text,
+  'Pastagem':       t.color.neutral[400],
+}
+
+const AREA_BY_CROP = (() => {
+  const acc = new Map<string, number>()
+  for (const tl of TALHAOES) {
+    const ha = parseInt(tl.area, 10) || 0
+    acc.set(tl.crop, (acc.get(tl.crop) ?? 0) + ha)
+  }
+  return [...acc.entries()].sort((a, b) => b[1] - a[1])
+})()
+const TOTAL_HA = AREA_BY_CROP.reduce((s, [, ha]) => s + ha, 0)
+
+// Resultado operacional (DRE) — receita decrescendo através das camadas de custo
+// até o resultado. Cruza o total de receita com a composição de custo (COE/COT).
+const DRE_STAGES = [
+  { label: 'Receita bruta',  value: 18900, sublabel: 'R$ 18,9M' },
+  { label: 'Após COE',       value: 11000, sublabel: '− custeio' },
+  { label: 'Após COT',       value: 7400,  sublabel: '− c. total' },
+  { label: 'Resultado',      value: 3500,  sublabel: 'R$ 3,5M'  },
 ]
 
 // ─── Talhões Map ──────────────────────────────────────────────────────────────
@@ -138,9 +172,15 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
 
   const recPts = pts('receitas')
   const dspPts = pts('despesas')
+  // Margem = receitas − despesas (cruzamento dos dois totais numa 3ª série)
+  const mgPts: [number, number][] = AREA_DATA.map((d, i) => [
+    PL + (i / (AREA_DATA.length - 1)) * cW,
+    PT + cH - ((d.receitas - d.despesas) / maxV) * cH,
+  ])
 
   const recPath = smoothPath(recPts)
   const dspPath = smoothPath(dspPts)
+  const mgPath  = smoothPath(mgPts)
 
   const areaClose = (path: string, baseY: number) =>
     `${path} L ${PL + cW} ${baseY} L ${PL} ${baseY} Z`
@@ -184,6 +224,7 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
         {/* Lines */}
         <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
+        <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
 
         {/* X labels */}
         {AREA_DATA.map((d, i) => {
@@ -205,6 +246,7 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
                   <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border.default} strokeWidth={1} strokeDasharray="3 2" />
                   <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.bg.surface} strokeWidth={2} />
                   <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.feedback.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
+                  <circle cx={mgPts[i][0]} cy={mgPts[i][1]} r={3.5} fill={MARGEM_COLOR} stroke={colors.bg.surface} strokeWidth={2} />
                 </g>
               )}
             </g>
@@ -257,7 +299,7 @@ function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
       {/* Legend */}
       <div style={{ display: 'flex', gap: t.space[3], marginTop: -t.space[3] }}>
         {[
-          { dot: activeColor,   label: 'Receitas' },
+          { dot: activeColor,   label: 'Margem' },
           { dot: inactiveColor === t.color.neutral[200] ? t.color.neutral[400] : inactiveColor, label: sub },
         ].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -418,6 +460,7 @@ export default function OverviewPanel() {
               {[
                 { color: t.color.brand[600], label: 'Receitas' },
                 { color: t.color.feedback.error.solid, label: 'Despesas' },
+                { color: MARGEM_COLOR, label: 'Margem' },
               ].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
@@ -453,47 +496,37 @@ export default function OverviewPanel() {
 
             <VDivider color={bc} />
 
-            {/* Budget / COE usage */}
+            {/* Resultado operacional (DRE) — receita → custos → resultado */}
             <div style={{ flex: 1, padding: t.space[5] }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Custo de produção</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[2] }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Resultado operacional (DRE)</span>
                 <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
                   Detalhes
                 </Button>
               </div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, marginBottom: t.space[3] }}>
-                R$ 3,6M
-              </div>
-              <SegmentedBar
-                colors={colors}
-                segments={[
-                  { color: isGbMode ? t.color.brand[700] : t.color.neutral[700], pct: 50, label: 'COE — 50%' },
-                  { color: isGbMode ? t.color.brand[500] : t.color.neutral[500], pct: 25, label: 'COT — 25%' },
-                  { color: isGbMode ? t.color.brand[300] : t.color.neutral[300], pct: 25, label: 'Outros — 25%' },
-                ]}
-              />
+              <SankeyFunnel stages={DRE_STAGES} colors={colors} isGbMode={isGbMode} chartHeight={150} />
             </div>
 
           </div>
 
           <HDivider color={bc} />
 
-          {/* Bottom metric */}
-          <div style={{ padding: `${t.space[4]}px ${t.space[5]}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1 }}>
-                19.648
-              </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 3 }}>
-                Produção total (ton)
-              </div>
+          {/* Área plantada por cultura — cruza os talhões (ha × cultura) */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[5]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Área plantada por cultura</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
+                {TOTAL_HA.toLocaleString('pt-BR')} ha · {TALHAOES.length} talhões
+              </span>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <Trend value="9,8% nos últimos 30 dias" up />
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 3 }}>
-                Pico <strong style={{ color: colors.fg.default }}>21,73 ton/ha</strong> em Mai
-              </div>
-            </div>
+            <SegmentedBar
+              colors={colors}
+              segments={AREA_BY_CROP.map(([crop, ha]) => ({
+                color: CROP_COLOR[crop] ?? t.color.neutral[400],
+                pct: ha,
+                label: `${crop} — ${Math.round((ha / TOTAL_HA) * 100)}%`,
+              }))}
+            />
           </div>
 
         </div>
@@ -506,10 +539,10 @@ export default function OverviewPanel() {
           {/* Radial gauge */}
           <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <RadialGauge
-              value="R$ 19,0M"
-              label="Receitas Total"
-              sub="Despesas"
-              pct={0.78}
+              value="R$ 14,5M"
+              label="Margem operacional"
+              sub="Custos"
+              pct={0.77}
               colors={colors}
               isGbMode={isGbMode}
             />

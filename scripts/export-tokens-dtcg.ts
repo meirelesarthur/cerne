@@ -1,14 +1,22 @@
 /**
  * Exporta src/design/tokens.ts → tokens/tokens.json (W3C DTCG)
  *
+ * Estrutura de saída (3 camadas + componente), espelhando a arquitetura de
+ * tokens.ts e o padrão Tokens Studio (sets + $themes):
+ *
+ *   core      → primitivos (rampas) + fundação não-cor (font/space/size/…)
+ *   semantic  → papéis theme-agnostic (feedback/accent/state/overlay/gb)  → alias p/ core
+ *   light     → papéis de tela no tema claro (fg/bg/border/accent/nav/shadow) → alias p/ core
+ *   gbMode    → papéis de tela no tema escuro
+ *   component → tokens de componente (dashboardTile/login)
+ *
  * Saída consumida por:
- *   1. Tokens Studio (plugin Figma) → sincroniza com Figma Variables
+ *   1. Tokens Studio (plugin Figma) → sincroniza com Figma Variables (Modes Light/GBMode)
  *   2. Supernova → importa as Variables do Figma como data source
  *
- * Rodar:  npx tsx scripts/export-tokens-dtcg.ts
- *         ou:  npm run tokens:export
+ * Rodar:  npx tsx scripts/export-tokens-dtcg.ts   ou   npm run tokens:export
  *
- * Direção do fluxo (imutável):
+ * Direção do fluxo (imutável — Lei 5):
  *   tokens.ts → tokens.json → Figma Variables → Supernova
  *   Figma/Supernova NUNCA definem tokens — apenas consomem.
  */
@@ -29,7 +37,7 @@ type DTCGNode = DTCGLeaf | { [key: string]: DTCGNode }
 
 const px = (n: number) => `${n}px`
 
-/** Converte recursivamente objeto de strings para tokens de cor DTCG */
+/** Converte recursivamente objeto de strings para tokens de cor DTCG (valor literal) */
 function colorGroup(obj: Record<string, unknown>): Record<string, DTCGNode> {
   return Object.fromEntries(
     Object.entries(obj).map(([k, v]) => {
@@ -55,21 +63,48 @@ function dimensionGroup(obj: Record<string, unknown>): Record<string, DTCGNode> 
   )
 }
 
+// ─── Referência de alias (camada semântica → primitivos) ───────────────────────
+// As camadas semantic/light/gbMode/component referenciam os primitivos por alias
+// DTCG (`{core.color.brand.600}`) quando o valor casa com uma rampa primitiva —
+// é o que faz o Tokens Studio cascatear edições da rampa para os papéis.
+
+/** Mapa reverso hex → caminho de alias do primitivo (`{core.color.<hue>.<step>}`) */
+function buildColorRefMap(prim: Record<string, Record<string, string>>): Record<string, string> {
+  const map: Record<string, string> = {}
+  for (const [hue, ramp] of Object.entries(prim))
+    for (const [step, hex] of Object.entries(ramp)) {
+      const key = hex.toLowerCase()
+      if (!(key in map)) map[key] = `{core.color.${hue}.${step}}`
+    }
+  return map
+}
+
+const REF = buildColorRefMap(t.primitive as unknown as Record<string, Record<string, string>>)
+
+/** Substitui um valor de cor por alias do primitivo, se houver correspondência exata */
+const colorRef = (v: string): string => REF[v.toLowerCase()] ?? v
+
+/** Como colorGroup, mas aliando para os primitivos quando possível */
+function colorGroupRef(obj: Record<string, unknown>): Record<string, DTCGNode> {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => {
+      if (typeof v === 'string') return [k, { $value: colorRef(v), $type: 'color' }]
+      if (typeof v === 'object' && v !== null)
+        return [k, colorGroupRef(v as Record<string, unknown>)]
+      return [k, { $value: v, $type: 'color' }]
+    })
+  )
+}
+
 /** Parseia shorthand CSS de borda para o tipo `border` composto do DTCG */
 function parseBorder(css: string): DTCGLeaf {
   const m = css.match(/^(\S+)\s+(\S+)\s+(.+)$/)
   if (!m) return { $value: css, $type: 'border' }
-  // DTCG border: { color, width, style }
-  return {
-    $value: { color: m[3], width: m[1], style: m[2] },
-    $type: 'border',
-  }
+  return { $value: { color: m[3], width: m[1], style: m[2] }, $type: 'border' }
 }
 
 // ─── Parsers de tipos compostos DTCG ──────────────────────────────────────────
-// O DTCG rejeita strings CSS cruas para cubicBezier/duration/shadow/transition:
-// cubicBezier exige array de 4 números; duration exige { value, unit };
-// shadow/transition exigem objetos. Sem isso, Tokens Studio recusa o arquivo.
+// O DTCG rejeita strings CSS cruas para cubicBezier/duration/shadow/transition.
 
 /** "150ms" | "0.1s" → { value: <ms>, unit: "ms" } (DTCG duration) */
 function parseDuration(css: string): { value: number; unit: 'ms' } {
@@ -81,7 +116,6 @@ function parseDuration(css: string): { value: number; unit: 'ms' } {
 
 const durationToken = (css: string): DTCGLeaf => ({ $value: parseDuration(css), $type: 'duration' })
 
-/** Mapeamento das palavras-chave de easing CSS para curvas de Bézier */
 const EASING_KEYWORDS: Record<string, number[]> = {
   ease:          [0.25, 0.1, 0.25, 1],
   linear:        [0, 0, 1, 1],
@@ -125,24 +159,31 @@ function parseShadowLayer(layer: string) {
 
 /** "0 1px 2px rgba(...)" (1+ camadas) → DTCG shadow (objeto ou array de objetos) */
 function parseShadow(css: string): DTCGLeaf {
-  // separa camadas em vírgulas de nível superior (preservando as de dentro do rgba)
   const layers = css.match(/(?:[^,(]|\([^)]*\))+/g)?.map(s => s.trim()).filter(Boolean) ?? [css]
   const parsed = layers.map(parseShadowLayer)
   return { $value: parsed.length === 1 ? parsed[0] : parsed, $type: 'shadow' }
 }
 
-// ─── Mapeamento completo ──────────────────────────────────────────────────────
+// ─── Camadas ────────────────────────────────────────────────────────────────
 
-const output: Record<string, DTCGNode> = {
+/** Set semântico theme-aware (light/gbMode): papéis de tela, aliando primitivos */
+function paletteSet(p: typeof t.themePalette.light): Record<string, DTCGNode> {
+  return {
+    fg:     colorGroupRef(p.fg),
+    bg:     colorGroupRef(p.bg),
+    border: colorGroupRef(p.border),
+    accent: colorGroupRef(p.accent),
+    nav:    colorGroupRef(p.nav),
+    shadow: parseShadow(p.shadow),
+  }
+}
 
-  // ── Cores ──────────────────────────────────────────────────────────────────
-  color: colorGroup(t.color as unknown as Record<string, unknown>),
+// ── core: primitivos + fundação não-cor ──────────────────────────────────────
+const core: Record<string, DTCGNode> = {
+  color: colorGroup(t.primitive as unknown as Record<string, unknown>),
 
-  // ── Tipografia ─────────────────────────────────────────────────────────────
   font: {
-    family: {
-      sans: { $value: "'Outfit', sans-serif", $type: 'fontFamily' },
-    },
+    family: { sans: { $value: "'Outfit', sans-serif", $type: 'fontFamily' } },
     size: Object.fromEntries(
       Object.entries(t.font.size).map(([k, v]) => [k, { $value: px(v), $type: 'dimension' }])
     ),
@@ -154,41 +195,33 @@ const output: Record<string, DTCGNode> = {
     ),
   },
 
-  // ── Espaçamento ────────────────────────────────────────────────────────────
   space: Object.fromEntries(
     Object.entries(t.space).map(([k, v]) => [k, { $value: px(v), $type: 'dimension' }])
   ),
 
-  // ── Tamanhos de controle ───────────────────────────────────────────────────
   size: dimensionGroup(t.size as unknown as Record<string, unknown>),
 
-  // ── Border radius ──────────────────────────────────────────────────────────
   // DTCG não tem tipo "borderRadius" — raios são "dimension".
   radius: Object.fromEntries(
     Object.entries(t.radius).map(([k, v]) => [k, { $value: px(v), $type: 'dimension' }])
   ),
 
-  // ── Sombras ────────────────────────────────────────────────────────────────
   shadow: Object.fromEntries(
     Object.entries(t.shadow).map(([k, v]) => [k, parseShadow(v)])
   ),
 
-  // ── Bordas ─────────────────────────────────────────────────────────────────
   border: Object.fromEntries(
     Object.entries(t.border).map(([k, v]) => [k, parseBorder(v)])
   ),
 
-  // ── Z-index ────────────────────────────────────────────────────────────────
   zIndex: Object.fromEntries(
     Object.entries(t.zIndex).map(([k, v]) => [k, { $value: v, $type: 'number' }])
   ),
 
-  // ── Transições ─────────────────────────────────────────────────────────────
   transition: Object.fromEntries(
     Object.entries(t.transition).map(([k, v]) => [k, parseTransition(v)])
   ),
 
-  // ── Animações ──────────────────────────────────────────────────────────────
   animation: {
     duration: Object.fromEntries(
       Object.entries(t.animation.duration).map(([k, v]) => [k, durationToken(v)])
@@ -198,34 +231,64 @@ const output: Record<string, DTCGNode> = {
     ),
   },
 
-  // ── Delays de loading ──────────────────────────────────────────────────────
   delay: {
     loadingShow: durationToken(`${t.delay.loadingShow}ms`),
     loadingMin:  durationToken(`${t.delay.loadingMin}ms`),
   },
 
-  // ── Focus rings / Glow ─────────────────────────────────────────────────────
   glow: Object.fromEntries(
     Object.entries(t.glow).map(([k, v]) => [k, parseShadow(v)])
   ),
 
-  // ── Tema login ─────────────────────────────────────────────────────────────
-  loginTheme: {
-    leftBg:     { $value: t.loginTheme.leftBg,     $type: 'color' },
-    rightBg:    { $value: t.loginTheme.rightBg,    $type: 'color' },
-    accentGlow: { $value: t.loginTheme.accentGlow, $type: 'color' },
-  },
+  breakpoint: dimensionGroup(t.breakpoint as unknown as Record<string, unknown>),
 
-  // ── Dashboard tiles ────────────────────────────────────────────────────────
-  dashboard: colorGroup(t.dashboard as unknown as Record<string, unknown>),
+  layout: dimensionGroup(t.layout as unknown as Record<string, unknown>),
 
-  // ── Gráficos ───────────────────────────────────────────────────────────────
   chart: {
     revenue: { $value: t.chart.revenue, $type: 'color' },
     expense: { $value: t.chart.expense, $type: 'color' },
     series: Object.fromEntries(
       (t.chart.series as string[]).map((v, i) => [`${i + 1}`, { $value: v, $type: 'color' }])
     ),
+    grid:   { $value: t.chart.grid,   $type: 'color' },
+    gridGb: { $value: t.chart.gridGb, $type: 'color' },
+  },
+}
+
+// ── semantic: papéis theme-agnostic (alias → core) ───────────────────────────
+const semantic: Record<string, DTCGNode> = {
+  color: colorGroupRef({
+    feedback: t.color.feedback,
+    accent:   t.color.accent,
+    state:    t.color.state,
+    overlay:  t.color.overlay,
+    gb:       t.color.gb,
+  } as unknown as Record<string, unknown>),
+}
+
+// ─── Montagem final (sets + $themes Tokens Studio) ─────────────────────────────
+
+const output: Record<string, unknown> = {
+  core,
+  semantic,
+  light:     paletteSet(t.themePalette.light),
+  gbMode:    paletteSet(t.themePalette.gbMode),
+  component: colorGroupRef(t.component as unknown as Record<string, unknown>),
+
+  $themes: [
+    {
+      id: 'light',
+      name: 'Light',
+      selectedTokenSets: { core: 'source', semantic: 'enabled', light: 'enabled', gbMode: 'disabled', component: 'enabled' },
+    },
+    {
+      id: 'gbMode',
+      name: 'GBMode',
+      selectedTokenSets: { core: 'source', semantic: 'enabled', light: 'disabled', gbMode: 'enabled', component: 'enabled' },
+    },
+  ],
+  $metadata: {
+    tokenSetOrder: ['core', 'semantic', 'light', 'gbMode', 'component'],
   },
 }
 
@@ -237,9 +300,9 @@ const outFile = resolve(outDir, 'tokens.json')
 mkdirSync(outDir, { recursive: true })
 writeFileSync(outFile, JSON.stringify(output, null, 2), 'utf-8')
 
-const groupCount = Object.keys(output).length
-const leafCount  = JSON.stringify(output).match(/"\$value"/g)?.length ?? 0
+const setCount  = ['core', 'semantic', 'light', 'gbMode', 'component'].length
+const leafCount = JSON.stringify(output).match(/"\$value"/g)?.length ?? 0
 
 console.log(`✓  tokens/tokens.json gerado`)
-console.log(`   ${groupCount} grupos · ${leafCount} tokens`)
+console.log(`   ${setCount} sets (core · semantic · light · gbMode · component) · ${leafCount} tokens`)
 console.log(`   → Próximo passo: abrir Tokens Studio no Figma e sincronizar com este arquivo`)

@@ -1,13 +1,25 @@
 /**
  * GB CERNE Design Tokens
- * Nomenclatura inspirada no Tailwind CSS, adaptada para o contexto agrícola.
- * Toda decisão visual do sistema deve referenciar este arquivo.
+ *
+ * Arquitetura semântica em 3 camadas (padrão W3C DTCG / GitHub Primer):
+ *   1. PRIMITIVOS   — rampas cruas, sem papel (brand, neutral, red, amber, blue).
+ *   2. SEMÂNTICO    — papéis que referenciam primitivos:
+ *        • theme-agnostic (`color.feedback`, `color.accent`, `color.state`, `color.overlay`, `color.gb`)
+ *        • theme-aware    (`themePalette.light` / `themePalette.gbMode` → consumidos pelo ThemeContext)
+ *   3. FUNDAÇÃO/COMPONENTE — escalas não-cor (font, space, size, radius…) e tokens de componente.
+ *
+ * Fonte única do sistema: toda decisão visual referencia este arquivo (via `t.*`
+ * ou `useTheme().colors`). Exportação para o ecossistema de design segue o padrão
+ * W3C DTCG — ver `scripts/export-tokens-dtcg.ts` (Lei 5).
  */
 
-// ─── Cores ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMADA 1 — PRIMITIVOS (theme-agnostic)
+// Rampas cruas. Não carregam papel/semântica; são a base que o restante alia.
+// ═══════════════════════════════════════════════════════════════════════════
 
-export const color = {
-  /** Verde primário — identidade GB CERNE */
+export const primitive = {
+  /** Verde primário — identidade GB CERNE (600 principal · 700 hover) */
   brand: {
     50:  '#f0fdf4',
     100: '#dcfce7',
@@ -15,8 +27,8 @@ export const color = {
     300: '#86efac',
     400: '#4ade80',
     500: '#22c55e',
-    600: '#059669', // principal
-    700: '#047857', // hover
+    600: '#059669',
+    700: '#047857',
     800: '#065f46',
     900: '#064e3b',
   },
@@ -39,78 +51,246 @@ export const color = {
     950: '#171717',
   },
 
-  /** Notificação — âmbar (substitui valores hardcoded #f59e0b) */
-  notification: '#f59e0b',
-
-  /** Overlays de modais e drawers (fundos escurecidos atrás de dialogs) */
-  overlay: {
-    modal:  'rgba(0,0,0,0.45)',
-    drawer: 'rgba(0,0,0,0.18)',
+  /** Vermelho — base do feedback negativo (600 = texto/sólido de erro) */
+  red: {
+    50:  '#fef2f2',
+    100: '#fee2e2',
+    200: '#fecaca',
+    300: '#fca5a5',
+    400: '#f87171',
+    500: '#ef4444',
+    600: '#dc2626',
+    700: '#b91c1c',
+    800: '#991b1b',
+    900: '#7f1d1d',
   },
 
-  /** Acentos exclusivos do GBMode (tema escuro) — evita hex solto nos charts */
-  gbAccent:  '#4ade80',              // = brand[400], texto/destaque sobre fundo escuro
-  gbSurface: 'rgba(14,42,29,0.55)',  // superfície translúcida de cards no GBMode
-
-  /** Semânticos */
-  success: {
-    bg:     '#f0fdf4',
-    border: '#bbf7d0',
-    text:   '#059669',
-    solid:  '#059669',
-  },
-  error: {
-    bg:     '#fee2e2',
-    border: '#fca5a5',
-    text:   '#dc2626',
-    solid:  '#dc2626',
-  },
-  warning: {
-    bg:     '#fffbeb',
-    border: '#fde68a',
-    text:   '#d97706',
-    solid:  '#f59e0b',
-  },
-  info: {
-    bg:     '#eff6ff',
-    border: '#bfdbfe',
-    text:   '#2563eb',
-    solid:  '#3b82f6',
+  /** Âmbar — base de warning e notificação (500 = sólido · 600 = texto) */
+  amber: {
+    50:  '#fffbeb',
+    100: '#fef3c7',
+    200: '#fde68a',
+    300: '#fcd34d',
+    400: '#fbbf24',
+    500: '#f59e0b',
+    600: '#d97706',
+    700: '#b45309',
+    800: '#92400e',
+    900: '#78350f',
   },
 
-  /** Acentos auxiliares para Badge/Tag (variantes não-semânticas) */
-  purple: {
-    bg:   '#f5f3ff',
-    text: '#7c3aed',
-  },
-  cyan: {
-    bg:   '#ecfeff',
-    text: '#0891b2',
-  },
-
-  /** Estado desabilitado — centraliza valores antes definidos por componente */
-  disabled: {
-    bg:     '#f5f5f5',   // = neutral[100]
-    text:   '#9ca3af',   // = neutral[400]
-    border: '#e5e7eb',   // = neutral[200]
-  },
-  /** Estado somente-leitura (read-only) — superfície sutil, texto legível */
-  readonly: {
-    bg:     '#fafafa',   // = neutral[50]
-    text:   '#404040',   // = neutral[700]
-    border: '#e5e7eb',   // = neutral[200]
-  },
-
-  /** Estados de linha de tabela (hover/selecionada/zebra) — light + GBMode */
-  row: {
-    hover:       '#f5f5f5',                  // light — = neutral[100]
-    hoverGb:     'rgba(255,255,255,0.03)',   // GBMode
-    selected:    '#f0fdf4',                  // light — = brand[50]
-    selectedGb:  'rgba(16,185,129,0.06)',    // GBMode
-    striped:     '#fafafa',                  // light — = neutral[50]
-    stripedGb:   'rgba(255,255,255,0.015)',  // GBMode
+  /** Azul — base de informação (500 = sólido · 600 = texto) */
+  blue: {
+    50:  '#eff6ff',
+    100: '#dbeafe',
+    200: '#bfdbfe',
+    300: '#93c5fd',
+    400: '#60a5fa',
+    500: '#3b82f6',
+    600: '#2563eb',
+    700: '#1d4ed8',
+    800: '#1e40af',
+    900: '#1e3a8a',
   },
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMADA 2a — SEMÂNTICO theme-agnostic (papéis que não dependem do tema)
+// Aliam primitivos. Consumidos via `t.color.<grupo>` — sem hook de tema.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Feedback de estado (success/error/warning/info) + aviso pontual */
+const feedback = {
+  success: {
+    bg:     primitive.brand[50],
+    border: primitive.brand[200],
+    text:   primitive.brand[600],
+    solid:  primitive.brand[600],
+  },
+  error: {
+    bg:     primitive.red[100],
+    border: primitive.red[300],
+    text:   primitive.red[600],
+    solid:  primitive.red[600],
+  },
+  warning: {
+    bg:     primitive.amber[50],
+    border: primitive.amber[200],
+    text:   primitive.amber[600],
+    solid:  primitive.amber[500],
+  },
+  info: {
+    bg:     primitive.blue[50],
+    border: primitive.blue[200],
+    text:   primitive.blue[600],
+    solid:  primitive.blue[500],
+  },
+  /** Cor pontual de notificação/alerta (badge "novo", ponto de aviso) */
+  notice: primitive.amber[500],
+}
+
+/** Acentos auxiliares para Badge/Tag (variantes não-semânticas) */
+const accent = {
+  purple: { bg: '#f5f3ff', text: '#7c3aed' },
+  cyan:   { bg: '#ecfeff', text: '#0891b2' },
+}
+
+/** Estados de controle e de linha de tabela */
+const state = {
+  /** Desabilitado — superfície apagada, texto/borda suaves */
+  disabled: {
+    bg:     primitive.neutral[100],
+    text:   primitive.neutral[400],
+    border: primitive.neutral[200],
+  },
+  /** Somente-leitura (read-only) — superfície sutil, texto legível */
+  readonly: {
+    bg:     primitive.neutral[50],
+    text:   primitive.neutral[700],
+    border: primitive.neutral[200],
+  },
+  /** Linhas de tabela (hover/selecionada/zebra) — light + GBMode */
+  row: {
+    hover:       primitive.neutral[100],            // light
+    hoverGb:     'rgba(255,255,255,0.03)',          // GBMode
+    selected:    primitive.brand[50],               // light
+    selectedGb:  'rgba(16,185,129,0.06)',           // GBMode
+    striped:     primitive.neutral[50],             // light
+    stripedGb:   'rgba(255,255,255,0.015)',         // GBMode
+  },
+}
+
+/** Fundos escurecidos atrás de dialogs/drawers */
+const overlay = {
+  modal:  'rgba(0,0,0,0.45)',
+  drawer: 'rgba(0,0,0,0.18)',
+}
+
+/** Acentos exclusivos do GBMode (tema escuro) — ver FIGMA_NAMING `color/gb/*` */
+const gb = {
+  accent:  '#4ade80',              // verde claro de destaque (= brand[400])
+  surface: 'rgba(14,42,29,0.55)',  // superfície translúcida de cards no GBMode
+}
+
+// ─── Superfície pública de cor ─────────────────────────────────────────────
+// Expõe primitivos + grupos semânticos theme-agnostic. Os papéis theme-aware
+// (fg/bg/border/accent de tela) ficam em `themePalette`, consumidos via useTheme.
+
+export const color = {
+  // primitivos
+  brand:   primitive.brand,
+  neutral: primitive.neutral,
+  red:     primitive.red,
+  amber:   primitive.amber,
+  blue:    primitive.blue,
+  // semânticos theme-agnostic
+  feedback,
+  accent,
+  state,
+  overlay,
+  gb,
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMADA 2b — SEMÂNTICO theme-aware (papéis de tela, resolvidos por tema)
+// Sets light / gbMode consumidos pelo ThemeContext. Nomes estilo Primer/DTCG:
+//   fg     → texto         bg     → superfícies      border → linhas
+//   accent → marca/ação    nav    → navegação        shadow → sombra base
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface ThemePalette {
+  fg:     { default: string; muted: string; subtle: string; onAccent: string }
+  bg:     { canvas: string; outer: string; surface: string; subtle: string; input: string; sidebar: string }
+  border: { default: string; subtle: string }
+  accent: { default: string; hover: string; subtle: string }
+  nav: {
+    text: string; textActive: string; textMuted: string
+    itemActive: string; itemHover: string; divider: string
+    headerBg: string; headerText: string
+  }
+  shadow: string
+}
+
+const lightPalette: ThemePalette = {
+  fg: {
+    default:  primitive.neutral[950],   // #171717
+    muted:    primitive.neutral[700],   // #404040
+    subtle:   primitive.neutral[500],   // #6b7280
+    onAccent: primitive.neutral[0],     // #ffffff
+  },
+  bg: {
+    canvas:  '#f0f0f0',
+    outer:   primitive.neutral[50],     // #fafafa
+    surface: primitive.neutral[0],      // #ffffff
+    subtle:  primitive.neutral[100],    // #f5f5f5
+    input:   primitive.neutral[50],     // #fafafa
+    sidebar: primitive.neutral[0],      // #ffffff
+  },
+  border: {
+    default: primitive.neutral[200],    // #e5e7eb
+    subtle:  '#f0f0f0',
+  },
+  accent: {
+    default: primitive.brand[600],      // #059669
+    hover:   primitive.brand[700],      // #047857
+    subtle:  primitive.brand[50],       // #f0fdf4
+  },
+  nav: {
+    text:       '#525252',
+    textActive: primitive.neutral[950], // #171717
+    textMuted:  primitive.neutral[500], // #6b7280
+    itemActive: primitive.brand[50],    // #f0fdf4
+    itemHover:  'rgba(0,0,0,0.04)',
+    divider:    '#f0f0f0',
+    headerBg:   '#e6f5f0',
+    headerText: primitive.brand[700],   // #047857
+  },
+  shadow: '0 1px 4px rgba(0,0,0,0.06)',
+}
+
+/** Extraído do Figma: https://figma.com/design/S8qJ9G8mbenqZ0Zcq3XnrE — node 53941:3849 */
+const gbModePalette: ThemePalette = {
+  fg: {
+    default:  '#e2f0e8',
+    muted:    '#7da893',
+    subtle:   'rgba(216,237,226,0.6)',
+    onAccent: primitive.neutral[0],     // #ffffff
+  },
+  bg: {
+    canvas:  '#051008',
+    outer:   '#081a12',
+    surface: '#0e2a1d',
+    subtle:  '#0b1e14',
+    input:   '#132f22',
+    sidebar: '#081a12',
+  },
+  border: {
+    default: '#1c3f2c',
+    subtle:  'rgba(28,63,44,0.5)',
+  },
+  accent: {
+    default: '#10b981',
+    hover:   primitive.brand[600],      // #059669
+    subtle:  'rgba(16,185,129,0.12)',
+  },
+  nav: {
+    text:       'rgba(216,237,226,0.55)',
+    textActive: '#d8ede2',
+    textMuted:  'rgba(216,237,226,0.45)',
+    itemActive: '#0b1e14',
+    itemHover:  'rgba(255,255,255,0.04)',
+    divider:    'rgba(28,63,44,0.8)',
+    headerBg:   'rgba(16,185,129,0.12)',
+    headerText: '#10b981',
+  },
+  shadow: '0 1px 4px rgba(0,0,0,0.3)',
+}
+
+export const themePalette = { light: lightPalette, gbMode: gbModePalette }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMADA 3 — FUNDAÇÃO (theme-agnostic, não-cor)
+// ═══════════════════════════════════════════════════════════════════════════
 
 // ─── Tipografia ─────────────────────────────────────────────────────────────
 
@@ -170,8 +350,7 @@ export const space = {
 }
 
 // ─── Tamanhos de controle ───────────────────────────────────────────────────
-// Alturas/larguras reutilizadas de controles interativos. Centraliza os px
-// antes soltos em FormField, Button, ToggleSwitch, IconButton, etc.
+// Alturas/larguras reutilizadas de controles interativos.
 
 export const size = {
   /** Altura de inputs/selects padrão — alinhada ao botão md (t.size.btn.md) */
@@ -208,23 +387,23 @@ export const size = {
 // ─── Border radius ────────────────────────────────────────────────────────────
 
 export const radius = {
-  sm:      4,
-  md:      6,
-  DEFAULT: 8,   // inputs, botões
-  lg:      10,  // tabelas com borda
-  xl:      12,  // cards de formulário
-  '2xl':   16,  // container principal
-  '3xl':   20,  // modais grandes
-  '4xl':   24,  // containers expandidos
-  modal:   20,  // alias semântico para modais
-  full:    9999,
+  sm:    4,
+  md:    6,
+  base:  8,   // inputs, botões (raio padrão do sistema)
+  lg:    10,  // tabelas com borda
+  xl:    12,  // cards de formulário
+  '2xl': 16,  // container principal
+  '3xl': 20,  // modais grandes
+  '4xl': 24,  // containers expandidos
+  modal: 20,  // alias semântico para modais
+  full:  9999,
 }
 
 // ─── Sombras ─────────────────────────────────────────────────────────────────
 
 export const shadow = {
   sm:      '0 1px 2px rgba(0,0,0,0.05)',
-  DEFAULT: '0 1px 4px rgba(0,0,0,0.08)',
+  base:    '0 1px 4px rgba(0,0,0,0.08)',
   md:      '0 4px 12px rgba(0,0,0,0.08)',
   lg:      '0 8px 24px rgba(0,0,0,0.10)',
   brand:   '0 4px 16px rgba(5,150,105,0.25)',
@@ -232,38 +411,38 @@ export const shadow = {
   modal:   '0 8px 40px rgba(0,0,0,0.12)',  // sombra focada para dialogs
 
   /** Cards de dashboard — estado idle e hover (light + GBMode) */
-  card:        '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-  cardHover:   '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
-  cardDark:    '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+  card:          '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+  cardHover:     '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
+  cardDark:      '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
   cardDarkHover: '0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)',
 }
 
 // ─── Bordas ───────────────────────────────────────────────────────────────────
 
 export const border = {
-  DEFAULT: `1px solid ${color.neutral[200]}`,
-  medium:  `1.5px solid ${color.neutral[250]}`,
-  brand:   `1px solid ${color.brand[200]}`,
-  error:   `1.5px solid ${color.error.solid}`,
+  base:   `1px solid ${primitive.neutral[200]}`,
+  medium: `1.5px solid ${primitive.neutral[250]}`,
+  brand:  `1px solid ${primitive.brand[200]}`,
+  error:  `1.5px solid ${primitive.red[600]}`,
 }
 
 // ─── Z-index ──────────────────────────────────────────────────────────────────
 
 export const zIndex = {
-  base:    1,
+  base:     1,
   dropdown: 100,
-  overlay: 200,
-  drawer:  201,
-  toast:   9999,
+  overlay:  200,
+  drawer:   201,
+  toast:    9999,
 }
 
 // ─── Transições ───────────────────────────────────────────────────────────────
 
 export const transition = {
-  fast:    '0.1s ease',
-  DEFAULT: '0.15s ease',
-  smooth:  '0.2s ease',
-  drawer:  '0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+  fast:   '0.1s ease',
+  base:   '0.15s ease',
+  smooth: '0.2s ease',
+  drawer: '0.25s cubic-bezier(0.4, 0, 0.2, 1)',
 }
 
 // ─── Animações ───────────────────────────────────────────────────────────────
@@ -285,8 +464,7 @@ export const animation = {
 }
 
 // ─── Delays de loading ─────────────────────────────────────────────────────────
-// Diretriz de UI: atrasar a exibição do loading evita flash em respostas rápidas;
-// manter um tempo mínimo visível evita flicker. Use estes em spinners/skeletons.
+// Atrasar a exibição do loading evita flash; manter um tempo mínimo evita flicker.
 
 export const delay = {
   /** Espera antes de exibir o indicador de loading (evita flash) */
@@ -303,29 +481,37 @@ export const glow = {
   error:   '0 0 0 3px rgba(220,38,38, 0.10)',
 }
 
-// ─── Tema da tela de login ────────────────────────────────────────────────────
+// ─── Breakpoints ───────────────────────────────────────────────────────────────
 
-export const loginTheme = {
-  leftBg:     '#081a12',         // Verde muito escuro — substitui marrom #1c1917
-  rightBg:    '#fafaf9',         // Warm white — substitui branco frio #ffffff
-  accentGlow: 'rgba(5,150,105, 0.05)',
+export const breakpoint = {
+  xs: 360,   // menor alvo de teste
+  sm: 768,   // limite do ViewportGuard / tablet
+  md: 1024,
+  lg: 1280,  // laptop de referência
+  xl: 1920,  // wide de referência
 }
 
-// ─── Tokens para tiles de dashboard ──────────────────────────────────────────
-// Backgrounds escuros exclusivos da visualização de scoreboards no OverviewPanel
+// ─── Layout ───────────────────────────────────────────────────────────────────
+// Constantes do chassi da aplicação (AppLayout).
 
-export const dashboard = {
-  tileRevenue:    '#1b4332',  // verde escuro — receitas
-  tileExpense:    '#7f1d1d',  // vermelho escuro — despesas
-  tileFinance:    '#1e3a5f',  // azul escuro — análise financeira
-  tileProduction: '#14532d',  // verde escuro alt — produção
-  tileDark:       '#1c1917',  // quase-preto — produtividade / neutro
+export const layout = {
+  /**
+   * Altura total consumida pelo chassi acima/abaixo da área de conteúdo:
+   * padding do root (8+8) + padding do card externo (8+8) + Topbar (48) + gap (8) = 88.
+   */
+  contentOffset: 88,
+  /**
+   * Distância do topo da viewport até o topo da área de conteúdo / navegação secundária.
+   */
+  contentTop: 72,
+  /** Folga externa do chassi (root pad 8 + card pad 8 = 16). */
+  gutter: 16,
 }
 
-// ─── Tokens para séries de gráficos ──────────────────────────────────────────
+// ─── Gráficos ──────────────────────────────────────────────────────────────────
 
 export const chart = {
-  revenue: '#3b82f6',  // azul — receitas (equivale a color.info.solid)
+  revenue: '#3b82f6',  // azul — receitas (= feedback.info.solid)
   expense: '#ef4444',  // vermelho vivo — despesas
   /** Paleta categórica para múltiplas séries (até 8) — ordem estável */
   series: [
@@ -339,51 +525,71 @@ export const chart = {
     '#65a30d',  // 8 — verde-limão
   ],
   /** Linhas de grade / eixos dos gráficos */
-  grid: 'rgba(0,0,0,0.06)',
+  grid:   'rgba(0,0,0,0.06)',
   gridGb: 'rgba(255,255,255,0.06)',
 }
 
-// ─── Breakpoints ───────────────────────────────────────────────────────────────
-// Larguras de viewport de referência. O app não é mobile-first, mas filtros,
-// auto-zoom de inputs iOS e o ViewportGuard dependem destes pontos.
+// ─── Tokens de componente (camada 3 — "theme" da referência DTCG) ──────────────
 
-export const breakpoint = {
-  xs: 360,   // menor alvo de teste
-  sm: 768,   // limite do ViewportGuard / tablet
-  md: 1024,
-  lg: 1280,  // laptop de referência
-  xl: 1920,  // wide de referência
+export const component = {
+  /** Backgrounds escuros dos tiles de scoreboard no OverviewPanel */
+  dashboardTile: {
+    revenue:    '#1b4332',  // verde escuro — receitas
+    expense:    '#7f1d1d',  // vermelho escuro — despesas
+    finance:    '#1e3a5f',  // azul escuro — análise financeira
+    production: '#14532d',  // verde escuro alt — produção
+    dark:       '#1c1917',  // quase-preto — produtividade / neutro
+  },
+  /** Tela de login (split-screen) */
+  login: {
+    leftBg:     '#081a12',         // verde muito escuro
+    rightBg:    '#fafaf9',         // warm white
+    accentGlow: 'rgba(5,150,105, 0.05)',
+  },
 }
 
-// ─── Layout ───────────────────────────────────────────────────────────────────
-// Constantes do chassi da aplicação (AppLayout). Centralizadas para evitar
-// números mágicos espalhados nas telas.
+// ═══════════════════════════════════════════════════════════════════════════
+// ALIASES DE COMPATIBILIDADE (temporários — removidos na Fase 5 da migração)
+// Mantêm os nomes antigos funcionando enquanto as chamadas migram para os
+// novos. NÃO USE em código novo.
+// ═══════════════════════════════════════════════════════════════════════════
 
-export const layout = {
-  /**
-   * Altura total consumida pelo chassi acima/abaixo da área de conteúdo:
-   * padding do root (8+8) + padding do card externo (8+8) + Topbar (48) + gap (8) = 88.
-   * Use `calc(100vh - ${t.layout.contentOffset}px)` para um card que preenche
-   * exatamente a altura da navegação secundária (sub-menu).
-   */
-  contentOffset: 88,
-  /**
-   * Distância do topo da viewport até o topo da área de conteúdo / navegação
-   * secundária (sub-menu): root pad (8) + card pad (8) + Topbar (48) + gap (8) = 72.
-   * Use como `top` em overlays que devem se alinhar ao menu e ao sub-menu
-   * (sem cobrir a Topbar).
-   */
-  contentTop: 72,
-  /**
-   * Folga externa do chassi (root pad 8 + card pad 8 = 16). Usada nas laterais e
-   * base de overlays alinhados à área de conteúdo, mantendo a mesma margem do
-   * menu e do sub-menu. Observação: contentTop + gutter = contentOffset.
-   */
-  gutter: 16,
+/** @deprecated use `color.feedback.*` / `color.accent.*` / `color.state.*` / `color.gb.*` */
+const colorCompat = {
+  success:      feedback.success,
+  error:        feedback.error,
+  warning:      feedback.warning,
+  info:         feedback.info,
+  notification: feedback.notice,
+  purple:       accent.purple,
+  cyan:         accent.cyan,
+  disabled:     state.disabled,
+  readonly:     state.readonly,
+  row:          state.row,
+  gbAccent:     gb.accent,
+  gbSurface:    gb.surface,
 }
+
+/** @deprecated use `component.dashboardTile` */
+export const dashboard = component.dashboardTile
+/** @deprecated use `component.login` */
+export const loginTheme = component.login
 
 // ─── Atalho global ────────────────────────────────────────────────────────────
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
-export const t = { color, font, space, size, radius, shadow, border, zIndex, transition, animation, delay, glow, login: loginTheme, dashboard, chart, breakpoint, layout }
+export const t = {
+  color: { ...color, ...colorCompat },
+  font, space, size,
+  radius:     { ...radius, DEFAULT: radius.base },
+  shadow:     { ...shadow, DEFAULT: shadow.base },
+  border:     { ...border, DEFAULT: border.base },
+  transition: { ...transition, DEFAULT: transition.base },
+  zIndex, animation, delay, glow,
+  breakpoint, layout, chart, component,
+  themePalette,
+  // aliases de compat (removidos na Fase 5)
+  login:     component.login,
+  dashboard: component.dashboardTile,
+}
 export default t

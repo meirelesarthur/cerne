@@ -16,8 +16,8 @@ const bezerros  = [730,  740,  745,  755,  760,  750,  765,  770,  755,  770,  7
 
 const rebanhoComp = [
   { label: 'Novilhos',  pct: 38, color: t.color.brand[600] },
-  { label: 'Matrizes',  pct: 28, color: '#d97706' },
-  { label: 'Touros',    pct: 8,  color: '#7c3aed' },
+  { label: 'Matrizes',  pct: 28, color: t.chart.series[6] },
+  { label: 'Touros',    pct: 8,  color: t.chart.series[3] },
   { label: 'Bezerros',  pct: 18, color: t.color.brand[400] },
   { label: 'Descarte',  pct: 8,  color: t.color.neutral[400] },
 ] as const
@@ -29,7 +29,7 @@ const pesagensData = [30, 28, 40, 35, 45, 32, 38, 42, 30, 36, 48, 35]
 
 const PEC_SERIES = [
   { data: novilhos, color: t.color.brand[600], label: 'Novilhos',  gradId: 'gradNovPec' },
-  { data: matrizes, color: '#d97706',           label: 'Matrizes',  gradId: 'gradMatPec' },
+  { data: matrizes, color: t.chart.series[6],           label: 'Matrizes',  gradId: 'gradMatPec' },
   { data: bezerros, color: t.color.brand[400],  label: 'Bezerros',  gradId: 'gradBezPec' },
 ] as const
 
@@ -315,7 +315,7 @@ function DonutRebanho({ colors, isGbMode }: { colors: ReturnType<typeof useTheme
 
 const BAR_SERIES = [
   { data: vermifugData, color: t.color.brand[600], label: 'Vermifugações' },
-  { data: pesagensData, color: '#d97706',           label: 'Pesagens' },
+  { data: pesagensData, color: t.chart.series[6],           label: 'Pesagens' },
 ] as const
 
 function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
@@ -426,7 +426,7 @@ function ManejosBars({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>
               <rect
                 x={gx + gap / 2} y={yOf(vP)}
                 width={barW} height={hP} rx={3}
-                fill="#d97706"
+                fill={t.chart.series[6]}
                 opacity={dimmed ? 0.28 : 1}
                 style={{
                   transformBox: 'fill-box' as React.CSSProperties['transformBox'],

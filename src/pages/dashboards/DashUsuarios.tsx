@@ -227,7 +227,7 @@ function DonutModulos() {
             />
           )
         })}
-        <text x={cx} y={cy - 6} textAnchor="middle" fontSize={t.font.size.xl} fontWeight={t.font.weight.bold} fill={isGbMode ? '#4ade80' : colors.fg.default as string} fontFamily={t.font.family.sans}>
+        <text x={cx} y={cy - 6} textAnchor="middle" fontSize={t.font.size.xl} fontWeight={t.font.weight.bold} fill={isGbMode ? t.color.gb.accent : colors.fg.default as string} fontFamily={t.font.family.sans}>
           183
         </text>
         <text x={cx} y={cy + 11} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>

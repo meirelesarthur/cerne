@@ -216,7 +216,7 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
         <path d={describeArc(startAng, startAng + fillPct * 180)} fill="none"
           stroke={t.color.brand[600]} strokeWidth={sw} strokeLinecap="round" />
         <text x={cx} y={cy - 14} textAnchor="middle" fontSize={22} fontWeight={700}
-          fill={isGbMode ? '#4ade80' : colors.fg.default as string} fontFamily={t.font.family.sans}>
+          fill={isGbMode ? t.color.gb.accent : colors.fg.default as string} fontFamily={t.font.family.sans}>
           68%
         </text>
         <text x={cx} y={cy} textAnchor="middle" fontSize={10}

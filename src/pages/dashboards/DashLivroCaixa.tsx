@@ -330,7 +330,7 @@ export default function DashLivroCaixa() {
     background: colors.bg.surface,
     borderRadius: t.radius['2xl'],
     border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? '0 1px 2px rgba(0,0,0,0.30), 0 4px 16px rgba(0,0,0,0.35)' : '0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.07)',
+    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
     overflow: 'hidden',
     fontFamily: t.font.family.sans,
   }

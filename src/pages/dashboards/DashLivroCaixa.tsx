@@ -6,6 +6,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
 import { DataTable, type Column } from '../../components/ui/DataTable'
+import { LineChart } from '../../components/ui/LineChart'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -39,148 +40,18 @@ const tipoBadge: Record<string, { color: string; bg: string }> = {
   Transferência: { color: t.color.feedback.info.text, bg: t.color.feedback.info.bg },
 }
 
-// ─── Area Chart (Fluxo de Caixa) ─────────────────────────────────────────────
+// ─── Séries do Fluxo de Caixa ────────────────────────────────────────────────
 
-function FluxoAreaChart({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
-  const [hovIdx, setHovIdx] = useState<number | null>(null)
-  const W = 760
-  const H = 220
-  const padL = 54
-  const padR = 16
-  const padT = 16
-  const padB = 32
-  const chartW = W - padL - padR
-  const chartH = H - padT - padB
+const fluxoSeries = [
+  { name: 'Entradas', data: entradasData, color: t.color.brand[600] },
+  { name: 'Saídas',   data: saidasData,   color: t.color.feedback.error.solid },
+  { name: 'Saldo',    data: saldoData,    color: t.color.neutral[500] },
+]
 
-  const allVals = [...entradasData, ...saidasData, ...saldoData]
-  const minV = Math.min(...allVals) * 0.85
-  const maxV = Math.max(...allVals) * 1.08
-
-  const xOf = (i: number) => padL + (i / (entradasData.length - 1)) * chartW
-  const yOf = (v: number) => padT + chartH - ((v - minV) / (maxV - minV)) * chartH
-
-  const bezier = (data: number[]) => {
-    return data.map((v, i) => {
-      const x = xOf(i)
-      const y = yOf(v)
-      if (i === 0) return `M ${x},${y}`
-      const px = xOf(i - 1)
-      const py = yOf(data[i - 1])
-      const cpx = (px + x) / 2
-      return `C ${cpx},${py} ${cpx},${y} ${x},${y}`
-    }).join(' ')
-  }
-
-  const closedBez = (data: number[]) => {
-    return bezier(data) + ` L ${xOf(data.length - 1)},${padT + chartH} L ${xOf(0)},${padT + chartH} Z`
-  }
-
-  const tickCount = 4
-  const ticks = Array.from({ length: tickCount }, (_, i) => minV + ((maxV - minV) * i) / (tickCount - 1))
-  const tooltipFill = isGbMode ? '#0b1e14' : '#ffffff'
-
-  const series = [
-    { data: entradasData, color: t.color.brand[600], label: 'Entradas', gradId: 'gradEnt' },
-    { data: saidasData, color: t.color.feedback.error.solid, label: 'Saídas', gradId: 'gradSai' },
-    { data: saldoData, color: t.color.neutral[500], label: 'Saldo', gradId: 'gradSal', dashed: true },
-  ]
-
-  return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        {series.map(s => (
-          <linearGradient key={s.gradId} id={s.gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={s.color} stopOpacity="0.20" />
-            <stop offset="100%" stopColor={s.color} stopOpacity="0.01" />
-          </linearGradient>
-        ))}
-      </defs>
-
-      {ticks.map((tick, i) => {
-        const y = yOf(tick)
-        return (
-          <g key={i}>
-            <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="3,3" />
-            <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-              {tick >= 1000000 ? `${(tick / 1000000).toFixed(1)}M` : `${(tick / 1000).toFixed(0)}K`}
-            </text>
-          </g>
-        )
-      })}
-
-      {monthLabels.map((label, i) => (
-        <text key={i} x={xOf(i)} y={H - 6} textAnchor="middle" fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-          {label}
-        </text>
-      ))}
-
-      {series.map(s => (
-        <path key={s.gradId + 'fill'} d={closedBez(s.data)} fill={`url(#${s.gradId})`} />
-      ))}
-
-      {series.map(s => (
-        <path
-          key={s.gradId + 'line'}
-          d={bezier(s.data)}
-          fill="none"
-          stroke={s.color}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeDasharray={s.dashed ? '5,4' : undefined}
-        />
-      ))}
-
-      {series.map(s =>
-        s.data.map((v, i) => (
-          <circle
-            key={`${s.gradId}-pt-${i}`}
-            cx={xOf(i)}
-            cy={yOf(v)}
-            r={hovIdx === i ? 5 : 3}
-            fill={hovIdx === i ? s.color : '#fff'}
-            stroke={s.color}
-            strokeWidth={1.5}
-            style={{ cursor: 'pointer', transition: 'r 0.12s ease' }}
-            onMouseEnter={() => setHovIdx(i)}
-            onMouseLeave={() => setHovIdx(null)}
-          />
-        ))
-      )}
-
-      {hovIdx !== null && (
-        <g>
-          <rect
-            x={Math.min(xOf(hovIdx) + 6, W - padR - 130)}
-            y={padT}
-            width={122}
-            height={58}
-            rx={t.radius.base}
-            fill={tooltipFill}
-            stroke={colors.border.default as string}
-            strokeWidth={0.8}
-          />
-          <text x={Math.min(xOf(hovIdx) + 6, W - padR - 130) + 8} y={padT + 14} fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-            {monthLabels[hovIdx]}
-          </text>
-          {series.map((s, si) => (
-            <text
-              key={si}
-              x={Math.min(xOf(hovIdx) + 6, W - padR - 130) + 8}
-              y={padT + 14 + (si + 1) * 14}
-              fontSize={9}
-              fill={s.color}
-              fontFamily={t.font.family.sans}
-              fontWeight={t.font.weight.semibold}
-            >
-              {s.label}: R$ {(s.data[hovIdx] / 1000).toFixed(0)}K
-            </text>
-          ))}
-        </g>
-      )}
-    </svg>
-  )
-}
+const fluxoYFormat = (v: number) =>
+  v >= 1_000_000
+    ? `R$ ${(v / 1_000_000).toFixed(1)}M`
+    : `R$ ${(v / 1_000).toFixed(0)}K`
 
 // ─── Tabela de Movimentações ──────────────────────────────────────────────────
 
@@ -384,7 +255,14 @@ export default function DashLivroCaixa() {
             ))}
           </div>
         </div>
-        <FluxoAreaChart colors={colors} isGbMode={isGbMode} />
+        <LineChart
+          series={fluxoSeries}
+          labels={monthLabels}
+          height={220}
+          yFormat={fluxoYFormat}
+          area
+          showLegend={false}
+        />
       </div>
       <HDivider color={bc} />
 

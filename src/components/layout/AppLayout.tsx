@@ -24,6 +24,10 @@ import DashAtivos        from '../../pages/dashboards/DashAtivos'
 import DashUsuarios      from '../../pages/dashboards/DashUsuarios'
 import DashLivroCaixa   from '../../pages/dashboards/DashLivroCaixa'
 import DashLotacaoCurrais from '../../pages/dashboards/DashLotacaoCurrais'
+import DashDesempenhoLotes from '../../pages/dashboards/DashDesempenhoLotes'
+import DashEstoqueNutricao from '../../pages/dashboards/DashEstoqueNutricao'
+import DashConsumoRacao   from '../../pages/dashboards/DashConsumoRacao'
+import DashCustosConfinamento from '../../pages/dashboards/DashCustosConfinamento'
 import PlanosPage        from '../../pages/planos/PlanosPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
@@ -101,6 +105,10 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'dash-usr')  return <DashUsuarios />
   if (itemId === 'dash-lcx')  return <DashLivroCaixa />
   if (itemId === 'dash-cur')  return <DashLotacaoCurrais />
+  if (itemId === 'dash-des')  return <DashDesempenhoLotes />
+  if (itemId === 'dash-nut')  return <DashEstoqueNutricao />
+  if (itemId === 'dash-rac')  return <DashConsumoRacao />
+  if (itemId === 'dash-cco')  return <DashCustosConfinamento />
   if (itemId === 'planos')    return <PlanosPage />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }

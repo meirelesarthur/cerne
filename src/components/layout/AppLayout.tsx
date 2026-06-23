@@ -23,6 +23,7 @@ import DashDepreciacoes  from '../../pages/dashboards/DashDepreciacoes'
 import DashAtivos        from '../../pages/dashboards/DashAtivos'
 import DashUsuarios      from '../../pages/dashboards/DashUsuarios'
 import DashLivroCaixa   from '../../pages/dashboards/DashLivroCaixa'
+import DashLotacaoCurrais from '../../pages/dashboards/DashLotacaoCurrais'
 import PlanosPage        from '../../pages/planos/PlanosPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
@@ -99,6 +100,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'dash-ati')  return <DashAtivos />
   if (itemId === 'dash-usr')  return <DashUsuarios />
   if (itemId === 'dash-lcx')  return <DashLivroCaixa />
+  if (itemId === 'dash-cur')  return <DashLotacaoCurrais />
   if (itemId === 'planos')    return <PlanosPage />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }

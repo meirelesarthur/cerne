@@ -93,6 +93,11 @@ export const menuModules: NavModule[] = [
       { id: 'dash-usr', label: 'Análise de Usuários', path: '/dashboards/usuarios' },
       { id: 'dash-plu', label: 'Pluviometria', path: '/dashboards/pluviometria' },
       { id: 'dash-lcx', label: 'Livro Caixa', path: '/dashboards/livro-caixa' },
+      { id: 'dash-cur', label: 'Lotação de Currais', path: '/dashboards/lotacao-currais' },
+      { id: 'dash-des', label: 'Desempenho de Lotes', path: '/dashboards/desempenho-lotes' },
+      { id: 'dash-nut', label: 'Estoque Nutrição', path: '/dashboards/estoque-nutricao' },
+      { id: 'dash-rac', label: 'Consumo de Ração', path: '/dashboards/consumo-racao' },
+      { id: 'dash-cco', label: 'Custos do Confinamento', path: '/dashboards/custos-confinamento' },
     ],
   },
   {

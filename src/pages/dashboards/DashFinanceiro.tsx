@@ -16,6 +16,7 @@ import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
+import { GaugeChart } from '../../components/ui/GaugeChart'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -76,19 +77,9 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 
 // ─── Arc Gauge ────────────────────────────────────────────────────────────────
 
-function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
+function ArcGauge({ colors }: { colors: ReturnType<typeof useTheme>['colors'] }) {
   const [segHov, setSegHov] = useState<number | null>(null)
-  const fillPct = 0.68
-  const W = 260; const H = 160; const cx = W / 2; const cy = H - 20; const r = 100; const sw = 18
 
-  const describeArc = (startAngle: number, endAngle: number) => {
-    const toRad = (a: number) => ((a - 90) * Math.PI) / 180
-    const sx = cx + r * Math.cos(toRad(startAngle)); const sy = cy + r * Math.sin(toRad(startAngle))
-    const ex = cx + r * Math.cos(toRad(endAngle)); const ey = cy + r * Math.sin(toRad(endAngle))
-    return `M ${sx},${sy} A ${r},${r} 0 ${endAngle - startAngle > 180 ? 1 : 0},1 ${ex},${ey}`
-  }
-
-  const startAng = -90
   const segments = [
     { label: 'Realizado', pct: 0.68, color: t.color.brand[600] },
     { label: 'Previsto',  pct: 0.20, color: t.color.brand[200] },
@@ -97,20 +88,7 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
 
   return (
     <div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-        <path d={describeArc(startAng, startAng + 180)} fill="none"
-          stroke={isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100]} strokeWidth={sw} strokeLinecap="round" />
-        <path d={describeArc(startAng, startAng + fillPct * 180)} fill="none"
-          stroke={t.color.brand[600]} strokeWidth={sw} strokeLinecap="round" />
-        <text x={cx} y={cy - 14} textAnchor="middle" fontSize={22} fontWeight={700}
-          fill={isGbMode ? t.color.gb.accent : colors.fg.default as string} fontFamily={t.font.family.sans}>
-          68%
-        </text>
-        <text x={cx} y={cy} textAnchor="middle" fontSize={10}
-          fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-          R$ 6,12M / R$ 9,0M
-        </text>
-      </svg>
+      <GaugeChart value={68} centerValue="68%" centerLabel="R$ 6,12M / R$ 9,0M" color={t.color.brand[600]} />
       <div style={{ display: 'flex', gap: t.space[3], justifyContent: 'center', marginTop: t.space[2] }}>
         {[{ label: 'Realizado', color: t.color.brand[600] }, { label: 'Disponível', color: t.color.neutral[300] }].map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
@@ -327,7 +305,7 @@ export default function DashFinanceiro() {
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[2] }}>
               Orçamento Anual
             </div>
-            <ArcGauge colors={colors} isGbMode={isGbMode} />
+            <ArcGauge colors={colors} />
           </div>
         </div>
       </div>

@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
+import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 
-// ─── Horizontal Grouped Bar Chart ─────────────────────────────────────────────
+// ─── Ativos por Categoria ──────────────────────────────────────────────────────
 
 const CATEGORIAS = [
   { label: 'Tratores',     total: 85, op: 72 },
@@ -17,142 +18,20 @@ const CATEGORIAS = [
   { label: 'Outros',       total: 56, op: 55 },
 ]
 
-interface HBarTooltip {
-  x: number
-  y: number
-  label: string
-  total: number
-  op: number
-}
+const CATEGORIAS_LABELS = CATEGORIAS.map(c => c.label)
 
-function HorizontalGroupedBar() {
-  const { colors, isGbMode } = useTheme()
-  const [hovRow, setHovRow] = useState<number | null>(null)
-  const [tooltip, setTooltip] = useState<HBarTooltip | null>(null)
-  const svgRef = useRef<SVGSVGElement>(null)
-
-  const W = 480
-  const ROW_H = 36
-  const GAP = 10
-  const PL = 90
-  const PR = 40
-  const PT = 8
-  const H = CATEGORIAS.length * (ROW_H + GAP) + PT + 8
-
-  const maxVal = Math.max(...CATEGORIAS.map(c => c.total))
-  const chartW = W - PL - PR
-
-  function toBarW(v: number) { return (v / maxVal) * chartW }
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
-        {CATEGORIAS.map((cat, i) => {
-          const y = PT + i * (ROW_H + GAP)
-          const isHov = hovRow === i
-          const isDim = hovRow !== null && !isHov
-
-          return (
-            <g
-              key={i}
-              onMouseEnter={e => {
-                setHovRow(i)
-                const rect = svgRef.current!.getBoundingClientRect()
-                setTooltip({
-                  x: (PL + toBarW(cat.total) + PR / 2) / W * rect.width + rect.left,
-                  y: (y + ROW_H / 2) / H * rect.height + rect.top,
-                  label: cat.label,
-                  total: cat.total,
-                  op: cat.op,
-                })
-              }}
-              onMouseLeave={() => { setHovRow(null); setTooltip(null) }}
-              style={{ cursor: 'pointer', transition: 'opacity 0.18s ease', opacity: isDim ? 0.35 : 1 }}
-            >
-              {/* Category label */}
-              <text x={PL - 8} y={y + ROW_H / 2 - 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.muted as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
-                {cat.label}
-              </text>
-
-              {/* Total bar */}
-              <rect
-                x={PL}
-                y={y}
-                width={toBarW(cat.total)}
-                height={14}
-                rx={3}
-                fill={t.color.brand[600]}
-                style={{ transition: 'width 0.3s ease' }}
-              />
-
-              {/* Op bar */}
-              <rect
-                x={PL}
-                y={y + 18}
-                width={toBarW(cat.op)}
-                height={14}
-                rx={3}
-                fill={t.color.brand[200]}
-                style={{ transition: 'width 0.3s ease' }}
-              />
-
-              {/* Value labels */}
-              <text x={PL + toBarW(cat.total) + 5} y={y + 7} fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
-                {cat.total}
-              </text>
-              <text x={PL + toBarW(cat.op) + 5} y={y + 25} fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans} dominantBaseline="middle">
-                {cat.op}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-
-      {tooltip && (
-        <div style={{
-          position: 'fixed',
-          left: tooltip.x + 12,
-          top: tooltip.y - 30,
-          background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border.default}`,
-          borderRadius: t.radius.base,
-          padding: `${t.space[1] + 2}px ${t.space[2]}px`,
-          fontSize: t.font.size.xs,
-          color: colors.fg.default as string,
-          fontFamily: t.font.family.sans,
-          boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          pointerEvents: 'none',
-          whiteSpace: 'nowrap',
-        }}>
-          <div style={{ fontWeight: t.font.weight.semibold, marginBottom: 2 }}>{tooltip.label}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[600] }} />
-            <span style={{ color: colors.fg.muted as string }}>Total:</span>
-            <span style={{ fontWeight: t.font.weight.medium }}>{tooltip.total}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[200] }} />
-            <span style={{ color: colors.fg.muted as string }}>Em operação:</span>
-            <span style={{ fontWeight: t.font.weight.medium }}>{tooltip.op}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: t.space[3], marginTop: t.space[3] }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[600] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Total</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[200] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Em Operação</span>
-        </div>
-      </div>
-    </div>
-  )
-}
+const CATEGORIAS_SERIES = [
+  {
+    name: 'Total',
+    data: CATEGORIAS.map(c => c.total),
+    color: t.color.brand[600],
+  },
+  {
+    name: 'Em Operação',
+    data: CATEGORIAS.map(c => c.op),
+    color: t.color.brand[200],
+  },
+]
 
 // ─── Status Cards ─────────────────────────────────────────────────────────────
 
@@ -218,7 +97,7 @@ function StatusCards() {
   )
 }
 
-// ─── Monthly Maintenance Bar Chart ────────────────────────────────────────────
+// ─── Manutenções por Mês ──────────────────────────────────────────────────────
 
 const MANUT_DATA = [
   { prev: 8, cor: 3 }, { prev: 6, cor: 5 }, { prev: 9, cor: 2 }, { prev: 7, cor: 4 },
@@ -226,140 +105,20 @@ const MANUT_DATA = [
   { prev: 12, cor: 3 }, { prev: 10, cor: 5 }, { prev: 13, cor: 2 }, { prev: 11, cor: 4 },
 ]
 
-interface ManutTooltip {
-  x: number
-  y: number
-  index: number
-}
+const MANUT_LABELS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
-function ManutChart() {
-  const { colors, isGbMode } = useTheme()
-  const [hovCol, setHovCol] = useState<number | null>(null)
-  const [tooltip, setTooltip] = useState<ManutTooltip | null>(null)
-  const svgRef = useRef<SVGSVGElement>(null)
-
-  const W = 860
-  const H = 200
-  const PL = 40
-  const PR = 12
-  const PT = 10
-  const PB = 28
-  const chartW = W - PL - PR
-  const chartH = H - PT - PB
-
-  const maxVal = Math.max(...MANUT_DATA.map(d => d.prev + d.cor))
-  const colW = (chartW / MANUT_DATA.length) * 0.65
-  const colSpacing = chartW / MANUT_DATA.length
-  const barW = colW / 2 - 1
-
-  return (
-    <div style={{ position: 'relative' }}>
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: t.space[3], marginBottom: t.space[2] }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.brand[600] }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Preventivas</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 2, background: t.color.feedback.error.text }} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Corretivas</span>
-        </div>
-      </div>
-
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', overflow: 'visible' }}>
-        {/* Grid */}
-        {[0, 0.25, 0.5, 0.75, 1].map((r, i) => {
-          const v = Math.round(maxVal * r)
-          const y = PT + chartH - r * chartH
-          return (
-            <g key={i}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke={colors.border.default as string} strokeWidth={1} strokeDasharray="4 4" />
-              {v > 0 && (
-                <text x={PL - 6} y={y + 4} textAnchor="end" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>{v}</text>
-              )}
-            </g>
-          )
-        })}
-
-        {MANUT_DATA.map((d, i) => {
-          const xBase = PL + i * colSpacing + (colSpacing - colW) / 2
-          const isHov = hovCol === i
-          const isDim = hovCol !== null && !isHov
-
-          const prevH = (d.prev / maxVal) * chartH
-          const corH = (d.cor / maxVal) * chartH
-
-          return (
-            <g
-              key={i}
-              onMouseEnter={e => {
-                setHovCol(i)
-                const rect = svgRef.current!.getBoundingClientRect()
-                setTooltip({ x: (xBase + colW / 2) / W * rect.width + rect.left, y: rect.top, index: i })
-              }}
-              onMouseLeave={() => { setHovCol(null); setTooltip(null) }}
-              style={{ cursor: 'pointer', transition: 'opacity 0.18s ease', opacity: isDim ? 0.3 : 1 }}
-            >
-              <rect
-                x={xBase}
-                y={PT + chartH - prevH}
-                width={barW}
-                height={prevH}
-                rx={3}
-                fill={t.color.brand[600]}
-              />
-              <rect
-                x={xBase + barW + 2}
-                y={PT + chartH - corH}
-                width={barW}
-                height={corH}
-                rx={3}
-                fill={t.color.feedback.error.text}
-              />
-              <rect x={xBase} y={PT} width={colW} height={chartH} fill="transparent" />
-              <text x={xBase + colW / 2} y={H - 8} textAnchor="middle" fontSize={t.font.size.xs} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-                {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][i]}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-
-      {tooltip && hovCol !== null && (
-        <div style={{
-          position: 'fixed',
-          left: tooltip.x + 12,
-          top: tooltip.y + 10,
-          background: isGbMode ? '#0b1e14' : '#fff',
-          border: `1px solid ${colors.border.default}`,
-          borderRadius: t.radius.base,
-          padding: `${t.space[1] + 2}px ${t.space[2]}px`,
-          fontSize: t.font.size.xs,
-          color: colors.fg.default as string,
-          fontFamily: t.font.family.sans,
-          boxShadow: t.shadow.lg,
-          zIndex: t.zIndex.toast,
-          pointerEvents: 'none',
-          whiteSpace: 'nowrap',
-        }}>
-          <div style={{ fontWeight: t.font.weight.semibold, marginBottom: 2 }}>
-            {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][hovCol]}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.brand[600] }} />
-            <span style={{ color: colors.fg.muted as string }}>Preventivas:</span>
-            <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].prev}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginTop: 2 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color.feedback.error.text }} />
-            <span style={{ color: colors.fg.muted as string }}>Corretivas:</span>
-            <span style={{ fontWeight: t.font.weight.medium }}>{MANUT_DATA[hovCol].cor}</span>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+const MANUT_SERIES = [
+  {
+    name: 'Preventivas',
+    data: MANUT_DATA.map(d => d.prev),
+    color: t.color.brand[600],
+  },
+  {
+    name: 'Corretivas',
+    data: MANUT_DATA.map(d => d.cor),
+    color: t.color.feedback.error.text,
+  },
+]
 
 // ─── DashAtivos ───────────────────────────────────────────────────────────────
 
@@ -424,7 +183,12 @@ export default function DashAtivos() {
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 3, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
-          <HorizontalGroupedBar />
+          <GroupedBarChart
+            series={CATEGORIAS_SERIES}
+            labels={CATEGORIAS_LABELS}
+            height={260}
+            showLegend
+          />
         </div>
         <VDivider color={bc} />
         <div style={{ flex: 2, padding: t.space[5] }}>
@@ -437,7 +201,12 @@ export default function DashAtivos() {
       {/* Row 3 — Manutenções */}
       <div style={{ padding: t.space[5] }}>
         <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
-        <ManutChart />
+        <GroupedBarChart
+          series={MANUT_SERIES}
+          labels={MANUT_LABELS}
+          height={200}
+          showLegend
+        />
       </div>
     </div>
   )

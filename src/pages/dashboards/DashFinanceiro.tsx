@@ -14,6 +14,8 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
+import { LineChart } from '../../components/ui/LineChart'
+import { DonutChart } from '../../components/ui/DonutChart'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -69,121 +71,6 @@ function Trend({ value, up }: { value: string; up: boolean }) {
       </span>
       {value}
     </span>
-  )
-}
-
-// ─── Area Chart (Receitas x Despesas) ────────────────────────────────────────
-
-function AreaChartRD({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
-  const [hovIdx, setHovIdx] = useState<number | null>(null)
-  const W = 600
-  const H = 200
-  const padL = 48
-  const padR = 16
-  const padT = 12
-  const padB = 32
-  const chartW = W - padL - padR
-  const chartH = H - padT - padB
-
-  const allVals = [...revenueData, ...expenseData]
-  const minV = Math.min(...allVals) * 0.9
-  const maxV = Math.max(...allVals) * 1.05
-
-  const xOf = (i: number) => padL + (i / (revenueData.length - 1)) * chartW
-  const yOf = (v: number) => padT + chartH - ((v - minV) / (maxV - minV)) * chartH
-
-  const bezier = (data: number[]) =>
-    data.map((v, i) => {
-      const x = xOf(i); const y = yOf(v)
-      if (i === 0) return `M ${x},${y}`
-      const px = xOf(i - 1); const py = yOf(data[i - 1])
-      const cpx = (px + x) / 2
-      return `C ${cpx},${py} ${cpx},${y} ${x},${y}`
-    }).join(' ')
-
-  const closedPath = (data: number[]) => {
-    const path = bezier(data)
-    return `${path} L ${xOf(data.length - 1)},${padT + chartH} L ${xOf(0)},${padT + chartH} Z`
-  }
-
-  const tickCount = 4
-  const ticks = Array.from({ length: tickCount }, (_, i) => minV + ((maxV - minV) * i) / (tickCount - 1))
-  const tooltipFill = isGbMode ? '#0b1e14' : '#ffffff'
-
-  return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="finGradRev" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={t.color.brand[600]} stopOpacity={isGbMode ? 0.28 : 0.18} />
-          <stop offset="100%" stopColor={t.color.brand[600]} stopOpacity={0.02} />
-        </linearGradient>
-        <linearGradient id="finGradExp" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={t.color.feedback.error.solid} stopOpacity={isGbMode ? 0.20 : 0.12} />
-          <stop offset="100%" stopColor={t.color.feedback.error.solid} stopOpacity={0.02} />
-        </linearGradient>
-      </defs>
-
-      {ticks.map((tick, i) => {
-        const y = yOf(tick)
-        return (
-          <g key={i}>
-            <line x1={padL} y1={y} x2={W - padR} y2={y}
-              stroke={colors.border.default as string} strokeWidth={0.5} strokeDasharray="3,3" />
-            <text x={padL - 4} y={y + 4} textAnchor="end" fontSize={9}
-              fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-              {tick >= 1000000 ? `${(tick / 1000000).toFixed(1)}M` : `${(tick / 1000).toFixed(0)}K`}
-            </text>
-          </g>
-        )
-      })}
-
-      {monthLabels.map((label, i) => (
-        <text key={i} x={xOf(i)} y={H - 6} textAnchor="middle" fontSize={9}
-          fill={hovIdx === i ? (colors.fg.default as string) : (colors.fg.subtle as string)}
-          fontFamily={t.font.family.sans} fontWeight={hovIdx === i ? 600 : 400}>
-          {label}
-        </text>
-      ))}
-
-      <path d={closedPath(revenueData)} fill="url(#finGradRev)" />
-      <path d={closedPath(expenseData)} fill="url(#finGradExp)" />
-      <path d={bezier(revenueData)} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <path d={bezier(expenseData)} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-
-      {revenueData.map((v, i) => (
-        <circle key={`r${i}`} cx={xOf(i)} cy={yOf(v)} r={hovIdx === i ? 5 : 3}
-          fill={hovIdx === i ? t.color.brand[600] : '#fff'}
-          stroke={t.color.brand[600]} strokeWidth={1.5}
-          style={{ cursor: 'pointer', transition: 'r 0.12s ease' }}
-          onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
-      ))}
-      {expenseData.map((v, i) => (
-        <circle key={`e${i}`} cx={xOf(i)} cy={yOf(v)} r={hovIdx === i ? 5 : 3}
-          fill={hovIdx === i ? t.color.feedback.error.solid : '#fff'}
-          stroke={t.color.feedback.error.solid} strokeWidth={1.5}
-          style={{ cursor: 'pointer', transition: 'r 0.12s ease' }}
-          onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
-      ))}
-
-      {hovIdx !== null && (
-        <g>
-          <rect x={Math.min(xOf(hovIdx) - 4, W - padR - 110)} y={padT} width={108} height={46}
-            rx={t.radius.base} fill={tooltipFill} stroke={colors.border.default as string} strokeWidth={0.8} />
-          <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 14}
-            fontSize={9} fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-            {monthLabels[hovIdx]}
-          </text>
-          <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 27}
-            fontSize={9} fill={t.color.brand[600]} fontFamily={t.font.family.sans} fontWeight={600}>
-            Rec: R$ {(revenueData[hovIdx] / 1000).toFixed(0)}K
-          </text>
-          <text x={Math.min(xOf(hovIdx) - 4, W - padR - 110) + 8} y={padT + 39}
-            fontSize={9} fill={t.color.feedback.error.solid} fontFamily={t.font.family.sans} fontWeight={600}>
-            Desp: R$ {(expenseData[hovIdx] / 1000).toFixed(0)}K
-          </text>
-        </g>
-      )}
-    </svg>
   )
 }
 
@@ -244,63 +131,6 @@ function ArcGauge({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['c
           <span key={i} style={{ fontSize: t.font.size.xs, color: seg.color, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
             {seg.label} {(seg.pct * 100).toFixed(0)}%
           </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ─── Donut Chart ──────────────────────────────────────────────────────────────
-
-function DonutChart({ colors }: { colors: ReturnType<typeof useTheme>['colors'] }) {
-  const [hovIdx, setHovIdx] = useState<number | null>(null)
-  const W = 160; const H = 160; const cx = W / 2; const cy = H / 2; const r = 62; const inner = 38
-
-  let cum = 0
-  const slices = donutData.map(d => {
-    const start = cum; cum += d.pct / 100
-    return { ...d, start, end: cum }
-  })
-
-  const descSlice = (start: number, end: number) => {
-    const toRad = (p: number) => p * 2 * Math.PI - Math.PI / 2
-    const sx = cx + r * Math.cos(toRad(start)); const sy = cy + r * Math.sin(toRad(start))
-    const ex = cx + r * Math.cos(toRad(end)); const ey = cy + r * Math.sin(toRad(end))
-    const ix = cx + inner * Math.cos(toRad(end)); const iy = cy + inner * Math.sin(toRad(end))
-    const jx = cx + inner * Math.cos(toRad(start)); const jy = cy + inner * Math.sin(toRad(start))
-    const large = end - start > 0.5 ? 1 : 0
-    return `M ${sx},${sy} A ${r},${r} 0 ${large},1 ${ex},${ey} L ${ix},${iy} A ${inner},${inner} 0 ${large},0 ${jx},${jy} Z`
-  }
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4] }}>
-      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ flexShrink: 0 }}>
-        {slices.map((s, i) => (
-          <path key={i} d={descSlice(s.start, s.end)} fill={s.color}
-            opacity={hovIdx !== null && hovIdx !== i ? 0.3 : 1}
-            style={{ cursor: 'pointer', transition: 'opacity 0.18s ease' }}
-            onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
-        ))}
-        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={12} fontWeight={700}
-          fill={colors.fg.default as string} fontFamily={t.font.family.sans}>
-          {hovIdx !== null ? `${donutData[hovIdx].pct}%` : '100%'}
-        </text>
-        <text x={cx} y={cy + 12} textAnchor="middle" fontSize={9}
-          fill={colors.fg.subtle as string} fontFamily={t.font.family.sans}>
-          {hovIdx !== null ? donutData[hovIdx].label : 'Total'}
-        </text>
-      </svg>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-        {donutData.map((d, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: d.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string, fontFamily: t.font.family.sans }}>
-              {d.label}
-            </span>
-            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans, marginLeft: 'auto' }}>
-              {d.pct}%
-            </span>
-          </div>
         ))}
       </div>
     </div>
@@ -393,6 +223,16 @@ export default function DashFinanceiro() {
     { label: 'Inadimplência',    value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
   ]
 
+  const lineSeries = [
+    { name: 'Receitas', data: revenueData, color: t.color.brand[600] },
+    { name: 'Despesas', data: expenseData, color: t.color.feedback.error.solid },
+  ]
+
+  const yFormat = (v: number) =>
+    v >= 1000000 ? `R$ ${(v / 1000000).toFixed(1)}M` : `R$ ${(v / 1000).toFixed(0)}K`
+
+  const donutSlices = donutData.map(d => ({ label: d.label, value: d.pct, color: d.color }))
+
   return (
     <div style={cardStyle}>
 
@@ -455,7 +295,14 @@ export default function DashFinanceiro() {
               ))}
             </div>
           </div>
-          <AreaChartRD colors={colors} isGbMode={isGbMode} />
+          <LineChart
+            series={lineSeries}
+            labels={monthLabels}
+            height={200}
+            yFormat={yFormat}
+            area
+            showLegend={false}
+          />
         </div>
 
         <VDivider color={bc} />
@@ -466,7 +313,14 @@ export default function DashFinanceiro() {
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[3] }}>
               Despesas por Categoria
             </div>
-            <DonutChart colors={colors} />
+            <DonutChart
+              data={donutSlices}
+              height={160}
+              centerLabel="Total"
+              centerValue="100%"
+              showLegend
+              valueFormat={(v) => `${v}%`}
+            />
           </div>
           <HDivider color={bc} />
           <div style={{ padding: `${t.space[5]}px` }}>

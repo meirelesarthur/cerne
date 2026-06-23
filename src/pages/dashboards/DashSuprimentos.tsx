@@ -15,6 +15,7 @@ import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { Button } from '../../components/ui/Button'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { BarChart } from '../../components/ui/BarChart'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -82,44 +83,6 @@ function Trend({ value, up }: { value: string; up: boolean }) {
       </span>
       {value}
     </span>
-  )
-}
-
-// ─── Horizontal Bar Chart ─────────────────────────────────────────────────────
-
-function HBarChart({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
-  const [hovIdx, setHovIdx] = useState<number | null>(null)
-  const maxVal = Math.max(...categoriaData.map(d => d.value))
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
-      {categoriaData.map((cat, i) => {
-        const pct = (cat.value / maxVal) * 100
-        const isHov = hovIdx === i
-        const dimmed = hovIdx !== null && !isHov
-        return (
-          <div key={i} onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} style={{ cursor: 'default' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
-                {cat.label}
-              </span>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans, opacity: dimmed ? 0.3 : 1, transition: 'opacity 0.18s ease' }}>
-                R$ {(cat.value / 1000).toFixed(0)}K
-              </span>
-            </div>
-            <div style={{ height: 8, background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100], borderRadius: t.radius.full, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', width: `${pct}%`,
-                background: isHov ? t.color.brand[500] : t.color.brand[600],
-                borderRadius: t.radius.full,
-                opacity: dimmed ? 0.2 : 1,
-                transition: 'opacity 0.18s ease, background 0.15s ease',
-              }} />
-            </div>
-          </div>
-        )
-      })}
-    </div>
   )
 }
 
@@ -313,7 +276,12 @@ export default function DashSuprimentos() {
               Gastos por Categoria
             </span>
           </div>
-          <HBarChart colors={colors} isGbMode={isGbMode} />
+          <BarChart
+            data={categoriaData.map((c) => ({ label: c.label, value: c.value }))}
+            horizontal
+            height={240}
+            yFormat={(v) => `R$ ${(v / 1000).toFixed(0)}K`}
+          />
         </div>
 
         <VDivider color={bc} />

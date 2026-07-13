@@ -206,7 +206,6 @@ export interface ThemePalette {
   nav: {
     text: string; textActive: string; textMuted: string
     itemActive: string; itemHover: string; divider: string
-    headerBg: string; headerText: string
   }
   shadow: string
 }
@@ -242,8 +241,6 @@ const lightPalette: ThemePalette = {
     itemActive: primitive.brand[50],    // #f0fdf4
     itemHover:  'rgba(0,0,0,0.04)',
     divider:    '#f0f0f0',
-    headerBg:   '#e6f5f0',
-    headerText: primitive.brand[700],   // #047857
   },
   shadow: '0 1px 4px rgba(0,0,0,0.06)',
 }
@@ -280,8 +277,6 @@ const gbModePalette: ThemePalette = {
     itemActive: '#0b1e14',
     itemHover:  'rgba(255,255,255,0.04)',
     divider:    'rgba(28,63,44,0.8)',
-    headerBg:   'rgba(16,185,129,0.12)',
-    headerText: '#10b981',
   },
   shadow: '0 1px 4px rgba(0,0,0,0.3)',
 }

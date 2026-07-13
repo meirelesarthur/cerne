@@ -14,8 +14,8 @@
   --nav-icon-color:         #616161;
   --nav-sub-color:          #1a1a1a;
   --nav-sub-hover-bg:       rgba(115,115,115,0.06);
-  --nav-sub-active-bg:      #059669;
-  --nav-sub-active-color:   #ffffff;
+  --nav-sub-active-bg:      rgba(5,150,105,0.10);
+  --nav-sub-active-color:   #059669;
   --scrollbar-thumb:        #d1d5db;
   --scrollbar-thumb-hover:  #9ca3af;
   --module-card-hover-bg:   rgba(0,0,0,0.04);
@@ -31,8 +31,8 @@
   --nav-icon-color:         rgba(216,237,226,0.5);
   --nav-sub-color:          rgba(216,237,226,0.7);
   --nav-sub-hover-bg:       rgba(255,255,255,0.04);
-  --nav-sub-active-bg:      #10b981;
-  --nav-sub-active-color:   #ffffff;
+  --nav-sub-active-bg:      rgba(16,185,129,0.12);
+  --nav-sub-active-color:   #10b981;
   --scrollbar-thumb:        #1c3f2c;
   --scrollbar-thumb-hover:  #2a5c40;
   --module-card-hover-bg:   rgba(16,185,129,0.08);

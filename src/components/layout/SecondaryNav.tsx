@@ -14,20 +14,20 @@ function NavHeader({ module }: { module: NavModule }) {
       style={{
         height: 44,
         flexShrink: 0,
-        background: colors.nav.headerBg,
+        borderBottom: `1px solid ${colors.nav.divider}`,
         display: 'flex',
         alignItems: 'center',
         gap: t.space[1],
         padding: `0 ${t.space[3]}px`,
-        transition: 'background 0.2s',
+        transition: 'border-color 0.2s',
       }}
     >
-      <Icon size={16} strokeWidth={2} color={colors.nav.headerText} style={{ flexShrink: 0 }} aria-hidden="true" />
+      <Icon size={16} strokeWidth={2} color={colors.fg.muted} style={{ flexShrink: 0 }} aria-hidden="true" />
       <span
         style={{
           fontSize: t.font.size.md,
           fontWeight: t.font.weight.bold,
-          color: colors.nav.headerText,
+          color: colors.fg.default,
           fontFamily: "'Outfit', sans-serif",
           letterSpacing: '-0.1px',
         }}
@@ -73,7 +73,7 @@ function NavItem({
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[1] + 2 }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, minWidth: 0 }}>
-          <Icon size={14} strokeWidth={2} style={{ flexShrink: 0, color: isActive && !hasChildren ? '#ffffff' : colors.fg.subtle }} aria-hidden="true" />
+          <Icon size={14} strokeWidth={2} style={{ flexShrink: 0, color: isActive && !hasChildren ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
         </span>
         {hasChildren && (
@@ -102,7 +102,7 @@ function NavItem({
                 onClick={() => onChildClick(child.id)}
                 style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, paddingLeft: 22 }}
               >
-                <ChildIcon size={13} strokeWidth={2} style={{ flexShrink: 0, color: isChildActive ? '#ffffff' : colors.fg.subtle }} aria-hidden="true" />
+                <ChildIcon size={13} strokeWidth={2} style={{ flexShrink: 0, color: isChildActive ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{child.label}</span>
               </button>
             )

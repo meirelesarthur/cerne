@@ -192,7 +192,7 @@ semantic/color/gb/{accent,surface}            (exclusivos do GBMode)
 {light|gbMode}/bg/{canvas,outer,surface,subtle,input,sidebar}
 {light|gbMode}/border/{default,subtle}
 {light|gbMode}/accent/{default,hover,subtle}
-{light|gbMode}/nav/{text,textActive,textMuted,itemActive,itemHover,divider,headerBg,headerText}
+{light|gbMode}/nav/{text,textActive,textMuted,itemActive,itemHover,divider}
 {light|gbMode}/shadow
 ```
 

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useId, useCallback } from 'react'
-import { Search, X, ChevronDown } from 'lucide-react'
+import { Search, X, ChevronDown, HelpCircle } from 'lucide-react'
+import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -19,6 +20,10 @@ interface SearchSelectAction {
 interface SearchSelectProps {
   label?:        string
   required?:     boolean
+  /** Dica exibida em tooltip ao lado do rótulo. */
+  hint?:         string
+  /** Bloqueia a interação (não abre o dropdown, não permite limpar). */
+  disabled?:     boolean
   placeholder?:  string
   /** Texto de busca (controlado). */
   query:         string
@@ -47,6 +52,8 @@ interface SearchSelectProps {
 export function SearchSelect({
   label,
   required,
+  hint,
+  disabled,
   placeholder = 'Buscar...',
   query,
   onQueryChange,
@@ -120,8 +127,15 @@ export function SearchSelect({
     <div>
       {label && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
-          <label htmlFor={id} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
-            {label}{required && <span style={{ color: t.color.feedback.error.text }}> *</span>}
+          <label htmlFor={id} style={{ display: 'flex', alignItems: 'center', gap: t.space[1], fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, fontFamily: t.font.family.sans }}>
+            <span>{label}{required && <span style={{ color: t.color.feedback.error.text }}> *</span>}</span>
+            {hint && (
+              <Tooltip label={hint}>
+                <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
+                  <HelpCircle size={12} color={t.color.neutral[400]} />
+                </span>
+              </Tooltip>
+            )}
           </label>
           {headerAction && (
             <button
@@ -142,7 +156,9 @@ export function SearchSelect({
           border: `1.5px solid ${error ? t.color.feedback.error.text : open ? t.color.brand[600] : colors.border.default}`,
           borderRadius: t.radius.base,
           padding: `0 ${t.space[2] + 2}px`,
-          background: colors.bg.surface,
+          background: disabled ? t.color.state.disabled.bg : colors.bg.surface,
+          opacity: disabled ? 0.7 : 1,
+          cursor: disabled ? 'not-allowed' : undefined,
           transition: `border-color ${t.transition.base}`,
         }}>
           <Search size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} aria-hidden="true" />
@@ -156,8 +172,9 @@ export function SearchSelect({
             aria-activedescendant={activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
             placeholder={placeholder}
             value={query}
+            disabled={disabled}
             onChange={e => { onQueryChange(e.target.value); setOpen(true); setActiveIndex(-1) }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => !disabled && setOpen(true)}
             onKeyDown={handleKeyDown}
             autoComplete="off"
             data-1p-ignore="true"
@@ -167,7 +184,7 @@ export function SearchSelect({
             spellCheck={false}
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.md, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0 }}
           />
-          {query && onClear && (
+          {query && onClear && !disabled && (
             <button
               type="button"
               aria-label="Limpar seleção"

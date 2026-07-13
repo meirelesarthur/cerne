@@ -4,19 +4,10 @@ import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { applyMask, maskInputMode, type MaskType } from './masks'
+import type { BaseFieldProps } from './fieldTypes'
 
 interface FormFieldProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'rows'> {
-  label: string
-  required?: boolean
-  error?: string
-  hint?: string
-  /** Ícone posicionado à esquerda do input */
-  iconLeft?: React.ReactNode
-  /** Ícone ou botão posicionado à direita do input */
-  iconRight?: React.ReactNode
-  /** Estado visual: 'ok' = borda verde, 'err' = borda vermelha */
-  status?: 'idle' | 'ok' | 'err'
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'rows' | 'size'>, BaseFieldProps {
   /** Altura do controle: 'md' = t.size.control (40, padrão) · 'lg' = t.size.controlLg (48) */
   size?: 'md' | 'lg'
   /** Renderiza um <textarea> multi-linha em vez de <input> */
@@ -80,39 +71,49 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   const maskInputModeValue =
     mask && typeof mask === 'string' ? maskInputMode[mask] : inputProps.inputMode
 
+  const isDisabled = !!inputProps.disabled
+  const isReadOnly = !!inputProps.readOnly && !isDisabled
   const isError = !!error || status === 'err'
   const isOk = !isError && status === 'ok'
   const borderColor = isError
     ? t.color.feedback.error.text
     : isOk
     ? t.color.feedback.success.text
+    : isDisabled
+    ? t.color.state.disabled.border
+    : isReadOnly
+    ? t.color.state.readonly.border
     : colors.border.default
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: 2 }}>
-        <span
-          style={{
-            fontSize: t.font.size.sm,
-            fontWeight: t.font.weight.medium,
-            color: colors.fg.default,
-            fontFamily: t.font.family.sans,
-            transition: 'color 0.2s',
-          }}
-        >
-          {label}
-        </span>
-        {required && (
-          <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
-        )}
-        {hint && (
-          <Tooltip label={hint}>
-            <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-              <HelpCircle size={12} color={t.color.neutral[400]} />
+      {(label || required || hint) && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: 2 }}>
+          {label && (
+            <span
+              style={{
+                fontSize: t.font.size.sm,
+                fontWeight: t.font.weight.medium,
+                color: colors.fg.default,
+                fontFamily: t.font.family.sans,
+                transition: 'color 0.2s',
+              }}
+            >
+              {label}
             </span>
-          </Tooltip>
-        )}
-      </div>
+          )}
+          {required && (
+            <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+          )}
+          {hint && (
+            <Tooltip label={hint}>
+              <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
+                <HelpCircle size={12} color={t.color.neutral[400]} />
+              </span>
+            </Tooltip>
+          )}
+        </div>
+      )}
 
       <div style={{ position: 'relative', display: 'flex', alignItems: multiline ? 'flex-start' : 'center' }}>
         {iconLeft && !multiline && (
@@ -138,8 +139,19 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             borderRadius: t.radius.base,
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
-            color: colors.fg.default,
-            background: isError ? t.color.feedback.error.bg : colors.bg.input,
+            color: isDisabled
+              ? t.color.state.disabled.text
+              : isReadOnly
+              ? t.color.state.readonly.text
+              : colors.fg.default,
+            background: isError
+              ? t.color.feedback.error.bg
+              : isDisabled
+              ? t.color.state.disabled.bg
+              : isReadOnly
+              ? t.color.state.readonly.bg
+              : colors.bg.input,
+            cursor: isDisabled ? 'not-allowed' : undefined,
             outline: 'none',
             boxSizing: 'border-box',
             transition: `border-color ${t.transition.base}, background ${t.transition.smooth}`,

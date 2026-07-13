@@ -2,10 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, ArrowRight, Hash, type LucideIcon } from 'lucide-react'
 import { menuModules } from '../data/menuData'
 import { useTheme } from '../context/ThemeContext'
+import { useNavigation } from '../context/NavigationContext'
+import { t } from '../design/tokens'
 
 interface SearchItem {
   id: string
   label: string
+  moduleId: string
   moduleLabel: string
   moduleIcon: LucideIcon
   groupLabel?: string
@@ -17,13 +20,13 @@ function buildIndex(): SearchItem[] {
   for (const mod of menuModules) {
     if (mod.flatItems) {
       for (const item of mod.flatItems) {
-        items.push({ id: item.id, label: item.label, moduleLabel: mod.label, moduleIcon: mod.icon, path: item.path })
+        items.push({ id: item.id, label: item.label, moduleId: mod.id, moduleLabel: mod.label, moduleIcon: mod.icon, path: item.path })
       }
     }
     if (mod.groups) {
       for (const group of mod.groups) {
         for (const item of group.items) {
-          items.push({ id: item.id, label: item.label, moduleLabel: mod.label, moduleIcon: mod.icon, groupLabel: group.label, path: item.path })
+          items.push({ id: item.id, label: item.label, moduleId: mod.id, moduleLabel: mod.label, moduleIcon: mod.icon, groupLabel: group.label, path: item.path })
         }
       }
     }
@@ -50,10 +53,13 @@ function highlight(text: string, query: string): React.ReactNode {
 
 interface SearchBarProps {
   onNavigate?: (path: string) => void
+  /** Versão compacta para uso em barras estreitas (ex.: Topbar). */
+  compact?: boolean
 }
 
-export default function SearchBar({ onNavigate }: SearchBarProps) {
+export default function SearchBar({ onNavigate, compact = false }: SearchBarProps) {
   const { colors, isGbMode } = useTheme()
+  const { navigateTo } = useNavigation()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
@@ -71,8 +77,9 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
   const handleSelect = useCallback((item: SearchItem) => {
     setQuery('')
     setOpen(false)
+    navigateTo(item.moduleId, item.id)
     onNavigate?.(item.path)
-  }, [onNavigate])
+  }, [navigateTo, onNavigate])
 
   useEffect(() => { setActiveIdx(0) }, [query])
 
@@ -107,39 +114,47 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
   const isOpen = open && results.length > 0
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%', maxWidth: 560 }}>
+    <div
+      ref={containerRef}
+      style={
+        compact
+          ? { position: 'relative', width: 220 }
+          : { position: 'relative', width: '100%', maxWidth: 560 }
+      }
+    >
       {/* Input */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
+          gap: compact ? t.space[1] + 3 : 10,
           background: colors.bg.surface,
-          border: open ? `1.5px solid ${colors.accent.default}` : `1.5px solid ${colors.border.default}`,
-          borderRadius: isOpen ? '12px 12px 0 0' : 12,
-          padding: '0 16px',
-          height: 48,
-          boxShadow: open ? `0 0 0 3px ${colors.accent.subtle}` : colors.shadow,
+          border: open ? `1.5px solid ${colors.accent.default}` : `1px solid ${colors.border.default}`,
+          borderRadius: isOpen ? (compact ? `${t.radius.base}px ${t.radius.base}px 0 0` : '12px 12px 0 0') : (compact ? t.radius.base : 12),
+          padding: compact ? `0 ${t.space[3]}px` : '0 16px',
+          height: compact ? 32 : 48,
+          boxShadow: open ? `0 0 0 3px ${colors.accent.subtle}` : (compact ? 'none' : colors.shadow),
           transition: 'border-color 0.15s, box-shadow 0.15s, background 0.2s',
           cursor: 'text',
         }}
         onClick={() => inputRef.current?.focus()}
       >
-        <Search size={16} color={open ? '#059669' : '#9ca3af'} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
+        <Search size={compact ? 13 : 16} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
         <input
           ref={inputRef}
           value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Buscar funcionalidades, módulos e mais..."
+          placeholder={compact ? 'Buscar...' : 'Buscar funcionalidades, módulos e mais...'}
           style={{
             flex: 1,
+            minWidth: 0,
             border: 'none',
             outline: 'none',
             background: 'transparent',
-            fontSize: 14,
-            fontFamily: "'Outfit', sans-serif",
+            fontSize: compact ? t.font.size.sm : 14,
+            fontFamily: t.font.family.sans,
             fontWeight: 400,
             color: colors.fg.default,
             lineHeight: 1,
@@ -147,19 +162,19 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
         />
         <kbd
           style={{
-            fontSize: 11,
+            fontSize: compact ? t.font.size.xs - 1 : 11,
             background: colors.bg.subtle,
             border: `1px solid ${colors.border.default}`,
-            borderRadius: 6,
-            padding: '2px 7px',
+            borderRadius: compact ? t.radius.sm : 6,
+            padding: compact ? '1px 4px' : '2px 7px',
             color: colors.fg.subtle,
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: t.font.family.sans,
             whiteSpace: 'nowrap',
             flexShrink: 0,
-            lineHeight: 1.6,
+            lineHeight: compact ? 1.4 : 1.6,
           }}
         >
-          Ctrl K
+          {compact ? '⌘K' : 'Ctrl K'}
         </kbd>
       </div>
 
@@ -169,14 +184,13 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
           style={{
             position: 'absolute',
             top: '100%',
-            left: 0,
-            right: 0,
+            ...(compact ? { right: 0, width: 420 } : { left: 0, right: 0 }),
             background: colors.bg.surface,
             border: `1.5px solid ${colors.accent.default}`,
             borderTop: `1px solid ${colors.border.subtle}`,
-            borderRadius: '0 0 12px 12px',
+            borderRadius: `0 0 ${compact ? t.radius.lg : 12}px ${compact ? t.radius.lg : 12}px`,
             boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
-            zIndex: 100,
+            zIndex: t.zIndex.dropdown,
             overflow: 'hidden',
           }}
         >
@@ -330,19 +344,18 @@ export default function SearchBar({ onNavigate }: SearchBarProps) {
           style={{
             position: 'absolute',
             top: '100%',
-            left: 0,
-            right: 0,
+            ...(compact ? { right: 0, width: 420 } : { left: 0, right: 0 }),
             background: colors.bg.surface,
             border: `1.5px solid ${colors.accent.default}`,
             borderTop: `1px solid ${colors.border.subtle}`,
-            borderRadius: '0 0 12px 12px',
+            borderRadius: `0 0 ${compact ? t.radius.lg : 12}px ${compact ? t.radius.lg : 12}px`,
             boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
-            zIndex: 100,
+            zIndex: t.zIndex.dropdown,
             padding: '18px 16px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: 13, color: colors.fg.subtle, fontFamily: "'Outfit', sans-serif", lineHeight: 1 }}>
+          <div style={{ fontSize: 13, color: colors.fg.subtle, fontFamily: t.font.family.sans, lineHeight: 1 }}>
             Nenhum resultado para{' '}
             <strong style={{ color: colors.fg.muted }}>"{query}"</strong>
           </div>

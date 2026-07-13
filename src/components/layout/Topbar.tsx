@@ -1,9 +1,10 @@
-import { Bell, Search } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { FarmSwitcher } from '../ui/FarmSwitcher'
+import SearchBar from '../SearchBar'
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -48,40 +49,8 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
 
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        {/* Search */}
-        <button
-          style={{
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: `0 ${t.space[3]}px`,
-            borderRadius: t.radius.base,
-            border: `1px solid ${colors.border.default}`,
-            background: colors.bg.surface,
-            cursor: 'pointer',
-            color: colors.fg.subtle,
-            fontSize: t.font.size.sm,
-            fontFamily: t.font.family.sans,
-            transition: 'background 0.15s',
-          }}
-        >
-          <Search size={13} />
-          <span>Buscar...</span>
-          <kbd
-            style={{
-              fontSize: t.font.size.xs - 1, // ~10px (abaixo do mínimo do token)
-              background: colors.bg.subtle,
-              border: `1px solid ${colors.border.default}`,
-              borderRadius: t.radius.sm,
-              padding: '1px 4px',
-              color: colors.fg.subtle,
-              fontFamily: 'monospace',
-            }}
-          >
-            ⌘K
-          </kbd>
-        </button>
+        {/* Search global — mesmo mecanismo de busca da Home (SearchBar), em versão compacta */}
+        <SearchBar compact />
 
         {/* Farm Switcher */}
         <FarmSwitcher />

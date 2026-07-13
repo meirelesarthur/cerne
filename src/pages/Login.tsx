@@ -7,6 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
+import defaultBg from '../assets/aerial-view-agricultural-fields.jpg'
 const CDN = 'https://pub-0f1e695318f140f895ccdb13696c1c62.r2.dev'
 const vidCafe = `${CDN}/cafe.mp4`
 const vidGado = `${CDN}/Gado.mp4`
@@ -240,13 +241,22 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
         {/* ══ LEFT PANEL ══════════════════════════════════════════════════ */}
         <div className="lgn-left">
 
-          {/* Vídeo de fundo */}
-          <div className="lgn-video-wrap">
+          {/* Vídeo de fundo — imagem padrão atrás/como poster: cobre o carregamento
+             inicial e conexões lentas onde o vídeo demora ou falha ao renderizar. */}
+          <div
+            className="lgn-video-wrap"
+            style={{
+              backgroundImage: `url(${defaultBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
             {!prefersReduced.current && (
               <video
                 ref={videoRef}
                 className="lgn-video lgn-video--on"
                 src={slide.src}
+                poster={defaultBg}
                 autoPlay
                 muted
                 loop

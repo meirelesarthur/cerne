@@ -23,7 +23,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
         style={{
           position: 'relative',
           width: t.size.toggle.track,
-          height: 22,
+          height: t.size.toggle.trackHeight,
           borderRadius: t.radius.full,
           background: checked ? t.color.brand[600] : colors.border.default,
           border: 'none',

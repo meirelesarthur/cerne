@@ -45,7 +45,7 @@ export function SSOButton({ provider, onClick, loading, disabled }: SSOButtonPro
       aria-busy={loading}
       style={{
         width: '100%',
-        height: 46,
+        height: t.size.controlLg,
         border: `1.5px solid ${t.color.neutral[200]}`,
         background: t.color.neutral[0],
         borderRadius: t.radius.xl,

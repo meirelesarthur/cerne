@@ -5,6 +5,7 @@ import { FormSelect } from '../components/ui/FormSelect'
 import { Button } from '../components/ui/Button'
 import { Avatar } from '../components/ui/Avatar'
 import { Heading } from '../components/ui/Heading'
+import { ToggleSwitch } from '../components/ui/ToggleSwitch'
 import { t } from '../design/tokens'
 
 // ─── primitives ──────────────────────────────────────────────────────────────
@@ -46,39 +47,6 @@ function Section({ children, last }: { children: React.ReactNode; last?: boolean
       }}
     >
       {children}
-    </div>
-  )
-}
-
-function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
-  return (
-    <div
-      onClick={onChange}
-      style={{
-        width: 40,
-        height: 20,
-        borderRadius: 9999,
-        background: checked ? t.color.brand[600] : 'rgba(115,115,115,0.2)',
-        position: 'relative',
-        cursor: 'pointer',
-        flexShrink: 0,
-        transition: `background ${t.transition.smooth}`,
-        boxShadow: '0 0 2px rgba(18,18,18,0.08), 0 2px 2px rgba(18,18,18,0.04)',
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          top: 2,
-          left: checked ? 22 : 2,
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          background: t.color.neutral[50],
-          transition: `left ${t.transition.smooth}`,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-        }}
-      />
     </div>
   )
 }
@@ -215,7 +183,7 @@ export default function PerfilUsuario() {
                 Ao entrar, enviaremos um código de 6 dígitos para o seu e-mail para verificar sua identidade.
               </Muted>
             </div>
-            <Toggle checked={twoFactor} onChange={() => setTwoFactor((v) => !v)} />
+            <ToggleSwitch checked={twoFactor} onChange={setTwoFactor} />
           </div>
         </div>
       </Section>
@@ -254,7 +222,7 @@ export default function PerfilUsuario() {
           <SubTitle>Newsletter</SubTitle>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
             <Muted>Receba newsletters, promoções e novidades do GB CERNE.</Muted>
-            <Toggle checked={newsletter} onChange={() => setNewsletter((v) => !v)} />
+            <ToggleSwitch checked={newsletter} onChange={setNewsletter} />
           </div>
         </div>
       </Section>

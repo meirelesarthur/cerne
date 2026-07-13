@@ -17,6 +17,8 @@ interface FormFieldProps
   iconRight?: React.ReactNode
   /** Estado visual: 'ok' = borda verde, 'err' = borda vermelha */
   status?: 'idle' | 'ok' | 'err'
+  /** Altura do controle: 'md' = t.size.control (40, padrão) · 'lg' = t.size.controlLg (48) */
+  size?: 'md' | 'lg'
   /** Renderiza um <textarea> multi-linha em vez de <input> */
   multiline?: boolean
   /** Número de linhas visíveis quando multiline (default 4) */
@@ -42,6 +44,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   iconLeft,
   iconRight,
   status,
+  size = 'md',
   multiline = false,
   rows = 4,
   mask,
@@ -50,6 +53,8 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   ...inputProps
 }, ref) {
   const { colors } = useTheme()
+
+  const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
 
   // Atributos que sinalizam aos gerenciadores de senha para ignorar o campo.
   // Aplicados a campos não-credenciais (todos exceto type="password") quando
@@ -169,7 +174,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
                   ...sharedStyle,
                   padding: `${t.space[2]}px ${t.space[2] + t.space[1] / 2}px`,
                   resize: 'vertical',
-                  minHeight: t.size.control,
+                  minHeight: controlHeight,
                   lineHeight: t.font.lineHeight.normal,
                   ...style,
                 }}
@@ -189,7 +194,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
               onChange={maskedOnChange}
               style={{
                 ...sharedStyle,
-                height: t.size.control,
+                height: controlHeight,
                 paddingTop: 0,
                 paddingBottom: 0,
                 paddingLeft: iconLeft ? 44 : t.space[2] + t.space[1] / 2,

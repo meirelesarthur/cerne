@@ -192,7 +192,7 @@ function CalendarGrid({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 32,
+                height: t.size.calendarCell,
                 width: '100%',
                 border: isToday && !isSelected ? `1.5px solid ${t.color.brand[500]}` : '1.5px solid transparent',
                 borderRadius,

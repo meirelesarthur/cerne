@@ -412,7 +412,8 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   onFocus={() => setEmailStatus('idle')}
                   status={emailStatus}
                   error={emailStatus === 'err' ? 'Insira um e-mail válido' : undefined}
-                  style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                  size="lg"
+                  style={{ borderRadius: t.radius.xl }}
                   iconLeft={
                     <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
                       <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
@@ -447,7 +448,8 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                   onFocus={() => setPassErr(false)}
                   status={passErr ? 'err' : 'idle'}
                   error={passErr ? 'Insira sua senha' : undefined}
-                  style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                  size="lg"
+                  style={{ borderRadius: t.radius.xl }}
                   iconLeft={
                     <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
                       <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
@@ -604,7 +606,8 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                     autoComplete="email"
                     allowPasswordManager
                     onChange={e => setForgotEmail(e.target.value)}
-                    style={{ height: t.space[12], borderRadius: t.radius.xl }}
+                    size="lg"
+                    style={{ borderRadius: t.radius.xl }}
                     iconLeft={
                       <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
                         <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>

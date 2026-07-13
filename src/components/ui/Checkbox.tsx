@@ -42,7 +42,7 @@ export function Checkbox({
         opacity: disabled ? 0.5 : 1,
       }}
     >
-      <span style={{ position: 'relative', width: 18, height: 18, flexShrink: 0 }}>
+      <span style={{ position: 'relative', width: t.size.checkbox, height: t.size.checkbox, flexShrink: 0 }}>
         {/* Input nativo visualmente oculto mas totalmente acessível */}
         <input
           id={id}

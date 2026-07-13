@@ -8,55 +8,55 @@ import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
 const CDN = 'https://pub-0f1e695318f140f895ccdb13696c1c62.r2.dev'
-const vid0 = `${CDN}/agricultura.mp4`
-const vid1 = `${CDN}/apicultura.mp4`
-const vid2 = `${CDN}/avicultura.mp4`
-const vid3 = `${CDN}/ovicultura.mp4`
-const vid4 = `${CDN}/Psicultura.mp4`
+const vidCafe = `${CDN}/cafe.mp4`
+const vidGado = `${CDN}/Gado.mp4`
+const vidConfinamento = `${CDN}/confinamento.mov`
+const vidPlantation = `${CDN}/plantation.mov`
+const vidSoja = `${CDN}/soja.mp4`
 import './Login.css'
 
 // ─── Constantes ────────────────────────────────────────────────────────────
 
 const SLIDES = [
   {
-    src: vid0,
-    eyebrow: 'Gestão rural inteligente',
-    h1a: 'Sua fazenda,',
+    src: vidCafe,
+    eyebrow: 'Cafeicultura de precisão',
+    h1a: 'Sua safra de café,',
     h1em: 'gerenciada',
     h1b: 'com precisão.',
     desc: 'Do campo ao escritório, controle produção, custos, colheita e equipes em uma plataforma pensada para o agronegócio brasileiro.',
   },
   {
-    src: vid1,
-    eyebrow: 'Apicultura de precisão',
-    h1a: 'Produção de mel',
-    h1em: 'monitorada',
+    src: vidGado,
+    eyebrow: 'Pecuária de corte',
+    h1a: 'Rebanho e pastagem',
+    h1em: 'monitorados',
     h1b: 'em tempo real.',
-    desc: 'Gerencie colmeias, floradas e extração com rastreabilidade completa do campo até a embalagem.',
+    desc: 'Gerencie lotes, manejo e sanidade animal com rastreabilidade completa do campo até o abate.',
   },
   {
-    src: vid2,
-    eyebrow: 'Avicultura integrada',
-    h1a: 'Lotes e aves',
+    src: vidConfinamento,
+    eyebrow: 'Confinamento inteligente',
+    h1a: 'Cochos e currais',
     h1em: 'controlados',
     h1b: 'sem esforço.',
-    desc: 'Ciclos de produção, conversão alimentar e sanidade animal integrados em um único painel.',
+    desc: 'Ciclos de produção, conversão alimentar e lotação de currais integrados em um único painel.',
   },
   {
-    src: vid3,
-    eyebrow: 'Ovinocultura moderna',
-    h1a: 'Rebanho',
-    h1em: 'acompanhado',
-    h1b: 'do nascimento ao abate.',
-    desc: 'Rastreie cada animal, controle peso, vacinação e genealogia com registros precisos e auditáveis.',
+    src: vidPlantation,
+    eyebrow: 'Agricultura moderna',
+    h1a: 'Plantio e colheita',
+    h1em: 'acompanhados',
+    h1b: 'do plantio à venda.',
+    desc: 'Rastreie cada talhão, controle insumos, safras e produtividade com registros precisos e auditáveis.',
   },
   {
-    src: vid4,
-    eyebrow: 'Piscicultura eficiente',
-    h1a: 'Tanques e safras',
-    h1em: 'gerenciados',
+    src: vidSoja,
+    eyebrow: 'Grãos e commodities',
+    h1a: 'Lavouras de soja',
+    h1em: 'gerenciadas',
     h1b: 'com inteligência.',
-    desc: 'Controle qualidade da água, biometria e despesca com análises automáticas e alertas em tempo real.',
+    desc: 'Controle produtividade, armazenagem e comercialização com análises automáticas e alertas em tempo real.',
   },
 ]
 

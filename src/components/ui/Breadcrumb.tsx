@@ -1,5 +1,4 @@
 import { Fragment } from 'react'
-import { ChevronRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -39,7 +38,7 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
         return (
           <Fragment key={`${item.label}-${i}`}>
             {i > 0 && (
-              <ChevronRight size={13} style={{ color: colors.border.default, flexShrink: 0 }} aria-hidden="true" />
+              <span style={{ color: colors.fg.subtle, flexShrink: 0 }} aria-hidden="true">/</span>
             )}
             {interactive ? (
               <a

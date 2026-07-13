@@ -7,7 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
-import defaultBg from '../assets/aerial-view-agricultural-fields.jpg'
+import defaultBg from '../assets/default-bg.jpg'
 const CDN = 'https://pub-0f1e695318f140f895ccdb13696c1c62.r2.dev'
 const vidCafe = `${CDN}/cafe.mp4`
 const vidGado = `${CDN}/Gado.mp4`

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
   List, LayoutGrid, MapPin, Layers, Ruler, Eye,
-  TrendingUp, TrendingDown,
+  TrendingUp, TrendingDown, ListPlus, X,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -10,10 +10,14 @@ import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { DataTable }       from '../../../components/ui/DataTable'
+import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { Badge }           from '../../../components/ui/Badge'
 import type { BadgeVariant } from '../../../components/ui/Badge'
+import { FormField }       from '../../../components/ui/FormField'
 import { FormSelect }      from '../../../components/ui/FormSelect'
+import { ToggleSwitch }    from '../../../components/ui/ToggleSwitch'
+import { Modal }           from '../../../components/ui/Modal'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
 import { FilterButton } from '../../../components/ui/TableToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
@@ -71,6 +75,8 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 
   const [data, setData] = useState<FazendaRow[]>(mockFazendas)
   const [deleteTarget, setDeleteTarget] = useState<FazendaRow | null>(null)
+  const [areaTarget, setAreaTarget] = useState<FazendaRow | null>(null)
+  const [multiAreaTarget, setMultiAreaTarget] = useState<FazendaRow | null>(null)
   const { toasts, show, dismiss } = useToast()
   const [viewMode,   setViewMode]   = useState<ViewMode>('list')
   const [search,     setSearch]     = useState('')
@@ -125,9 +131,58 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return
-    setData((prev) => prev.filter((f) => f.id !== deleteTarget.id))
+    // Áreas (filhas) são removidas da lista `areas` da fazenda-pai; fazendas
+    // (raiz) são removidas da lista principal.
+    if (deleteTarget.isArea) {
+      setData((prev) => prev.map((f) => ({
+        ...f,
+        areas: f.areas?.filter((a) => a.id !== deleteTarget.id),
+      })))
+    } else {
+      setData((prev) => prev.filter((f) => f.id !== deleteTarget.id))
+    }
     show(`"${deleteTarget.nome}" excluída.`, 'info')
     setDeleteTarget(null)
+  }
+
+  const handleSaveArea = (novaArea: { nome: string; areaTotal: number; ativo: boolean }) => {
+    if (!areaTarget) return
+    const area: FazendaRow = {
+      id: `${areaTarget.id}-${crypto.randomUUID()}`,
+      nome: novaArea.nome,
+      cpfCnpj: '',
+      cidade: '',
+      uf: '',
+      tipoExploracao: '',
+      areaTotal: novaArea.areaTotal,
+      ativo: novaArea.ativo,
+      isArea: true,
+    }
+    setData((prev) => prev.map((f) => (
+      f.id === areaTarget.id ? { ...f, areas: [...(f.areas ?? []), area] } : f
+    )))
+    show(`Área "${novaArea.nome}" adicionada a "${areaTarget.nome}".`, 'success')
+    setAreaTarget(null)
+  }
+
+  const handleSaveMultiAreas = (novasAreas: { nome: string; areaTotal: number }[]) => {
+    if (!multiAreaTarget) return
+    const areas: FazendaRow[] = novasAreas.map((a) => ({
+      id: `${multiAreaTarget.id}-${crypto.randomUUID()}`,
+      nome: a.nome,
+      cpfCnpj: '',
+      cidade: '',
+      uf: '',
+      tipoExploracao: '',
+      areaTotal: a.areaTotal,
+      ativo: true,
+      isArea: true,
+    }))
+    setData((prev) => prev.map((f) => (
+      f.id === multiAreaTarget.id ? { ...f, areas: [...(f.areas ?? []), ...areas] } : f
+    )))
+    show(`${areas.length} área${areas.length !== 1 ? 's' : ''} adicionada${areas.length !== 1 ? 's' : ''} a "${multiAreaTarget.nome}".`, 'success')
+    setMultiAreaTarget(null)
   }
 
   // ── Colunas da tabela ─────────────────────────────────────────────────────
@@ -141,26 +196,27 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       key: 'cpfCnpj',
       label: 'CPF / CNPJ',
       render: (row) => (
-        <span style={{ color: colors.fg.muted, fontSize: 12 }}>{row.cpfCnpj}</span>
+        row.cpfCnpj
+          ? <span style={{ color: colors.fg.muted, fontSize: 12 }}>{row.cpfCnpj}</span>
+          : null
       ),
     },
     {
       key: 'cidadeUf',
       label: 'Cidade / UF',
       render: (row) => (
-        <span style={{ color: colors.fg.muted }}>
-          {row.cidade} — {row.uf}
-        </span>
+        row.cidade
+          ? <span style={{ color: colors.fg.muted }}>{row.cidade} — {row.uf}</span>
+          : null
       ),
     },
     {
       key: 'tipoExploracao',
       label: 'Tipo Exploração',
       render: (row) => (
-        <Badge
-          label={row.tipoExploracao}
-          variant={TIPO_VARIANT[row.tipoExploracao] ?? 'neutral'}
-        />
+        row.tipoExploracao
+          ? <Badge label={row.tipoExploracao} variant={TIPO_VARIANT[row.tipoExploracao] ?? 'neutral'} />
+          : null
       ),
     },
     {
@@ -187,33 +243,29 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       label: 'Ações',
       align: 'center',
       sortable: false,
-      width: 80,
+      width: 60,
       render: (row) => (
         <div
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: t.space[1] }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <IconButton
-            icon={<Eye size={13} />}
-            aria-label="Visualizar fazenda"
-            tooltip="Visualizar"
-            size="sm"
-            onClick={() => onView(row.id)}
-          />
-          <IconButton
-            icon={<Pencil size={13} />}
-            aria-label="Editar fazenda"
-            tooltip="Editar"
-            size="sm"
-            onClick={() => onEdit(row.id)}
-          />
-          <IconButton
-            icon={<Trash2 size={13} />}
-            aria-label="Excluir fazenda"
-            tooltip="Excluir"
-            size="sm"
-            danger
-            onClick={() => setDeleteTarget(row)}
+          <DropdownMenu
+            ariaLabel={`Ações de ${row.nome}`}
+            items={
+              row.isArea
+                ? [
+                    { id: 'view',   label: 'Visualizar', icon: <Eye size={14} />,    onClick: () => onView(row.id) },
+                    { id: 'edit',   label: 'Editar',      icon: <Pencil size={14} />, onClick: () => onEdit(row.id) },
+                    { id: 'delete', label: 'Excluir',     icon: <Trash2 size={14} />, danger: true, divider: true, onClick: () => setDeleteTarget(row) },
+                  ]
+                : [
+                    { id: 'view',       label: 'Visualizar',                icon: <Eye size={14} />,     onClick: () => onView(row.id) },
+                    { id: 'add-area',   label: 'Adicionar Área',            icon: <Plus size={14} />,    onClick: () => setAreaTarget(row) },
+                    { id: 'add-multi',  label: 'Adicionar Múltiplas Áreas', icon: <ListPlus size={14} />, onClick: () => setMultiAreaTarget(row) },
+                    { id: 'edit',       label: 'Editar',                    icon: <Pencil size={14} />,   divider: true, onClick: () => onEdit(row.id) },
+                    { id: 'delete',     label: 'Excluir',                   icon: <Trash2 size={14} />,   danger: true, onClick: () => setDeleteTarget(row) },
+                  ]
+            }
           />
         </div>
       ),
@@ -298,6 +350,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               keyField="id"
               emptyMessage="Nenhuma fazenda encontrada."
               onRowClick={(row) => onView(row.id)}
+              getChildren={(row) => row.areas}
             />
             {totalFiltered > PAGE_SIZE && (
               <div style={{
@@ -368,7 +421,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         open={!!deleteTarget}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
-        title="Excluir fazenda"
+        title={deleteTarget?.isArea ? 'Excluir área' : 'Excluir fazenda'}
         message={
           deleteTarget
             ? `"${deleteTarget.nome}" será excluída permanentemente. Esta ação não pode ser desfeita.`
@@ -377,9 +430,226 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
         confirmLabel="Excluir"
       />
 
+      {/* ── Modal: Adicionar Área ────────────────────────────────────────── */}
+      <AreaModal
+        open={!!areaTarget}
+        fazendaNome={areaTarget?.nome}
+        onClose={() => setAreaTarget(null)}
+        onSave={handleSaveArea}
+      />
+
+      {/* ── Modal: Adicionar Múltiplas Áreas ─────────────────────────────── */}
+      <MultiAreaModal
+        open={!!multiAreaTarget}
+        fazendaNome={multiAreaTarget?.nome}
+        onClose={() => setMultiAreaTarget(null)}
+        onSave={handleSaveMultiAreas}
+      />
+
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
 
     </PageContainer>
+  )
+}
+
+// ─── Modal: Adicionar Área (única) ────────────────────────────────────────────
+
+interface AreaModalProps {
+  open: boolean
+  fazendaNome?: string
+  onClose: () => void
+  onSave: (area: { nome: string; areaTotal: number; ativo: boolean }) => void
+}
+
+function AreaModal({ open, fazendaNome, onClose, onSave }: AreaModalProps) {
+  const [nome, setNome] = useState('')
+  const [areaTotal, setAreaTotal] = useState('')
+  const [ativo, setAtivo] = useState(true)
+  const [errors, setErrors] = useState<{ nome?: string; areaTotal?: string }>({})
+
+  // Reseta o form sempre que o modal é reaberto para uma fazenda diferente
+  useEffect(() => {
+    if (open) {
+      setNome('')
+      setAreaTotal('')
+      setAtivo(true)
+      setErrors({})
+    }
+  }, [open])
+
+  const handleSave = () => {
+    const nomeTrim = nome.trim()
+    const areaNum = Number(areaTotal.replace(',', '.'))
+    const nextErrors: typeof errors = {}
+    if (!nomeTrim) nextErrors.nome = 'Informe o nome da área.'
+    if (!areaTotal || !(areaNum > 0)) nextErrors.areaTotal = 'Informe uma área válida.'
+    if (Object.keys(nextErrors).length > 0) { setErrors(nextErrors); return }
+
+    onSave({ nome: nomeTrim, areaTotal: areaNum, ativo })
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Adicionar Área"
+      subtitle={fazendaNome}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+        <FormField
+          label="Nome da Área"
+          required
+          value={nome}
+          onChange={(e) => { setNome(e.target.value); setErrors((er) => ({ ...er, nome: undefined })) }}
+          error={errors.nome}
+          placeholder="Ex: Talhão 03"
+        />
+        <FormField
+          label="Área (ha)"
+          required
+          type="number"
+          min="0"
+          step="0.01"
+          value={areaTotal}
+          onChange={(e) => { setAreaTotal(e.target.value); setErrors((er) => ({ ...er, areaTotal: undefined })) }}
+          error={errors.areaTotal}
+          placeholder="Ex: 250"
+        />
+        <ToggleSwitch checked={ativo} onChange={setAtivo} label="Ativo" />
+      </div>
+    </Modal>
+  )
+}
+
+// ─── Modal: Adicionar Múltiplas Áreas ──────────────────────────────────────────
+
+interface MultiAreaRow {
+  key: string
+  nome: string
+  areaTotal: string
+}
+
+function newMultiAreaRow(): MultiAreaRow {
+  return { key: crypto.randomUUID(), nome: '', areaTotal: '' }
+}
+
+interface MultiAreaModalProps {
+  open: boolean
+  fazendaNome?: string
+  onClose: () => void
+  onSave: (areas: { nome: string; areaTotal: number }[]) => void
+}
+
+function MultiAreaModal({ open, fazendaNome, onClose, onSave }: MultiAreaModalProps) {
+  const { colors } = useTheme()
+  const [rows, setRows] = useState<MultiAreaRow[]>([newMultiAreaRow()])
+  const [error, setError] = useState<string | undefined>()
+
+  useEffect(() => {
+    if (open) {
+      setRows([newMultiAreaRow()])
+      setError(undefined)
+    }
+  }, [open])
+
+  const updateRow = (key: string, field: 'nome' | 'areaTotal', value: string) => {
+    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, [field]: value } : r)))
+    setError(undefined)
+  }
+
+  const addRow = () => setRows((prev) => [...prev, newMultiAreaRow()])
+  const removeRow = (key: string) => setRows((prev) => (prev.length > 1 ? prev.filter((r) => r.key !== key) : prev))
+
+  const handleSave = () => {
+    const valid = rows
+      .map((r) => ({ nome: r.nome.trim(), areaTotal: Number(r.areaTotal.replace(',', '.')) }))
+      .filter((r) => r.nome && r.areaTotal > 0)
+
+    if (valid.length === 0) { setError('Preencha ao menos uma área com nome e tamanho válidos.'); return }
+    onSave(valid)
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Adicionar Múltiplas Áreas"
+      subtitle={fazendaNome}
+      size="md"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
+        {rows.map((row, idx) => (
+          <div key={row.key} style={{ display: 'flex', gap: t.space[2], alignItems: 'flex-end' }}>
+            <div style={{ flex: 2 }}>
+              <FormField
+                label={idx === 0 ? 'Nome da Área' : ''}
+                value={row.nome}
+                onChange={(e) => updateRow(row.key, 'nome', e.target.value)}
+                placeholder="Ex: Talhão 03"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <FormField
+                label={idx === 0 ? 'Área (ha)' : ''}
+                type="number"
+                min="0"
+                step="0.01"
+                value={row.areaTotal}
+                onChange={(e) => updateRow(row.key, 'areaTotal', e.target.value)}
+                placeholder="Ex: 250"
+              />
+            </div>
+            <IconButton
+              icon={<X size={14} />}
+              aria-label="Remover linha"
+              tooltip="Remover"
+              size="sm"
+              danger
+              disabled={rows.length === 1}
+              onClick={() => removeRow(row.key)}
+            />
+          </div>
+        ))}
+
+        {error && (
+          <span style={{ fontSize: t.font.size.xs, color: t.color.feedback.error.text, fontFamily: t.font.family.sans }}>
+            {error}
+          </span>
+        )}
+
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<Plus size={13} />}
+          onClick={addRow}
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            padding: '9px',
+            border: `1px dashed ${colors.border.default}`,
+            borderRadius: t.radius.base,
+            color: colors.fg.subtle,
+            fontSize: t.font.size.sm,
+            fontWeight: t.font.weight.medium,
+          }}
+        >
+          Adicionar linha
+        </Button>
+      </div>
+    </Modal>
   )
 }
 

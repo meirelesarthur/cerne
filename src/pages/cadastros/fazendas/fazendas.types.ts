@@ -7,6 +7,10 @@ export interface FazendaRow {
   tipoExploracao: string
   areaTotal: number
   ativo: boolean
+  /** Áreas internas da fazenda — 2º nível de listagem, exibido ao expandir a linha. */
+  areas?: FazendaRow[]
+  /** `true` para linhas de área (filhas) — reduz colunas e ações exibidas na tabela. */
+  isArea?: boolean
 }
 
 export interface FazendaFormData {

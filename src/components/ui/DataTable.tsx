@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -18,6 +19,12 @@ interface DataTableProps<T> {
   emptyMessage?: string
   loading?: boolean
   onRowClick?: (row: T) => void
+  /**
+   * Retorna os filhos de uma linha (2º nível hierárquico). Quando informado,
+   * habilita expand/collapse com chevron na primeira coluna — linhas sem
+   * filhos permanecem inalteradas. Ex.: áreas internas de uma fazenda.
+   */
+  getChildren?: (row: T) => T[] | undefined
 }
 
 function SortIcon({ active, color }: { active?: boolean; color: string }) {
@@ -36,16 +43,43 @@ export function DataTable<T extends object>({
   emptyMessage = 'Nenhum registro encontrado.',
   loading,
   onRowClick,
+  getChildren,
 }: DataTableProps<T>) {
   const { colors, isGbMode } = useTheme()
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set())
 
   const handleSort = (colKey: string) => {
     if (sortCol === colKey) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else { setSortCol(colKey); setSortDir('asc') }
   }
+
+  const toggleExpand = (key: string) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  // Achata a árvore em uma lista linear { row, level } — só desce para os
+  // filhos de linhas explicitamente expandidas.
+  function flattenRows(rows: T[], level = 0): { row: T; level: number }[] {
+    return rows.flatMap((row) => {
+      const key = String(row[keyField])
+      const children = getChildren?.(row)
+      const entry = { row, level }
+      if (children && children.length > 0 && expandedKeys.has(key)) {
+        return [entry, ...flattenRows(children, level + 1)]
+      }
+      return [entry]
+    })
+  }
+
+  const flatRows = getChildren ? flattenRows(data) : data.map((row) => ({ row, level: 0 }))
 
   // Derived colors
   const borderColor   = colors.border.default
@@ -113,9 +147,12 @@ export function DataTable<T extends object>({
                 </td>
               </tr>
             ) : (
-              data.map((row) => {
+              flatRows.map(({ row, level }) => {
                 const rowKey = String(row[keyField])
                 const isHovered = hoveredRow === rowKey
+                const children = getChildren?.(row)
+                const hasChildren = !!children && children.length > 0
+                const isExpanded = expandedKeys.has(rowKey)
                 return (
                   <tr
                     key={rowKey}
@@ -123,13 +160,17 @@ export function DataTable<T extends object>({
                     onMouseLeave={() => setHoveredRow(null)}
                     onClick={() => onRowClick?.(row)}
                     style={{
-                      background: isHovered ? rowHoverBg : rowBg,
+                      background: isHovered
+                        ? rowHoverBg
+                        : level > 0
+                          ? (isGbMode ? t.color.state.row.stripedGb : t.color.state.row.striped)
+                          : rowBg,
                       borderBottom: `1px solid ${borderSubtle}`,
                       transition: `background ${t.transition.fast}`,
                       cursor: onRowClick ? 'pointer' : 'default',
                     }}
                   >
-                    {columns.map((col) => {
+                    {columns.map((col, colIdx) => {
                       const content = col.render(row)
                       return (
                         <td
@@ -144,20 +185,59 @@ export function DataTable<T extends object>({
                             height: t.size.tableRow,
                             maxWidth: col.width,
                             boxSizing: 'border-box',
-                            overflow: 'hidden',
+                            // Sem overflow:hidden na célula — o truncamento fica a cargo do
+                            // <div> interno (ellipsis), permitindo que overlays da coluna
+                            // (ex.: DropdownMenu de ações) escapem sem serem cortados.
                           }}
                         >
-                          {/* Trunca com reticências; texto completo no hover (title) */}
-                          <div
-                            title={typeof content === 'string' ? content : undefined}
-                            style={{
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {content}
-                          </div>
+                          {colIdx === 0 && getChildren ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], paddingLeft: level * 18 }}>
+                              {hasChildren ? (
+                                <button
+                                  type="button"
+                                  aria-label={isExpanded ? 'Recolher' : 'Expandir'}
+                                  onClick={(e) => { e.stopPropagation(); toggleExpand(rowKey) }}
+                                  style={{
+                                    width: 16,
+                                    height: 16,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: colors.fg.subtle,
+                                    flexShrink: 0,
+                                    padding: 0,
+                                    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                    transition: `transform ${t.transition.fast}`,
+                                  }}
+                                >
+                                  <ChevronRight size={13} />
+                                </button>
+                              ) : (
+                                <span style={{ width: 16, flexShrink: 0 }} />
+                              )}
+                              <div
+                                title={typeof content === 'string' ? content : undefined}
+                                style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                              >
+                                {content}
+                              </div>
+                            </div>
+                          ) : (
+                            /* Trunca com reticências; texto completo no hover (title) */
+                            <div
+                              title={typeof content === 'string' ? content : undefined}
+                              style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {content}
+                            </div>
+                          )}
                         </td>
                       )
                     })}

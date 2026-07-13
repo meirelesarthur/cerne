@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { MoreVertical } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -20,10 +21,20 @@ interface DropdownMenuProps {
   triggerIcon?: React.ReactNode
 }
 
+interface MenuPos {
+  top: number
+  left?: number
+  right?: number
+}
+
 /**
  * Menu de ações contextual ancorado a um botão gatilho. Gerencia seu próprio
- * estado aberto/fechado, fecha com ESC, clique fora e ao escolher um item.
- * Substitui os DropdownItem/MoreVertical reimplementados nas listagens.
+ * estado aberto/fechado, fecha com ESC, clique fora, scroll e ao escolher um
+ * item. Substitui os DropdownItem/MoreVertical reimplementados nas listagens.
+ *
+ * O menu é renderizado via portal em `document.body` (posicionado por
+ * coordenadas do gatilho) para escapar de qualquer ancestral com
+ * `overflow: hidden` — ex.: o wrapper arredondado do `DataTable`.
  */
 export function DropdownMenu({
   items,
@@ -33,19 +44,46 @@ export function DropdownMenu({
 }: DropdownMenuProps) {
   const { colors, isGbMode } = useTheme()
   const [open, setOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState<MenuPos | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  const computePosition = useCallback(() => {
+    const rect = rootRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setMenuPos(
+      align === 'right'
+        ? { top: rect.bottom + 4, right: window.innerWidth - rect.right }
+        : { top: rect.bottom + 4, left: rect.left }
+    )
+  }, [align])
+
+  const toggleOpen = () => {
+    if (!open) computePosition()
+    setOpen((o) => !o)
+  }
 
   useEffect(() => {
     if (!open) return
     const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      if (
+        rootRef.current && !rootRef.current.contains(target) &&
+        menuRef.current && !menuRef.current.contains(target)
+      ) setOpen(false)
     }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    // Fecha ao rolar (tabela, drawer, página) — evita menu desalinhado do gatilho.
+    const onScroll = () => setOpen(false)
     document.addEventListener('mousedown', onDoc)
     document.addEventListener('keydown', onKey)
+    window.addEventListener('scroll', onScroll, true)
+    window.addEventListener('resize', onScroll)
     return () => {
       document.removeEventListener('mousedown', onDoc)
       document.removeEventListener('keydown', onKey)
+      window.removeEventListener('scroll', onScroll, true)
+      window.removeEventListener('resize', onScroll)
     }
   }, [open])
 
@@ -56,7 +94,7 @@ export function DropdownMenu({
         aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggleOpen}
         style={{
           width:          t.size.pageBtn,
           height:         t.size.pageBtn,
@@ -86,13 +124,15 @@ export function DropdownMenu({
         {triggerIcon ?? <MoreVertical size={15} />}
       </button>
 
-      {open && (
+      {open && menuPos && createPortal(
         <div
+          ref={menuRef}
           role="menu"
           style={{
-            position:     'absolute',
-            top:          'calc(100% + 4px)',
-            [align]:      0,
+            position:     'fixed',
+            top:          menuPos.top,
+            left:         menuPos.left,
+            right:        menuPos.right,
             background:   colors.bg.surface,
             border:       `1px solid ${colors.border.default}`,
             borderRadius: t.radius.lg,
@@ -114,7 +154,8 @@ export function DropdownMenu({
               />
             </React.Fragment>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

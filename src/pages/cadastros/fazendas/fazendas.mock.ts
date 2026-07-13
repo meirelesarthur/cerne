@@ -10,6 +10,10 @@ export const mockFazendas: FazendaRow[] = [
     tipoExploracao: 'Agrícola',
     areaTotal: 2450,
     ativo: true,
+    areas: [
+      { id: '1-a1', nome: 'Santa Luzia - Talhão 01', cpfCnpj: '', cidade: '', uf: '', tipoExploracao: '', areaTotal: 1200, ativo: true, isArea: true },
+      { id: '1-a2', nome: 'Santa Luzia - Talhão 02', cpfCnpj: '', cidade: '', uf: '', tipoExploracao: '', areaTotal: 1250, ativo: true, isArea: true },
+    ],
   },
   {
     id: '2',

@@ -3,6 +3,7 @@ import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
 import { Breadcrumb } from '../ui/Breadcrumb'
+import { FarmSwitcher } from '../ui/FarmSwitcher'
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -81,6 +82,9 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
             ⌘K
           </kbd>
         </button>
+
+        {/* Farm Switcher */}
+        <FarmSwitcher />
 
         {/* Notifications */}
         <button

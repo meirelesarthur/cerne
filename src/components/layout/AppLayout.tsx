@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
+import { FarmProvider } from '../../context/FarmContext'
 import { t } from '../../design/tokens'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
@@ -186,6 +187,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     : children
 
   return (
+    <FarmProvider>
     <NavigationContext.Provider value={{ navigateTo }}>
     <div
       style={{
@@ -251,5 +253,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
     </div>
     </NavigationContext.Provider>
+    </FarmProvider>
   )
 }

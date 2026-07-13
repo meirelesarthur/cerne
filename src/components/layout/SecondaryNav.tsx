@@ -52,6 +52,7 @@ function NavItem({
   onChildClick:  (id: string) => void
 }) {
   const { colors } = useTheme()
+  const Icon = item.icon
   const hasChildren = item.children && item.children.length > 0
   const hasActiveChild = hasChildren && item.children!.some(c => c.id === activeItemId)
   const [expanded, setExpanded] = useState(hasActiveChild)
@@ -69,9 +70,12 @@ function NavItem({
       <button
         className={`nav-sub-btn ${isActive && !hasChildren ? 'active' : ''}`}
         onClick={handleClick}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[1] + 2 }}
       >
-        <span>{item.label}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, minWidth: 0 }}>
+          <Icon size={14} strokeWidth={2} style={{ flexShrink: 0, color: colors.fg.subtle }} aria-hidden="true" />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+        </span>
         {hasChildren && (
           <ChevronRight
             size={10}
@@ -88,16 +92,20 @@ function NavItem({
       </button>
       {expanded && hasChildren && (
         <div style={{ paddingBottom: 2 }}>
-          {item.children!.map(child => (
-            <button
-              key={child.id}
-              className={`nav-sub-btn ${activeItemId === child.id ? 'active' : ''}`}
-              onClick={() => onChildClick(child.id)}
-              style={{ paddingLeft: 22 }}
-            >
-              {child.label}
-            </button>
-          ))}
+          {item.children!.map(child => {
+            const ChildIcon = child.icon
+            return (
+              <button
+                key={child.id}
+                className={`nav-sub-btn ${activeItemId === child.id ? 'active' : ''}`}
+                onClick={() => onChildClick(child.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, paddingLeft: 22 }}
+              >
+                <ChildIcon size={13} strokeWidth={2} style={{ flexShrink: 0, color: colors.fg.subtle }} aria-hidden="true" />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{child.label}</span>
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
@@ -117,11 +125,11 @@ function NavGroupSection({
   onToggle: () => void
   onItemClick: (id: string) => void
 }) {
-  const GroupIcon = group.icon
   const { colors } = useTheme()
 
   return (
     <div style={{ marginBottom: 4 }}>
+      {/* Divisão/contexto — apenas rótulo (sem ícone), permanece colapsável */}
       <button
         onClick={onToggle}
         style={{
@@ -145,7 +153,6 @@ function NavGroupSection({
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = colors.nav.itemHover }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
       >
-        <GroupIcon size={10} strokeWidth={2} style={{ flexShrink: 0 }} />
         <span style={{ flex: 1, textAlign: 'left' }}>{group.label}</span>
         <ChevronRight
           size={11}

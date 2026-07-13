@@ -250,8 +250,10 @@ const core: Record<string, DTCGNode> = {
     series: Object.fromEntries(
       (t.chart.series as string[]).map((v, i) => [`${i + 1}`, { $value: v, $type: 'color' }])
     ),
-    grid:   { $value: t.chart.grid,   $type: 'color' },
-    gridGb: { $value: t.chart.gridGb, $type: 'color' },
+    grid:      { $value: t.chart.grid,      $type: 'color' },
+    gridGb:    { $value: t.chart.gridGb,    $type: 'color' },
+    surface:   { $value: t.chart.surface,   $type: 'color' },
+    surfaceGb: { $value: t.chart.surfaceGb, $type: 'color' },
   },
 }
 

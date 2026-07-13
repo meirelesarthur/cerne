@@ -294,8 +294,11 @@ export const font = {
     sans: "'Outfit', sans-serif",
   },
 
-  /** Em pixels — equivalentes Tailwind: xs=11 sm=12 base=13 md=14 lg=15 xl=16 */
+  /** Em pixels — equivalentes Tailwind: xs=11 sm=12 base=13 md=14 lg=15 xl=16.
+   *  `2xs`/`3xs` cobrem rótulos densos de gráfico/canvas (10/9px). */
   size: {
+    '3xs': 9,
+    '2xs': 10,
     xs:   11,
     sm:   12,
     base: 13,
@@ -364,11 +367,16 @@ export const size = {
     md: 30,
     lg: 36,
   },
-  /** Switch (track + thumb) */
+  /** Switch (track: largura · trackHeight: altura · thumb) */
   toggle: {
     track: 40,
+    trackHeight: 22,
     thumb: 18,
   },
+  /** Caixa do Checkbox (quadrada) */
+  checkbox: 18,
+  /** Célula de dia do calendário (DatePicker) */
+  calendarCell: 32,
   /** Botões de paginação (quadrados) */
   pageBtn: 32,
   /** Altura fixa da linha de dados das tabelas (não cresce com quebra de texto) */
@@ -410,6 +418,9 @@ export const shadow = {
   cardHover:     '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
   cardDark:      '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
   cardDarkHover: '0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)',
+
+  /** Realce de marca de gráfico (barra/fatia/ponto) — usar via `drop-shadow(...)` */
+  chartMark:     '0 2px 4px rgba(0,0,0,0.12)',
 }
 
 // ─── Bordas ───────────────────────────────────────────────────────────────────
@@ -444,6 +455,7 @@ export const transition = {
 
 export const animation = {
   duration: {
+    faster: '120ms',
     fast:   '150ms',
     normal: '200ms',
     slow:   '300ms',
@@ -522,6 +534,9 @@ export const chart = {
   /** Linhas de grade / eixos dos gráficos */
   grid:   'rgba(0,0,0,0.06)',
   gridGb: 'rgba(255,255,255,0.06)',
+  /** Superfície sob a marca do gráfico (rótulo/traço sobre a barra) — light + GBMode */
+  surface:   '#ffffff',
+  surfaceGb: '#0b1e14',
 }
 
 // ─── Tokens de componente (camada 3 — "theme" da referência DTCG) ──────────────

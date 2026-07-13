@@ -73,10 +73,10 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
         <Construction size={24} color={colors.accent.default} strokeWidth={1.5} />
       </div>
       <div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: colors.fg.default, fontFamily: "'Outfit', sans-serif", marginBottom: 4 }}>
+        <div style={{ fontSize: t.font.size.lg, fontWeight: 600, color: colors.fg.default, fontFamily: t.font.family.sans, marginBottom: 4 }}>
           {item?.label ?? 'Funcionalidade'}
         </div>
-        <div style={{ fontSize: 12, color: colors.fg.subtle, fontFamily: "'Outfit', sans-serif" }}>
+        <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
           Esta tela será implementada em breve.
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         padding: t.space[2],
         gap: t.space[2],
         boxSizing: 'border-box',
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: t.font.family.sans,
         transition: 'background 0.2s ease',
       }}
     >
@@ -219,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         style={{
           flex: 1,
           background: colors.bg.outer,
-          borderRadius: 16,
+          borderRadius: t.radius['2xl'],
           display: 'flex',
           flexDirection: 'column',
           padding: t.space[2],

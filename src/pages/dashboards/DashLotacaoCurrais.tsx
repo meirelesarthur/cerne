@@ -65,7 +65,7 @@ function Trend({ value, up }: { value: string; up: boolean }) {
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 14, height: 14, borderRadius: t.radius.full,
         background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
-        fontSize: 9,
+        fontSize: t.font.size['3xs'],
       }}>
         {up ? '▲' : '▼'}
       </span>

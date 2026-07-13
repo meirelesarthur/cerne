@@ -256,7 +256,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
               style={{
                 fontSize: 42,
                 fontWeight: 800,
-                color: '#ffffff',
+                color: t.color.neutral[0],
                 letterSpacing: '0.22em',
                 lineHeight: 1,
                 animation: 'sp-name-in 0.55s cubic-bezier(0.22,1,0.36,1) 2.55s both',

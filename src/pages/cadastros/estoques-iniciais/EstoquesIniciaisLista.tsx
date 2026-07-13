@@ -315,7 +315,7 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
         height: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         background: hovered ? colors.bg.subtle : 'transparent',
-        transition: 'background 0.12s',
+        transition: `background ${t.animation.duration.faster}`,
         alignItems: 'center',
         gap: 8,
       }}

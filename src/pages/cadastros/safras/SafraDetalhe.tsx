@@ -28,7 +28,7 @@ function InfoField({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div>
       <div style={{
-        fontSize: 10,
+        fontSize: t.font.size['2xs'],
         fontWeight: t.font.weight.semibold,
         color: colors.fg.subtle,
         textTransform: 'uppercase',
@@ -77,7 +77,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
     {
       label: 'Semanas',
       value: `${safra.weeks.length} semanas`,
-      icon: <Calendar size={16} color="#059669" />,
+      icon: <Calendar size={16} color={t.color.brand[600]} />,
       iconBg: '#d1fae5',
     },
     {
@@ -149,11 +149,11 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  transition: 'background 0.2s',
+                  transition: `background ${t.animation.duration.normal}`,
                 }}
               >
                 <div style={{
-                  width: 34, height: 34, borderRadius: 8,
+                  width: 34, height: 34, borderRadius: t.radius.base,
                   background: s.iconBg,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
@@ -161,7 +161,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
                   {s.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: 10, color: colors.fg.subtle, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
+                  <div style={{ fontSize: t.font.size['2xs'], color: colors.fg.subtle, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
                     {s.label}
                   </div>
                   <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
@@ -173,7 +173,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
           </div>
 
           {/* ── Dados gerais ─────────────────────────────────────────────────── */}
-          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
+          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: `background ${t.animation.duration.normal}` }}>
             <div style={{
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,
@@ -196,7 +196,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
           </div>
 
           {/* ── Canvas de semanas (read-only) ─────────────────────────────────── */}
-          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: 'background 0.2s' }}>
+          <div style={{ background: colors.bg.surface, borderRadius: t.radius.xl, padding: 24, transition: `background ${t.animation.duration.normal}` }}>
             <div style={{
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,

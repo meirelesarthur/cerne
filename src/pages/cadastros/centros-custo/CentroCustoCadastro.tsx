@@ -161,8 +161,8 @@ export default function CentroCustoCadastro({
               <span style={{
                 fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
                 padding: '2px 8px', borderRadius: t.radius.full,
-                background: classe === 'sintetica' ? '#eff6ff' : '#f0fdf4',
-                color:      classe === 'sintetica' ? '#2563eb' : '#059669',
+                background: classe === 'sintetica' ? t.color.feedback.info.bg : t.color.brand[50],
+                color:      classe === 'sintetica' ? t.color.feedback.info.text : t.color.brand[600],
                 fontFamily: t.font.family.sans,
               }}>
                 {CLASSE_LABEL[classe]}
@@ -341,7 +341,7 @@ function CategoriasSection({
                   padding: '7px 6px',
                   borderRadius: t.radius.base,
                   cursor: 'pointer',
-                  transition: 'background 0.12s',
+                  transition: `background ${t.animation.duration.faster}`,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
@@ -365,7 +365,7 @@ function CategoriasSection({
                   color={colors.fg.subtle}
                   style={{
                     transform: isOpen ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 0.15s',
+                    transition: `transform ${t.animation.duration.fast}`,
                     flexShrink: 0,
                   }}
                 />
@@ -382,7 +382,7 @@ function CategoriasSection({
                         padding: '5px 6px',
                         borderRadius: t.radius.base,
                         cursor: 'pointer',
-                        transition: 'background 0.12s',
+                        transition: `background ${t.animation.duration.faster}`,
                       }}
                       onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}

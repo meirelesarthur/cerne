@@ -1,5 +1,6 @@
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion'
 import logoFull from '../assets/Logo.svg'
+import { t } from '../design/tokens'
 
 export function SplashAnimation() {
   const frame = useCurrentFrame()
@@ -36,10 +37,10 @@ export function SplashAnimation() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f0fdf4',
+        background: t.color.brand[50],
         opacity: screenOpacity,
         gap: 20,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: t.font.family.sans,
       }}
     >
       <div
@@ -54,8 +55,8 @@ export function SplashAnimation() {
       <div
         style={{
           opacity: taglineOpacity,
-          fontSize: 13,
-          color: '#059669',
+          fontSize: t.font.size.base,
+          color: t.color.brand[600],
           fontWeight: 500,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',

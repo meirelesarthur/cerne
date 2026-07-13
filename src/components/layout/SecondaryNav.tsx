@@ -28,7 +28,7 @@ function NavHeader({ module }: { module: NavModule }) {
           fontSize: t.font.size.md,
           fontWeight: t.font.weight.bold,
           color: colors.fg.default,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           letterSpacing: '-0.1px',
         }}
       >
@@ -138,17 +138,17 @@ function NavGroupSection({
           display: 'flex',
           alignItems: 'center',
           gap: t.space[1],
-          fontSize: 10,
+          fontSize: t.font.size['2xs'],
           fontWeight: 500,
           color: colors.fg.subtle,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
           padding: `6px 10px 6px ${t.space[1]}px`,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          borderRadius: 6,
+          borderRadius: t.radius.md,
           transition: 'background 0.1s, color 0.15s',
         }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = colors.nav.itemHover }}
@@ -249,7 +249,7 @@ export default function SecondaryNav({
         width: 224,
         minWidth: 224,
         background: colors.bg.surface,
-        borderRadius: 12,
+        borderRadius: t.radius.xl,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

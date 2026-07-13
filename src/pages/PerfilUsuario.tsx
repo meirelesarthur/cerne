@@ -28,7 +28,7 @@ function SubTitle({ children }: { children: React.ReactNode }) {
 
 function Muted({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
+    <p style={{ fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
       {children}
     </p>
   )
@@ -62,7 +62,7 @@ export default function PerfilUsuario() {
       style={{
         padding: '28px 32px',
         maxWidth: 800,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: t.font.family.sans,
         boxSizing: 'border-box',
       }}
     >
@@ -209,8 +209,8 @@ export default function PerfilUsuario() {
             <path d="M3.926 9.884A4.807 4.807 0 0 1 3.675 8.5c0-.48.082-.947.251-1.384V4.999H1.198A8.003 8.003 0 0 0 .5 8.5c0 1.29.31 2.51.698 3.501l2.728-2.117z" fill="#FBBC05"/>
             <path d="M8.5 3.748c1.198 0 2.273.412 3.12 1.22l2.337-2.337C12.549 1.282 10.705.5 8.5.5A8.003 8.003 0 0 0 1.198 4.999L3.926 7.116C4.57 5.185 6.372 3.748 8.5 3.748z" fill="#EA4335"/>
           </svg>
-          <span style={{ fontSize: t.font.size.lg, fontWeight: 700, color: t.color.neutral[800], fontFamily: "'Outfit', sans-serif", width: 60 }}>Google</span>
-          <span style={{ flex: 1, fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>Conectado</span>
+          <span style={{ fontSize: t.font.size.lg, fontWeight: 700, color: t.color.neutral[800], fontFamily: t.font.family.sans, width: 60 }}>Google</span>
+          <span style={{ flex: 1, fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>Conectado</span>
           <Button variant="secondary" size="sm">Desconectar</Button>
         </div>
       </Section>
@@ -234,12 +234,12 @@ export default function PerfilUsuario() {
           <span
             style={{
               background: t.color.neutral[200],
-              borderRadius: 9999,
+              borderRadius: t.radius.full,
               padding: '2px 10px',
               fontSize: t.font.size.sm,
               fontWeight: 500,
               color: t.color.neutral[800],
-              fontFamily: "'Outfit', sans-serif",
+              fontFamily: t.font.family.sans,
               marginTop: -16,
             }}
           >
@@ -248,7 +248,7 @@ export default function PerfilUsuario() {
         </div>
         <Muted>Por motivos de segurança, cada conta é limitada a três dispositivos conectados.</Muted>
 
-        <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', border: `1px solid ${t.color.neutral[200]}` }}>
+        <div style={{ width: '100%', borderRadius: t.radius.base, overflow: 'hidden', border: `1px solid ${t.color.neutral[200]}` }}>
           {/* header */}
           <div
             style={{
@@ -266,7 +266,7 @@ export default function PerfilUsuario() {
                   fontSize: t.font.size.sm,
                   fontWeight: 500,
                   color: t.color.neutral[700],
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: t.font.family.sans,
                 }}
               >
                 {h}
@@ -275,18 +275,18 @@ export default function PerfilUsuario() {
           </div>
           {/* row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto', alignItems: 'center' }}>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: t.font.family.sans }}>
               Windows 11
             </div>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
               Chrome 145
             </div>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>
+            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
               179.82.68.233
             </div>
             <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color.brand[600], flexShrink: 0 }} />
-              <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: "'Outfit', sans-serif" }}>Este dispositivo</span>
+              <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>Este dispositivo</span>
             </div>
             <div style={{ padding: '16px', opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -303,7 +303,7 @@ export default function PerfilUsuario() {
           <div style={{ width: 'fit-content' }}>
             <Button variant="destructive" size="sm">Excluir conta</Button>
           </div>
-          <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: "'Outfit', sans-serif", margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
             <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
             Entre em contato com{' '}
             <span style={{ color: t.color.brand[600], fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}

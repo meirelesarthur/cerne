@@ -174,7 +174,7 @@ export function WeekCanvas({
                 style={{
                   position: 'absolute',
                   left: `${m.pct}%`,
-                  fontSize: 9,
+                  fontSize: t.font.size['3xs'],
                   color: colors.fg.subtle,
                   whiteSpace: 'nowrap',
                   transform: 'translateX(-50%)',
@@ -268,7 +268,7 @@ export function WeekCanvas({
                           style={{
                             width: 80,
                             height: 72,
-                            borderRadius: 10,
+                            borderRadius: t.radius.lg,
                             background: def.bg,
                             border: `2px solid ${isCurrent ? '#16a34a' : def.border}`,
                             display: 'flex',
@@ -280,7 +280,7 @@ export function WeekCanvas({
                             position: 'relative',
                             transform: isHov && !isPainting.current ? 'translateY(-3px) scale(1.04)' : 'none',
                             boxShadow: isHov ? t.shadow.md : 'none',
-                            transition: 'transform 0.12s, box-shadow 0.12s',
+                            transition: `transform ${t.animation.duration.faster}, box-shadow ${t.animation.duration.faster}`,
                             userSelect: 'none',
                             WebkitUserSelect: 'none',
                           }}
@@ -314,7 +314,7 @@ export function WeekCanvas({
                             }} />
                           )}
                           <span style={{
-                            fontSize: 13,
+                            fontSize: t.font.size.base,
                             fontWeight: t.font.weight.bold,
                             color: def.text,
                             fontFamily: t.font.family.sans,
@@ -323,7 +323,7 @@ export function WeekCanvas({
                             S{String(week.num).padStart(2, '0')}
                           </span>
                           <span style={{
-                            fontSize: 9,
+                            fontSize: t.font.size['3xs'],
                             color: def.text,
                             opacity: 0.75,
                             textAlign: 'center',
@@ -387,7 +387,7 @@ export function WeekCanvas({
             background: '#0f172a',
             color: 'white',
             padding: '7px 11px',
-            borderRadius: 10,
+            borderRadius: t.radius.lg,
             fontSize: t.font.size.xs,
             fontFamily: t.font.family.sans,
             pointerEvents: 'none',

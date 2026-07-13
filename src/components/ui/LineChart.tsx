@@ -260,10 +260,10 @@ export function LineChart({
               width={ttW}
               height={ttH}
               rx={t.radius.sm}
-              fill={isGbMode ? '#0b1e14' : '#ffffff'}
+              fill={isGbMode ? t.chart.surfaceGb : t.chart.surface}
               stroke={colors.border.default as string}
               strokeWidth={0.8}
-              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))' }}
+              style={{ filter: `drop-shadow(${t.shadow.chartMark})` }}
             />
             <text
               x={ttXPos + ttPad}

@@ -91,7 +91,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
               background: btnHov
                 ? (isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100])
                 : 'transparent',
-              transition: 'background 0.15s ease',
+              transition: `background ${t.animation.duration.fast}`,
               opacity: hov ? 1 : 0.5,
             }}
           >

@@ -100,9 +100,9 @@ export function SankeyFunnel({
               x={cx}
               y={midY - 9}
               textAnchor="middle"
-              fontSize={13}
+              fontSize={t.font.size.base}
               fontWeight={700}
-              fill="#fff"
+              fill={t.color.neutral[0]}
               opacity={dimmed ? 0.2 : 1}
               style={{ transition: 'opacity 0.18s ease' }}
             >
@@ -126,9 +126,9 @@ export function SankeyFunnel({
                   x={cx}
                   y={midY + 13}
                   textAnchor="middle"
-                  fontSize={9}
+                  fontSize={t.font.size['3xs']}
                   fontWeight={600}
-                  fill="#fff"
+                  fill={t.color.neutral[0]}
                   opacity={dimmed ? 0 : 1}
                   style={{ transition: 'opacity 0.18s ease' }}
                 >
@@ -142,7 +142,7 @@ export function SankeyFunnel({
               x={cx}
               y={H - 4}
               textAnchor="middle"
-              fontSize={9}
+              fontSize={t.font.size['3xs']}
               fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
               style={{ transition: 'opacity 0.18s ease' }}
@@ -185,15 +185,15 @@ export function SankeyFunnel({
               y={finalY}
               width={ttW}
               height={36}
-              rx={4}
-              fill={isGbMode ? '#0b1e14' : '#ffffff'}
+              rx={t.radius.sm}
+              fill={isGbMode ? t.chart.surfaceGb : t.chart.surface}
               stroke={colors.border.default as string}
               strokeWidth={0.8}
             />
             <text
               x={ttX + 8}
               y={finalY + 14}
-              fontSize={9}
+              fontSize={t.font.size['3xs']}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
               fontWeight={600}
@@ -204,7 +204,7 @@ export function SankeyFunnel({
               <text
                 x={ttX + 8}
                 y={finalY + 27}
-                fontSize={9}
+                fontSize={t.font.size['3xs']}
                 fill={color}
                 fontFamily={t.font.family.sans}
               >

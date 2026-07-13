@@ -43,7 +43,7 @@ function highlight(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <mark style={{ background: '#d1fae5', color: '#059669', borderRadius: 2, padding: '0 1px' }}>
+      <mark style={{ background: '#d1fae5', color: t.color.brand[600], borderRadius: 2, padding: '0 1px' }}>
         {text.slice(idx, idx + query.length)}
       </mark>
       {text.slice(idx + query.length)}
@@ -130,7 +130,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
           gap: compact ? t.space[1] + 3 : 10,
           background: colors.bg.surface,
           border: open ? `1.5px solid ${colors.accent.default}` : `1px solid ${colors.border.default}`,
-          borderRadius: isOpen ? (compact ? `${t.radius.base}px ${t.radius.base}px 0 0` : '12px 12px 0 0') : (compact ? t.radius.base : 12),
+          borderRadius: isOpen ? (compact ? `${t.radius.base}px ${t.radius.base}px 0 0` : '12px 12px 0 0') : (compact ? t.radius.base : t.radius.xl),
           padding: compact ? `0 ${t.space[3]}px` : '0 16px',
           height: compact ? 32 : 48,
           boxShadow: open ? `0 0 0 3px ${colors.accent.subtle}` : (compact ? 'none' : colors.shadow),
@@ -153,7 +153,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
             border: 'none',
             outline: 'none',
             background: 'transparent',
-            fontSize: compact ? t.font.size.sm : 14,
+            fontSize: compact ? t.font.size.sm : t.font.size.md,
             fontFamily: t.font.family.sans,
             fontWeight: 400,
             color: colors.fg.default,
@@ -162,7 +162,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
         />
         <kbd
           style={{
-            fontSize: compact ? t.font.size.xs - 1 : 11,
+            fontSize: compact ? t.font.size.xs - 1 : t.font.size.xs,
             background: colors.bg.subtle,
             border: `1px solid ${colors.border.default}`,
             borderRadius: compact ? t.radius.sm : 6,
@@ -188,7 +188,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
             background: colors.bg.surface,
             border: `1.5px solid ${colors.accent.default}`,
             borderTop: `1px solid ${colors.border.subtle}`,
-            borderRadius: `0 0 ${compact ? t.radius.lg : 12}px ${compact ? t.radius.lg : 12}px`,
+            borderRadius: `0 0 ${compact ? t.radius.lg : t.radius.xl}px ${compact ? t.radius.lg : t.radius.xl}px`,
             boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
             zIndex: t.zIndex.dropdown,
             overflow: 'hidden',
@@ -244,10 +244,10 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                 >
                   <span
                     style={{
-                      fontSize: 13,
+                      fontSize: t.font.size.base,
                       fontWeight: 500,
                       color: colors.fg.default,
-                      fontFamily: "'Outfit', sans-serif",
+                      fontFamily: t.font.family.sans,
                       lineHeight: 1,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -257,16 +257,16 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                     {highlight(item.label, query)}
                   </span>
 
-                  <span style={{ color: colors.border.default, fontSize: 12, lineHeight: 1, flexShrink: 0 }}>·</span>
+                  <span style={{ color: colors.border.default, fontSize: t.font.size.sm, lineHeight: 1, flexShrink: 0 }}>·</span>
 
                   <span
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: 3,
-                      fontSize: 11,
+                      fontSize: t.font.size.xs,
                       color: colors.fg.subtle,
-                      fontFamily: "'Outfit', sans-serif",
+                      fontFamily: t.font.family.sans,
                       fontWeight: 400,
                       lineHeight: 1,
                       whiteSpace: 'nowrap',
@@ -309,12 +309,12 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
               <span
                 key={key}
                 style={{
-                  fontSize: 10,
+                  fontSize: t.font.size['2xs'],
                   color: colors.fg.subtle,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 4,
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: t.font.family.sans,
                   lineHeight: 1,
                 }}
               >
@@ -322,9 +322,9 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                   style={{
                     background: colors.bg.surface,
                     border: `1px solid ${colors.border.default}`,
-                    borderRadius: 4,
+                    borderRadius: t.radius.sm,
                     padding: '2px 5px',
-                    fontSize: 10,
+                    fontSize: t.font.size['2xs'],
                     color: colors.fg.muted,
                     lineHeight: 1.4,
                   }}
@@ -348,14 +348,14 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
             background: colors.bg.surface,
             border: `1.5px solid ${colors.accent.default}`,
             borderTop: `1px solid ${colors.border.subtle}`,
-            borderRadius: `0 0 ${compact ? t.radius.lg : 12}px ${compact ? t.radius.lg : 12}px`,
+            borderRadius: `0 0 ${compact ? t.radius.lg : t.radius.xl}px ${compact ? t.radius.lg : t.radius.xl}px`,
             boxShadow: isGbMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.1)',
             zIndex: t.zIndex.dropdown,
             padding: '18px 16px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: 13, color: colors.fg.subtle, fontFamily: t.font.family.sans, lineHeight: 1 }}>
+          <div style={{ fontSize: t.font.size.base, color: colors.fg.subtle, fontFamily: t.font.family.sans, lineHeight: 1 }}>
             Nenhum resultado para{' '}
             <strong style={{ color: colors.fg.muted }}>"{query}"</strong>
           </div>

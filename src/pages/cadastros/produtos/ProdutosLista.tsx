@@ -406,7 +406,7 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

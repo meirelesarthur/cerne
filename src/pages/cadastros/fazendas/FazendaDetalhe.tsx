@@ -115,7 +115,7 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
         ? <CheckCircle2 size={14} color={colors.accent.default} />
         : <XCircle size={14} color={colors.fg.subtle} />
       }
-      <span style={{ fontSize: t.font.size.base, color: value ? colors.accent.default : colors.fg.subtle, fontFamily: "'Outfit', sans-serif" }}>
+      <span style={{ fontSize: t.font.size.base, color: value ? colors.accent.default : colors.fg.subtle, fontFamily: t.font.family.sans }}>
         {value ? trueLabel : falseLabel}
       </span>
     </div>
@@ -154,7 +154,7 @@ function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
         <SectionTitle>Registros Ambientais e Fundiários</SectionTitle>
         <FieldGrid>
           <InfoField label="CAR — Cadastro Ambiental Rural" value={
-            <span style={{ fontSize: 12, fontFamily: 'monospace' }}>{f.car}</span>
+            <span style={{ fontSize: t.font.size.sm, fontFamily: 'monospace' }}>{f.car}</span>
           } />
           <InfoField label="NIRF — Imóvel Rural" value={f.nirf} />
           <InfoField label="CCIR — Certificado de Cadastro" value={f.ccir} />
@@ -317,7 +317,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
         <SectionTitle>Centros de Custo Vinculados</SectionTitle>
-        <div style={{ background: colors.bg.subtle, borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: colors.bg.subtle, borderRadius: t.radius.lg, overflow: 'hidden' }}>
           <DataTable<CCRow>
             columns={columns}
             data={f.centrosCusto}
@@ -337,7 +337,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
               lineHeight: 1.6,
               fontFamily: t.font.family.sans,
               background: colors.bg.subtle,
-              borderRadius: 8,
+              borderRadius: t.radius.base,
               padding: '12px 14px',
               margin: 0,
               transition: `color ${t.transition.smooth}, background ${t.transition.smooth}`,
@@ -391,7 +391,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSa
           <div
             style={{
               background: colors.bg.surface,
-              borderRadius: 12,
+              borderRadius: t.radius.xl,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',

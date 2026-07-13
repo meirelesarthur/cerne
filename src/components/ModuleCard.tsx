@@ -27,7 +27,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
           width: 40,
           height: 40,
           background: t.color.brand[100],
-          borderRadius: 10,
+          borderRadius: t.radius.lg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -38,11 +38,11 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
       </div>
       <div
         style={{
-          fontSize: 13,
+          fontSize: t.font.size.base,
           fontWeight: 600,
           color: colors.fg.default,
           marginBottom: 3,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           transition: 'color 0.2s',
         }}
       >
@@ -50,10 +50,10 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
       </div>
       <div
         style={{
-          fontSize: 11,
+          fontSize: t.font.size.xs,
           color: colors.fg.muted,
           lineHeight: 1.4,
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: t.font.family.sans,
           transition: 'color 0.2s',
         }}
       >

@@ -197,7 +197,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
       label: 'CPF / CNPJ',
       render: (row) => (
         row.cpfCnpj
-          ? <span style={{ color: colors.fg.muted, fontSize: 12 }}>{row.cpfCnpj}</span>
+          ? <span style={{ color: colors.fg.muted, fontSize: t.font.size.sm }}>{row.cpfCnpj}</span>
           : null
       ),
     },

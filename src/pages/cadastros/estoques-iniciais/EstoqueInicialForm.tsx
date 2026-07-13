@@ -519,7 +519,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
       >
         {/* Info banner */}
         <div style={{ background: t.color.feedback.info.bg, border: `1px solid ${t.color.feedback.info.border}`, borderRadius: t.radius.base, padding: `${t.space[3]}px ${t.space[4]}px`, marginBottom: t.space[4], fontSize: t.font.size.xs, color: t.color.feedback.info.text, fontFamily: t.font.family.sans, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 14 }}>ℹ</span>
+          <span style={{ fontSize: t.font.size.md }}>ℹ</span>
           <span>Preencha os campos essenciais. Você pode completar o cadastro depois em Estrutura → Produtos.</span>
         </div>
 

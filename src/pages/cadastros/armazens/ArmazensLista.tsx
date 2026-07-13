@@ -265,7 +265,7 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: 'background 0.12s', alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

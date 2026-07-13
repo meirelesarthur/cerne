@@ -433,7 +433,7 @@ export default function Pluviometria() {
                   >
                     {/* Day label */}
                     <span style={{
-                      fontSize: 10,
+                      fontSize: t.font.size['2xs'],
                       fontFamily: t.font.family.sans,
                       fontWeight: isToday ? t.font.weight.semibold : t.font.weight.normal,
                       color: isToday ? colors.accent.default : colors.fg.subtle,
@@ -461,7 +461,7 @@ export default function Pluviometria() {
 
                     {/* Min temp */}
                     <span style={{
-                      fontSize: 10,
+                      fontSize: t.font.size['2xs'],
                       fontFamily: t.font.family.sans,
                       color: colors.fg.subtle,
                       lineHeight: 1,
@@ -478,7 +478,7 @@ export default function Pluviometria() {
                     }}>
                       {hasRain ? (
                         <span style={{
-                          fontSize: 9,
+                          fontSize: t.font.size['3xs'],
                           fontFamily: t.font.family.sans,
                           fontWeight: t.font.weight.semibold,
                           color: rainColor,
@@ -490,7 +490,7 @@ export default function Pluviometria() {
                           {f.rain}
                         </span>
                       ) : (
-                        <span style={{ fontSize: 9, color: colors.border.subtle, fontFamily: t.font.family.sans }}>—</span>
+                        <span style={{ fontSize: t.font.size['3xs'], color: colors.border.subtle, fontFamily: t.font.family.sans }}>—</span>
                       )}
                     </div>
                   </div>

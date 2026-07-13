@@ -124,7 +124,7 @@ function Trend({ value, up }: { value: string; up: boolean }) {
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 14, height: 14, borderRadius: t.radius.full,
         background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
-        fontSize: 9, lineHeight: 1,
+        fontSize: t.font.size['3xs'], lineHeight: 1,
       }}>
         {up ? '▲' : '▼'}
       </span>
@@ -385,8 +385,8 @@ export default function OverviewPanel() {
           background: t.color.brand[600], borderRadius: t.radius.full,
           padding: `4px ${t.space[2]}px`, display: 'flex', alignItems: 'center', gap: t.space[1],
         }}>
-          <span style={{ fontSize: t.font.size.xs, color: '#fff', fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
-          <ArrowRight size={10} color="#fff" />
+          <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[0], fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
+          <ArrowRight size={10} color={t.color.neutral[0]} />
         </div>
         <TalhoesMap />
       </div>
@@ -411,7 +411,7 @@ export default function OverviewPanel() {
               <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
                 Últimos 30 dias
               </Button>
-              <Button variant="secondary" size="sm" icon={<span style={{ fontSize: 11 }}>📅</span>}>
+              <Button variant="secondary" size="sm" icon={<span style={{ fontSize: t.font.size.xs }}>📅</span>}>
                 03/05 – 01/06/2026
               </Button>
               <Button variant="secondary" size="sm" icon={<Settings2 size={12} />}>

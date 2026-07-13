@@ -271,7 +271,7 @@ function TreeNode({
           height: t.size.tableRow,
           borderBottom: isLastRow && depth === 0 ? 'none' : `1px solid ${border}`,
           background: hovered ? colors.bg.subtle : 'transparent',
-          transition: 'background 0.12s',
+          transition: `background ${t.animation.duration.faster}`,
           alignItems: 'center',
           boxSizing: 'border-box',
         }}
@@ -288,7 +288,7 @@ function TreeNode({
                   size={13}
                   style={{
                     transform: isExpanded ? 'rotate(90deg)' : 'none',
-                    transition: 'transform 0.15s ease',
+                    transition: `transform ${t.animation.duration.fast} ease`,
                     flexShrink: 0,
                   }}
                 />

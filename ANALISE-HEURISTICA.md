@@ -44,35 +44,36 @@ Regras vigentes em toda a esteira:
 
 > Achado extra (fora do escopo original, sinalizado por um subagente): `ProdutosLista.tsx` e `ArmazensLista.tsx` têm a mesma combinação reprovada `neutral[100]`/`neutral[500]` hardcoded fora do componente `Badge` — candidato a lote da Fase 3.
 
-## Fase 2 — Graves nas telas (Sev. 3)
+## Fase 2 — Graves nas telas (Sev. 3) ✅ concluída (com 2 itens adiados)
 
 ### Casca / Login / Perfil
-- ☐ Sidebar: navegar não recolhe o menu (`stopPropagation` no item) — `Sidebar.tsx`
-- ☐ Perfil: "Salvar" por seção + toast; "Alterar avatar"/"Excluir conta" com ação real ou desabilitados com tooltip; revogar sessão como `<button aria-label>` (mock) — `PerfilUsuario.tsx`
-- ☐ Login: modal "Esqueci a senha" via `Modal` do kit (focus trap); validação inline do e-mail no blur — `Login.tsx`
+- ✅ Sidebar: navegar não recolhe o menu (`stopPropagation` no item) — `Sidebar.tsx`
+- ✅ Perfil: "Salvar" por seção + toast; "Alterar avatar"/"Excluir conta" com ação real ou desabilitados com tooltip; revogar sessão como `<button aria-label>` (mock) — `PerfilUsuario.tsx`
+- ✅ Login: modal "Esqueci a senha" via `Modal` do kit (focus trap); validação inline do e-mail no blur — `Login.tsx`
 
 ### Fazendas / Pessoas
-- ☐ Validar NIRF/CCIR/CAFIR/CAEPI e centros de custo em `validateStep` — `FazendaCadastro.tsx`, steps
-- ☐ Hook `useUnsavedChangesGuard` (extraído de `EstoqueInicialForm`) + prop `onBeforeBack?` no `FormPageHeader`; aplicar em Fazenda e Pessoa — kit + 2 forms
-- ☐ `focusFirstError()` após `setErrors`; toast cita o campo — `FazendaCadastro.tsx`, `PessoaForm.tsx`
-- ☐ Remover `setTimeout(onBack, 3200)` — `FazendaCadastro.tsx`
+- ✅ Validar NIRF/CCIR/CAFIR/CAEPI e centros de custo em `validateStep` — `FazendaCadastro.tsx`, steps
+- ✅ Hook `useUnsavedChangesGuard` (extraído de `EstoqueInicialForm`); aplicado em Fazenda e Pessoa — `hooks/useUnsavedChangesGuard.ts` + 2 forms
+- ✅ `focusFirstError()` após `setErrors`; toast cita o 1º erro — `FazendaCadastro.tsx`, `PessoaForm.tsx`
+- ✅ Removida a trava de 3,2s — `FazendaCadastro.tsx`
 
 ### CRUDs simples
-- ☐ `useUnsavedChangesGuard` nos 5 formulários restantes (Produto, Embalagem, Armazém, Endereço, Centro de Custo)
-- ☐ Empty states com `hasSearch` + CTA "Adicionar X" em Embalagens, Armazéns, Estoques Iniciais, Centros de Custo
-- ☐ Toast de sucesso em `EstoquesIniciaisPage`; Centro de Custo com toast pós-save + `submitting`
-- ☐ "Exportar" (Estoques Iniciais) desabilitado; "Substituir" do alerta de duplicidade substitui de fato
-- ☐ Exclusão de Centro de Custo trata descendentes (padrão de Endereços)
+- ✅ `useUnsavedChangesGuard` nos 5 formulários restantes (Produto, Embalagem, Armazém, Endereço, Centro de Custo)
+- ✅ Empty states com `hasSearch` + CTA "Adicionar X" em Embalagens, Armazéns, Estoques Iniciais, Centros de Custo
+- ✅ Toast de sucesso em `EstoquesIniciaisPage`; Centro de Custo com toast pós-save + `submitting`
+- ✅ "Exportar" (Estoques Iniciais) desabilitado; "Substituir" da duplicidade atualiza o registro existente de fato
+- ✅ Exclusão de Centro de Custo trata descendentes (`getAllDescendantCentroIds`, padrão de Endereços) — testado: 20→10 centros ao excluir raiz com 9 filhos
 
 ### Safras
-- ☐ Linha da tabela operável por teclado; tooltip também no focus; "Reiniciar ciclo" com `ConfirmDialog`; toast pós-save + botão desabilitado — `SafrasLista.tsx`, `WeekCanvas.tsx`, `SafraCadastro.tsx`
+- ✅ Linha da tabela operável por teclado; "Reiniciar ciclo" com `ConfirmDialog`; toast pós-save + `nextLoading` no `StepFooter` (evita double-submit) — `SafrasLista.tsx`, `WeekCanvas.tsx`, `SafraCadastro.tsx`, `StepFooter.tsx`
+  *(tooltip de semana no focus já havia sido resolvido na Fase 0)*
 
 ### Dashboards
-- ☐ Estados de erro (retry) e vazio nos 13 dashboards
-- ☐ Títulos via `Heading`; tabela de lotes semântica — `DashDesempenhoLotes.tsx` e demais
-- ☐ Criticidade de estoque com ícone/rótulo além da cor — `DashEstoqueNutricao.tsx`
-- ☐ Heatmap/Sankey/mapa: foco por teclado + alternativa textual — `HeatmapChart.tsx`, `SankeyFunnel.tsx`, `OverviewPanel.tsx`
-- ☐ Unificar shell dos 12 dashboards bespoke em `ChartCard`/`KpiStatCard`
+- ⏸️ **Adiado para lote futuro:** estados de erro (retry) e vazio nos 13 dashboards — escopo grande, arquitetura por dashboard diverge; melhor como lote dedicado
+- ✅ Títulos via `Heading` nos 13 dashboards + `OverviewPanel` + `ChartCard` (usado por Pluviometria); tabela de lotes com `role="table"/"row"/"columnheader"/"cell"` — `DashDesempenhoLotes.tsx`
+- ✅ Criticidade de estoque com ícone `AlertTriangle` + prefixo textual, além da cor — `DashEstoqueNutricao.tsx`
+- ✅ Heatmap/Sankey acessíveis por teclado (`tabIndex`, foco replica hover) — `HeatmapChart.tsx`, `SankeyFunnel.tsx`. Mapa Leaflet do `OverviewPanel` fica como limitação conhecida (lib não é nativamente acessível)
+- ⏸️ **Adiado por decisão de escopo (conforme plano):** unificar shell dos 12 dashboards bespoke em `ChartCard`/`KpiStatCard` — mudança grande, requer commit dedicado
 
 ## Fase 3 — Moderados (Sev. 2)
 

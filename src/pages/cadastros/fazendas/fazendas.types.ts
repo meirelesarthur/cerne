@@ -93,6 +93,40 @@ export interface FazendaDetalheData {
   observacao: string
 }
 
+/** Converte os dados de detalhe em dados de formulário — usado no modo edição. */
+export function detalheToForm(det: FazendaDetalheData): FazendaFormData {
+  return {
+    nome: det.nome,
+    cpfCnpj: det.cpfCnpj,
+    inscricaoEstadual: det.inscricaoEstadual,
+    telefone: det.telefone,
+    tipoExploracao: det.tipoExploracao,
+    car: det.car,
+    nirf: det.nirf,
+    ccir: det.ccir,
+    cafir: det.cafir,
+    caepi: det.caepi,
+    perimetroGeoJSON: det.perimetroGeoJSON ?? '',
+    kmlFileName: '',
+    pais: det.pais,
+    cep: det.cep,
+    cidade: det.cidade,
+    endereco: det.endereco,
+    numero: det.numero,
+    bairro: det.bairro,
+    latitude: det.latitude,
+    longitude: det.longitude,
+    moeda: det.moeda,
+    areaTotal: det.areaTotal ? String(det.areaTotal) : '',
+    valorHa: det.valorHa ? String(det.valorHa) : '',
+    taxaRemuneracao: det.taxaRemuneracao ? String(det.taxaRemuneracao) : '',
+    ativo: det.ativo,
+    usoLivroCaixa: det.usoLivroCaixa,
+    observacao: det.observacao,
+    centrosCusto: det.centrosCusto.map((cc) => cc.id),
+  }
+}
+
 export const emptyFazendaForm: FazendaFormData = {
   nome: '',
   cpfCnpj: '',

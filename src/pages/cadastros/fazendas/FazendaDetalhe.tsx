@@ -14,7 +14,6 @@ import { MapView } from '../../../components/ui/MapView'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { DataTable } from '../../../components/ui/DataTable'
 import type { Column } from '../../../components/ui/DataTable'
-import { mockFazendaSantaLuzia } from './fazendas.mock'
 import type { FazendaDetalheData } from './fazendas.types'
 import { useTheme } from '../../../context/ThemeContext'
 import { Tabs } from '../../../components/ui/Tabs'
@@ -25,7 +24,7 @@ import { t }             from '../../../design/tokens'
 interface FazendaDetalheProps {
   onBack: () => void
   onEdit: () => void
-  fazenda?: FazendaDetalheData
+  fazenda: FazendaDetalheData
 }
 
 type Tab = 'documentacao' | 'localizacao' | 'financeiro' | 'centrosCusto'
@@ -351,7 +350,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
   )
 }
 
-export default function FazendaDetalhe({ onBack, onEdit, fazenda = mockFazendaSantaLuzia }: FazendaDetalheProps) {
+export default function FazendaDetalhe({ onBack, onEdit, fazenda }: FazendaDetalheProps) {
   const { colors } = useTheme()
   const [activeTab, setActiveTab] = useState<Tab>('documentacao')
 

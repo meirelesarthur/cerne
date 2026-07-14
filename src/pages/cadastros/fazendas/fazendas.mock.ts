@@ -152,6 +152,48 @@ export const mockFazendaSantaLuzia: FazendaDetalheData = {
   observacao: 'Propriedade com certificação de boas práticas agrícolas. Safra principal: soja. Safra secundária: milho. Área de preservação permanente regularizada junto ao IBAMA.',
 }
 
+/**
+ * Resolve os dados de detalhe de uma fazenda pelo id.
+ * Santa Luzia ('1') possui o cadastro completo; para as demais, o detalhe é
+ * derivado da linha da listagem (campos não cadastrados ficam vazios) —
+ * substituir por chamada à API quando houver backend.
+ */
+export function getFazendaDetalhe(id: string): FazendaDetalheData | undefined {
+  if (id === mockFazendaSantaLuzia.id) return mockFazendaSantaLuzia
+  const row = mockFazendas.find((f) => f.id === id)
+  if (!row) return undefined
+  return {
+    id: row.id,
+    nome: row.nome,
+    cpfCnpj: row.cpfCnpj,
+    inscricaoEstadual: '',
+    telefone: '',
+    tipoExploracao: row.tipoExploracao,
+    car: '',
+    nirf: '',
+    ccir: '',
+    cafir: '',
+    caepi: '',
+    pais: 'Brasil',
+    cep: '',
+    cidade: row.cidade,
+    uf: row.uf,
+    endereco: '',
+    numero: '',
+    bairro: '',
+    latitude: '',
+    longitude: '',
+    moeda: 'BRL',
+    areaTotal: row.areaTotal,
+    valorHa: 0,
+    taxaRemuneracao: 0,
+    ativo: row.ativo,
+    usoLivroCaixa: true,
+    centrosCusto: [],
+    observacao: '',
+  }
+}
+
 export const mockCentrosCusto: CentroCusto[] = [
   { id: 'cc1', codigo: '1.01.001', classe: 'Analítica', condicao: 'Ambos', descricao: 'Centro Custo/Apropriar' },
   { id: 'cc2', codigo: '1.01.002', classe: 'Analítica', condicao: 'Despesa', descricao: 'Administração Geral' },

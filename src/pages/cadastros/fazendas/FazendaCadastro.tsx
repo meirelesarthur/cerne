@@ -11,12 +11,14 @@ import { Step3Mapa } from './steps/Step3Mapa'
 import { Step4Endereco } from './steps/Step4Endereco'
 import { Step4Financeiro } from './steps/Step4Financeiro'
 import { Step5Configuracoes } from './steps/Step5Configuracoes'
-import { emptyFazendaForm } from './fazendas.types'
-import type { FazendaFormData } from './fazendas.types'
+import { emptyFazendaForm, detalheToForm } from './fazendas.types'
+import type { FazendaFormData, FazendaDetalheData } from './fazendas.types'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 
 interface FazendaCadastroProps {
   onBack: () => void
+  /** Fazenda existente — quando presente, o formulário abre em modo edição com os dados carregados. */
+  fazenda?: FazendaDetalheData
 }
 
 const STEPS = [
@@ -66,10 +68,16 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
   return errors
 }
 
-export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
+export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProps) {
+  const isEdit = fazenda !== undefined
   const [currentStep, setCurrentStep] = useState(1)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [formData, setFormData] = useState<FazendaFormData>(emptyFazendaForm)
+  // Em edição, todos os steps já são navegáveis (dados existentes)
+  const [completedSteps, setCompletedSteps] = useState<number[]>(
+    isEdit ? STEPS.map((s) => s.id) : []
+  )
+  const [formData, setFormData] = useState<FazendaFormData>(
+    () => (fazenda ? detalheToForm(fazenda) : emptyFazendaForm)
+  )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const { toasts, show, dismiss } = useToast()
 
@@ -105,7 +113,7 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1)
     } else {
-      show('Fazenda cadastrada com sucesso!', 'success', 3000)
+      show(isEdit ? 'Fazenda atualizada com sucesso!' : 'Fazenda cadastrada com sucesso!', 'success', 3000)
       setTimeout(onBack, 3200)
     }
   }
@@ -172,8 +180,8 @@ export default function FazendaCadastro({ onBack }: FazendaCadastroProps) {
         footerBare
       >
         <FormPageHeader
-          title="Nova Fazenda"
-          subtitle="Preencha os dados da fazenda"
+          title={isEdit ? 'Editar Fazenda' : 'Nova Fazenda'}
+          subtitle={isEdit ? `Atualize os dados de ${fazenda.nome}` : 'Preencha os dados da fazenda'}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

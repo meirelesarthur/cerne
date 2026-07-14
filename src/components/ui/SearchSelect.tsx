@@ -187,6 +187,7 @@ export function SearchSelect({
           {query && onClear && !disabled && (
             <button
               type="button"
+              className="gb-focusable"
               aria-label="Limpar seleção"
               onClick={() => { onClear(); setOpen(false) }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.fg.subtle }}
@@ -271,8 +272,10 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }:
     <button
       id={optionId}
       type="button"
+      className="gb-focusable"
       role="option"
       aria-selected={isSelected}
+      tabIndex={-1}
       onClick={onSelect}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}

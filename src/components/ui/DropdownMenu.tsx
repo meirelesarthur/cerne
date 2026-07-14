@@ -87,10 +87,54 @@ export function DropdownMenu({
     }
   }, [open])
 
+  // Move o foco para o primeiro item do menu ao abrir (padrão ARIA APG para role="menu").
+  useEffect(() => {
+    if (!open) return
+    const raf = requestAnimationFrame(() => {
+      const first = menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')
+      first?.focus()
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [open])
+
+  const onMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const menuItems = Array.from(
+      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []
+    )
+    if (menuItems.length === 0) return
+    const currentIndex = menuItems.indexOf(document.activeElement as HTMLElement)
+
+    switch (e.key) {
+      case 'ArrowDown': {
+        e.preventDefault()
+        const next = menuItems[(currentIndex + 1 + menuItems.length) % menuItems.length]
+        next.focus()
+        break
+      }
+      case 'ArrowUp': {
+        e.preventDefault()
+        const prev = menuItems[(currentIndex - 1 + menuItems.length) % menuItems.length]
+        prev.focus()
+        break
+      }
+      case 'Home': {
+        e.preventDefault()
+        menuItems[0].focus()
+        break
+      }
+      case 'End': {
+        e.preventDefault()
+        menuItems[menuItems.length - 1].focus()
+        break
+      }
+    }
+  }
+
   return (
     <div ref={rootRef} style={{ position: 'relative', display: 'inline-flex' }}>
       <button
         type="button"
+        className="gb-focusable"
         aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -128,6 +172,7 @@ export function DropdownMenu({
         <div
           ref={menuRef}
           role="menu"
+          onKeyDown={onMenuKeyDown}
           style={{
             position:     'fixed',
             top:          menuPos.top,
@@ -174,6 +219,7 @@ function DropdownRow({
     <button
       type="button"
       role="menuitem"
+      className="gb-focusable"
       onClick={onSelect}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}

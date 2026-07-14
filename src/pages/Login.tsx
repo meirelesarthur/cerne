@@ -6,6 +6,7 @@ import { SSOButton } from '../components/ui/SSOButton'
 import { Spinner } from '../components/ui/Spinner'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
+import { Modal } from '../components/ui/Modal'
 import { t } from '../design/tokens'
 import defaultBg from '../assets/default-bg.jpg'
 import logoWhite from '../assets/Logo-white.svg'
@@ -116,6 +117,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
   const [forgotEmail,   setForgotEmail]   = useState('')
   const [forgotLoading, setForgotLoading] = useState(false)
   const [forgotSent,    setForgotSent]    = useState(false)
+  const [forgotEmailStatus, setForgotEmailStatus] = useState<'idle' | 'ok' | 'err'>('idle')
 
   const isBlocked = attempts >= MAX_ATTEMPTS
 
@@ -214,13 +216,19 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
   // ── Handlers — forgot password ────────────────────────────────────────────
   const openForgot = () => {
     setForgotEmail(email)
+    setForgotEmailStatus('idle')
     setForgotSent(false)
     setForgotOpen(true)
   }
 
+  const handleForgotEmailBlur = () => {
+    if (!forgotEmail) return
+    setForgotEmailStatus(validateEmail(forgotEmail) ? 'ok' : 'err')
+  }
+
   const handleForgotSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!forgotEmail || !validateEmail(forgotEmail)) return
+    if (!forgotEmail || !validateEmail(forgotEmail)) { setForgotEmailStatus('err'); return }
     setForgotLoading(true)
     await new Promise(resolve => setTimeout(resolve, 1200))
     setForgotLoading(false)
@@ -564,93 +572,68 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       </div>
 
       {/* ══ MODAL — Esqueci a senha ══════════════════════════════════════════ */}
-      {forgotOpen && (
-        <div
-          className="lgn-modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="forgot-title"
-          onClick={e => { if (e.target === e.currentTarget) setForgotOpen(false) }}
-        >
-          <div className="lgn-modal">
+      {/* Usa o Modal do kit (useFocusTrap embutido) em vez de overlay/dialog
+          inline — antes o Tab escapava do diálogo para o formulário por trás. */}
+      <Modal
+        open={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        size="sm"
+        title={forgotSent ? 'Link enviado!' : 'Recuperar acesso'}
+        subtitle={forgotSent ? undefined : 'Informe seu e-mail corporativo. Enviaremos um link para redefinir sua senha.'}
+      >
+        {!forgotSent ? (
+          <form onSubmit={handleForgotSubmit} noValidate>
+            <FormField
+              label="E-mail corporativo"
+              type="email"
+              placeholder="voce@suafazenda.com.br"
+              value={forgotEmail}
+              autoComplete="email"
+              allowPasswordManager
+              onChange={e => { setForgotEmail(e.target.value); if (forgotEmailStatus === 'err') setForgotEmailStatus('idle') }}
+              onBlur={handleForgotEmailBlur}
+              status={forgotEmailStatus}
+              error={forgotEmailStatus === 'err' ? 'Insira um e-mail válido' : undefined}
+              size="lg"
+              iconLeft={
+                <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
+                  <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+                  <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                </svg>
+              }
+            />
 
             <button
-              type="button"
-              className="lgn-modal-close"
-              aria-label="Fechar modal"
-              onClick={() => setForgotOpen(false)}
+              type="submit"
+              className="lgn-btn lgn-btn--modal"
+              disabled={forgotLoading || !forgotEmail || forgotEmailStatus === 'err'}
+              aria-busy={forgotLoading}
+              style={{ marginTop: t.space[5] }}
             >
-              <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
-                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
+              {forgotLoading
+                ? <Spinner size="sm" />
+                : 'Enviar link de recuperação'}
             </button>
-
-            {!forgotSent ? (
-              <>
-                <h3 id="forgot-title" className="lgn-modal-title">Recuperar acesso</h3>
-                <p className="lgn-modal-sub">
-                  Informe seu e-mail corporativo. Enviaremos um link para redefinir sua senha.
-                </p>
-
-                <form onSubmit={handleForgotSubmit} noValidate>
-                  <FormField
-                    label="E-mail corporativo"
-                    type="email"
-                    placeholder="voce@suafazenda.com.br"
-                    value={forgotEmail}
-                    autoComplete="email"
-                    allowPasswordManager
-                    onChange={e => setForgotEmail(e.target.value)}
-                    size="lg"
-                    style={{ borderRadius: t.radius.xl }}
-                    iconLeft={
-                      <svg viewBox="0 0 16 16" fill="none" width={16} height={16} aria-hidden="true">
-                        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4"/>
-                        <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                      </svg>
-                    }
-                  />
-
-                  <button
-                    type="submit"
-                    className="lgn-btn lgn-btn--modal"
-                    disabled={forgotLoading || !forgotEmail}
-                    aria-busy={forgotLoading}
-                    style={{ marginTop: t.space[5] }}
-                  >
-                    {forgotLoading
-                      ? <Spinner size="sm" />
-                      : 'Enviar link de recuperação'}
-                  </button>
-                </form>
-
-                <button type="button" className="lgn-modal-back" onClick={() => setForgotOpen(false)}>
-                  ← Voltar ao login
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="lgn-modal-success-icon" aria-hidden="true">
-                  <svg viewBox="0 0 56 56" fill="none">
-                    <circle cx="28" cy="28" r="28" fill="rgba(5,150,105,.10)"/>
-                    <path d="M16 28l9 9 15-15" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 id="forgot-title" className="lgn-modal-title">Link enviado!</h3>
-                <p className="lgn-modal-sub">
-                  Enviamos as instruções de recuperação para{' '}
-                  <strong>{forgotEmail}</strong>.{' '}
-                  Verifique sua caixa de entrada e a pasta de spam.
-                </p>
-                <button type="button" className="lgn-modal-back" onClick={() => setForgotOpen(false)}>
-                  ← Voltar ao login
-                </button>
-              </>
-            )}
-
-          </div>
-        </div>
-      )}
+          </form>
+        ) : (
+          <>
+            <div className="lgn-modal-success-icon" aria-hidden="true">
+              <svg viewBox="0 0 56 56" fill="none">
+                <circle cx="28" cy="28" r="28" fill="rgba(5,150,105,.10)"/>
+                <path d="M16 28l9 9 15-15" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <p className="lgn-modal-sub">
+              Enviamos as instruções de recuperação para{' '}
+              <strong>{forgotEmail}</strong>.{' '}
+              Verifique sua caixa de entrada e a pasta de spam.
+            </p>
+            <button type="button" className="lgn-modal-back" onClick={() => setForgotOpen(false)}>
+              ← Voltar ao login
+            </button>
+          </>
+        )}
+      </Modal>
     </>
   )
 }

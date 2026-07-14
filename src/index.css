@@ -173,7 +173,7 @@ body {
   height: 32px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 10px 0 4px;
   border-radius: 8px;
   border: none;
   cursor: pointer;

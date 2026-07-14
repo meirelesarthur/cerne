@@ -11,7 +11,6 @@ function NavHeader({ module }: { module: NavModule }) {
   return (
     <div
       style={{
-        flexShrink: 0,
         display: 'flex',
         alignItems: 'center',
         padding: `6px 10px 6px ${t.space[1]}px`,
@@ -260,9 +259,8 @@ export default function SecondaryNav({
         transition: 'background 0.2s',
       }}
     >
-      {module.flatItems && <NavHeader module={module} />}
-
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 8px' }}>
+        {module.flatItems && <NavHeader module={module} />}
         {module.flatItems ? (
           <NavFlatList
             items={module.flatItems}

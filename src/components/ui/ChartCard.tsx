@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { Heading } from './Heading'
 
 // ─── ChartCard ─────────────────────────────────────────────────────────────────
 // Wrapper com tab-chip header (ícone + título), expand icon e hover shadow lift.
@@ -60,17 +61,15 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
           }}
         >
           <Icon size={12} color={colors.fg.subtle as string} />
-          <span
-            style={{
-              fontSize: t.font.size.xs,
-              fontWeight: t.font.weight.medium,
-              color: colors.fg.muted,
-              fontFamily: t.font.family.sans,
-              letterSpacing: '0.01em',
-            }}
+          <Heading
+            level={3}
+            size="xs"
+            weight="medium"
+            tone="secondary"
+            letterSpacing="0.01em"
           >
             {title}
-          </span>
+          </Heading>
         </div>
 
         {/* Right: action slot + expand icon */}

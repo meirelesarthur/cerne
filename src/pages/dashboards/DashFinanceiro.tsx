@@ -13,6 +13,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
@@ -225,9 +226,7 @@ export default function DashFinanceiro() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
-            Financeiro
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Financeiro</Heading>
         </div>
         <FilterSelect
           ariaLabel="Filtrar por período"

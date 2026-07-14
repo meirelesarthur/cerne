@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -124,9 +125,7 @@ export default function DashDepreciacoes() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
-          Depreciações
-        </span>
+        <Heading level={2} size="md" weight="semibold">Depreciações</Heading>
         <FilterSelect
           ariaLabel="Filtrar por período"
           options={[

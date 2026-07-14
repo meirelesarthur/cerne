@@ -11,12 +11,14 @@ import {
   BarChart2,
   TrendingDown,
   Activity,
+  AlertTriangle,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -193,12 +195,7 @@ export default function DashEstoqueNutricao() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <Package size={13} color={colors.fg.subtle as string} />
-          <span style={{
-            fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-            color: colors.fg.default as string,
-          }}>
-            Estoque Nutrição
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Estoque Nutrição</Heading>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <FilterSelect
@@ -314,11 +311,15 @@ export default function DashEstoqueNutricao() {
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
           <TrendingDown size={12} color={colors.fg.subtle as string} />
           <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-            Cobertura por Produto (dias restantes) — itens em vermelho abaixo de {CRITICO_THRESHOLD} dias
+            Cobertura por Produto (dias restantes) — itens críticos (
+            <AlertTriangle size={10} color={t.color.feedback.error.solid as string} style={{ verticalAlign: -1, margin: '0 2px' }} aria-hidden="true" />
+            ) abaixo de {CRITICO_THRESHOLD} dias
           </span>
         </div>
         <BarChart
-          data={mockCoberturaProdutos.filter((p) => produto === 'todos' || p.label === produto)}
+          data={mockCoberturaProdutos
+            .filter((p) => produto === 'todos' || p.label === produto)
+            .map((p) => ({ ...p, label: p.value <= CRITICO_THRESHOLD ? `⚠ ${p.label}` : p.label }))}
           height={260}
           horizontal
           yFormat={(v) => `${Math.round(v)}d`}

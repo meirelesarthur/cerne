@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
@@ -89,9 +90,7 @@ export default function DashPecuaria() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
-          Pecuária de Corte
-        </span>
+        <Heading level={2} size="md" weight="semibold">Pecuária de Corte</Heading>
         <FilterSelect
           ariaLabel="Filtrar por período"
           options={[

@@ -13,6 +13,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 
@@ -187,9 +188,7 @@ export default function DashSuprimentos() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
-            Suprimentos
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Suprimentos</Heading>
         </div>
         <FilterSelect
           ariaLabel="Filtrar por categoria"

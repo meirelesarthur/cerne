@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css'
 import {
   Layers, ArrowRight, ChevronDown, TrendingUp, TrendingDown,
   DollarSign, Wheat, BarChart2, MessageCircle, Settings2,
-  MoreHorizontal,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -13,6 +12,7 @@ import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
+import { Heading } from '../../components/ui/Heading'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -409,9 +409,7 @@ export default function OverviewPanel() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px`,
           }}>
-            <span style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default }}>
-              {greeting}
-            </span>
+            <Heading level={1} size="2xl" weight="bold">{greeting}</Heading>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
               <FilterSelect
                 ariaLabel="Filtrar por período"

@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
 
@@ -220,7 +221,7 @@ export default function DashLivroCaixa() {
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Livro Caixa</span>
+        <Heading level={2} size="sm" weight="semibold">Livro Caixa</Heading>
         <FilterSelect
           ariaLabel="Filtrar por período"
           options={[

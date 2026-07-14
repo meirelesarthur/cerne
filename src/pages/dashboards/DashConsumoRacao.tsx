@@ -20,6 +20,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
@@ -196,12 +197,7 @@ export default function DashConsumoRacao() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <Wheat size={13} color={colors.fg.subtle as string} />
-          <span style={{
-            fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-            color: colors.fg.default as string,
-          }}>
-            Consumo de Ração
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Consumo de Ração</Heading>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <FilterSelect

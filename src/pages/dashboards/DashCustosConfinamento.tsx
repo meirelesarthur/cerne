@@ -21,6 +21,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
@@ -219,12 +220,7 @@ export default function DashCustosConfinamento() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <DollarSign size={13} color={colors.fg.subtle as string} />
-          <span style={{
-            fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-            color: colors.fg.default as string,
-          }}>
-            Custos do Confinamento
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Custos do Confinamento</Heading>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <FilterSelect

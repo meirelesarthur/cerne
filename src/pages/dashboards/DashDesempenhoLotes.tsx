@@ -19,6 +19,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { Heading } from '../../components/ui/Heading'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
@@ -219,12 +220,7 @@ export default function DashDesempenhoLotes() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <TrendingUp size={13} color={colors.fg.subtle as string} />
-          <span style={{
-            fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-            color: colors.fg.default as string,
-          }}>
-            Desempenho de Lotes
-          </span>
+          <Heading level={2} size="sm" weight="semibold">Desempenho de Lotes</Heading>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           <FilterSelect
@@ -346,75 +342,79 @@ export default function DashDesempenhoLotes() {
           </span>
         </div>
 
-        {/* Cabeçalho da lista */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-          gap: `${t.space[2]}px ${t.space[4]}px`,
-          paddingBottom: t.space[2],
-          borderBottom: `1px solid ${bc}`,
-          fontSize: t.font.size.xs,
-          fontWeight: t.font.weight.semibold,
-          color: colors.fg.subtle as string,
-          fontFamily: t.font.family.sans,
-        }}>
-          <span>Lote</span>
-          <span>Curral</span>
-          <span style={{ textAlign: 'right' }}>Animais</span>
-          <span style={{ textAlign: 'right' }}>Peso Médio</span>
-          <span style={{ textAlign: 'right' }}>GMD</span>
-        </div>
+        {/* Tabela de detalhamento — grid CSS com semântica de tabela via ARIA */}
+        <div role="table" aria-label="Detalhamento por lote">
+          {/* Cabeçalho da lista */}
+          <div role="row" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+            gap: `${t.space[2]}px ${t.space[4]}px`,
+            paddingBottom: t.space[2],
+            borderBottom: `1px solid ${bc}`,
+            fontSize: t.font.size.xs,
+            fontWeight: t.font.weight.semibold,
+            color: colors.fg.subtle as string,
+            fontFamily: t.font.family.sans,
+          }}>
+            <span role="columnheader">Lote</span>
+            <span role="columnheader">Curral</span>
+            <span role="columnheader" style={{ textAlign: 'right' }}>Animais</span>
+            <span role="columnheader" style={{ textAlign: 'right' }}>Peso Médio</span>
+            <span role="columnheader" style={{ textAlign: 'right' }}>GMD</span>
+          </div>
 
-        {/* Linhas */}
-        {lotesFiltrados.map((lote, i) => {
-          const isAboveMeta = lote.gmd >= 1.40
-          const isLast = i === lotesFiltrados.length - 1
-          return (
-            <div
-              key={lote.id}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-                gap: `${t.space[2]}px ${t.space[4]}px`,
-                alignItems: 'center',
-                padding: `${t.space[3]}px 0`,
-                borderBottom: isLast ? 'none' : `1px solid ${bc}`,
-                fontFamily: t.font.family.sans,
-              }}
-            >
-              <span style={{
-                fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-                color: colors.fg.default as string,
-              }}>
-                {lote.id}
-              </span>
-              <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string }}>
-                {lote.curral}
-              </span>
-              <span style={{
-                fontSize: t.font.size.sm, color: colors.fg.default as string,
-                textAlign: 'right',
-              }}>
-                {lote.animais.toLocaleString('pt-BR')}
-              </span>
-              <span style={{
-                fontSize: t.font.size.sm, color: colors.fg.default as string,
-                textAlign: 'right',
-              }}>
-                {lote.pesoMedio.toLocaleString('pt-BR')} kg
-              </span>
-              <span style={{
-                fontSize: t.font.size.sm, fontWeight: t.font.weight.medium,
-                color: isAboveMeta
-                  ? (t.color.feedback.success.text as string)
-                  : (t.color.feedback.error.text as string),
-                textAlign: 'right',
-              }}>
-                {lote.gmd.toFixed(2)} kg/dia
-              </span>
-            </div>
-          )
-        })}
+          {/* Linhas */}
+          {lotesFiltrados.map((lote, i) => {
+            const isAboveMeta = lote.gmd >= 1.40
+            const isLast = i === lotesFiltrados.length - 1
+            return (
+              <div
+                key={lote.id}
+                role="row"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                  gap: `${t.space[2]}px ${t.space[4]}px`,
+                  alignItems: 'center',
+                  padding: `${t.space[3]}px 0`,
+                  borderBottom: isLast ? 'none' : `1px solid ${bc}`,
+                  fontFamily: t.font.family.sans,
+                }}
+              >
+                <span role="cell" style={{
+                  fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
+                  color: colors.fg.default as string,
+                }}>
+                  {lote.id}
+                </span>
+                <span role="cell" style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string }}>
+                  {lote.curral}
+                </span>
+                <span role="cell" style={{
+                  fontSize: t.font.size.sm, color: colors.fg.default as string,
+                  textAlign: 'right',
+                }}>
+                  {lote.animais.toLocaleString('pt-BR')}
+                </span>
+                <span role="cell" style={{
+                  fontSize: t.font.size.sm, color: colors.fg.default as string,
+                  textAlign: 'right',
+                }}>
+                  {lote.pesoMedio.toLocaleString('pt-BR')} kg
+                </span>
+                <span role="cell" style={{
+                  fontSize: t.font.size.sm, fontWeight: t.font.weight.medium,
+                  color: isAboveMeta
+                    ? (t.color.feedback.success.text as string)
+                    : (t.color.feedback.error.text as string),
+                  textAlign: 'right',
+                }}>
+                  {lote.gmd.toFixed(2)} kg/dia
+                </span>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
     </div>

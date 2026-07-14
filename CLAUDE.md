@@ -214,7 +214,7 @@ permitir "Cancelar" habilitado na 1ª etapa, sem quebrar as telas que dependiam 
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
 literal, procure o token:
 
-- **Tamanhos de controle:** `t.size.control` (40, = botão md), `controlSm` (32), `controlLg` (48),
+- **Tamanhos de controle:** `t.size.control` (42, = botão md), `controlSm` (32), `controlLg` (46),
   `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,thumb}`, `pageBtn` (32), `tableRow` (42),
   `drawer` (320), `stepBtn` (180).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).

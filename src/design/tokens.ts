@@ -352,14 +352,14 @@ export const space = {
 
 export const size = {
   /** Altura de inputs/selects padrão — alinhada ao botão md (t.size.btn.md) */
-  control:   40,
+  control:   42,
   controlSm: 32,
-  controlLg: 48,
+  controlLg: 46,
   /** Alturas dos botões (sm/md/lg) — md é o padrão do sistema */
   btn: {
     sm: 32,
-    md: 40,
-    lg: 48,
+    md: 42,
+    lg: 46,
   },
   /** Botões apenas-ícone (sm/md/lg) */
   iconBtn: {

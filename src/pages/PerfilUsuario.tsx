@@ -6,7 +6,17 @@ import { Button } from '../components/ui/Button'
 import { Avatar } from '../components/ui/Avatar'
 import { Heading } from '../components/ui/Heading'
 import { ToggleSwitch } from '../components/ui/ToggleSwitch'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { useToast, ToastContainer } from '../components/ui/Toast'
 import { t } from '../design/tokens'
+
+interface Device {
+  id: string
+  sistema: string
+  navegador: string
+  localizacao: string
+  atual: boolean
+}
 
 // ─── primitives ──────────────────────────────────────────────────────────────
 
@@ -56,6 +66,44 @@ function Section({ children, last }: { children: React.ReactNode; last?: boolean
 export default function PerfilUsuario() {
   const [twoFactor, setTwoFactor] = useState(false)
   const [newsletter, setNewsletter] = useState(true)
+  const { toasts, show, dismiss } = useToast()
+
+  // ── Dados pessoais ──
+  const [nome, setNome] = useState('Silvio Ventura Abreu')
+  const [usuario, setUsuario] = useState('silvioventura')
+  const [savingPerfil, setSavingPerfil] = useState(false)
+
+  const handleSalvarPerfil = () => {
+    setSavingPerfil(true)
+    setTimeout(() => {
+      setSavingPerfil(false)
+      show('Perfil atualizado com sucesso.')
+    }, 600)
+  }
+
+  // ── Excluir conta ──
+  const hasActivePlan = true
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
+
+  const handleConfirmDelete = () => {
+    setDeletingAccount(true)
+    setTimeout(() => {
+      setDeletingAccount(false)
+      setConfirmDeleteOpen(false)
+      show('Conta excluída com sucesso.')
+    }, 600)
+  }
+
+  // ── Sessões e dispositivos ──
+  const [devices, setDevices] = useState<Device[]>([
+    { id: 'dev-1', sistema: 'Windows 11', navegador: 'Chrome 145', localizacao: '179.82.68.233', atual: true },
+  ])
+
+  const handleRevogarSessao = (id: string) => {
+    setDevices(prev => prev.filter(d => d.id !== id))
+    show('Sessão encerrada.')
+  }
 
   return (
     <div
@@ -73,9 +121,22 @@ export default function PerfilUsuario() {
       {/* ── Avatar ── */}
       <Section>
         <SectionTitle>Avatar</SectionTitle>
-        <div title="Alterar avatar" style={{ cursor: 'pointer', display: 'inline-flex' }}>
+        <button
+          type="button"
+          title="Alterar avatar"
+          onClick={() => show('Upload de avatar em breve.', 'info')}
+          className="gb-focusable"
+          style={{
+            cursor: 'pointer',
+            display: 'inline-flex',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            borderRadius: t.radius.full,
+          }}
+        >
           <Avatar name="Silvio Ventura" size="xl" />
-        </div>
+        </button>
       </Section>
 
       {/* ── Dados pessoais ── */}
@@ -85,14 +146,16 @@ export default function PerfilUsuario() {
           <div style={{ width: 320 }}>
             <FormField
               label="Nome completo"
-              defaultValue="Silvio Ventura Abreu"
+              value={nome}
+              onChange={e => setNome(e.target.value)}
               iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
             />
           </div>
           <div style={{ width: 320 }}>
             <FormField
               label="Usuário"
-              defaultValue="silvioventura"
+              value={usuario}
+              onChange={e => setUsuario(e.target.value)}
               iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
             />
           </div>
@@ -102,6 +165,11 @@ export default function PerfilUsuario() {
               defaultValue="ventura.silvio@greenbelt-ti.com"
               readOnly
             />
+          </div>
+          <div style={{ width: 'fit-content' }}>
+            <Button variant="primary" size="sm" loading={savingPerfil} onClick={handleSalvarPerfil}>
+              Salvar
+            </Button>
           </div>
         </div>
       </Section>
@@ -243,7 +311,7 @@ export default function PerfilUsuario() {
               marginTop: -16,
             }}
           >
-            1/3 dispositivos
+            {devices.length}/3 dispositivos
           </span>
         </div>
         <Muted>Por motivos de segurança, cada conta é limitada a três dispositivos conectados.</Muted>
@@ -273,27 +341,59 @@ export default function PerfilUsuario() {
               </div>
             ))}
           </div>
-          {/* row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto', alignItems: 'center' }}>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: t.font.family.sans }}>
-              Windows 11
+          {/* rows */}
+          {devices.map((device, i) => (
+            <div
+              key={device.id}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto',
+                alignItems: 'center',
+                borderTop: i === 0 ? 'none' : `1px solid ${t.color.neutral[200]}`,
+              }}
+            >
+              <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: t.font.family.sans }}>
+                {device.sistema}
+              </div>
+              <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
+                {device.navegador}
+              </div>
+              <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
+                {device.localizacao}
+              </div>
+              <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color.brand[600], flexShrink: 0 }} />
+                <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
+                  {device.atual ? 'Este dispositivo' : 'Ativo'}
+                </span>
+              </div>
+              <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  aria-label="Encerrar sessão neste dispositivo"
+                  title="Encerrar sessão"
+                  onClick={() => handleRevogarSessao(device.id)}
+                  className="gb-focusable"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 24,
+                    height: 24,
+                    background: 'none',
+                    border: 'none',
+                    borderRadius: t.radius.md,
+                    color: t.color.neutral[600],
+                    cursor: 'pointer',
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
-              Chrome 145
-            </div>
-            <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
-              179.82.68.233
-            </div>
-            <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color.brand[600], flexShrink: 0 }} />
-              <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>Este dispositivo</span>
-            </div>
-            <div style={{ padding: '16px', opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-              </svg>
-            </div>
-          </div>
+          ))}
         </div>
       </Section>
 
@@ -301,16 +401,39 @@ export default function PerfilUsuario() {
       <Section last>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ width: 'fit-content' }}>
-            <Button variant="destructive" size="sm">Excluir conta</Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={hasActivePlan}
+              title={hasActivePlan ? 'Cancele seu plano antes de excluir a conta' : undefined}
+              onClick={() => setConfirmDeleteOpen(true)}
+            >
+              Excluir conta
+            </Button>
           </div>
-          <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
-            <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
-            Entre em contato com{' '}
-            <span style={{ color: t.color.brand[600], fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}
-            para obter assistência.
-          </p>
+          {hasActivePlan && (
+            <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
+              <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
+              Entre em contato com{' '}
+              <span style={{ color: t.color.brand[600], fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}
+              para obter assistência.
+            </p>
+          )}
         </div>
       </Section>
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDeleteOpen(false)}
+        title="Excluir conta…"
+        message="Esta ação é permanente e removerá todos os seus dados de acesso. Deseja continuar?"
+        tone="destructive"
+        confirmLabel="Excluir conta"
+        loading={deletingAccount}
+      />
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }

@@ -132,7 +132,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
           border: open ? `1.5px solid ${colors.accent.default}` : `1px solid ${colors.border.default}`,
           borderRadius: isOpen ? (compact ? `${t.radius.base}px ${t.radius.base}px 0 0` : '12px 12px 0 0') : (compact ? t.radius.base : t.radius.xl),
           padding: compact ? `0 ${t.space[3]}px` : '0 16px',
-          height: compact ? 32 : 48,
+          height: compact ? t.size.control : 48,
           boxShadow: open ? `0 0 0 3px ${colors.accent.subtle}` : (compact ? 'none' : colors.shadow),
           transition: 'border-color 0.15s, box-shadow 0.15s, background 0.2s',
           cursor: 'text',

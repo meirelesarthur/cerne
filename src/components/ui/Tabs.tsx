@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -35,6 +35,7 @@ interface TabsProps {
  */
 export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, variant = 'pill' }: TabsProps) {
   const { colors, isGbMode } = useTheme()
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   // On mount: if syncParam is set and URL has a matching search param, drive the parent's onChange
   useEffect(() => {
@@ -54,6 +55,36 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, var
       window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`)
     }
     onChange(id)
+  }
+
+  const focusTab = (id: string) => {
+    tabRefs.current[id]?.focus()
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number | null = null
+
+    switch (event.key) {
+      case 'ArrowRight':
+        nextIndex = (index + 1) % items.length
+        break
+      case 'ArrowLeft':
+        nextIndex = (index - 1 + items.length) % items.length
+        break
+      case 'Home':
+        nextIndex = 0
+        break
+      case 'End':
+        nextIndex = items.length - 1
+        break
+      default:
+        return
+    }
+
+    event.preventDefault()
+    const nextItem = items[nextIndex]
+    focusTab(nextItem.id)
+    handleChange(nextItem.id)
   }
 
   const isOutline = variant === 'outline'
@@ -81,15 +112,19 @@ export function Tabs({ items, activeId, onChange, label = 'Abas', syncParam, var
             }
       }
     >
-      {items.map((item) => {
+      {items.map((item, index) => {
         const active = item.id === activeId
         return (
           <button
             key={item.id}
+            ref={(el) => { tabRefs.current[item.id] = el }}
             role="tab"
             type="button"
             aria-selected={active}
+            tabIndex={active ? 0 : -1}
             onClick={() => handleChange(item.id)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+            className="gb-focusable"
             style={
               isOutline
                 ? {

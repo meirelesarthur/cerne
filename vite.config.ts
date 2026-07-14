@@ -9,6 +9,8 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
+  // Respeita a porta atribuída pelo ambiente (preview/CI); sem PORT, usa o default do Vite.
+  server: process.env.PORT ? { port: Number(process.env.PORT), strictPort: true } : undefined,
   test: {
     projects: [{
       extends: true,

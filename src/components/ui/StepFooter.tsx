@@ -12,6 +12,8 @@ interface StepFooterProps {
   backLabel?: string
   /** Sobrescreve o desabilitar padrão do botão Voltar (default: desabilitado na 1ª etapa). Útil quando a 1ª etapa deve permitir "Cancelar". */
   backDisabled?: boolean
+  /** Coloca o botão de avançar/salvar em estado de loading (spinner + desabilitado), evitando double-submit. */
+  nextLoading?: boolean
 }
 
 /**
@@ -26,6 +28,7 @@ export function StepFooter({
   nextLabel,
   backLabel = 'Voltar',
   backDisabled,
+  nextLoading = false,
 }: StepFooterProps) {
   const { colors } = useTheme()
   const isFirst = currentStep === 1
@@ -69,6 +72,8 @@ export function StepFooter({
           size="md"
           style={{ width: t.size.stepBtn }}
           onClick={onNext}
+          loading={nextLoading}
+          disabled={nextLoading}
         >
           {label}
         </Button>

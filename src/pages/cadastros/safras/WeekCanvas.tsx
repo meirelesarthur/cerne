@@ -3,6 +3,7 @@ import { RotateCcw } from 'lucide-react'
 import { t } from '../../../design/tokens'
 import { useTheme } from '../../../context/ThemeContext'
 import { Button } from '../../../components/ui/Button'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import {
   WEEK_COLORS, COLOR_CYCLE, MONTH_NAMES,
   isCurrentWeek,
@@ -63,6 +64,7 @@ export function WeekCanvas({
   const [selectedColor, setSelectedColor] = useState<WeekColor>('amarelo')
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, week: null })
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
 
   useEffect(() => {
     const up = () => { isPainting.current = false }
@@ -162,11 +164,22 @@ export function WeekCanvas({
           )}
         </div>
         {editable && (
-          <Button variant="secondary" size="sm" icon={<RotateCcw size={12} />} onClick={resetCycle}>
+          <Button variant="secondary" size="sm" icon={<RotateCcw size={12} />} onClick={() => setResetConfirmOpen(true)}>
             Reiniciar ciclo
           </Button>
         )}
       </div>
+
+      <ConfirmDialog
+        open={resetConfirmOpen}
+        onConfirm={() => { resetCycle(); setResetConfirmOpen(false) }}
+        onCancel={() => setResetConfirmOpen(false)}
+        title="Reiniciar ciclo de cores?"
+        message="Isso substitui todas as cores pintadas manualmente pelo ciclo padrão de cores. Esta ação não pode ser desfeita."
+        confirmLabel="Reiniciar"
+        cancelLabel="Cancelar"
+        tone="destructive"
+      />
 
       {/* ── Visão geral (strip) ──────────────────────────────────────────── */}
       <div>

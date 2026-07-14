@@ -370,6 +370,10 @@ function SafraRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar safra ${safra.desc}`}
+      className="gb-focusable"
       style={{
         display:         'grid',
         gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
@@ -384,6 +388,12 @@ function SafraRow({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onView(safra.id)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          onView(safra.id)
+        }
+      }}
     >
       {/* Descrição */}
       <span title={safra.desc} style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.accent.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

@@ -89,6 +89,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
 
   const [weeks, setWeeks] = useState<Week[]>(initialData?.weeks ?? [])
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
 
   const set = (field: keyof FormData, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -132,6 +133,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
 
   // ── Salvar ────────────────────────────────────────────────────────────────
   const handleSave = () => {
+    if (submitting) return
     const safra: Safra = {
       id:   initialData?.id ?? 0,
       desc: form.desc.trim(),
@@ -144,8 +146,12 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
       s2:    form.s2,
       weeks,
     }
-    show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!')
-    setTimeout(() => onSave(safra), 800)
+    setSubmitting(true)
+    setTimeout(() => {
+      onSave(safra)
+      show(isEdit ? 'Safra atualizada com sucesso!' : 'Safra cadastrada com sucesso!')
+      setSubmitting(false)
+    }, 800)
   }
 
   const handleWeeksChange = useCallback((w: Week[]) => setWeeks(w), [])
@@ -167,6 +173,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
             backLabel={step === 1 ? 'Cancelar' : 'Voltar'}
             nextLabel={step === 1 ? 'Configurar Semanas' : 'Salvar Safra'}
             backDisabled={false}
+            nextLoading={step === 2 && submitting}
           />
         }
         footerBare

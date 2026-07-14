@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Sidebar from './Sidebar'
 import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
@@ -144,6 +144,19 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
         )
       })
     : undefined
+
+  // Título da aba reflete a tela atual — antes ficava fixo em todas as navegações.
+  useEffect(() => {
+    const currentModule = activeItemModule ?? menuModules.find((m) => m.id === activeModuleId)
+    const currentItem = activeItemId && currentModule
+      ? [
+          ...(currentModule.flatItems ?? []),
+          ...(currentModule.groups?.flatMap((g) => g.items) ?? []),
+        ].find((i) => i.id === activeItemId)
+      : undefined
+    const parts = [currentItem?.label, currentModule?.label].filter(Boolean)
+    document.title = parts.length > 0 ? `${parts.join(' — ')} — GB CERNE` : 'GB CERNE — Painel Administrativo'
+  }, [activeItemId, activeModuleId, activeItemModule])
 
   const handleModuleClick = (module: NavModule) => {
     if (module.path) {

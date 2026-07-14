@@ -70,6 +70,8 @@ const STATS = [
 ]
 
 const MAX_ATTEMPTS = 5
+/** Duração comunicada ao usuário ao bloquear a conta (mock — o backend real controla o tempo). */
+const BLOCK_DURATION_MIN = 15
 const LS_REMEMBER = 'cerne_remember'
 const LS_EMAIL    = 'cerne_email'
 
@@ -204,7 +206,8 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       setAttempts(next)
       setProgressState('error')
       setGlobalErr(true)
-      setPassword('')
+      // Preserva a senha digitada — só o e-mail costuma estar errado;
+      // reescrever tudo de novo a cada tentativa frustra sem necessidade.
       triggerShake()
       setTimeout(() => {
         setProgressState('idle')
@@ -367,10 +370,11 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
                 <strong>Credenciais inválidas</strong>
                 {isBlocked ? (
                   <span>
-                    Conta bloqueada temporariamente.{' '}
+                    Conta bloqueada por {BLOCK_DURATION_MIN} minutos. Tente novamente depois ou{' '}
                     <button type="button" className="lgn-alert-link" onClick={openForgot}>
-                      Recuperar acesso
+                      recupere o acesso
                     </button>
+                    .
                   </span>
                 ) : attempts > 0 ? (
                   <span>
@@ -390,9 +394,9 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="lgn-form-sub">
                 Novo no CERNE?{' '}
-                <a href="#solicitar" onClick={e => e.preventDefault()}>
+                <span className="lgn-link-disabled" title="Em breve">
                   Solicitar acesso
-                </a>
+                </span>
               </p>
             </div>
 
@@ -530,10 +534,12 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
               <Divider label="ou acesse com" />
             </div>
 
-            {/* SSO Google */}
+            {/* SSO Google — desabilitado até a integração OAuth existir; evita
+                sugerir um caminho de login que não funciona */}
             <SSOButton
               provider="google"
-              onClick={() => { /* integrar com Google OAuth */ }}
+              onClick={() => {}}
+              disabled
             />
 
             {/* Trust badges */}
@@ -563,8 +569,8 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
             <p className="lgn-legal">
               Ao acessar, você concorda com os{' '}
-              <a href="#">Termos de Uso</a> e{' '}
-              <a href="#">Política de Privacidade</a> do CERNE.
+              <span className="lgn-link-disabled" title="Em breve">Termos de Uso</span> e{' '}
+              <span className="lgn-link-disabled" title="Em breve">Política de Privacidade</span> do CERNE.
             </p>
 
           </div>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Bell, LogOut, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
@@ -7,6 +8,12 @@ import { Breadcrumb } from '../ui/Breadcrumb'
 import { FarmSwitcher } from '../ui/FarmSwitcher'
 import { DropdownMenu } from '../ui/DropdownMenu'
 import SearchBar from '../SearchBar'
+
+const INITIAL_NOTIFICATIONS = [
+  { id: 'n1', label: 'Safra 25/26 aguardando configuração de semanas' },
+  { id: 'n2', label: 'Estoque de Uréia Pecuária abaixo do mínimo' },
+  { id: 'n3', label: 'Fazenda Três Irmãos com cadastro incompleto' },
+]
 
 interface TopbarProps {
   expandedModule?: NavModule
@@ -18,6 +25,9 @@ interface TopbarProps {
 export default function Topbar({ expandedModule, activeItemId, onLogout }: TopbarProps) {
   const { colors } = useTheme()
   const { navigateTo } = useNavigation()
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const dismissNotification = (id: string) =>
+    setNotifications((prev) => prev.filter((n) => n.id !== id))
 
   const activeItem =
     expandedModule && activeItemId
@@ -61,45 +71,55 @@ export default function Topbar({ expandedModule, activeItemId, onLogout }: Topba
         <FarmSwitcher />
 
         {/* Notifications */}
-        <button
-          style={{
-            position: 'relative',
-            width: 34,
-            height: 34,
-            borderRadius: t.radius.base,
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: colors.fg.muted,
-            transition: 'background 0.15s',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = colors.nav.itemHover }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-        >
-          <Bell size={16} />
-          <span
-            style={{
-              position: 'absolute',
-              top: 5,
-              right: 5,
-              background: t.color.feedback.notice,
-              color: 'white',
-              borderRadius: t.radius.full,
-              width: 14,
-              height: 14,
-              fontSize: t.font.size.xs - 3, // ~8px (badge de notificação, abaixo do mínimo do token)
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: t.font.weight.bold,
-            }}
-          >
-            3
-          </span>
-        </button>
+        <DropdownMenu
+          ariaLabel={`Notificações${notifications.length > 0 ? ` (${notifications.length} não lidas)` : ''}`}
+          triggerIcon={
+            <span
+              aria-hidden="true"
+              style={{
+                position: 'relative',
+                width: 34,
+                height: 34,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.fg.muted,
+              }}
+            >
+              <Bell size={16} />
+              {notifications.length > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 5,
+                    right: 5,
+                    background: t.color.feedback.notice,
+                    color: 'white',
+                    borderRadius: t.radius.full,
+                    width: 14,
+                    height: 14,
+                    fontSize: t.font.size.xs - 3, // ~8px (badge de notificação, abaixo do mínimo do token)
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: t.font.weight.bold,
+                  }}
+                >
+                  {notifications.length}
+                </span>
+              )}
+            </span>
+          }
+          items={
+            notifications.length > 0
+              ? notifications.map((n) => ({
+                  id: n.id,
+                  label: n.label,
+                  onClick: () => dismissNotification(n.id),
+                }))
+              : [{ id: 'empty', label: 'Nenhuma notificação', onClick: () => {} }]
+          }
+        />
 
         {/* Menu de conta — avatar como gatilho do DropdownMenu do kit */}
         <DropdownMenu

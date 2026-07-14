@@ -285,7 +285,7 @@
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: var(--lgn-neutral-400);
+  color: var(--lgn-neutral-600);
   margin-bottom: 28px;
 }
 
@@ -383,7 +383,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--lgn-neutral-400);
+  color: var(--lgn-neutral-600);
   display: flex;
   align-items: center;
   padding: 4px;
@@ -501,7 +501,7 @@
   align-items: center;
   gap: 5px;
   font-size: 11px;
-  color: var(--lgn-neutral-400);
+  color: var(--lgn-neutral-600);
 }
 .lgn-trust-item svg {
   width: 13px;
@@ -514,11 +514,19 @@
   text-align: center;
   margin-top: 16px;
   font-size: 11px;
-  color: var(--lgn-neutral-400);
+  color: var(--lgn-neutral-600);
   line-height: 1.6;
 }
 .lgn-legal a { color: var(--lgn-neutral-500); text-decoration: none; }
 .lgn-legal a:hover { color: var(--lgn-neutral-700); }
+
+/* Texto de link ainda sem destino real (páginas em construção) — não
+   simula uma affordance clicável, apenas sinaliza "em breve" no title. */
+.lgn-link-disabled {
+  color: var(--lgn-neutral-500);
+  cursor: default;
+  text-decoration: none;
+}
 
 /* ── MODAL — Esqueci a senha ─────────────────────────────────────────────── */
 .lgn-modal-overlay {
@@ -563,7 +571,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--lgn-neutral-400);
+  color: var(--lgn-neutral-600);
   display: flex;
   align-items: center;
   justify-content: center;

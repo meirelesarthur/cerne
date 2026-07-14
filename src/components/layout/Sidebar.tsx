@@ -1,4 +1,4 @@
-import { Bell, Settings, ChevronRight, PanelLeftClose, Moon, Sun, Gem } from 'lucide-react'
+import { ChevronRight, PanelLeftClose, Moon, Sun, Gem } from 'lucide-react'
 import logoFull from '../../assets/Logo.svg'
 import logoFullWhite from '../../assets/Logo-white.svg'
 import logoMin from '../../assets/logo-min.svg'
@@ -166,34 +166,8 @@ export default function Sidebar({
           paddingLeft: isIconOnly ? 0 : 4,
         }}
       >
-        <Tooltip label="Notificações">
-          <button
-            className="nav-icon-btn"
-            style={{ position: 'relative' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Bell size={15} />
-            <span
-              style={{
-                position: 'absolute',
-                top: 4,
-                right: 4,
-                background: t.color.feedback.notice,
-                color: 'white',
-                borderRadius: t.radius.full,
-                width: 13,
-                height: 13,
-                fontSize: t.font.size.xs - 3, // ~8px (badge de notificação)
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: t.font.weight.bold,
-              }}
-            >
-              3
-            </span>
-          </button>
-        </Tooltip>
+        {/* Notificações já vivem no Bell do Topbar — evita duplicar/dessincronizar
+            a mesma badge em dois lugares da casca. */}
 
         <Tooltip label={isGbMode ? 'Modo claro' : 'GB Mode'}>
           <button
@@ -215,14 +189,8 @@ export default function Sidebar({
           </button>
         </Tooltip>
 
-        <Tooltip label="Configurações">
-          <button
-            className="nav-icon-btn"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Settings size={15} />
-          </button>
-        </Tooltip>
+        {/* 'Configurações' removido: sem tela de destino ainda — reintroduzir
+            quando existir, em vez de deixar um ícone sem ação. */}
       </div>
     </div>
   )

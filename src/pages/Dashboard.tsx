@@ -68,6 +68,13 @@ function SectionHeader({ title, action }: { title: string; action?: string }) {
   )
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Bom dia, vamos começar!'
+  if (hour < 18) return 'Boa tarde, vamos começar!'
+  return 'Boa noite, vamos começar!'
+}
+
 export default function Dashboard() {
   const { navigateTo } = useNavigation()
   const { colors } = useTheme()
@@ -83,7 +90,7 @@ export default function Dashboard() {
           letterSpacing="-0.4px"
           style={{ marginBottom: t.space[2] }}
         >
-          Bom dia, vamos começar!
+          {getGreeting()}
         </Heading>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <SearchBar />

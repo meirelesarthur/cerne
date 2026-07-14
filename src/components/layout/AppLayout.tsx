@@ -84,6 +84,12 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
   )
 }
 
+function getFirstItemId(module: NavModule): string | null {
+  if (module.flatItems?.length) return module.flatItems[0].id
+  const firstGroupWithItems = module.groups?.find((g) => g.items.length > 0)
+  return firstGroupWithItems?.items[0]?.id ?? null
+}
+
 function renderPage(itemId: string | null, module?: NavModule) {
   if (!itemId) return null
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
@@ -151,7 +157,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     } else {
       setActiveModuleId(module.id)
       setExpandedModuleId(module.id)
-      setActiveItemId(null)
+      setActiveItemId(getFirstItemId(module))
     }
   }
 
@@ -178,7 +184,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       setActiveItemId(null)
     } else {
       setExpandedModuleId(moduleId)
-      setActiveItemId(itemId ?? null)
+      setActiveItemId(itemId ?? getFirstItemId(module))
     }
   }, [])
 

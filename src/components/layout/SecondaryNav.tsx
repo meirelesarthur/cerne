@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronRight } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
@@ -12,11 +12,9 @@ function NavHeader({ module }: { module: NavModule }) {
     <div
       style={{
         flexShrink: 0,
-        borderBottom: `1px solid ${colors.nav.divider}`,
         display: 'flex',
         alignItems: 'center',
-        padding: `${t.space[3]}px ${t.space[3]}px ${t.space[2]}px`,
-        transition: 'border-color 0.2s',
+        padding: `6px 10px 6px ${t.space[1]}px`,
       }}
     >
       <span
@@ -208,6 +206,17 @@ function NavFlatList({
 
 // ─── main component ───────────────────────────────────────────────────────────
 
+function computeOpenGroups(module: NavModule, activeItemId: string | null): Set<string> {
+  const next = new Set<string>()
+  module.groups?.forEach((g) => {
+    const matches = g.items.some(
+      (i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId)
+    )
+    if (matches) next.add(g.id)
+  })
+  return next
+}
+
 interface SecondaryNavProps {
   module: NavModule
   activeItemId: string | null
@@ -219,16 +228,14 @@ export default function SecondaryNav({
   activeItemId,
   onItemClick,
 }: SecondaryNavProps) {
-  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
-    const initial = new Set<string>()
-    module.groups?.forEach((g) => {
-      const matches = g.items.some(
-        (i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId)
-      )
-      if (matches) initial.add(g.id)
-    })
-    return initial
-  })
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => computeOpenGroups(module, activeItemId))
+
+  // Recalcula apenas na troca de módulo — preserva grupos abertos manualmente
+  // quando o usuário apenas seleciona outro item dentro do mesmo módulo.
+  useEffect(() => {
+    setOpenGroups(computeOpenGroups(module, activeItemId))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [module.id])
 
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => {
@@ -253,7 +260,7 @@ export default function SecondaryNav({
         transition: 'background 0.2s',
       }}
     >
-      <NavHeader module={module} />
+      {module.flatItems && <NavHeader module={module} />}
 
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 8px' }}>
         {module.flatItems ? (

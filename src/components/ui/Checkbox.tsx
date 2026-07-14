@@ -1,5 +1,6 @@
 import { useId, useRef, useEffect } from 'react'
 import { t } from '../../design/tokens'
+import { useTheme } from '../../context/ThemeContext'
 
 interface CheckboxProps {
   /** Rótulo visível. Quando ausente, informe `aria-label` para acessibilidade. */
@@ -22,6 +23,7 @@ export function Checkbox({
 }: CheckboxProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
+  const { colors } = useTheme()
 
   // `indeterminate` só existe no DOM, não como atributo JSX
   useEffect(() => {
@@ -73,9 +75,9 @@ export function Checkbox({
             inset: 0,
             border: filled
               ? `1.5px solid ${t.color.brand[600]}`
-              : `1.5px solid ${t.color.neutral[300]}`,
+              : `1.5px solid ${colors.border.default}`,
             borderRadius: t.radius.sm,
-            background: filled ? t.color.brand[600] : t.color.neutral[0],
+            background: filled ? t.color.brand[600] : colors.bg.input,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -107,7 +109,7 @@ export function Checkbox({
           style={{
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
-            color: t.color.neutral[600],
+            color: colors.fg.default,
             lineHeight: 1,
           }}
         >

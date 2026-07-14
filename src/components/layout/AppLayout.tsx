@@ -36,6 +36,8 @@ import { NavigationContext } from '../../context/NavigationContext'
 
 interface AppLayoutProps {
   children: React.ReactNode
+  /** Encerra a sessão do usuário (chamado pelo menu de conta do Topbar). */
+  onLogout?: () => void
 }
 
 function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?: NavModule }) {
@@ -120,7 +122,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children, onLogout }: AppLayoutProps) {
   const { colors } = useTheme()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeModuleId, setActiveModuleId] = useState<string>('painel')
@@ -235,7 +237,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           transition: 'background 0.2s ease',
         }}
       >
-        <Topbar expandedModule={expandedModule} activeItemId={activeItemId} />
+        <Topbar expandedModule={expandedModule} activeItemId={activeItemId} onLogout={onLogout} />
 
         <div style={{ flex: 1, display: 'flex', gap: t.space[2], overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -t.space[2] : 0 }}>
           {hasSecondaryNav && expandedModule && (

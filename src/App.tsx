@@ -22,7 +22,7 @@ export default function App() {
         // para a futura camada HTTP chamar em respostas 401.
         <PermissionProvider>
           <SessionProvider onRelogin={() => setLoggedIn(false)}>
-            <AppLayout>
+            <AppLayout onLogout={() => setLoggedIn(false)}>
               <Dashboard />
             </AppLayout>
             <SessionExpiredModal />

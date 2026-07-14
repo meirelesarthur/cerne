@@ -1,18 +1,23 @@
-import { Bell } from 'lucide-react'
+import { Bell, LogOut, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
+import { useNavigation } from '../../context/NavigationContext'
 import { t } from '../../design/tokens'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { FarmSwitcher } from '../ui/FarmSwitcher'
+import { DropdownMenu } from '../ui/DropdownMenu'
 import SearchBar from '../SearchBar'
 
 interface TopbarProps {
   expandedModule?: NavModule
   activeItemId: string | null
+  /** Encerra a sessão do usuário (item "Sair" do menu de conta). */
+  onLogout?: () => void
 }
 
-export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
+export default function Topbar({ expandedModule, activeItemId, onLogout }: TopbarProps) {
   const { colors } = useTheme()
+  const { navigateTo } = useNavigation()
 
   const activeItem =
     expandedModule && activeItemId
@@ -96,27 +101,46 @@ export default function Topbar({ expandedModule, activeItemId }: TopbarProps) {
           </span>
         </button>
 
-        {/* Avatar */}
-        <button
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: t.radius.full,
-            background: `linear-gradient(135deg, ${colors.accent.default}, ${t.color.brand[300]})`,
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: t.font.size.sm,
-            fontWeight: t.font.weight.semibold,
-            letterSpacing: '0.3px',
-          }}
-          title="Silvio Ventura"
-        >
-          SV
-        </button>
+        {/* Menu de conta — avatar como gatilho do DropdownMenu do kit */}
+        <DropdownMenu
+          ariaLabel="Abrir menu da conta de Silvio Ventura"
+          triggerIcon={
+            <span
+              aria-hidden="true"
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: t.radius.full,
+                background: `linear-gradient(135deg, ${colors.accent.default}, ${t.color.brand[300]})`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: t.font.size.xs,
+                fontWeight: t.font.weight.semibold,
+                letterSpacing: '0.3px',
+              }}
+            >
+              SV
+            </span>
+          }
+          items={[
+            {
+              id: 'perfil',
+              label: 'Meu perfil',
+              icon: <UserCog size={15} />,
+              onClick: () => navigateTo('cadastros', 'cad-pes-per'),
+            },
+            {
+              id: 'sair',
+              label: 'Sair',
+              icon: <LogOut size={15} />,
+              danger: true,
+              divider: true,
+              onClick: () => onLogout?.(),
+            },
+          ]}
+        />
       </div>
     </div>
   )

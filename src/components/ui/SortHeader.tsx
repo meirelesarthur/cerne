@@ -38,6 +38,7 @@ export function SortHeader({
   return (
     <button
       type="button"
+      className="gb-focusable"
       onClick={() => onSort(field)}
       style={{
         display: 'inline-flex',

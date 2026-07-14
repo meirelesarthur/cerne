@@ -26,6 +26,7 @@ export function CollapsibleSection({
       {/* Header */}
       <button
         type="button"
+        className="gb-focusable"
         onClick={() => setOpen(p => !p)}
         style={{
           width: '100%',

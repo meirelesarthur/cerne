@@ -51,6 +51,7 @@ export function TableSearchInput({
       {value && (
         <button
           type="button"
+          className="gb-focusable"
           onClick={() => onChange('')}
           aria-label="Limpar busca"
           style={{

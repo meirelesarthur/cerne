@@ -74,6 +74,7 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
 
       <button
         type="button"
+        className="gb-focusable"
         onClick={onClose}
         aria-label="Limpar seleção"
         style={{
@@ -101,6 +102,7 @@ function BarButton({ action }: { action: BulkAction }) {
   return (
     <button
       type="button"
+      className="gb-focusable"
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}

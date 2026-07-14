@@ -123,12 +123,13 @@ export default function Sidebar({
             )
           }
 
-          // Full: sem stopPropagation → clique no item abre secondary nav + colapsa sidebar via root onClick
+          // Full: stopPropagation para não recolher a sidebar ao navegar — o
+          // colapso só deve acontecer pelo botão dedicado (PanelLeftClose).
           return (
             <button
               key={module.id}
               className={`nav-module-btn ${highlighted ? (isExpanded ? 'expanded' : 'active') : ''}`}
-              onClick={() => onModuleClick(module)}
+              onClick={(e) => { e.stopPropagation(); onModuleClick(module) }}
               style={{ marginBottom: 2 }}
             >
               <Icon size={15} style={{ flexShrink: 0, minWidth: 15 }} />

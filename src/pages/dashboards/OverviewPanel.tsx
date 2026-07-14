@@ -11,7 +11,7 @@ import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Button } from '../../components/ui/Button'
-import { IconButton } from '../../components/ui/IconButton'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
@@ -162,19 +162,19 @@ function smoothPath(pts: [number, number][]): string {
   return d
 }
 
-function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
+function AreaChart({ colors, isGbMode, data = AREA_DATA }: { colors: ThemeColors; isGbMode: boolean; data?: typeof AREA_DATA }) {
   const [hov, setHov] = useState<number | null>(null)
   const W = 700; const H = 200; const PL = 40; const PT = 16; const PR = 8; const PB = 32
   const cW = W - PL - PR; const cH = H - PT - PB
-  const maxV = Math.max(...AREA_DATA.map(d => d.receitas)) * 1.12
+  const maxV = Math.max(...data.map(d => d.receitas)) * 1.12
   const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
-    AREA_DATA.map((d, i) => [PL + (i / (AREA_DATA.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
+    data.map((d, i) => [PL + (i / (data.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
 
   const recPts = pts('receitas')
   const dspPts = pts('despesas')
   // Margem = receitas − despesas (cruzamento dos dois totais numa 3ª série)
-  const mgPts: [number, number][] = AREA_DATA.map((d, i) => [
-    PL + (i / (AREA_DATA.length - 1)) * cW,
+  const mgPts: [number, number][] = data.map((d, i) => [
+    PL + (i / (data.length - 1)) * cW,
     PT + cH - ((d.receitas - d.despesas) / maxV) * cH,
   ])
 
@@ -227,8 +227,8 @@ function AreaChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolea
         <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
 
         {/* X labels */}
-        {AREA_DATA.map((d, i) => {
-          const x = PL + (i / (AREA_DATA.length - 1)) * cW
+        {data.map((d, i) => {
+          const x = PL + (i / (data.length - 1)) * cW
           const isH = hov === i
           return (
             <g key={i}>
@@ -347,9 +347,14 @@ function Div({ colors }: { colors: ThemeColors }) {
 
 export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('10')
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
+
+  // Período fatia os últimos N meses da série de receitas/despesas
+  const areaData = AREA_DATA.slice(-Number(periodo))
 
   const bc = colors.border.default as string
 
@@ -408,16 +413,19 @@ export default function OverviewPanel() {
               {greeting}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-                Últimos 30 dias
-              </Button>
-              <Button variant="secondary" size="sm" icon={<span style={{ fontSize: t.font.size.xs }}>📅</span>}>
-                03/05 – 01/06/2026
-              </Button>
-              <Button variant="secondary" size="sm" icon={<Settings2 size={12} />}>
+              <FilterSelect
+                ariaLabel="Filtrar por período"
+                options={[
+                  { value: '3',  label: 'Últimos 3 meses' },
+                  { value: '6',  label: 'Últimos 6 meses' },
+                  { value: '10', label: 'Últimos 10 meses' },
+                ]}
+                value={periodo}
+                onChange={setPeriodo}
+              />
+              <Button variant="secondary" size="sm" icon={<Settings2 size={12} />} disabled title="Personalização em breve">
                 Personalizar
               </Button>
-              <IconButton icon={<MoreHorizontal size={16} />} aria-label="Mais opções" size="sm" />
             </div>
           </div>
 
@@ -466,7 +474,7 @@ export default function OverviewPanel() {
                 </div>
               ))}
             </div>
-            <AreaChart colors={colors} isGbMode={isGbMode} />
+            <AreaChart colors={colors} isGbMode={isGbMode} data={areaData} />
           </div>
 
           <HDivider color={bc} />

@@ -5,14 +5,13 @@
 // - Extrair e validar fórmulas de custeio diferidas (Lei 8) via Spike técnico dedicado
 // - Padronizar `pageSlug` em kebab-case (`custos-confinamento`) e registrar RBAC explícito
 //   com permissão sugerida `feedlot_costs_dashboard_view`
-// - Permitir recorte por curral/pátio/lote diretamente no filtro (hoje apenas visuais/mock)
+// - Permitir recorte por curral/pátio/lote diretamente no filtro (hoje filtram os mocks localmente)
 // - Exportação consistente PDF/Excel — corrigir bug de inclusão Excel (DUV-402)
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
 
 import { useEffect, useState } from 'react'
 import {
   DollarSign,
-  ChevronDown,
   BarChart2,
   TrendingUp,
   PieChart,
@@ -21,7 +20,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
@@ -129,6 +128,11 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 export default function DashCustosConfinamento() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('6')
+  const [categoria, setCategoria] = useState('todas')
+  // Safra única nos mocks — o filtro existe para manter o recorte explícito
+  const [safra, setSafra] = useState('25/26')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -223,15 +227,30 @@ export default function DashCustosConfinamento() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Jan–Jun 2025
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todos os Currais
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Safra 25/26
-          </Button>
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3', label: 'Abr–Jun 2025' },
+              { value: '6', label: 'Jan–Jun 2025' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por categoria de custo"
+            options={[
+              { value: 'todas', label: 'Todas as categorias' },
+              ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
+            ]}
+            value={categoria}
+            onChange={setCategoria}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por safra"
+            options={[{ value: '25/26', label: 'Safra 25/26' }]}
+            value={safra}
+            onChange={setSafra}
+          />
         </div>
       </div>
 
@@ -283,8 +302,10 @@ export default function DashCustosConfinamento() {
             </span>
           </div>
           <StackedBarChart
-            series={mockStackedSeries}
-            labels={MESES}
+            series={mockStackedSeries
+              .filter((s) => categoria === 'todas' || s.name === categoria)
+              .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+            labels={MESES.slice(-Number(periodo))}
             height={260}
             showLegend
             yFormat={(v) => `R$ ${v}`}
@@ -302,8 +323,8 @@ export default function DashCustosConfinamento() {
             </span>
           </div>
           <LineChart
-            series={mockLineSeries}
-            labels={MESES}
+            series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+            labels={MESES.slice(-Number(periodo))}
             height={260}
             area={false}
             showLegend

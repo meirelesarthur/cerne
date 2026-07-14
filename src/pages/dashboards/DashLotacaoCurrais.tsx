@@ -4,12 +4,11 @@
 // - Canonizar enum de status de curral (Disponível | Ocupado | Em manejo | Manutenção) na API
 // - Implementar drill-down por setor e por curral individual
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
-// - Filtros de Pátio e Setor devem chamar endpoint filtrado (hoje apenas visuais/mock)
+// - Filtros de Pátio e Setor devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 
 import { useEffect, useState } from 'react'
 import {
   LayoutGrid,
-  ChevronDown,
   PieChart,
   BarChart2,
 } from 'lucide-react'
@@ -17,7 +16,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
@@ -79,6 +78,10 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 export default function DashLotacaoCurrais() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  // Pátio único nos mocks — o filtro mantém o recorte explícito
+  const [patio, setPatio] = useState('principal')
+  const [setor, setSetor] = useState('todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -175,12 +178,21 @@ export default function DashLotacaoCurrais() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Pátio Principal
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todos os Setores
-          </Button>
+          <FilterSelect
+            ariaLabel="Filtrar por pátio"
+            options={[{ value: 'principal', label: 'Pátio Principal' }]}
+            value={patio}
+            onChange={setPatio}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por setor"
+            options={[
+              { value: 'todos', label: 'Todos os Setores' },
+              ...mockSetores.map((s) => ({ value: s, label: s })),
+            ]}
+            value={setor}
+            onChange={setSetor}
+          />
         </div>
       </div>
 
@@ -252,8 +264,11 @@ export default function DashLotacaoCurrais() {
             </span>
           </div>
           <StackedBarChart
-            series={mockStackedSeries}
-            labels={mockSetores}
+            series={mockStackedSeries.map((s) => ({
+              ...s,
+              data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
+            }))}
+            labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
             height={260}
             horizontal
             showLegend

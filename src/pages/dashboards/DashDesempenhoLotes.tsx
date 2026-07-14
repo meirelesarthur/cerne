@@ -4,13 +4,12 @@
 // - RBAC: permissões sugeridas `feedlot_weighing_performance_view` / `feedlot_weighing_performance_export`
 // - Unificar relatórios "Pesagem do Confinamento" e "Gerenciamento de Lote" em endpoint único paginado
 // - i18n: extrair strings literais de UI para catálogo de mensagens
-// - Filtros de Período, Curral e Lote devem chamar endpoint filtrado (hoje apenas visuais/mock)
+// - Filtros de Período, Curral e Lote devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
 
 import { useEffect, useState } from 'react'
 import {
   TrendingUp,
-  ChevronDown,
   BarChart2,
   Activity,
   List,
@@ -19,7 +18,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
@@ -108,6 +107,10 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 export default function DashDesempenhoLotes() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('7')
+  const [curral, setCurral] = useState('todos')
+  const [lote, setLote] = useState('todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -137,18 +140,35 @@ export default function DashDesempenhoLotes() {
   }
 
   // ── KPIs derivados dos mocks ────────────────────────────────────────────────
-  const totalAnimais = mockLotesDetalhe.reduce((a, l) => a + l.animais, 0)
-  const ganhoTotal = mockLotesDetalhe.reduce((a, l) => a + l.ganhoTotal, 0)
+  // Dados filtrados por curral/lote — base dos KPIs, gráficos e tabela
+  const lotesFiltrados = mockLotesDetalhe.filter((l) =>
+    (curral === 'todos' || l.curral === curral) &&
+    (lote === 'todos' || `Lote ${l.id}` === lote)
+  )
+  const idsFiltrados = new Set(lotesFiltrados.map((l) => `Lote ${l.id}`))
+  const nPesagens = Number(periodo)
+  const pesagemLabels = mockPesagemLabels.slice(-nPesagens)
+  const lotesSeries = mockLotesSeries
+    .filter((s) => idsFiltrados.has(s.name))
+    .map((s) => ({ ...s, data: s.data.slice(-nPesagens) }))
+  const gmdIdx = mockLoteLabels
+    .map((l, i) => (idsFiltrados.has(l) ? i : -1))
+    .filter((i) => i >= 0)
+  const gmdLabels = gmdIdx.map((i) => mockLoteLabels[i])
+  const gmdSeries = mockGmdSeries.map((s) => ({ ...s, data: gmdIdx.map((i) => s.data[i]) }))
 
-  // GMD médio ponderado por número de animais (evita divisão por zero — todos os lotes têm animais > 0 no mock)
-  const gmdMedio = mockLotesDetalhe.reduce((a, l) => a + l.gmd * l.animais, 0) / totalAnimais
+  const totalAnimais = lotesFiltrados.reduce((a, l) => a + l.animais, 0)
+  const ganhoTotal = lotesFiltrados.reduce((a, l) => a + l.ganhoTotal, 0)
+
+  // GMD médio ponderado por número de animais (guarda contra divisão por zero com filtro vazio)
+  const gmdMedio = lotesFiltrados.reduce((a, l) => a + l.gmd * l.animais, 0) / Math.max(totalAnimais, 1)
 
   // Peso médio final: média simples dos pesos médios por lote
   const pesoMedioFinal = Math.round(
-    mockLotesDetalhe.reduce((a, l) => a + l.pesoMedio, 0) / mockLotesDetalhe.length,
+    lotesFiltrados.reduce((a, l) => a + l.pesoMedio, 0) / Math.max(lotesFiltrados.length, 1),
   )
 
-  const lotesAtivos = mockLotesDetalhe.length
+  const lotesAtivos = lotesFiltrados.length
 
   const kpis = [
     {
@@ -207,15 +227,33 @@ export default function DashDesempenhoLotes() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Período
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Curral
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Lote
-          </Button>
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '4', label: 'Últimas 4 pesagens' },
+              { value: '7', label: 'Últimas 7 pesagens' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por curral"
+            options={[
+              { value: 'todos', label: 'Todos os currais' },
+              ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
+            ]}
+            value={curral}
+            onChange={setCurral}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por lote"
+            options={[
+              { value: 'todos', label: 'Todos os lotes' },
+              ...mockLoteLabels.map((l) => ({ value: l, label: l })),
+            ]}
+            value={lote}
+            onChange={setLote}
+          />
         </div>
       </div>
 
@@ -267,8 +305,8 @@ export default function DashDesempenhoLotes() {
             </span>
           </div>
           <LineChart
-            series={mockLotesSeries}
-            labels={mockPesagemLabels}
+            series={lotesSeries}
+            labels={pesagemLabels}
             height={260}
             area={false}
             showLegend
@@ -287,8 +325,8 @@ export default function DashDesempenhoLotes() {
             </span>
           </div>
           <GroupedBarChart
-            series={mockGmdSeries}
-            labels={mockLoteLabels}
+            series={gmdSeries}
+            labels={gmdLabels}
             height={260}
             showLegend
             yFormat={(v) => `${v.toFixed(2)} kg/dia`}
@@ -328,9 +366,9 @@ export default function DashDesempenhoLotes() {
         </div>
 
         {/* Linhas */}
-        {mockLotesDetalhe.map((lote, i) => {
+        {lotesFiltrados.map((lote, i) => {
           const isAboveMeta = lote.gmd >= 1.40
-          const isLast = i === mockLotesDetalhe.length - 1
+          const isLast = i === lotesFiltrados.length - 1
           return (
             <div
               key={lote.id}

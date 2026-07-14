@@ -8,6 +8,7 @@ import { ProgressBar } from '../components/ui/ProgressBar'
 import type { ProgressState } from '../components/ui/ProgressBar'
 import { t } from '../design/tokens'
 import defaultBg from '../assets/default-bg.jpg'
+import logoWhite from '../assets/Logo-white.svg'
 const CDN = 'https://pub-0f1e695318f140f895ccdb13696c1c62.r2.dev'
 const vidCafe = `${CDN}/cafe.mp4`
 const vidGado = `${CDN}/Gado.mp4`
@@ -281,13 +282,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
             {/* Logo */}
             <div className="lgn-logo">
-              <div className="lgn-logo-mark" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3L4 8v8l8 5 8-5V8L12 3z" fill="rgba(255,255,255,.9)"/>
-                  <path d="M12 8v8M8 10l4-2 4 2" stroke="rgba(20,83,45,.6)" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <span className="lgn-logo-text">CERNE</span>
+              <img src={logoWhite} alt="GB Agritech" className="lgn-logo-img" />
             </div>
 
             {/* Slide copy */}

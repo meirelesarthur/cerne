@@ -111,24 +111,10 @@
   gap: 12px;
 }
 
-.lgn-logo-mark {
-  width: 40px;
+.lgn-logo-img {
   height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--lgn-brand-500), var(--lgn-brand-700));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(5,150,105,.32);
-  flex-shrink: 0;
-}
-.lgn-logo-mark svg { width: 22px; height: 22px; }
-
-.lgn-logo-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--lgn-white);
-  letter-spacing: -.3px;
+  width: auto;
+  display: block;
 }
 
 .lgn-logo-badge {

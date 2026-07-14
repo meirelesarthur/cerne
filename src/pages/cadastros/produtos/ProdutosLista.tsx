@@ -46,7 +46,7 @@ const TIPO_COLORS: Record<TipoProduto, { bg: string; text: string }> = {
   insumo:     { bg: t.color.brand[50],   text: t.color.brand[600] },
   producao:   { bg: t.color.feedback.info.bg,     text: t.color.feedback.info.text },
   subproduto: { bg: t.color.feedback.warning.bg,  text: t.color.feedback.warning.text },
-  servico:    { bg: t.color.neutral[100], text: t.color.neutral[500] },
+  servico:    { bg: t.color.neutral[100], text: t.color.neutral[600] },
 }
 
 type SortField = 'codigo' | 'descricao'
@@ -428,7 +428,7 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
         </span>
       </span>
       <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: prod.ativo ? t.color.brand[50] : t.color.neutral[100], color: prod.ativo ? t.color.brand[600] : t.color.neutral[500] }}>
+        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: prod.ativo ? t.color.brand[50] : t.color.neutral[100], color: prod.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
           {prod.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>

@@ -59,6 +59,7 @@ export function WeekCanvas({
 }: WeekCanvasProps) {
   const { colors } = useTheme()
   const isPainting = useRef(false)
+  const gridRef = useRef<HTMLDivElement>(null)
   const [selectedColor, setSelectedColor] = useState<WeekColor>('amarelo')
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, week: null })
@@ -81,6 +82,42 @@ export function WeekCanvas({
   const resetCycle = () => {
     if (!onWeeksChange) return
     onWeeksChange(weeks.map((w, i) => ({ ...w, color: COLOR_CYCLE[i % 9] })))
+  }
+
+  // ── Acessibilidade: teclado e touch ────────────────────────────────────────
+
+  const focusTile = (idx: number) => {
+    const el = gridRef.current?.querySelector<HTMLElement>(`[data-week-idx="${idx}"]`)
+    el?.focus()
+  }
+
+  const handleTileKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        if (editable) { e.preventDefault(); paint(idx) }
+        break
+      case 'ArrowRight':
+        e.preventDefault(); focusTile(Math.min(idx + 1, weeks.length - 1)); break
+      case 'ArrowLeft':
+        e.preventDefault(); focusTile(Math.max(idx - 1, 0)); break
+      case 'Home':
+        e.preventDefault(); focusTile(0); break
+      case 'End':
+        e.preventDefault(); focusTile(weeks.length - 1); break
+    }
+  }
+
+  // Drag-paint em touch: localiza o tile sob o dedo e pinta conforme o gesto avança
+  const handleGridTouchMove = (e: React.TouchEvent) => {
+    if (!editable || !isPainting.current) return
+    const touch = e.touches[0]
+    const el = document.elementFromPoint(touch.clientX, touch.clientY)
+    const tile = el?.closest<HTMLElement>('[data-week-idx]')
+    if (tile) {
+      const idx = Number(tile.dataset.weekIdx)
+      if (!Number.isNaN(idx) && weeks[idx].color !== selectedColor) paint(idx)
+    }
   }
 
   const grouped = groupWeeks(weeks)
@@ -225,7 +262,15 @@ export function WeekCanvas({
       )}
 
       {/* ── Grade de tiles ──────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div
+        ref={gridRef}
+        role="group"
+        aria-label={editable
+          ? 'Grade de semanas — navegue com as setas e pinte com Enter ou Espaço'
+          : 'Grade de semanas'}
+        onTouchMove={handleGridTouchMove}
+        style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+      >
         {grouped.map(yg => (
           <div key={yg.year}>
             {grouped.length > 1 && (
@@ -265,6 +310,14 @@ export function WeekCanvas({
                       return (
                         <div
                           key={idx}
+                          data-week-idx={idx}
+                          role={editable ? 'button' : undefined}
+                          tabIndex={editable ? 0 : undefined}
+                          aria-label={editable
+                            ? `Semana ${week.num}, ${week.start} a ${week.end}, cor ${def.label}. Enter ou Espaço pinta com ${WEEK_COLORS[selectedColor].label}`
+                            : undefined}
+                          className={editable ? 'gb-focusable' : undefined}
+                          onKeyDown={editable ? (e) => handleTileKeyDown(e, idx) : undefined}
                           style={{
                             width: 80,
                             height: 72,
@@ -283,10 +336,24 @@ export function WeekCanvas({
                             transition: `transform ${t.animation.duration.faster}, box-shadow ${t.animation.duration.faster}`,
                             userSelect: 'none',
                             WebkitUserSelect: 'none',
+                            touchAction: editable ? 'none' : undefined,
                           }}
                           onMouseDown={editable ? () => {
                             isPainting.current = true
                             paint(idx)
+                          } : undefined}
+                          onTouchStart={editable ? () => {
+                            isPainting.current = true
+                            paint(idx)
+                          } : undefined}
+                          onFocus={editable ? (e) => {
+                            const rect = e.currentTarget.getBoundingClientRect()
+                            setHoveredIdx(idx)
+                            setTooltip({ visible: true, x: rect.right + 6, y: rect.top - 52, week })
+                          } : undefined}
+                          onBlur={editable ? () => {
+                            setHoveredIdx(null)
+                            setTooltip(prev => ({ ...prev, visible: false }))
                           } : undefined}
                           onMouseEnter={e => {
                             setHoveredIdx(idx)

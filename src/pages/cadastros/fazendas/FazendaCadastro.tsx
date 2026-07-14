@@ -11,9 +11,12 @@ import { Step3Mapa } from './steps/Step3Mapa'
 import { Step4Endereco } from './steps/Step4Endereco'
 import { Step4Financeiro } from './steps/Step4Financeiro'
 import { Step5Configuracoes } from './steps/Step5Configuracoes'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { emptyFazendaForm, detalheToForm } from './fazendas.types'
 import type { FazendaFormData, FazendaDetalheData } from './fazendas.types'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
+import { focusFirstError } from '../../../hooks/focusFirstError'
 
 interface FazendaCadastroProps {
   onBack: () => void
@@ -57,12 +60,20 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     if (!data.tipoExploracao) {
       errors.tipoExploracao = 'Selecione o tipo de exploração'
     }
+    if (!data.nirf) errors.nirf = 'NIRF é obrigatório'
+    if (!data.ccir) errors.ccir = 'CCIR é obrigatório'
+    if (!data.cafir) errors.cafir = 'CAFIR é obrigatório'
+    if (!data.caepi) errors.caepi = 'CAEPI é obrigatório'
   }
 
   if (step === 5) {
     if (!data.areaTotal) errors.areaTotal = 'Área total é obrigatória'
     if (!data.valorHa) errors.valorHa = 'Valor por hectare é obrigatório'
     if (!data.taxaRemuneracao) errors.taxaRemuneracao = 'Taxa de remuneração é obrigatória'
+  }
+
+  if (step === 6) {
+    if (data.centrosCusto.length === 0) errors.centrosCusto = 'Selecione ao menos um centro de custo'
   }
 
   return errors
@@ -80,9 +91,11 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const { toasts, show, dismiss } = useToast()
+  const guard = useUnsavedChangesGuard(onBack)
 
   const handleChange = (field: keyof FazendaFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    guard.setIsDirty(true)
     if (errors[field as string]) {
       setErrors((prev) => {
         const next = { ...prev }
@@ -94,16 +107,19 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
 
   const handleBoolChange = (field: keyof FazendaFormData, value: boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    guard.setIsDirty(true)
   }
 
   const handleCentrosCustoChange = (ids: string[]) => {
     setFormData((prev) => ({ ...prev, centrosCusto: ids }))
+    guard.setIsDirty(true)
   }
 
   const handleNext = () => {
     const stepErrors = validateStep(currentStep, formData)
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors)
+      focusFirstError()
       return
     }
     setErrors({})
@@ -114,7 +130,7 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
       setCurrentStep(currentStep + 1)
     } else {
       show(isEdit ? 'Fazenda atualizada com sucesso!' : 'Fazenda cadastrada com sucesso!', 'success', 3000)
-      setTimeout(onBack, 3200)
+      onBack()
     }
   }
 
@@ -182,7 +198,7 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
         <FormPageHeader
           title={isEdit ? 'Editar Fazenda' : 'Nova Fazenda'}
           subtitle={isEdit ? `Atualize os dados de ${fazenda.nome}` : 'Preencha os dados da fazenda'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -198,6 +214,17 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
           {renderStep()}
         </div>
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>

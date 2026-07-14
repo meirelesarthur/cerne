@@ -17,6 +17,9 @@ import { StepFuncionario }  from './steps/StepFuncionario'
 import { StepFornecedor }   from './steps/StepFornecedor'
 import { StepCliente }      from './steps/StepCliente'
 import { StepUsuario }      from './steps/StepUsuario'
+import { ConfirmDialog }    from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
+import { focusFirstError } from '../../../hooks/focusFirstError'
 
 // ─── Steps ──────────────────────────────────────────────────────────────────
 
@@ -115,6 +118,7 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
   const [form, setForm]       = useState<Pessoa>(() => initialData ?? emptyPessoa())
   const [errors, setErrors]   = useState<Record<string, string>>({})
   const [currentKey, setCurrentKey] = useState<StepKey>('basico')
+  const guard = useUnsavedChangesGuard(onBack)
   // Em edição/visualização, todas as etapas iniciam navegáveis.
   const [completed, setCompleted] = useState<StepKey[]>(
     () => (initialData ? computeSteps(initialData) : []),
@@ -129,10 +133,12 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
 
   const set = <K extends keyof Pessoa>(key: K, value: Pessoa[K]) => {
     setForm((f) => ({ ...f, [key]: value }))
+    guard.setIsDirty(true)
     clearErrors()
   }
   const setRole = <R extends RoleKey>(role: R, patch: Partial<Pessoa[R]>) => {
     setForm((f) => ({ ...f, [role]: { ...f[role], ...patch } }))
+    guard.setIsDirty(true)
     clearErrors()
   }
   const onToggleRole = (key: RoleKey, value: boolean) => {
@@ -148,7 +154,8 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
       const stepErrors = validateStep(currentKey, form, isEdit)
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors)
-        show('Há campos pendentes — verifique os destaques em vermelho.', 'error')
+        focusFirstError()
+        show(Object.values(stepErrors)[0] ?? 'Há campos pendentes — verifique os destaques em vermelho.', 'error')
         return
       }
     }
@@ -206,7 +213,7 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
         <FormPageHeader
           title={readOnly ? 'Detalhes da Pessoa' : isEdit ? 'Editar Pessoa' : 'Nova Pessoa'}
           subtitle={isEdit ? `${form.name} — ${form.nickname}` : 'Preencha as etapas para cadastrar a pessoa.'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -221,6 +228,17 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
           {renderStep()}
         </div>
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>

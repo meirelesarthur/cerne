@@ -281,7 +281,7 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
         </span>
       </span>
       <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: arm.ativo ? t.color.brand[50] : t.color.neutral[100], color: arm.ativo ? t.color.brand[600] : t.color.neutral[500] }}>
+        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: arm.ativo ? t.color.brand[50] : t.color.neutral[100], color: arm.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
           {arm.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>

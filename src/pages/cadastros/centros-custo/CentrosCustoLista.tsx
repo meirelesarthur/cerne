@@ -22,7 +22,7 @@ import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 import {
-  classeOf, CONDICAO_LABEL, TIPO_LABEL, CLASSE_LABEL,
+  classeOf, CONDICAO_LABEL, TIPO_LABEL, CLASSE_LABEL, getAllDescendantCentroIds,
   type CentroCusto,
 } from './centrosCusto.types'
 
@@ -250,10 +250,16 @@ export default function CentrosCustoLista({
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <EmptyStateUI
-              message="Nenhum centro de custo encontrado."
-              description="Tente ajustar os filtros ou limpar a busca."
-            />
+            (() => {
+              const hasSearch = search.trim().length > 0 || activeFilterCount > 0
+              return (
+                <EmptyStateUI
+                  message={hasSearch ? 'Nenhum centro de custo encontrado.' : 'Nenhum centro de custo cadastrado.'}
+                  description={hasSearch ? 'Tente ajustar os filtros ou limpar a busca.' : 'Comece adicionando o primeiro centro de custo.'}
+                  action={hasSearch ? undefined : { label: 'Adicionar Centro', onClick: onNew }}
+                />
+              )
+            })()
           ) : (
             <>
               <div style={{
@@ -326,7 +332,14 @@ export default function CentrosCustoLista({
         open={deleteId !== null}
         tone="destructive"
         title="Excluir centro de custo?"
-        message={deleteTarget ? `${deleteTarget.codigo} — ${deleteTarget.descricao}\nEsta ação não pode ser desfeita.` : 'Esta ação não pode ser desfeita.'}
+        message={(() => {
+          if (!deleteTarget) return 'Esta ação não pode ser desfeita.'
+          const descendentes = getAllDescendantCentroIds(centros, deleteTarget.id)
+          const aviso = descendentes.length > 0
+            ? ` Este centro possui ${descendentes.length} centro${descendentes.length > 1 ? 's' : ''} analítico${descendentes.length > 1 ? 's' : ''} vinculado${descendentes.length > 1 ? 's' : ''}, que também ${descendentes.length > 1 ? 'serão excluídos' : 'será excluído'}.`
+            : ''
+          return `${deleteTarget.codigo} — ${deleteTarget.descricao}.${aviso} Esta ação não pode ser desfeita.`
+        })()}
         confirmLabel="Excluir"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteId(null)}

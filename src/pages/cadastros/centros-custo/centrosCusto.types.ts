@@ -44,6 +44,12 @@ export function antecessorLabel(cc: CentroCusto): string {
   return `${cc.codigo} — ${cc.descricao}`
 }
 
+/** Ids de todos os centros analíticos descendentes de `id` (padrão de enderecos.types.ts). */
+export function getAllDescendantCentroIds(items: CentroCusto[], id: number): number[] {
+  const direct = items.filter(c => c.antecessorId === id)
+  return direct.flatMap(c => [c.id, ...getAllDescendantCentroIds(items, c.id)])
+}
+
 // ─── Labels / opts ────────────────────────────────────────────────────────────
 
 export const CONDICAO_LABEL: Record<CondicaoCC, string> = {

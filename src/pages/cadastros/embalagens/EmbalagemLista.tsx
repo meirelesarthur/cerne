@@ -127,10 +127,16 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyStateUI
-            message="Nenhuma embalagem encontrada."
-            description="Tente ajustar os filtros ou limpar a busca."
-          />
+          (() => {
+            const hasSearch = search.trim().length > 0 || activeFilterCount > 0
+            return (
+              <EmptyStateUI
+                message={hasSearch ? 'Nenhuma embalagem encontrada.' : 'Nenhuma embalagem cadastrada.'}
+                description={hasSearch ? 'Tente ajustar os filtros ou limpar a busca.' : 'Comece adicionando a primeira embalagem.'}
+                action={hasSearch ? undefined : { label: 'Adicionar Embalagem', onClick: onNew }}
+              />
+            )
+          })()
         ) : (
           <>
             <div style={{

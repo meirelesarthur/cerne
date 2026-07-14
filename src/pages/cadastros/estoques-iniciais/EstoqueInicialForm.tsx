@@ -25,7 +25,8 @@ interface Props {
   initialData?: EstoqueInicial
   registros:    EstoqueInicial[]
   onBack:       () => void
-  onSave:       (data: Omit<EstoqueInicial, 'id'>) => void
+  /** `replaceId`: quando presente, atualiza esse registro existente em vez de criar um novo (usado ao "Substituir" uma duplicidade). */
+  onSave:       (data: Omit<EstoqueInicial, 'id'>, replaceId?: number) => void
 }
 
 // ─── FormState ────────────────────────────────────────────────────────────────
@@ -178,12 +179,12 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
     if (!isValid) return
 
     // Duplicate check
-    const hasDup = registros.some(r =>
+    const duplicate = registros.find(r =>
       r.produtoId === Number(form.produtoId) &&
       r.armazemId === Number(form.armazemId) &&
       r.id !== (initialData?.id ?? -1)
     )
-    if (hasDup) {
+    if (duplicate) {
       setShowDuplicateAlert(true)
       return
     }
@@ -195,11 +196,29 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
     }, 200)
   }
 
+  const findDuplicate = () => registros.find(r =>
+    r.produtoId === Number(form.produtoId) &&
+    r.armazemId === Number(form.armazemId) &&
+    r.id !== (initialData?.id ?? -1)
+  )
+
+  /** Adiciona mesmo com duplicidade — cria um segundo registro para o mesmo produto/armazém. */
   const handleSaveAnyway = () => {
     setShowDuplicateAlert(false)
     setSubmitting(true)
     setTimeout(() => {
       onSave(buildPayload())
+      onBack()
+    }, 200)
+  }
+
+  /** Substitui o registro duplicado existente pelos dados deste formulário. */
+  const handleReplaceDuplicate = () => {
+    const duplicate = findDuplicate()
+    setShowDuplicateAlert(false)
+    setSubmitting(true)
+    setTimeout(() => {
+      onSave(buildPayload(), duplicate?.id)
       onBack()
     }, 200)
   }
@@ -449,7 +468,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
               </div>
             </div>
             <div style={{ display: 'flex', gap: t.space[2] }}>
-              <Button variant="secondary" size="sm" onClick={() => setShowDuplicateAlert(false)}>
+              <Button variant="secondary" size="sm" onClick={handleReplaceDuplicate}>
                 Substituir
               </Button>
               <Button variant="primary" size="sm" onClick={handleSaveAnyway}>

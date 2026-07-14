@@ -140,7 +140,7 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
           count={registros.length}
           actions={
             <div style={{ display: 'flex', gap: 8 }}>
-              <Button variant="secondary" size="md" icon={<Download size={14} />}>
+              <Button variant="secondary" size="md" icon={<Download size={14} />} disabled title="Em breve">
                 Exportar
               </Button>
               <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
@@ -194,10 +194,16 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState
-            message="Nenhum registro encontrado."
-            description="Tente ajustar os filtros ou limpar a busca."
-          />
+          (() => {
+            const hasSearch = search.trim().length > 0 || activeFilterCount > 0
+            return (
+              <EmptyState
+                message={hasSearch ? 'Nenhum registro encontrado.' : 'Nenhum saldo inicial cadastrado.'}
+                description={hasSearch ? 'Tente ajustar os filtros ou limpar a busca.' : 'Comece adicionando o primeiro saldo inicial.'}
+                action={hasSearch ? undefined : { label: 'Adicionar', onClick: onNew }}
+              />
+            )
+          })()
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
@@ -260,7 +266,12 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
       <ConfirmDialog
         open={deleteId !== null}
         title="Confirmar exclusão"
-        message="Esta ação não pode ser desfeita."
+        message={(() => {
+          const r = registros.find(x => x.id === deleteId)
+          return r
+            ? `${r.produtoDescricao} — ${r.armazemDescricao} será excluído permanentemente. Esta ação não pode ser desfeita.`
+            : 'Esta ação não pode ser desfeita.'
+        })()}
         tone="destructive"
         confirmLabel="Excluir"
         cancelLabel="Cancelar"

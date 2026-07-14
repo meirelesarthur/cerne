@@ -2,7 +2,7 @@ import { useState } from 'react'
 import CentrosCustoLista   from './CentrosCustoLista'
 import CentroCustoCadastro from './CentroCustoCadastro'
 import { mockCentrosCusto } from './centrosCusto.mock'
-import type { CentroCusto } from './centrosCusto.types'
+import { getAllDescendantCentroIds, type CentroCusto } from './centrosCusto.types'
 
 type View = 'list' | 'form'
 
@@ -28,7 +28,10 @@ export default function CentrosCustoPage() {
   }
 
   const handleDelete = (id: number) => {
-    setCentros(prev => prev.filter(c => c.id !== id))
+    setCentros(prev => {
+      const toRemove = new Set([id, ...getAllDescendantCentroIds(prev, id)])
+      return prev.filter(c => !toRemove.has(c.id))
+    })
   }
 
   if (view === 'form') {

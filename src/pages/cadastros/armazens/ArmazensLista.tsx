@@ -155,10 +155,16 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyStateUI
-            message="Nenhum armazém encontrado."
-            description="Tente ajustar os filtros ou limpar a busca."
-          />
+          (() => {
+            const hasSearch = search.trim().length > 0 || activeFilterCount > 0
+            return (
+              <EmptyStateUI
+                message={hasSearch ? 'Nenhum armazém encontrado.' : 'Nenhum armazém cadastrado.'}
+                description={hasSearch ? 'Tente ajustar os filtros ou limpar a busca.' : 'Comece adicionando o primeiro armazém.'}
+                action={hasSearch ? undefined : { label: 'Adicionar Armazém', onClick: onNew }}
+              />
+            )
+          })()
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>

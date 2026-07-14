@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { t } from '../../design/tokens'
 
@@ -26,6 +26,15 @@ export function Tooltip({ label, children }: TooltipProps) {
   }, [])
 
   const hide = useCallback(() => setVisible(false), [])
+
+  // Dismissível via Esc (WCAG 1.4.13) — não bloqueia o Esc de diálogos/menus
+  // abertos por cima, pois só atua enquanto o próprio tooltip está visível.
+  useEffect(() => {
+    if (!visible) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') hide() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [visible, hide])
 
   return (
     <div

@@ -79,9 +79,12 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
         aria-label="Limpar seleção"
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          color: t.color.neutral[400], padding: t.space[1],
-          display: 'flex', alignItems: 'center', marginLeft: t.space[1],
+          color: t.color.neutral[400],
+          width: t.size.iconBtn.sm, height: t.size.iconBtn.sm,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginLeft: t.space[1],
           borderRadius: t.radius.sm,
+          flexShrink: 0,
         }}
       >
         <X size={14} />

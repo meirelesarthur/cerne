@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -15,6 +15,7 @@ export function CollapsibleSection({
 }: CollapsibleSectionProps) {
   const { colors } = useTheme()
   const [open, setOpen] = useState(defaultOpen)
+  const bodyId = useId()
 
   return (
     <div style={{
@@ -27,6 +28,8 @@ export function CollapsibleSection({
       <button
         type="button"
         className="gb-focusable"
+        aria-expanded={open}
+        aria-controls={bodyId}
         onClick={() => setOpen(p => !p)}
         style={{
           width: '100%',
@@ -82,7 +85,7 @@ export function CollapsibleSection({
 
       {/* Body */}
       {open && (
-        <div style={{ padding: `${t.space[5]}px ${t.space[5]}px` }}>
+        <div id={bodyId} style={{ padding: `${t.space[5]}px ${t.space[5]}px` }}>
           {children}
         </div>
       )}

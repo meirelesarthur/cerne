@@ -33,8 +33,9 @@ export function PageHeader({ title, description, actions, count, breadcrumb }: P
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] / 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <span
+          <h1
             style={{
+              margin: 0,
               fontSize: t.font.size['2xl'],
               fontWeight: t.font.weight.bold,
               color: colors.fg.default,
@@ -44,7 +45,7 @@ export function PageHeader({ title, description, actions, count, breadcrumb }: P
             }}
           >
             {title}
-          </span>
+          </h1>
           {count !== undefined && (
             <span
               style={{

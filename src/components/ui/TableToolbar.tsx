@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Search, X, SlidersHorizontal } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { IconButton } from './IconButton'
 
 // ─── TableSearchInput ─────────────────────────────────────────────────────────
 
@@ -49,19 +50,12 @@ export function TableSearchInput({
         }}
       />
       {value && (
-        <button
-          type="button"
-          className="gb-focusable"
+        <IconButton
+          icon={<X size={11} />}
           onClick={() => onChange('')}
           aria-label="Limpar busca"
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: 0, display: 'flex', alignItems: 'center',
-            color: colors.fg.subtle,
-          }}
-        >
-          <X size={11} />
-        </button>
+          size="xs"
+        />
       )}
     </div>
   )

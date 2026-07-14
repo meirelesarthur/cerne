@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useId, useCallback } from 'react'
 import { Search, X, ChevronDown, HelpCircle } from 'lucide-react'
 import { Tooltip } from './Tooltip'
+import { IconButton } from './IconButton'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -185,15 +186,12 @@ export function SearchSelect({
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: t.font.size.md, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0 }}
           />
           {query && onClear && !disabled && (
-            <button
-              type="button"
-              className="gb-focusable"
+            <IconButton
+              icon={<X size={11} />}
               aria-label="Limpar seleção"
               onClick={() => { onClear(); setOpen(false) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: colors.fg.subtle }}
-            >
-              <X size={11} />
-            </button>
+              size="xs"
+            />
           )}
           <ChevronDown size={12} color={colors.fg.subtle} aria-hidden="true" />
         </div>

@@ -205,15 +205,11 @@ function NavFlatList({
 
 // ─── main component ───────────────────────────────────────────────────────────
 
-function computeOpenGroups(module: NavModule, activeItemId: string | null): Set<string> {
-  const next = new Set<string>()
-  module.groups?.forEach((g) => {
-    const matches = g.items.some(
-      (i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId)
-    )
-    if (matches) next.add(g.id)
-  })
-  return next
+function computeOpenGroup(module: NavModule, activeItemId: string | null): string | null {
+  const match = module.groups?.find((g) =>
+    g.items.some((i) => i.id === activeItemId || i.children?.some((c) => c.id === activeItemId))
+  )
+  return match?.id ?? null
 }
 
 interface SecondaryNavProps {
@@ -227,21 +223,18 @@ export default function SecondaryNav({
   activeItemId,
   onItemClick,
 }: SecondaryNavProps) {
-  const [openGroups, setOpenGroups] = useState<Set<string>>(() => computeOpenGroups(module, activeItemId))
+  const [openGroupId, setOpenGroupId] = useState<string | null>(() => computeOpenGroup(module, activeItemId))
 
-  // Recalcula apenas na troca de módulo — preserva grupos abertos manualmente
+  // Recalcula apenas na troca de módulo — preserva o grupo aberto manualmente
   // quando o usuário apenas seleciona outro item dentro do mesmo módulo.
   useEffect(() => {
-    setOpenGroups(computeOpenGroups(module, activeItemId))
+    setOpenGroupId(computeOpenGroup(module, activeItemId))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [module.id])
 
+  // Acordeão: abrir um grupo fecha qualquer outro que estivesse aberto.
   const toggleGroup = (id: string) => {
-    setOpenGroups((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+    setOpenGroupId((prev) => (prev === id ? null : id))
   }
 
   const { colors } = useTheme()
@@ -272,7 +265,7 @@ export default function SecondaryNav({
             <NavGroupSection
               key={group.id}
               group={group}
-              open={openGroups.has(group.id)}
+              open={openGroupId === group.id}
               activeItemId={activeItemId}
               onToggle={() => toggleGroup(group.id)}
               onItemClick={onItemClick}

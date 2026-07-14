@@ -56,9 +56,16 @@ function injectStyles() {
 function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: number) => void }) {
   injectStyles()
   const [exiting, setExiting] = useState(false)
+  const [paused, setPaused] = useState(false)
   const reduced = usePrefersReducedMotion()
   const { bg, Icon } = TYPE_CONFIG[toast.type]
   const duration = toast.duration ?? 4000
+  // Erros exigem dismiss manual — sem auto-close (WCAG 2.2.1/2.2.2).
+  const autoCloses = toast.type !== 'error'
+
+  const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const remainingRef = useRef(duration)
+  const startedAtRef = useRef(0)
 
   const dismiss = useCallback(() => {
     setExiting(true)
@@ -70,15 +77,51 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
     dismiss()
   }, [toast.action, dismiss])
 
+  const clearTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }, [])
+
+  const startTimer = useCallback((ms: number) => {
+    clearTimer()
+    startedAtRef.current = Date.now()
+    timerRef.current = setTimeout(dismiss, ms)
+  }, [clearTimer, dismiss])
+
+  // Agenda (ou reagenda) o auto-close quando duration muda; toasts de erro nunca agendam.
   useEffect(() => {
-    const timer = setTimeout(dismiss, duration)
-    return () => clearTimeout(timer)
-  }, [dismiss, duration])
+    if (!autoCloses) return
+    remainingRef.current = duration
+    startTimer(duration)
+    return clearTimer
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, autoCloses])
+
+  // Pausa/retoma o timer no hover/focus — dá tempo do usuário reagir (ex.: "Desfazer").
+  const handlePause = useCallback(() => {
+    if (!autoCloses || timerRef.current === null) return
+    clearTimer()
+    const elapsed = Date.now() - startedAtRef.current
+    remainingRef.current = Math.max(remainingRef.current - elapsed, 0)
+    setPaused(true)
+  }, [autoCloses, clearTimer])
+
+  const handleResume = useCallback(() => {
+    if (!autoCloses) return
+    setPaused(false)
+    startTimer(remainingRef.current)
+  }, [autoCloses, startTimer])
 
   return (
     <div
       role="status"
       aria-live="polite"
+      onMouseEnter={handlePause}
+      onMouseLeave={handleResume}
+      onFocus={handlePause}
+      onBlur={handleResume}
       style={{
         display:      'flex',
         flexDirection:'column',
@@ -105,6 +148,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
         {toast.action && (
           <button
             onClick={handleAction}
+            className="gb-focusable"
             style={{
               background:   'rgba(255,255,255,0.18)',
               border:       '1px solid rgba(255,255,255,0.3)',
@@ -126,6 +170,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
         <button
           onClick={dismiss}
           aria-label="Fechar notificação"
+          className="gb-focusable"
           style={{
             display:        'flex',
             alignItems:     'center',
@@ -145,15 +190,16 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
       </div>
 
       {/* Progress bar — only when action is present */}
-      {toast.action && !reduced && (
+      {toast.action && !reduced && autoCloses && (
         <div style={{ height: 3, background: 'rgba(255,255,255,0.2)', position: 'relative' }}>
           <div
             style={{
-              position:       'absolute',
-              inset:          0,
-              background:     'rgba(255,255,255,0.6)',
-              transformOrigin:'left center',
-              animation:      `gb-toast-progress ${duration}ms linear forwards`,
+              position:        'absolute',
+              inset:           0,
+              background:      'rgba(255,255,255,0.6)',
+              transformOrigin: 'left center',
+              animation:       `gb-toast-progress ${duration}ms linear forwards`,
+              animationPlayState: paused ? 'paused' : 'running',
             }}
           />
         </div>

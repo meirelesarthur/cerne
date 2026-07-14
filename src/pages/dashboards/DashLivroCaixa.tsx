@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
 
@@ -187,6 +186,8 @@ const LC_KPIS = [
 export default function DashLivroCaixa() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -210,14 +211,26 @@ export default function DashLivroCaixa() {
     return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
+  // Dados filtrados: período fatia os últimos N meses das séries mensais
+  const nMeses = Number(periodo)
+  const labels = monthLabels.slice(-nMeses)
+  const fluxoSeriesFiltrado = fluxoSeries.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+
   return (
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Livro Caixa</span>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '3',  label: 'Últimos 3 meses' },
+            { value: '6',  label: 'Últimos 6 meses' },
+            { value: '12', label: 'Últimos 12 meses' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
       <HDivider color={bc} />
 
@@ -256,8 +269,8 @@ export default function DashLivroCaixa() {
           </div>
         </div>
         <LineChart
-          series={fluxoSeries}
-          labels={monthLabels}
+          series={fluxoSeriesFiltrado}
+          labels={labels}
           height={220}
           yFormat={fluxoYFormat}
           area

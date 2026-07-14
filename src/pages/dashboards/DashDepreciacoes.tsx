@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -91,6 +90,8 @@ const DEP_KPIS = [
 export default function DashDepreciacoes() {
   const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('12')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600)
@@ -114,6 +115,11 @@ export default function DashDepreciacoes() {
     return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
+  // Dados filtrados: período fatia os últimos N meses da série empilhada
+  const nMeses = Number(periodo)
+  const stackedLabels = MONTHS_SHORT.slice(-nMeses)
+  const stackedSeries = STACKED_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+
   return (
     <div style={cardStyle}>
       {/* Header */}
@@ -121,9 +127,16 @@ export default function DashDepreciacoes() {
         <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
           Depreciações
         </span>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={12} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '3',  label: 'Últimos 3 meses' },
+            { value: '6',  label: 'Últimos 6 meses' },
+            { value: '12', label: 'Últimos 12 meses' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
       <HDivider color={bc} />
 
@@ -152,12 +165,12 @@ export default function DashDepreciacoes() {
       <div style={{ padding: t.space[5] }}>
         <div style={{ marginBottom: t.space[4] }}>
           <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
-            Depreciação por Categoria — 12 Meses
+            Depreciação por Categoria — {nMeses} Meses
           </div>
         </div>
         <StackedBarChart
-          series={STACKED_SERIES}
-          labels={MONTHS_SHORT}
+          series={stackedSeries}
+          labels={stackedLabels}
           height={210}
           yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
           showLegend

@@ -5,7 +5,6 @@ import {
   DollarSign,
   AlertCircle,
   BarChart2,
-  ChevronDown,
   Clock,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
@@ -13,7 +12,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
@@ -166,6 +165,8 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
 export default function DashFinanceiro() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -201,9 +202,12 @@ export default function DashFinanceiro() {
     { label: 'Inadimplência',    value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
   ]
 
+  // Dados filtrados: período fatia os últimos N meses das séries mensais
+  const nMeses = Number(periodo)
+  const chartLabels = monthLabels.slice(-nMeses)
   const lineSeries = [
-    { name: 'Receitas', data: revenueData, color: t.color.brand[600] },
-    { name: 'Despesas', data: expenseData, color: t.color.feedback.error.solid },
+    { name: 'Receitas', data: revenueData.slice(-nMeses), color: t.color.brand[600] },
+    { name: 'Despesas', data: expenseData.slice(-nMeses), color: t.color.feedback.error.solid },
   ]
 
   const yFormat = (v: number) =>
@@ -225,9 +229,16 @@ export default function DashFinanceiro() {
             Financeiro
           </span>
         </div>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-          Últimos 12 meses
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '3',  label: 'Últimos 3 meses' },
+            { value: '6',  label: 'Últimos 6 meses' },
+            { value: '12', label: 'Últimos 12 meses' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
 
       <HDivider color={bc} />
@@ -275,7 +286,7 @@ export default function DashFinanceiro() {
           </div>
           <LineChart
             series={lineSeries}
-            labels={monthLabels}
+            labels={chartLabels}
             height={200}
             yFormat={yFormat}
             area

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
@@ -132,6 +131,8 @@ const ATIVOS_KPIS = [
 export default function DashAtivos() {
   const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('12')
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
@@ -155,14 +156,26 @@ export default function DashAtivos() {
     return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
+  // Dados filtrados: período fatia os últimos N meses da série de manutenções
+  const nMeses = Number(periodo)
+  const manutLabels = MANUT_LABELS.slice(-nMeses)
+  const manutSeries = MANUT_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+
   return (
     <div style={cardStyle}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Ativos</span>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '3',  label: 'Últimos 3 meses' },
+            { value: '6',  label: 'Últimos 6 meses' },
+            { value: '12', label: 'Últimos 12 meses' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
       <HDivider color={bc} />
 
@@ -202,8 +215,8 @@ export default function DashAtivos() {
       <div style={{ padding: t.space[5] }}>
         <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
         <GroupedBarChart
-          series={MANUT_SERIES}
-          labels={MANUT_LABELS}
+          series={manutSeries}
+          labels={manutLabels}
           height={200}
           showLegend
         />

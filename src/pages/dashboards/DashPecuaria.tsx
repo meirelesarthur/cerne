@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
@@ -55,6 +54,8 @@ const PEC_KPIS = [
 export default function DashPecuaria() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -78,6 +79,12 @@ export default function DashPecuaria() {
     return <div style={cardStyle}><Skeleton height={600} /></div>
   }
 
+  // Dados filtrados: período fatia os últimos N meses das séries mensais
+  const nMeses = Number(periodo)
+  const labels = monthLabels.slice(-nMeses)
+  const rebanhoSeries = REBANHO_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+  const manejosSeries = MANEJOS_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+
   return (
     <div style={cardStyle}>
       {/* Header */}
@@ -85,9 +92,16 @@ export default function DashPecuaria() {
         <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>
           Pecuária de Corte
         </span>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={12} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '3',  label: 'Últimos 3 meses' },
+            { value: '6',  label: 'Últimos 6 meses' },
+            { value: '12', label: 'Últimos 12 meses' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
       <HDivider color={bc} />
 
@@ -117,8 +131,8 @@ export default function DashPecuaria() {
             Evolução do Rebanho
           </div>
           <LineChart
-            series={REBANHO_SERIES}
-            labels={monthLabels}
+            series={rebanhoSeries}
+            labels={labels}
             height={240}
             area
             showLegend
@@ -148,8 +162,8 @@ export default function DashPecuaria() {
           Manejos por Mês
         </div>
         <GroupedBarChart
-          series={MANEJOS_SERIES}
-          labels={monthLabels}
+          series={manejosSeries}
+          labels={labels}
           height={220}
           showLegend
         />

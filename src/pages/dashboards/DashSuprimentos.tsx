@@ -5,7 +5,6 @@ import {
   ShoppingCart,
   PackageCheck,
   BarChart2,
-  ChevronDown,
   Users,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
@@ -13,7 +12,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 
@@ -88,11 +87,12 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 
 // ─── Fornecedores List ────────────────────────────────────────────────────────
 
-function FornecedoresList({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
+function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean; categoria: string }) {
   const [hovIdx, setHovIdx] = useState<number | null>(null)
+  const visiveis = fornecedores.filter((f) => categoria === 'todas' || f.categoria === categoria)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
-      {fornecedores.map((f, i) => {
+      {visiveis.map((f, i) => {
         const bs = badgeStyle[f.badge]
         return (
           <div key={i}
@@ -140,6 +140,8 @@ function FornecedoresList({ colors, isGbMode }: { colors: ReturnType<typeof useT
 export default function DashSuprimentos() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [categoria, setCategoria] = useState('todas')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -189,9 +191,15 @@ export default function DashSuprimentos() {
             Suprimentos
           </span>
         </div>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por categoria"
+          options={[
+            { value: 'todas', label: 'Todas as categorias' },
+            ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+          ]}
+          value={categoria}
+          onChange={setCategoria}
+        />
       </div>
 
       <HDivider color={bc} />
@@ -277,7 +285,9 @@ export default function DashSuprimentos() {
             </span>
           </div>
           <BarChart
-            data={categoriaData.map((c) => ({ label: c.label, value: c.value }))}
+            data={categoriaData
+              .filter((c) => categoria === 'todas' || c.label === categoria)
+              .map((c) => ({ label: c.label, value: c.value }))}
             horizontal
             height={240}
             yFormat={(v) => `R$ ${(v / 1000).toFixed(0)}K`}
@@ -293,7 +303,7 @@ export default function DashSuprimentos() {
               Top Fornecedores
             </span>
           </div>
-          <FornecedoresList colors={colors} isGbMode={isGbMode} />
+          <FornecedoresList colors={colors} isGbMode={isGbMode} categoria={categoria} />
         </div>
 
       </div>

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { LineChart } from '../../components/ui/LineChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
@@ -112,6 +111,8 @@ const USR_KPIS = [
 export default function DashUsuarios() {
   const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('30')
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
@@ -140,9 +141,16 @@ export default function DashUsuarios() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
         <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string }}>Análise de Usuários</span>
-        <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-          Últimos 30 dias
-        </Button>
+        <FilterSelect
+          ariaLabel="Filtrar por período"
+          options={[
+            { value: '7',  label: 'Últimos 7 dias' },
+            { value: '15', label: 'Últimos 15 dias' },
+            { value: '30', label: 'Últimos 30 dias' },
+          ]}
+          value={periodo}
+          onChange={setPeriodo}
+        />
       </div>
       <HDivider color={bc} />
 
@@ -166,8 +174,8 @@ export default function DashUsuarios() {
         <div style={{ flex: 2, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Acessos Diários</div>
           <LineChart
-            series={[{ name: 'Sessões', data: DAILY_VALUES, color: t.color.brand[600] }]}
-            labels={DAILY_LABELS}
+            series={[{ name: 'Sessões', data: DAILY_VALUES.slice(-Number(periodo)), color: t.color.brand[600] }]}
+            labels={DAILY_LABELS.slice(-Number(periodo))}
             height={220}
             area
             showLegend={false}

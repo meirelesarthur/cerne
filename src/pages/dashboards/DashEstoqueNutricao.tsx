@@ -8,7 +8,6 @@
 import { useEffect, useState } from 'react'
 import {
   Package,
-  ChevronDown,
   BarChart2,
   TrendingDown,
   Activity,
@@ -17,7 +16,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -109,6 +108,10 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 export default function DashEstoqueNutricao() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('60')
+  const [produto, setProduto] = useState('todos')
+  const [armazem, setArmazem] = useState('todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -198,15 +201,33 @@ export default function DashEstoqueNutricao() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Últimos 60 dias
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todos os Produtos
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todos os Armazéns
-          </Button>
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '30', label: 'Últimos 30 dias' },
+              { value: '60', label: 'Últimos 60 dias' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por produto"
+            options={[
+              { value: 'todos', label: 'Todos os Produtos' },
+              ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
+            ]}
+            value={produto}
+            onChange={setProduto}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por armazém"
+            options={[
+              { value: 'todos', label: 'Todos os Armazéns' },
+              ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
+            ]}
+            value={armazem}
+            onChange={setArmazem}
+          />
         </div>
       </div>
 
@@ -258,7 +279,7 @@ export default function DashEstoqueNutricao() {
             </span>
           </div>
           <BarChart
-            data={mockSaldoArmazem}
+            data={mockSaldoArmazem.filter((a) => armazem === 'todos' || a.label === armazem)}
             height={240}
             yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
           />
@@ -275,8 +296,8 @@ export default function DashEstoqueNutricao() {
             </span>
           </div>
           <LineChart
-            series={mockConsumoSeries}
-            labels={mockConsumoLabels}
+            series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
+            labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
             height={240}
             area
             showLegend
@@ -297,7 +318,7 @@ export default function DashEstoqueNutricao() {
           </span>
         </div>
         <BarChart
-          data={mockCoberturaProdutos}
+          data={mockCoberturaProdutos.filter((p) => produto === 'todos' || p.label === produto)}
           height={260}
           horizontal
           yFormat={(v) => `${Math.round(v)}d`}

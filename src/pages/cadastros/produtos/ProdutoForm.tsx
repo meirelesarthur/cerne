@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }      from '../../../components/ui/PageContainer'
 import { PageCard }           from '../../../components/ui/PageCard'
@@ -8,6 +8,8 @@ import { FormField }          from '../../../components/ui/FormField'
 import { FormSelect }         from '../../../components/ui/FormSelect'
 import { ToggleSwitch }       from '../../../components/ui/ToggleSwitch'
 import { CollapsibleSection } from '../../../components/ui/CollapsibleSection'
+import { ConfirmDialog }      from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }                  from '../../../design/tokens'
 import { useTheme }           from '../../../context/ThemeContext'
 import {
@@ -113,6 +115,20 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
   })
   const [submitting, setSubmitting] = useState(false)
 
+  const guard = useUnsavedChangesGuard(onBack)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    guard.setIsDirty(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    descricao, ncm, tipo, grupoId, categoriaId, classeId, variedadeId,
+    unidadePrimaria, unidadeSecundaria, fatorConversao, controlaEstoque,
+    estoqueMinimo, controlaLote, controlaQualidade, valorReferencia,
+    catFinanceiraId, ativo, apontamento, adicionaInventario, emitirNFe,
+    principioAtivo,
+  ])
+
   // ── Opções em cascata ────────────────────────────────────────────────────────
   const categoriaOpts = useMemo(() => CATEGORIAS.filter(c => !grupoId || c.grupoId === Number(grupoId)), [grupoId])
   const classeOpts    = useMemo(() => CLASSES.filter(c    => !categoriaId || c.categoriaId === Number(categoriaId)), [categoriaId])
@@ -205,7 +221,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
+            <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>Cancelar</Button>
             <Button
               variant="primary"
               icon={<Save size={13} />}
@@ -223,7 +239,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
         <FormPageHeader
           title={isEdit ? 'Editar Produto' : 'Novo Produto'}
           subtitle={isEdit ? `Editando: ${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -470,6 +486,17 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
         </div>
 
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
     </PageContainer>
   )
 }

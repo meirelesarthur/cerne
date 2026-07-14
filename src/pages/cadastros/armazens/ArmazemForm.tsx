@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
@@ -7,6 +7,8 @@ import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { ToggleSwitch }  from '../../../components/ui/ToggleSwitch'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import {
@@ -58,6 +60,14 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
   const [touched,    setTouched]    = useState({ sigla: false, descricao: false, tipo: false })
   const [submitting, setSubmitting] = useState(false)
 
+  const guard = useUnsavedChangesGuard(onBack)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    guard.setIsDirty(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sigla, descricao, tipo, ativo])
+
   const errSigla     = touched.sigla     ? validateSigla(sigla, existingArmazens, initialData?.id)  : undefined
   const errDescricao = touched.descricao ? validateDescricao(descricao) : undefined
   const errTipo      = touched.tipo      ? validateTipo(tipo)           : undefined
@@ -90,7 +100,7 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} disabled={submitting}>Cancelar</Button>
+            <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>Cancelar</Button>
             <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
               Salvar
             </Button>
@@ -102,7 +112,7 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
         <FormPageHeader
           title={isEdit ? 'Editar Armazém' : 'Novo Armazém'}
           subtitle={isEdit ? `Editando: ${initialData!.sigla} — ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -168,6 +178,17 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
         </div>
 
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
     </PageContainer>
   )
 }

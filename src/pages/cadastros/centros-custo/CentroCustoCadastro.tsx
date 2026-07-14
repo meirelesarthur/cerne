@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft, Save, ChevronDown } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
@@ -7,6 +7,8 @@ import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
 import { Checkbox }      from '../../../components/ui/Checkbox'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
@@ -68,7 +70,15 @@ export default function CentroCustoCadastro({
   )
 
   const [errors, setErrors]   = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
   const { toasts, show, dismiss } = useToast()
+  const guard = useUnsavedChangesGuard(onBack)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    guard.setIsDirty(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form])
 
   const set = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -100,6 +110,7 @@ export default function CentroCustoCadastro({
 
   // ── Salvar ────────────────────────────────────────────────────────────────
   const handleSave = () => {
+    if (submitting) return
     if (!validate()) return
     const cc: CentroCusto = {
       id:           initialData?.id ?? 0,
@@ -112,8 +123,12 @@ export default function CentroCustoCadastro({
       antecessorId: form.antecessorId,
       categorias:   form.categorias,
     }
-    show(isEdit ? 'Centro atualizado com sucesso!' : 'Centro cadastrado com sucesso!')
-    setTimeout(() => onSave(cc), 800)
+    setSubmitting(true)
+    setTimeout(() => {
+      onSave(cc)
+      show(isEdit ? 'Centro atualizado com sucesso!' : 'Centro cadastrado com sucesso!')
+      setSubmitting(false)
+    }, 800)
   }
 
   return (
@@ -123,10 +138,10 @@ export default function CentroCustoCadastro({
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
               Cancelar
             </Button>
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
+            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
               {isEdit ? 'Salvar alterações' : 'Cadastrar Centro'}
             </Button>
           </>
@@ -137,7 +152,7 @@ export default function CentroCustoCadastro({
           <FormPageHeader
             title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
             subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
-            onBack={onBack}
+            onBack={guard.guardedBack}
             paddingTop={t.space[4]}
           />
 
@@ -230,6 +245,17 @@ export default function CentroCustoCadastro({
           </div>
 
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>

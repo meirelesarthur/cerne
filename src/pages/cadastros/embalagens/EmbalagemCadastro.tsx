@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Save } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
@@ -6,6 +6,8 @@ import { Button }         from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }             from '../../../design/tokens'
 import { UNIDADE_OPTS, type Embalagem, type UnidadeMedida } from './embalagens.types'
 
@@ -55,6 +57,14 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
   const [touched,    setTouched]    = useState({ descricao: false, qtd: false, unidade: false })
   const [submitting, setSubmitting] = useState(false)
 
+  const guard = useUnsavedChangesGuard(onBack)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    guard.setIsDirty(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [descricao, qtdRaw, unidade])
+
   const errDescricao = touched.descricao ? validateDescricao(descricao) : undefined
   const errQtd       = touched.qtd       ? validateQuantidade(qtdRaw)    : undefined
   const errUnidade   = touched.unidade   ? validateUnidade(unidade)      : undefined
@@ -88,7 +98,7 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} disabled={submitting}>
+            <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>
               Cancelar
             </Button>
             <Button
@@ -108,7 +118,7 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
         <FormPageHeader
           title={isEdit ? 'Editar Embalagem' : 'Nova Embalagem'}
           subtitle={isEdit ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -165,6 +175,17 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
         </div>
 
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
     </PageContainer>
   )
 }

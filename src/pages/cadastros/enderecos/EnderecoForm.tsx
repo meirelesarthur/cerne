@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Save, MapPin } from 'lucide-react'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormField }     from '../../../components/ui/FormField'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import {
@@ -39,6 +41,14 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
   const [touched,    setTouched]    = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
+  const guard = useUnsavedChangesGuard(onBack)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    guard.setIsDirty(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [descricao])
+
   const errDescricao = touched ? validateDescricao(descricao) : undefined
   const isValid = !validateDescricao(descricao)
 
@@ -72,7 +82,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} disabled={submitting}>
+            <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>
               Cancelar
             </Button>
             <Button
@@ -92,7 +102,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
         <FormPageHeader
           title={title}
           subtitle={mode === 'edit' ? `Editando: ${initialData!.descricao}` : 'Preencha os campos abaixo para cadastrar.'}
-          onBack={onBack}
+          onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />
 
@@ -157,6 +167,17 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
         </div>
 
       </PageCard>
+
+      <ConfirmDialog
+        open={guard.showExitModal}
+        title="Alterações não salvas"
+        message="Você tem alterações não salvas. Deseja sair sem salvar?"
+        tone="destructive"
+        confirmLabel="Sair sem salvar"
+        cancelLabel="Ficar"
+        onConfirm={guard.confirmExit}
+        onCancel={guard.cancelExit}
+      />
     </PageContainer>
   )
 }

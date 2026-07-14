@@ -27,7 +27,7 @@ export function Breadcrumb({ items, label = 'Trilha de navegação' }: Breadcrum
       style={{
         display:    'flex',
         alignItems: 'center',
-        gap:        t.space[1] / 2,
+        gap:        t.space[3],
         fontFamily: t.font.family.sans,
         fontSize:   t.font.size.sm,
       }}

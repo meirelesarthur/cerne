@@ -30,17 +30,19 @@ Regras vigentes em toda a esteira:
 | 0.5 | ✅ | **Checkout de planos (mock)** — Modal de confirmação + toast; trial com feedback; add-ons com toggle; "Saiba mais" desabilitado | `PlanosPage.tsx` |
 | 0.6 | ✅ | **Filtros de dashboard funcionais (mock)** — novo `ui/FilterSelect` (listbox acessível, temático) filtrando os mocks nos 13 dashboards | `ui/FilterSelect.tsx` + 13 `Dash*.tsx`/`OverviewPanel.tsx` |
 
-## Fase 1 — Graves no UI Kit (Sev. 3 · propagam para todo o sistema)
+## Fase 1 — Graves no UI Kit (Sev. 3 · propagam para todo o sistema) ✅ concluída
 
 | # | Status | Entrega | Arquivos |
 |---|--------|---------|----------|
-| 1.1 | ☐ | **Contraste Badge/Tag ≥ 4.5:1** — escurecer tokens de texto (warning/success/cyan/danger/neutral) + export DTCG | `tokens.ts`, `Badge.tsx`, `Tag.tsx`, `tokens/tokens.json` |
-| 1.2 | ☐ | **Checkbox com useTheme** — remover hardcodes de light mode, suportar GBMode | `Checkbox.tsx` |
-| 1.3 | ☐ | **Foco visível** — `.gb-focusable` em DropdownMenu, Tabs, SortHeader, Toast, TableToolbar, BulkActionBar, CollapsibleSection, SearchSelect | 8 componentes |
-| 1.4 | ☐ | **Navegação por setas** — DropdownMenu (APG menu) e Tabs (roving tabindex) | `DropdownMenu.tsx`, `Tabs.tsx` |
-| 1.5 | ☐ | **SearchSelect** — `tabIndex={-1}` nas opções do listbox | `SearchSelect.tsx` |
-| 1.6 | ☐ | **Toast** — pausa no hover/focus; tipo `error` sem auto-dismiss | `Toast.tsx` |
-| 1.7 | ☐ | **Stepper** — passos concluídos como `<button>` (teclado) + transitions com propriedades nomeadas | `Stepper.tsx` |
+| 1.1 | ✅ | **Contraste Badge/Tag ≥ 4.5:1** — escurecer tokens de texto (warning/success/cyan/danger/neutral) + export DTCG | `tokens.ts`, `Badge.tsx`, `tokens/tokens.json` |
+| 1.2 | ✅ | **Checkbox com useTheme** — remover hardcodes de light mode, suportar GBMode | `Checkbox.tsx` |
+| 1.3 | ✅ | **Foco visível** — `.gb-focusable` em DropdownMenu, Tabs, SortHeader, Toast, TableToolbar, BulkActionBar, CollapsibleSection, SearchSelect | 8 componentes |
+| 1.4 | ✅ | **Navegação por setas** — DropdownMenu (APG menu, foco no 1º item ao abrir) e Tabs (roving tabindex) | `DropdownMenu.tsx`, `Tabs.tsx` |
+| 1.5 | ✅ | **SearchSelect** — `tabIndex={-1}` nas opções do listbox | `SearchSelect.tsx` |
+| 1.6 | ✅ | **Toast** — pausa no hover/focus; tipo `error` sem auto-dismiss | `Toast.tsx` |
+| 1.7 | ✅ | **Stepper** — passos concluídos como `<button>` (teclado) + transitions com propriedades nomeadas | `Stepper.tsx` |
+
+> Achado extra (fora do escopo original, sinalizado por um subagente): `ProdutosLista.tsx` e `ArmazensLista.tsx` têm a mesma combinação reprovada `neutral[100]`/`neutral[500]` hardcoded fora do componente `Badge` — candidato a lote da Fase 3.
 
 ## Fase 2 — Graves nas telas (Sev. 3)
 

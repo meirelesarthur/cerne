@@ -23,12 +23,12 @@ Regras vigentes em toda a esteira:
 
 | # | Status | Entrega | Arquivos |
 |---|--------|---------|----------|
-| 0.1 | ☐ | **Logout funcional** — menu de conta no avatar do Topbar (`DropdownMenu` do kit) com "Sair" → limpa estado de auth e volta ao Login | `Topbar.tsx`, `AppLayout.tsx`, `App.tsx` |
-| 0.2 | ☐ | **Editar Fazenda com dados reais** — `FazendaCadastro` aceita `fazenda?`, popula `formData` (padrão de `PessoaForm`), título "Editar Fazenda" | `FazendaCadastro.tsx`, `FazendasPage.tsx` |
-| 0.3 | ☐ | **Detalhe da fazenda correta** — lookup por `selectedId` em `FazendasPage`; mock vira fallback de "não encontrado" | `FazendasPage.tsx`, `FazendaDetalhe.tsx` |
-| 0.4 | ☐ | **WeekCanvas acessível** — tiles com `role="button"`, `tabIndex`, `aria-label`, Enter/Espaço pinta, setas navegam; drag-paint em touch | `WeekCanvas.tsx` |
-| 0.5 | ☐ | **Checkout de planos (mock)** — "Comprar"/"Testar grátis" com modal de confirmação + toast; add-ons com toggle mock; "Saiba mais" desabilitado | `PlanosPage.tsx` |
-| 0.6 | ☐ | **Filtros de dashboard funcionais (mock)** — componente único de filtro em `ui/` que filtra os arrays mock; aplicado nos 13 dashboards | novo `ui/DashboardFilterBar.tsx` + `Dash*.tsx` |
+| 0.1 | ✅ | **Logout funcional** — menu de conta no avatar do Topbar (`DropdownMenu` do kit) com "Sair" → limpa estado de auth e volta ao Login | `Topbar.tsx`, `AppLayout.tsx`, `App.tsx` |
+| 0.2 | ✅ | **Editar Fazenda com dados reais** — `FazendaCadastro` aceita `fazenda?`, popula `formData` via `detalheToForm`, título "Editar Fazenda" | `FazendaCadastro.tsx`, `FazendasPage.tsx` |
+| 0.3 | ✅ | **Detalhe da fazenda correta** — `getFazendaDetalhe(id)` resolve pelo id; mock só como base de derivação | `FazendasPage.tsx`, `FazendaDetalhe.tsx`, `fazendas.mock.ts` |
+| 0.4 | ✅ | **WeekCanvas acessível** — tiles com `role="button"`, `tabIndex`, `aria-label`, Enter/Espaço pinta, setas navegam; drag-paint em touch | `WeekCanvas.tsx` |
+| 0.5 | ✅ | **Checkout de planos (mock)** — Modal de confirmação + toast; trial com feedback; add-ons com toggle; "Saiba mais" desabilitado | `PlanosPage.tsx` |
+| 0.6 | ✅ | **Filtros de dashboard funcionais (mock)** — novo `ui/FilterSelect` (listbox acessível, temático) filtrando os mocks nos 13 dashboards | `ui/FilterSelect.tsx` + 13 `Dash*.tsx`/`OverviewPanel.tsx` |
 
 ## Fase 1 — Graves no UI Kit (Sev. 3 · propagam para todo o sistema)
 

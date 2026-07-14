@@ -76,9 +76,14 @@ export function HeatmapChart({
             return (
               <div
                 key={ci}
+                tabIndex={0}
                 onMouseEnter={() => setHov([ri, ci])}
                 onMouseLeave={() => setHov(null)}
+                onFocus={() => setHov([ri, ci])}
+                onBlur={() => setHov(null)}
                 title={`${rowLabels[ri]} ${colLabels[ci]}: ${val}`}
+                aria-label={`${rowLabels[ri]}, ${colLabels[ci]}: ${val}`}
+                className="gb-focusable"
                 style={{
                   ...cellBase,
                   background: intensity === 0

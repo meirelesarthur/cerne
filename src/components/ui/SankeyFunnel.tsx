@@ -80,8 +80,14 @@ export function SankeyFunnel({
         return (
           <g
             key={i}
+            tabIndex={0}
+            role="button"
+            aria-label={`${stage.label}: ${stage.value}`}
+            className="gb-focusable"
             onMouseEnter={() => setHovIdx(i)}
             onMouseLeave={() => setHovIdx(null)}
+            onFocus={() => setHovIdx(i)}
+            onBlur={() => setHovIdx(null)}
             style={{ cursor: 'pointer' }}
           >
             <rect

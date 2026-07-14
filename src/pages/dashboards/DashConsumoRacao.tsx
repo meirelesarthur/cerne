@@ -5,13 +5,12 @@
 // - Revisar transação/rollback (atomicidade) nas operações de batida
 // - Centralizar conversão de UM (factor_type) e recálculo de custo médio (CalcAverageCostAction)
 // - Definir "consumo médio" canônico (Kg/animal/dia) e tratar animals_count = 0 sem fallback silencioso
-// - Filtros de Período, Formulação e Lote devem chamar endpoint filtrado (hoje apenas visuais/mock)
+// - Filtros de Período, Formulação e Lote devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
 
 import { useEffect, useState } from 'react'
 import {
   Wheat,
-  ChevronDown,
   TrendingUp,
   PieChart,
   BarChart2,
@@ -20,7 +19,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { Button } from '../../components/ui/Button'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
@@ -96,6 +95,10 @@ function Trend({ value, up }: { value: string; up: boolean }) {
 export default function DashConsumoRacao() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
+  const [periodo, setPeriodo] = useState('60')
+  const [formulacao, setFormulacao] = useState('todas')
+  const [lote, setLote] = useState('todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -124,16 +127,25 @@ export default function DashConsumoRacao() {
     )
   }
 
+  // ── Dados filtrados (período fatia as semanas; lote/formulação filtram séries)
+  const weekCount = periodo === '30' ? 4 : 8
+  const weekLabels = mockWeekLabels.slice(-weekCount)
+  const consumoSeries = mockConsumoSeries
+    .filter((s) => lote === 'todos' || s.name === lote)
+    .map((s) => ({ ...s, data: s.data.slice(-weekCount) }))
+  const custoBatidaData = mockCustoBatidaData
+    .filter((f) => formulacao === 'todas' || f.label === formulacao)
+
   // ── KPIs derivados dos mocks ──────────────────────────────────────────────
   // Ração Produzida: última semana em kg (série de 8 semanas, unidade 100 kg → kg)
   const racaoProduzidaKg = kpiSparklines.racaoProduzida[kpiSparklines.racaoProduzida.length - 1]
   // Ração Distribuída: última semana
   const racaoDistribuidaKg = kpiSparklines.racaoDistribuida[kpiSparklines.racaoDistribuida.length - 1]
-  // Consumo médio: média dos últimos valores de cada lote (Kg/animal/dia)
-  const consumoMedioLotes = mockConsumoSeries.map(s => s.data[s.data.length - 1])
-  const consumoMedio = consumoMedioLotes.reduce((a, b) => a + b, 0) / consumoMedioLotes.length
-  // Custo médio da batida: média das formulações
-  const custoMedioBatida = mockCustoBatidaData.reduce((a, d) => a + d.value, 0) / mockCustoBatidaData.length
+  // Consumo médio: média dos últimos valores de cada lote filtrado (Kg/animal/dia)
+  const consumoMedioLotes = consumoSeries.map(s => s.data[s.data.length - 1])
+  const consumoMedio = consumoMedioLotes.reduce((a, b) => a + b, 0) / Math.max(consumoMedioLotes.length, 1)
+  // Custo médio da batida: média das formulações filtradas
+  const custoMedioBatida = custoBatidaData.reduce((a, d) => a + d.value, 0) / Math.max(custoBatidaData.length, 1)
 
   const kpis = [
     {
@@ -192,15 +204,33 @@ export default function DashConsumoRacao() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Últimos 60 dias
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todas as formulações
-          </Button>
-          <Button variant="secondary" size="sm" iconRight={<ChevronDown size={11} />}>
-            Todos os lotes
-          </Button>
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '30', label: 'Últimos 30 dias' },
+              { value: '60', label: 'Últimos 60 dias' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por formulação"
+            options={[
+              { value: 'todas', label: 'Todas as formulações' },
+              ...mockCustoBatidaData.map((f) => ({ value: f.label, label: f.label })),
+            ]}
+            value={formulacao}
+            onChange={setFormulacao}
+          />
+          <FilterSelect
+            ariaLabel="Filtrar por lote"
+            options={[
+              { value: 'todos', label: 'Todos os lotes' },
+              ...mockConsumoSeries.map((s) => ({ value: s.name, label: s.name })),
+            ]}
+            value={lote}
+            onChange={setLote}
+          />
         </div>
       </div>
 
@@ -249,8 +279,8 @@ export default function DashConsumoRacao() {
           </span>
         </div>
         <LineChart
-          series={mockConsumoSeries}
-          labels={mockWeekLabels}
+          series={consumoSeries}
+          labels={weekLabels}
           height={220}
           area
           showLegend
@@ -272,7 +302,7 @@ export default function DashConsumoRacao() {
             </span>
           </div>
           <BarChart
-            data={mockCustoBatidaData}
+            data={custoBatidaData}
             height={260}
             yFormat={(v) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           />

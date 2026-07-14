@@ -34,7 +34,10 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
 
         return (
           <React.Fragment key={step.id}>
-            <div
+            <button
+              type="button"
+              disabled={!isClickable}
+              className={isClickable ? 'gb-focusable' : undefined}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -42,6 +45,12 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                 gap: t.space[2],
                 flex: '0 0 auto',
                 cursor: isClickable ? 'pointer' : 'default',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                margin: 0,
+                font: 'inherit',
+                color: 'inherit',
               }}
               onClick={() => isClickable && onStepClick(step.id)}
             >
@@ -57,7 +66,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                     : isActive
                     ? `2px solid ${t.color.brand[600]}`
                     : `1.5px solid ${colors.border.default}`,
-                  transition: t.transition.smooth,
+                  transition: `background ${t.transition.smooth}, border-color ${t.transition.smooth}`,
                   boxSizing: 'border-box',
                 }}
               />
@@ -73,7 +82,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
               >
                 {step.label}
               </span>
-            </div>
+            </button>
 
             {index < steps.length - 1 && (
               <div
@@ -82,7 +91,7 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   height: 1.5,
                   marginBottom: 19,
                   background: isCompleted ? t.color.brand[600] : colors.border.default,
-                  transition: t.transition.smooth,
+                  transition: `background ${t.transition.smooth}`,
                 }}
               />
             )}

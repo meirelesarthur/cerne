@@ -104,19 +104,22 @@ const feedback = {
   success: {
     bg:     primitive.brand[50],
     border: primitive.brand[200],
-    text:   primitive.brand[600],
+    /** brand[700] — brand[600] media 3.60:1 contra bg (reprovado AA); 700 = 5.24:1 */
+    text:   primitive.brand[700],
     solid:  primitive.brand[600],
   },
   error: {
     bg:     primitive.red[100],
     border: primitive.red[300],
-    text:   primitive.red[600],
+    /** red[700] — red[600] media 3.95:1 contra bg (reprovado AA); 700 = 5.30:1 */
+    text:   primitive.red[700],
     solid:  primitive.red[600],
   },
   warning: {
     bg:     primitive.amber[50],
     border: primitive.amber[200],
-    text:   primitive.amber[600],
+    /** amber[700] — amber[600] media 3.07:1 contra bg (reprovado AA); 700 = 4.84:1 */
+    text:   primitive.amber[700],
     solid:  primitive.amber[500],
   },
   info: {
@@ -132,7 +135,8 @@ const feedback = {
 /** Acentos auxiliares para Badge/Tag (variantes não-semânticas) */
 const accent = {
   purple: { bg: '#f5f3ff', text: '#7c3aed' },
-  cyan:   { bg: '#ecfeff', text: '#0891b2' },
+  /** #0e7490 (cyan-700) — #0891b2 media 3.54:1 contra bg (reprovado AA); 700 = 5.15:1 */
+  cyan:   { bg: '#ecfeff', text: '#0e7490' },
 }
 
 /** Estados de controle e de linha de tabela */

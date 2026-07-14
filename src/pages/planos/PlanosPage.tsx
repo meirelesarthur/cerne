@@ -15,6 +15,8 @@ import { ToggleSwitch } from '../../components/ui/ToggleSwitch'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { Tabs, type TabItem } from '../../components/ui/Tabs'
+import { Modal } from '../../components/ui/Modal'
+import { useToast, ToastContainer } from '../../components/ui/Toast'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import {
@@ -88,19 +90,48 @@ export default function PlanosPage() {
   const [anual, setAnual] = useState(true)
   const [loading, setLoading] = useState(true)
   const [comprando, setComprando] = useState<PlanoId | null>(null)
+  const [confirmandoId, setConfirmandoId] = useState<PlanoId | null>(null)
   const [detalheId, setDetalheId] = useState<PlanoId | null>(null)
+  const { toasts, show, dismiss } = useToast()
 
   useEffect(() => {
     const timerId = window.setTimeout(() => setLoading(false), 450)
     return () => window.clearTimeout(timerId)
   }, [])
 
+  // Contratação simulada — abre modal de confirmação; a efetivação real
+  // acontecerá via API de billing quando houver backend.
   const handleComprar = (planoId: PlanoId) => {
-    setComprando(planoId)
-    window.setTimeout(() => setComprando(null), 1600)
+    const plano = planoPorId(planoId)
+    if (plano.precoUsuarioMesAnual === null) {
+      // Sem preço tabelado (Enterprise): registra o contato comercial
+      show('Solicitação enviada. Nossa equipe comercial entrará em contato em até 1 dia útil.', 'success')
+      return
+    }
+    setConfirmandoId(planoId)
+  }
+
+  const handleConfirmarCompra = () => {
+    if (!confirmandoId) return
+    const plano = planoPorId(confirmandoId)
+    setComprando(confirmandoId)
+    window.setTimeout(() => {
+      setComprando(null)
+      setConfirmandoId(null)
+      show(`Plano ${plano.nome} contratado para ${nUsuarios} usuário${nUsuarios === 1 ? '' : 's'}. Você receberá a confirmação por e-mail.`, 'success')
+    }, 1200)
+  }
+
+  const handleTrial = (planoId: PlanoId) => {
+    const plano = planoPorId(planoId)
+    show(`Período de teste de ${plano.trialDias} dias do plano ${plano.nome} ativado.`, 'success')
   }
 
   const planoDetalhe = detalheId ? planoPorId(detalheId) : null
+  const planoConfirmando = confirmandoId ? planoPorId(confirmandoId) : null
+  const precoConfirmando = planoConfirmando
+    ? (anual ? planoConfirmando.precoUsuarioMesAnual : planoConfirmando.precoUsuarioMesMensal)
+    : null
 
   return (
     <PageContainer>
@@ -117,6 +148,7 @@ export default function PlanosPage() {
           isGbMode={isGbMode}
           comprando={comprando === planoDetalhe.id}
           onComprar={() => handleComprar(planoDetalhe.id)}
+          onTrial={() => handleTrial(planoDetalhe.id)}
           onVoltar={() => setDetalheId(null)}
         />
       ) : (
@@ -156,6 +188,7 @@ export default function PlanosPage() {
                     atual={plano.id === PLANO_ATUAL_ID}
                     comprando={comprando === plano.id}
                     onComprar={() => handleComprar(plano.id)}
+                    onTrial={() => handleTrial(plano.id)}
                     onVerDetalhes={() => setDetalheId(plano.id)}
                   />
                 ))}
@@ -185,7 +218,66 @@ export default function PlanosPage() {
           </div>
         </>
       )}
+
+      {/* Modal de confirmação de contratação (simulação — sem cobrança real) */}
+      <Modal
+        open={planoConfirmando !== null}
+        onClose={() => { if (!comprando) setConfirmandoId(null) }}
+        title={planoConfirmando ? `Contratar plano ${planoConfirmando.nome}` : ''}
+        subtitle="Revise os detalhes antes de confirmar"
+        size="sm"
+        footer={
+          <div style={{ display: 'flex', gap: t.space[2], justifyContent: 'flex-end' }}>
+            <Button variant="ghost" onClick={() => setConfirmandoId(null)} disabled={comprando !== null}>
+              Cancelar
+            </Button>
+            <Button variant="primary" loading={comprando !== null} onClick={handleConfirmarCompra}>
+              Confirmar contratação
+            </Button>
+          </div>
+        }
+      >
+        {planoConfirmando && precoConfirmando !== null && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], fontFamily: t.font.family.sans }}>
+            <ResumoLinha label="Plano" value={planoConfirmando.nome} colors={colors} />
+            <ResumoLinha label="Usuários" value={String(nUsuarios)} colors={colors} />
+            <ResumoLinha label="Cobrança" value={anual ? 'Anual' : 'Mensal'} colors={colors} />
+            <ResumoLinha
+              label="Total"
+              value={`${formatBRL(nUsuarios * precoConfirmando)}/mês`}
+              colors={colors}
+              destaque
+            />
+          </div>
+        )}
+      </Modal>
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
+  )
+}
+
+function ResumoLinha({
+  label, value, colors, destaque,
+}: {
+  label: string
+  value: string
+  colors: ReturnType<typeof useTheme>['colors']
+  destaque?: boolean
+}) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+      <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle }}>{label}</span>
+      <span
+        style={{
+          fontSize: destaque ? t.font.size.lg : t.font.size.base,
+          fontWeight: destaque ? t.font.weight.bold : t.font.weight.medium,
+          color: destaque ? colors.accent.default : colors.fg.default,
+        }}
+      >
+        {value}
+      </span>
+    </div>
   )
 }
 
@@ -446,11 +538,12 @@ interface PlanoCardProps {
   atual: boolean
   comprando: boolean
   onComprar: () => void
+  onTrial: () => void
   onVerDetalhes: () => void
 }
 
 function PlanoCard({
-  plano, nUsuarios, anual, colors, isGbMode, atual, comprando, onComprar, onVerDetalhes,
+  plano, nUsuarios, anual, colors, isGbMode, atual, comprando, onComprar, onTrial, onVerDetalhes,
 }: PlanoCardProps) {
   const sobConsulta = plano.precoUsuarioMesAnual === null
 
@@ -518,7 +611,7 @@ function PlanoCard({
               Comprar agora
             </Button>
             {plano.trialDias > 0 && (
-              <Button variant="ghost" block size="md">
+              <Button variant="ghost" block size="md" onClick={onTrial}>
                 Testar {plano.trialDias} dias grátis
                 {plano.trialUsuarios ? ` · até ${plano.trialUsuarios} usuários` : ''}
               </Button>
@@ -609,11 +702,12 @@ interface PlanoDetalheProps {
   isGbMode: boolean
   comprando: boolean
   onComprar: () => void
+  onTrial: () => void
   onVoltar: () => void
 }
 
 function PlanoDetalhe({
-  plano, nUsuarios, setNUsuarios, anual, setAnual, colors, isGbMode, comprando, onComprar, onVoltar,
+  plano, nUsuarios, setNUsuarios, anual, setAnual, colors, isGbMode, comprando, onComprar, onTrial, onVoltar,
 }: PlanoDetalheProps) {
   const [aba, setAba] = useState<DetalheAbaId>('precos')
   const sobConsulta = plano.precoUsuarioMesAnual === null
@@ -703,7 +797,7 @@ function PlanoDetalhe({
                     Comprar agora
                   </Button>
                   {plano.trialDias > 0 && (
-                    <Button variant="ghost" block size="md">
+                    <Button variant="ghost" block size="md" onClick={onTrial}>
                       Testar {plano.trialDias} dias grátis
                       {plano.trialUsuarios ? ` · até ${plano.trialUsuarios} usuários` : ''}
                     </Button>
@@ -1101,6 +1195,8 @@ interface AddOnCardProps {
 
 function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCardProps) {
   const totalMes = nUsuarios * addon.precoUsuarioMesAnual
+  // Estado mock de contratação do complemento — trocar por dado da assinatura real
+  const [adicionado, setAdicionado] = useState(false)
 
   return (
     <Card
@@ -1157,9 +1253,22 @@ function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCa
       )}
 
       <div style={{ marginTop: t.space[1] }}>
-        <Button variant="secondary" block size="sm">
-          {mostrarCompatibilidade ? 'Saiba mais' : 'Adicionar'}
-        </Button>
+        {mostrarCompatibilidade ? (
+          <Button variant="secondary" block size="sm" disabled title="Página de detalhes em breve">
+            Saiba mais
+          </Button>
+        ) : (
+          <Button
+            variant={adicionado ? 'primary' : 'secondary'}
+            block
+            size="sm"
+            icon={adicionado ? <Check size={13} /> : undefined}
+            aria-pressed={adicionado}
+            onClick={() => setAdicionado((v) => !v)}
+          >
+            {adicionado ? 'Adicionado' : 'Adicionar'}
+          </Button>
+        )}
       </div>
     </Card>
   )

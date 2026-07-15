@@ -64,12 +64,8 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   const [sortDir,       setSortDir]       = useState<'asc' | 'desc'>('desc')
   const [deleteId,      setDeleteId]      = useState<number | null>(null)
   const [page,          setPage]          = useState(1)
-  const [isLoading,     setIsLoading]     = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]     = useState(false)
 
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filterArmazem])

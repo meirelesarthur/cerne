@@ -42,14 +42,11 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Embalagem | null>(null)
-  const [isLoading,    setIsLoading]   = useState(true)
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]   = useState(false)
   const [page,         setPage]        = useState(1)
   const PAGE_SIZE = 10
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
 
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filters.unidade])

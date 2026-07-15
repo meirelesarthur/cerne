@@ -52,13 +52,9 @@ export default function CentrosCustoLista({
   const [page,        setPage]        = useState(1)
   const [deleteId,    setDeleteId]    = useState<number | null>(null)
   const [saibaMais,   setSaibaMais]   = useState(false)
-  const [isLoading,   setIsLoading]   = useState(true)
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]   = useState(false)
   const { toasts, show, dismiss }     = useToast()
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
 
   const activeFilterCount = [filters.condicao, filters.classe, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '' })

@@ -48,14 +48,10 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   /** Ids em soft-delete: já ocultos da lista, aguardando a janela de "Desfazer". */
   const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<number>>(new Set())
   const [showInfo,     setShowInfo]     = useState(false)
-  const [isLoading,    setIsLoading]    = useState(true)
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]    = useState(false)
   const [page,         setPage]         = useState(1)
   const PAGE_SIZE = 10
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
 
   useEffect(() => { setPage(1) }, [search, statusFilter])
 

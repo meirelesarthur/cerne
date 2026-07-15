@@ -55,14 +55,10 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const [sortField,    setSortField]   = useState<SortField>('sigla')
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
-  const [isLoading,    setIsLoading]   = useState(true)
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]   = useState(false)
   const [page,         setPage]        = useState(1)
   const PAGE_SIZE = 10
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
-  }, [])
 
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filters.tipo, filters.ativo])

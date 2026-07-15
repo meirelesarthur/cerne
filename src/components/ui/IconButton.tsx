@@ -10,7 +10,7 @@ interface IconButtonProps {
   onClick?:   () => void
   /**
    * Mapeia para `t.size.iconBtn.{sm,md,lg}` (24/30/36px) — a escala NÃO
-   * corresponde à de `Button` (`sm|md|lg` → 32/42/46px). Mesmo nome de token
+   * corresponde à de `Button` (`sm|md|lg` → 32/36/40px). Mesmo nome de token
    * de tamanho, alvos diferentes; confira `sizeValues` abaixo ao alinhar
    * visualmente um `IconButton` ao lado de um `Button`.
    */

@@ -8,7 +8,7 @@ import type { BaseFieldProps } from './fieldTypes'
 
 interface FormFieldProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'rows' | 'size'>, BaseFieldProps {
-  /** Altura do controle: 'md' = t.size.control (42, padrão) · 'lg' = t.size.controlLg (46) */
+  /** Altura do controle: 'md' = t.size.control (36, padrão) · 'lg' = t.size.controlLg (40) */
   size?: 'md' | 'lg'
   /** Renderiza um <textarea> multi-linha em vez de <input> */
   multiline?: boolean

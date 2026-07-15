@@ -7,7 +7,7 @@ import type React from 'react'
  * independentes, e estados de validação/dica consistentes.
  *
  * A altura do controle NÃO faz parte deste contrato: é sempre `t.size.control`
- * (com a variação `size='lg'` = `t.size.controlLg` no FormField). Ver Fase 1.
+ * (36px, com a variação `size='lg'` = `t.size.controlLg`, 40px, no FormField). Ver Fase 1.
  */
 export interface BaseFieldProps {
   /** Rótulo acima do campo. Opcional — omita para a variação "sem label". */

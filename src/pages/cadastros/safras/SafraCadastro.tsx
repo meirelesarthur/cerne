@@ -202,6 +202,7 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
               weeks={weeks}
               form={form}
               onWeeksChange={handleWeeksChange}
+              onBackToStep1={() => setStep(1)}
             />
           )}
         </div>
@@ -305,10 +306,12 @@ function Step2({
   weeks,
   form,
   onWeeksChange,
+  onBackToStep1,
 }: {
   weeks: Week[]
   form: FormData
   onWeeksChange: (w: Week[]) => void
+  onBackToStep1: () => void
 }) {
   return (
     <div>
@@ -323,7 +326,7 @@ function Step2({
         fimLabel={fmtYMDtoDMY(form.fim)}
         editable
         onWeeksChange={onWeeksChange}
-        onEmptyAction={() => setStep(1)}
+        onEmptyAction={onBackToStep1}
         emptyActionLabel="Voltar para Dados Gerais"
       />
     </div>

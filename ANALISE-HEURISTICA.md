@@ -75,13 +75,17 @@ Regras vigentes em toda a esteira:
 - ✅ Heatmap/Sankey acessíveis por teclado (`tabIndex`, foco replica hover) — `HeatmapChart.tsx`, `SankeyFunnel.tsx`. Mapa Leaflet do `OverviewPanel` fica como limitação conhecida (lib não é nativamente acessível)
 - ⏸️ **Adiado por decisão de escopo (conforme plano):** unificar shell dos 12 dashboards bespoke em `ChartCard`/`KpiStatCard` — mudança grande, requer commit dedicado
 
-## Fase 3 — Moderados (Sev. 2)
+## Fase 3 — Moderados (Sev. 2) ✅ concluída (com 5 itens adiados)
 
-**Kit:** hit targets → `IconButton` (TableToolbar, SearchSelect, BulkActionBar, Toast) · `PageHeader` com `<h1>` · `aria-expanded`/`aria-controls` no CollapsibleSection · Tooltip com Esc + hoverable.
+**Kit** ✅ — hit targets → `IconButton` (TableToolbar, SearchSelect, BulkActionBar, Toast) · `PageHeader` com `<h1>` · `aria-expanded`/`aria-controls` no CollapsibleSection · Tooltip com Esc.
 
-**Casca:** senha preservada no erro de login · links mortos (Termos/Privacidade/Solicitar acesso) · SSO Google desabilitado · contraste `Login.css` · saudação por hora real · `document.title` por rota · notificações mock ou removidas · bloqueio de tentativas comunicando duração.
+**Casca** ✅ — senha preservada no erro de login · links mortos (Termos/Privacidade/Solicitar acesso) viram texto não-clicável · SSO Google desabilitado · contraste `Login.css` (5 usos escurecidos) · saudação por hora real · `document.title` por rota · notificações do Topbar viram DropdownMenu funcional (duplicata da Sidebar removida) · bloqueio de tentativas comunica 15 min.
 
-**Telas:** ordem dos steps de Fazenda (Identificação primeiro) · toast citando linha do repeater (Pessoas) · KPI "Com Acesso" clicável · undo na exclusão de Safras · busca por data formatada · Stepper navegável em Safras · `aria-pressed` na paleta · rótulo de cor no tile · responsividade dos grids (minmax/auto-fit) · `ToastProvider` global único · remoção do loading fake (600ms) · confirmação de exclusão citando o item (Estoques Iniciais) · bulk actions reutilizável · rótulos "Salvar X" padronizados · seletor de período unificado · trend sem "+" contraditório · expand do ChartCard funcional · piso de opacidade do heatmap · MapView com estado vazio · hit targets da paleta em mobile · linhas parciais sinalizadas no modal de múltiplas áreas · asterisco removido de selects binários.
+**Telas** ✅ — ordem dos steps de Fazenda (Identificação primeiro, igual a Pessoas) · KPI "Com Acesso" clicável (Pessoas) · undo na exclusão de Safras (soft-delete 4s) · busca por data formatada (Safras) · Stepper navegável em Safras · `aria-pressed` na paleta de cores · abreviação de 2 letras no tile de semana (`WEEK_COLOR_ABBR`) · remoção do loading fake de 600ms (Embalagens/Armazéns/Estoques Iniciais/Centros de Custo/Safras) · rótulos "Salvar X" padronizados (Produto/Embalagem/Armazém/tipo de endereço) · trend sem "+" contraditório (Custos do Confinamento) · expand do ChartCard abre Modal · piso de opacidade do heatmap (0,12→0,28) · MapView com estado vazio · asterisco removido de selects binários (Fazenda/Financeiro).
+
+> Já cobertos em fases anteriores (verificado antes de redigitar): confirmação de exclusão citando o item (Estoques Iniciais, Fase 2) · seletor de período unificado (Fase 0) · toast citando o campo com erro (Pessoas, Fase 2).
+
+**Adiado** ⏸️ (refatorações maiores, candidatas a lote dedicado): `ToastProvider` global único · responsividade dos grids (minmax/auto-fit) em várias telas · bulk actions reutilizável (hoje só em Produtos) · hit targets da paleta de cores em mobile (exige breakpoint) · linhas parciais sinalizadas no modal de múltiplas áreas (FazendasLista).
 
 ## Fase 4 — Cosméticos (Sev. 1)
 

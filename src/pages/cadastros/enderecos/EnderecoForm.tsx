@@ -92,7 +92,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
               loading={submitting}
               disabled={!isValid || submitting}
             >
-              Salvar
+              Salvar {tipoLabel}
             </Button>
           </>
         }

@@ -24,11 +24,13 @@ interface FazendaCadastroProps {
   fazenda?: FazendaDetalheData
 }
 
+// Ordem alinhada ao padrão de Pessoas: dados básicos primeiro, demarcação
+// (opcional) por último antes da configuração final.
 const STEPS = [
-  { id: 1, label: 'Demarcação' },
-  { id: 2, label: 'Endereço' },
-  { id: 3, label: 'Identificação' },
-  { id: 4, label: 'Documentação' },
+  { id: 1, label: 'Identificação' },
+  { id: 2, label: 'Documentação' },
+  { id: 3, label: 'Endereço' },
+  { id: 4, label: 'Demarcação' },
   { id: 5, label: 'Financeiro' },
   { id: 6, label: 'Configurações' },
 ]
@@ -36,17 +38,7 @@ const STEPS = [
 function validateStep(step: number, data: FazendaFormData): Record<string, string> {
   const errors: Record<string, string> = {}
 
-  // Step 1 (Demarcação) is optional — user can advance without drawing
-
-  if (step === 2) {
-    if (!data.pais) errors.pais = 'País é obrigatório'
-    if (!data.cep) errors.cep = 'CEP é obrigatório'
-    if (!data.cidade) errors.cidade = 'Cidade é obrigatória'
-    if (!data.endereco) errors.endereco = 'Endereço é obrigatório'
-    if (!data.bairro) errors.bairro = 'Bairro é obrigatório'
-  }
-
-  if (step === 3) {
+  if (step === 1) {
     if (!data.nome || data.nome.trim().length < 3) {
       errors.nome = 'Nome deve ter pelo menos 3 caracteres'
     }
@@ -56,7 +48,7 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     }
   }
 
-  if (step === 4) {
+  if (step === 2) {
     if (!data.tipoExploracao) {
       errors.tipoExploracao = 'Selecione o tipo de exploração'
     }
@@ -65,6 +57,16 @@ function validateStep(step: number, data: FazendaFormData): Record<string, strin
     if (!data.cafir) errors.cafir = 'CAFIR é obrigatório'
     if (!data.caepi) errors.caepi = 'CAEPI é obrigatório'
   }
+
+  if (step === 3) {
+    if (!data.pais) errors.pais = 'País é obrigatório'
+    if (!data.cep) errors.cep = 'CEP é obrigatório'
+    if (!data.cidade) errors.cidade = 'Cidade é obrigatória'
+    if (!data.endereco) errors.endereco = 'Endereço é obrigatório'
+    if (!data.bairro) errors.bairro = 'Bairro é obrigatório'
+  }
+
+  // Step 4 (Demarcação) is optional — user can advance without drawing
 
   if (step === 5) {
     if (!data.areaTotal) errors.areaTotal = 'Área total é obrigatória'
@@ -151,13 +153,13 @@ export default function FazendaCadastro({ onBack, fazenda }: FazendaCadastroProp
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step3Mapa data={formData} errors={errors} onChange={handleChange} />
-      case 2:
-        return <Step4Endereco data={formData} errors={errors} onChange={handleChange} />
-      case 3:
         return <Step1Identificacao data={formData} errors={errors} onChange={handleChange} />
-      case 4:
+      case 2:
         return <Step2Documentacao data={formData} errors={errors} onChange={handleChange} />
+      case 3:
+        return <Step4Endereco data={formData} errors={errors} onChange={handleChange} />
+      case 4:
+        return <Step3Mapa data={formData} errors={errors} onChange={handleChange} />
       case 5:
         return (
           <Step4Financeiro

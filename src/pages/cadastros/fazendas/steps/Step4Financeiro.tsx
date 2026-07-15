@@ -83,7 +83,6 @@ export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4P
 
         <FormSelect
           label="Ativo"
-          required
           error={errors.ativo}
           options={simNaoOptions}
           value={String(data.ativo)}
@@ -92,7 +91,6 @@ export function Step4Financeiro({ data, errors, onChange, onBoolChange }: Step4P
 
         <FormSelect
           label="Uso no Livro Caixa"
-          required
           hint="Define se movimentações dessa fazenda aparecem no Livro Caixa"
           error={errors.usoLivroCaixa}
           options={simNaoOptions}

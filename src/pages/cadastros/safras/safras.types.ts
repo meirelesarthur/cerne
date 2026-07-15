@@ -51,6 +51,22 @@ export const WEEK_COLORS: Record<WeekColor, ColorDef> = {
   'rosa':         { bg: '#fce7f3', text: '#831843', label: 'Rosa',         border: '#f9a8d4' },
 }
 
+/**
+ * Abreviação de 2 letras exibida no tile, além da cor de fundo — cor sozinha
+ * não é suficiente para diferenciar os 3 tons de azul (daltonismo/WCAG 1.4.1).
+ */
+export const WEEK_COLOR_ABBR: Record<WeekColor, string> = {
+  'amarelo':      'AM',
+  'azul-claro':   'AC',
+  'azul-escuro':  'AE',
+  'azul-marinho': 'AZ',
+  'branco':       'BR',
+  'marrom':       'MR',
+  'palha':        'PL',
+  'preto':        'PT',
+  'rosa':         'RS',
+}
+
 export const COLOR_CYCLE: WeekColor[] = [
   'amarelo', 'azul-claro', 'azul-escuro', 'azul-marinho', 'branco',
   'marrom', 'palha', 'preto', 'rosa',

@@ -5,7 +5,7 @@ import { useTheme } from '../../../context/ThemeContext'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import {
-  WEEK_COLORS, COLOR_CYCLE, MONTH_NAMES,
+  WEEK_COLORS, WEEK_COLOR_ABBR, COLOR_CYCLE, MONTH_NAMES,
   isCurrentWeek,
   type Week, type WeekColor,
 } from './safras.types'
@@ -253,6 +253,7 @@ export function WeekCanvas({
                 key={key}
                 variant="ghost"
                 size="sm"
+                aria-pressed={active}
                 onClick={() => setSelectedColor(key)}
                 icon={<span style={{ width: 7, height: 7, borderRadius: '50%', background: def.text === '#ffffff' ? 'rgba(255,255,255,0.7)' : def.text, flexShrink: 0 }} />}
                 style={{
@@ -393,6 +394,23 @@ export function WeekCanvas({
                               boxShadow: '0 0 0 2px rgba(22,163,74,0.25)',
                             }} />
                           )}
+                          {/* Abreviação da cor — a cor de fundo sozinha não diferencia
+                              os 3 tons de azul para usuários daltônicos (WCAG 1.4.1). */}
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              position: 'absolute',
+                              top: 4,
+                              left: 5,
+                              fontSize: t.font.size['3xs'],
+                              fontWeight: t.font.weight.bold,
+                              color: def.text,
+                              opacity: 0.6,
+                              letterSpacing: '0.02em',
+                            }}
+                          >
+                            {WEEK_COLOR_ABBR[week.color]}
+                          </span>
                           <span style={{
                             fontSize: t.font.size.base,
                             fontWeight: t.font.weight.bold,

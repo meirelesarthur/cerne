@@ -102,7 +102,7 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
           <>
             <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>Cancelar</Button>
             <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
-              Salvar
+              Salvar Armazém
             </Button>
           </>
         }

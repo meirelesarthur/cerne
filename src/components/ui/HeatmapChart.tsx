@@ -89,7 +89,9 @@ export function HeatmapChart({
                   background: intensity === 0
                     ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[100])
                     : highColor,
-                  opacity: intensity === 0 ? 1 : Math.max(0.12, intensity) * (isH ? 1.25 : 1),
+                  // Piso de 0,28 (WCAG 1.4.11): abaixo disso, células com valor
+                  // baixo ficavam quase indistinguíveis do fundo "vazio".
+                  opacity: intensity === 0 ? 1 : Math.max(0.28, intensity) * (isH ? 1.25 : 1),
                   transform: isH ? 'scaleY(1.1)' : 'scaleY(1)',
                 }}
               />

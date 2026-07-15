@@ -132,17 +132,26 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             overflow: 'hidden', marginBottom: t.space[4],
           }}>
             {[
-              { label: 'Total de Pessoas', value: kpis.total },
-              { label: 'Pessoas Físicas',  value: kpis.pf },
-              { label: 'Pessoas Jurídicas', value: kpis.pj },
-              { label: 'Com Acesso',        value: kpis.acesso },
+              { label: 'Total de Pessoas', value: kpis.total, filterRole: null },
+              { label: 'Pessoas Físicas',  value: kpis.pf, filterRole: null },
+              { label: 'Pessoas Jurídicas', value: kpis.pj, filterRole: null },
+              { label: 'Com Acesso',        value: kpis.acesso, filterRole: 'user' as const },
             ].map((item, idx, arr) => (
-              <div key={item.label} style={{
-                padding: `${t.space[4]}px ${t.space[5]}px`,
-                background: colors.bg.surface,
-                borderRight: idx < arr.length - 1 ? `1px solid ${colors.border.default}` : undefined,
-                display: 'flex', flexDirection: 'column', gap: 6,
-              }}>
+              <div
+                key={item.label}
+                role={item.filterRole ? 'button' : undefined}
+                tabIndex={item.filterRole ? 0 : undefined}
+                className={item.filterRole ? 'gb-focusable' : undefined}
+                onClick={item.filterRole ? () => setRoleFilter((prev) => prev === item.filterRole ? '' : item.filterRole!) : undefined}
+                onKeyDown={item.filterRole ? (e) => { if (e.key === 'Enter') setRoleFilter((prev) => prev === item.filterRole ? '' : item.filterRole!) } : undefined}
+                style={{
+                  padding: `${t.space[4]}px ${t.space[5]}px`,
+                  background: item.filterRole && roleFilter === item.filterRole ? colors.accent.subtle : colors.bg.surface,
+                  borderRight: idx < arr.length - 1 ? `1px solid ${colors.border.default}` : undefined,
+                  display: 'flex', flexDirection: 'column', gap: 6,
+                  cursor: item.filterRole ? 'pointer' : undefined,
+                }}
+              >
                 <span style={{
                   fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
                   color: colors.fg.subtle, fontFamily: t.font.family.sans,

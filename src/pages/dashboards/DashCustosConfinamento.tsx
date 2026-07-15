@@ -173,7 +173,7 @@ export default function DashCustosConfinamento() {
     {
       label: 'Custo por Arroba',
       value: `R$ ${custoArrobaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/@`,
-      trend: '+2,5% vs mês ant.',
+      trend: '2,5% vs mês ant.', // sem "+": a seta (▼) já indica que o aumento de custo é desfavorável
       up: false, // custo subindo = desfavorável
       valueColor: colors.fg.default as string,
       sparkKey: 'custoArroba' as const,
@@ -182,7 +182,7 @@ export default function DashCustosConfinamento() {
     {
       label: 'Custo Animal/Dia',
       value: `R$ ${custoAnimalDiaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      trend: '+2,6% vs mês ant.',
+      trend: '2,6% vs mês ant.',
       up: false,
       valueColor: colors.fg.default as string,
       sparkKey: 'custoAnimalDia' as const,
@@ -191,7 +191,7 @@ export default function DashCustosConfinamento() {
     {
       label: 'COE (Custo Operacional)',
       value: `R$ ${(coeAtual * 1000).toLocaleString('pt-BR')}`,
-      trend: '+4,5% vs mês ant.',
+      trend: '4,5% vs mês ant.',
       up: false,
       valueColor: colors.fg.default as string,
       sparkKey: null,

@@ -1,4 +1,5 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
+import { MapPinOff } from 'lucide-react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { t } from '../../design/tokens'
@@ -31,6 +32,7 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
   const { colors } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
+  const [hasLocation, setHasLocation] = useState(true)
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
@@ -67,14 +69,18 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
     }
 
     // 2. Fallback: marcador na coordenada
+    let hasMarker = false
     if (!hasPolygon) {
       const la = toNum(lat)
       const ln = toNum(lng)
       if (la !== null && ln !== null) {
         L.marker([la, ln]).addTo(map)
         map.setView([la, ln], 13)
+        hasMarker = true
       }
     }
+
+    setHasLocation(hasPolygon || hasMarker)
 
     mapRef.current = map
     return () => {
@@ -85,14 +91,37 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        height,
-        borderRadius: t.radius.lg,
-        border: `1px solid ${colors.border.default}`,
-        overflow: 'hidden',
-      }}
-    />
+    <div style={{ position: 'relative' }}>
+      <div
+        ref={containerRef}
+        style={{
+          height,
+          borderRadius: t.radius.lg,
+          border: `1px solid ${colors.border.default}`,
+          overflow: 'hidden',
+        }}
+      />
+      {!hasLocation && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: t.space[2],
+            background: colors.bg.surface,
+            borderRadius: t.radius.lg,
+            pointerEvents: 'none',
+          }}
+        >
+          <MapPinOff size={24} color={colors.fg.subtle as string} aria-hidden="true" />
+          <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
+            Localização não definida para este registro.
+          </span>
+        </div>
+      )}
+    </div>
   )
 }

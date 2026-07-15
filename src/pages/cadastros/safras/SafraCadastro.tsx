@@ -182,7 +182,12 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
         <FormPageHeader title={pageTitle} subtitle={pageDesc} onBack={handleBack} paddingTop={t.space[4]} />
 
         {/* ── Stepper ──────────────────────────────────────────────────────── */}
-        <Stepper steps={STEPS} current={step} completed={completed} onStepClick={() => {}} />
+        <Stepper
+          steps={STEPS}
+          current={step}
+          completed={completed}
+          onStepClick={(id) => { if (completed.includes(id)) setStep(id) }}
+        />
 
         {/* Conteúdo do step */}
         <div style={{ padding: '32px 24px 40px' }}>

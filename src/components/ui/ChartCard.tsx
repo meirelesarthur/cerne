@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Heading } from './Heading'
+import { Modal } from './Modal'
 
 // ─── ChartCard ─────────────────────────────────────────────────────────────────
 // Wrapper com tab-chip header (ícone + título), expand icon e hover shadow lift.
@@ -21,6 +22,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState(false)
   const [btnHov, setBtnHov] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   return (
     <div
@@ -75,7 +77,11 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
         {/* Right: action slot + expand icon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           {action}
-          <div
+          <button
+            type="button"
+            className="gb-focusable"
+            aria-label={`Expandir ${title}`}
+            onClick={() => setExpanded(true)}
             onMouseEnter={() => setBtnHov(true)}
             onMouseLeave={() => setBtnHov(false)}
             style={{
@@ -92,14 +98,24 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
                 : 'transparent',
               transition: `background ${t.animation.duration.fast}`,
               opacity: hov ? 1 : 0.5,
+              padding: 0,
             }}
           >
             <ArrowUpRight size={13} color={colors.fg.subtle as string} />
-          </div>
+          </button>
         </div>
       </div>
 
       {children}
+
+      <Modal
+        open={expanded}
+        onClose={() => setExpanded(false)}
+        title={title}
+        size="lg"
+      >
+        {children}
+      </Modal>
     </div>
   )
 }

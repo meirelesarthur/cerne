@@ -108,7 +108,7 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
               loading={submitting}
               disabled={!isValid || submitting}
             >
-              Salvar
+              Salvar Embalagem
             </Button>
           </>
         }

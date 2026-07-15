@@ -45,6 +45,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todas')
   const [drawerOpen,   setDrawerOpen]   = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Safra | null>(null)
+  /** Ids em soft-delete: já ocultos da lista, aguardando a janela de "Desfazer". */
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<number>>(new Set())
   const [showInfo,     setShowInfo]     = useState(false)
   const [isLoading,    setIsLoading]    = useState(true)
   const [page,         setPage]         = useState(1)
@@ -75,24 +77,42 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return safras.filter(s => {
+      if (pendingDeleteIds.has(s.id)) return false
       const statusLabel = s.ativo === 'sim' ? 'ativa' : 'inativa'
-      const matchSearch = !q || s.desc.toLowerCase().includes(q) || s.ini.includes(q) || s.fim.includes(q) || statusLabel.includes(q) || String(s.weeks.length).includes(q)
+      const matchSearch = !q || s.desc.toLowerCase().includes(q) || fmtYMDtoDMY(s.ini).includes(q) || fmtYMDtoDMY(s.fim).includes(q) || statusLabel.includes(q) || String(s.weeks.length).includes(q)
       const matchStatus =
         statusFilter === 'todas'   ? true :
         statusFilter === 'ativas'  ? s.ativo === 'sim' :
                                      s.ativo === 'nao'
       return matchSearch && matchStatus
     })
-  }, [safras, search, statusFilter])
+  }, [safras, search, statusFilter, pendingDeleteIds])
 
   const totalFiltered = filtered.length
   const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
-    onDelete(deleteTarget.id)
+    const { id, desc } = deleteTarget
     setDeleteTarget(null)
-    show(`Safra "${deleteTarget.desc}" excluída.`, 'info')
+    // Soft-delete otimista: some da lista na hora, mas só remove de fato do
+    // estado do pai após a janela de undo (o toast pausa no hover — Toast.tsx).
+    setPendingDeleteIds((prev) => new Set(prev).add(id))
+    const timer = window.setTimeout(() => {
+      setPendingDeleteIds((prev) => { const next = new Set(prev); next.delete(id); return next })
+      onDelete(id)
+    }, 4000)
+    show(`Safra "${desc}" excluída.`, {
+      type: 'info',
+      duration: 4000,
+      action: {
+        label: 'Desfazer',
+        onClick: () => {
+          window.clearTimeout(timer)
+          setPendingDeleteIds((prev) => { const next = new Set(prev); next.delete(id); return next })
+        },
+      },
+    })
   }
 
   const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface

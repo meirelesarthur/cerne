@@ -45,6 +45,7 @@ export function SparklineArea({
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
       style={{ display: 'block' }}
+      aria-hidden="true"
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">

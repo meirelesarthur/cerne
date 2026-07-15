@@ -46,6 +46,9 @@ interface WeekCanvasProps {
   fimLabel?: string
   editable?: boolean
   onWeeksChange?: (weeks: Week[]) => void
+  /** Ação exibida no estado vazio (ex.: "Voltar para Dados Gerais") — sem ela, o usuário precisa descobrir sozinho o caminho de volta. */
+  onEmptyAction?: () => void
+  emptyActionLabel?: string
 }
 
 // ─── Componente ──────────────────────────────────────────────────────────────
@@ -57,6 +60,8 @@ export function WeekCanvas({
   fimLabel,
   editable = false,
   onWeeksChange,
+  onEmptyAction,
+  emptyActionLabel = 'Voltar',
 }: WeekCanvasProps) {
   const { colors } = useTheme()
   const isPainting = useRef(false)
@@ -140,8 +145,15 @@ export function WeekCanvas({
 
   if (weeks.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px 0', color: colors.fg.subtle, fontFamily: t.font.family.sans, fontSize: t.font.size.base }}>
-        Nenhuma semana gerada. Verifique as datas de início e fim.
+      <div style={{ textAlign: 'center', padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: t.space[3] }}>
+        <span style={{ color: colors.fg.subtle, fontFamily: t.font.family.sans, fontSize: t.font.size.base }}>
+          Nenhuma semana gerada. Verifique as datas de início e fim.
+        </span>
+        {onEmptyAction && (
+          <Button variant="secondary" size="sm" onClick={onEmptyAction}>
+            {emptyActionLabel}
+          </Button>
+        )}
       </div>
     )
   }

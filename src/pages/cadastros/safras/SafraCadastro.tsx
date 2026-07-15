@@ -323,6 +323,8 @@ function Step2({
         fimLabel={fmtYMDtoDMY(form.fim)}
         editable
         onWeeksChange={onWeeksChange}
+        onEmptyAction={() => setStep(1)}
+        emptyActionLabel="Voltar para Dados Gerais"
       />
     </div>
   )

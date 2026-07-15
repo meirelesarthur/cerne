@@ -87,9 +87,17 @@ Regras vigentes em toda a esteira:
 
 **Adiado** ⏸️ (refatorações maiores, candidatas a lote dedicado): `ToastProvider` global único · responsividade dos grids (minmax/auto-fit) em várias telas · bulk actions reutilizável (hoje só em Produtos) · hit targets da paleta de cores em mobile (exige breakpoint) · linhas parciais sinalizadas no modal de múltiplas áreas (FazendasLista).
 
-## Fase 4 — Cosméticos (Sev. 1)
+## Fase 4 — Cosméticos (Sev. 1) ✅ concluída
 
-`\n` no ConfirmDialog · `useDebouncedValue` compartilhado · componente `Trend` extraído e padronizado · `aria-hidden` no SparklineArea · nomenclatura IconButton/Button documentada · empty state do WeekCanvas com ação · loading artificial removido (Safras).
+- ✅ `\n` no ConfirmDialog (`whiteSpace: pre-line`)
+- ✅ `useDebouncedValue` compartilhado, aplicado a Embalagens/Armazéns/Estoques Iniciais/Centros de Custo
+- ✅ Componente `Trend` extraído (10 implementações locais → 1 componente em `ui/Trend.tsx`)
+- ✅ `aria-hidden` no SparklineArea
+- ✅ Nomenclatura IconButton/Button documentada (escalas não correspondem)
+- ✅ Empty state do WeekCanvas ganha ação "Voltar para Dados Gerais"
+- ✅ Loading artificial removido (Safras) — já coberto no lote da Fase 3
+
+**Esteira completa: 87 de 92 achados corrigidos.** Os 5 restantes (refatorações maiores) estão listados como adiados na Fase 3.
 
 ---
 

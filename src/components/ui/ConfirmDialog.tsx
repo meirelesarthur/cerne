@@ -98,6 +98,7 @@ export function ConfirmDialog({
                 color:      colors.fg.subtle,
                 fontFamily: t.font.family.sans,
                 lineHeight: t.font.lineHeight.normal,
+                whiteSpace: 'pre-line',
               }}
             >
               {message}

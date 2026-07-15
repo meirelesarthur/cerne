@@ -18,6 +18,7 @@ import { IconButton }      from '../../../components/ui/IconButton'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -37,7 +38,8 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
-  const [search,       setSearch]      = useState('')
+  const [searchRaw,    setSearchRaw]   = useState('')
+  const search = useDebouncedValue(searchRaw, 300)
   const [filters,      setFilters]     = useState({ unidade: '' })
   const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortDir,      setSortDir]     = useState<SortDir>('asc')
@@ -103,8 +105,8 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
 
         {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
         <ListToolbar
-          search={search}
-          onSearch={setSearch}
+          search={searchRaw}
+          onSearch={setSearchRaw}
           searchPlaceholder="Buscar embalagem..."
           onOpenFilter={() => setDrawerOpen(true)}
           filterCount={activeFilterCount}

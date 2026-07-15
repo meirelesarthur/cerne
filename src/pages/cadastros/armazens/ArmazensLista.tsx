@@ -18,6 +18,7 @@ import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import {
   TIPO_ARMAZEM_LABEL, TIPO_ARMAZEM_OPTS,
   type Armazem, type TipoArmazem,
@@ -49,7 +50,8 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
-  const [search,       setSearch]      = useState('')
+  const [searchRaw,    setSearchRaw]   = useState('')
+  const search = useDebouncedValue(searchRaw, 300)
   const [filters,      setFilters]     = useState({ tipo: '', ativo: '' })
   const [drawerOpen,   setDrawerOpen]  = useState(false)
   const [sortField,    setSortField]   = useState<SortField>('sigla')
@@ -125,8 +127,8 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
 
         {/* Toolbar */}
         <ListToolbar
-          search={search}
-          onSearch={setSearch}
+          search={searchRaw}
+          onSearch={setSearchRaw}
           searchPlaceholder="Buscar armazém..."
           onOpenFilter={() => setDrawerOpen(true)}
           filterCount={activeFilterCount}

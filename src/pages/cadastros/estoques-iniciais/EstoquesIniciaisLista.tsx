@@ -19,6 +19,7 @@ import { IconButton }      from '../../../components/ui/IconButton'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import type { EstoqueInicial } from './estoques-iniciais.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -58,7 +59,8 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
-  const [search,        setSearch]        = useState('')
+  const [searchRaw,     setSearchRaw]     = useState('')
+  const search = useDebouncedValue(searchRaw, 300)
   const [filterArmazem, setFilterArmazem] = useState('')
   const [drawerOpen,    setDrawerOpen]    = useState(false)
   const [sortDir,       setSortDir]       = useState<'asc' | 'desc'>('desc')
@@ -169,8 +171,8 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
         {/* Filter bar */}
         <ListToolbar
-          search={search}
-          onSearch={v => { setSearch(v); setPage(1) }}
+          search={searchRaw}
+          onSearch={v => { setSearchRaw(v); setPage(1) }}
           searchPlaceholder="Buscar produto, código ou armazém..."
           onOpenFilter={() => setDrawerOpen(true)}
           filterCount={activeFilterCount}

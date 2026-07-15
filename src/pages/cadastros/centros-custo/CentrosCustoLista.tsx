@@ -21,6 +21,7 @@ import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import {
   classeOf, CONDICAO_LABEL, TIPO_LABEL, CLASSE_LABEL, getAllDescendantCentroIds,
   type CentroCusto,
@@ -46,7 +47,8 @@ export default function CentrosCustoLista({
 }: CentrosCustoListaProps) {
   const { colors, isGbMode } = useTheme()
 
-  const [search,      setSearch]      = useState('')
+  const [searchRaw,   setSearchRaw]   = useState('')
+  const search = useDebouncedValue(searchRaw, 300)
   const [filters,     setFilters]     = useState({ condicao: '', classe: '', ativo: '' })
   const [drawerOpen,  setDrawerOpen]  = useState(false)
   const [page,        setPage]        = useState(1)
@@ -216,8 +218,8 @@ export default function CentrosCustoLista({
 
           {/* ── Toolbar ───────────────────────────────────────────────── */}
           <ListToolbar
-            search={search}
-            onSearch={v => { setSearch(v); setPage(1) }}
+            search={searchRaw}
+            onSearch={v => { setSearchRaw(v); setPage(1) }}
             searchPlaceholder="Buscar por código, descrição..."
             onOpenFilter={() => setDrawerOpen(true)}
             filterCount={activeFilterCount}

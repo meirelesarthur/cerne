@@ -19,6 +19,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { Heading } from '../../components/ui/Heading'
+import { Trend } from '../../components/ui/Trend'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -82,28 +83,6 @@ const consumoMedioDiario = Math.round(
 )
 const itensCriticos = mockCoberturaProdutos.filter(d => d.value <= CRITICO_THRESHOLD).length
 
-// ─── Trend badge (idêntico ao DashLotacaoCurrais) ────────────────────────────
-
-function Trend({ value, up }: { value: string; up: boolean }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-      fontFamily: t.font.family.sans,
-      color: up ? t.color.feedback.success.text : t.color.feedback.error.text,
-    }}>
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        width: 14, height: 14, borderRadius: t.radius.full,
-        background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
-        fontSize: t.font.size['3xs'],
-      }}>
-        {up ? '▲' : '▼'}
-      </span>
-      {value}
-    </span>
-  )
-}
 
 // ─── DashEstoqueNutricao ──────────────────────────────────────────────────────
 

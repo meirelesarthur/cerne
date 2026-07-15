@@ -5,6 +5,7 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { Heading } from '../../components/ui/Heading'
+import { Trend } from '../../components/ui/Trend'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
@@ -187,7 +188,7 @@ export default function DashAtivos() {
           <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
+            <Trend value={kpi.trend} up={kpi.up} />
           </div>,
         ])}
       </div>

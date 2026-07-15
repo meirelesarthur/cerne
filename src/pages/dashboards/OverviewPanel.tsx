@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Heading } from '../../components/ui/Heading'
+import { Trend } from '../../components/ui/Trend'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -108,29 +109,6 @@ function TalhoesMap() {
     return () => { map.remove(); mapRef.current = null }
   }, [])
   return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
-}
-
-// ─── Trend badge ──────────────────────────────────────────────────────────────
-
-function Trend({ value, up }: { value: string; up: boolean }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-      fontFamily: t.font.family.sans,
-      color: up ? t.color.feedback.success.text : t.color.feedback.error.text,
-    }}>
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        width: 14, height: 14, borderRadius: t.radius.full,
-        background: up ? t.color.feedback.success.bg : t.color.feedback.error.bg,
-        fontSize: t.font.size['3xs'], lineHeight: 1,
-      }}>
-        {up ? '▲' : '▼'}
-      </span>
-      {value}
-    </span>
-  )
 }
 
 // ─── KPI stat (top row, efferd style) ────────────────────────────────────────

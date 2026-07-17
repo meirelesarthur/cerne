@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useFarm } from '../../context/FarmContext'
 import { SearchSelect, type SearchSelectOption } from './SearchSelect'
 
 export function FarmSwitcher() {
   const { currentFarm, farms, setCurrentFarm } = useFarm()
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(currentFarm?.name ?? '')
+
+  useEffect(() => {
+    setQuery(currentFarm?.name ?? '')
+  }, [currentFarm])
 
   const options: SearchSelectOption[] = useMemo(
     () => farms.map((farm) => ({
@@ -29,7 +33,7 @@ export function FarmSwitcher() {
         options={options}
         selectedId={currentFarm?.id ?? null}
         onSelect={handleSelect}
-        onClear={() => setQuery('')}
+        onClear={() => setQuery(currentFarm?.name ?? '')}
         maxVisible={6}
       />
     </div>

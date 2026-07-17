@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Star } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
+import { useFavorites } from '../../context/FavoritesContext'
+import { IconButton } from '../ui/IconButton'
 import { t } from '../../design/tokens'
 
 // ─── sub-components ──────────────────────────────────────────────────────────
@@ -46,10 +48,12 @@ function NavItem({
   onChildClick:  (id: string) => void
 }) {
   const { colors } = useTheme()
+  const { isFavorite, toggleFavorite } = useFavorites()
   const Icon = item.icon
   const hasChildren = item.children && item.children.length > 0
   const hasActiveChild = hasChildren && item.children!.some(c => c.id === activeItemId)
   const [expanded, setExpanded] = useState(hasActiveChild)
+  const [hovered, setHovered] = useState(false)
 
   const handleClick = () => {
     if (hasChildren) {
@@ -59,12 +63,19 @@ function NavItem({
     }
   }
 
+  const favorited = !hasChildren && isFavorite(item.id)
+  const showStar = !hasChildren && (hovered || favorited)
+
   return (
-    <div>
+    <div
+      style={{ position: 'relative' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <button
         className={`nav-sub-btn ${isActive && !hasChildren ? 'active' : ''}`}
         onClick={handleClick}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[1] + 2 }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[1] + 2, paddingRight: !hasChildren ? 28 : undefined }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, minWidth: 0 }}>
           <Icon size={14} strokeWidth={2} style={{ flexShrink: 0, color: isActive && !hasChildren ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
@@ -84,6 +95,22 @@ function NavItem({
           />
         )}
       </button>
+      {showStar && (
+        <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}>
+          <IconButton
+            icon={
+              <Star
+                size={12}
+                color={favorited ? t.color.feedback.warning.solid : undefined}
+                fill={favorited ? t.color.feedback.warning.solid : 'none'}
+              />
+            }
+            aria-label={favorited ? `Remover ${item.label} dos favoritos` : `Adicionar ${item.label} aos favoritos`}
+            size="xs"
+            onClick={() => toggleFavorite(item.id)}
+          />
+        </span>
+      )}
       {expanded && hasChildren && (
         <div style={{ paddingBottom: 2 }}>
           {item.children!.map(child => {

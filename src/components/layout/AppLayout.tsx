@@ -4,6 +4,7 @@ import SecondaryNav from './SecondaryNav'
 import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
 import { FarmProvider } from '../../context/FarmContext'
+import { FavoritesProvider } from '../../context/FavoritesContext'
 import { t } from '../../design/tokens'
 import Favoritos from '../../pages/Favoritos'
 import PerfilUsuario from '../../pages/PerfilUsuario'
@@ -212,6 +213,7 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
 
   return (
     <FarmProvider>
+    <FavoritesProvider>
     <NavigationContext.Provider value={{ navigateTo }}>
     <div
       style={{
@@ -277,6 +279,7 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
       </div>
     </div>
     </NavigationContext.Provider>
+    </FavoritesProvider>
     </FarmProvider>
   )
 }

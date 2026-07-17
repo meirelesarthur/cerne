@@ -531,3 +531,24 @@ export const menuModules: NavModule[] = [
     ],
   },
 ]
+
+export interface NavItemMatch {
+  item:   NavSubItem
+  module: NavModule
+}
+
+/** Localiza uma funcionalidade (item de menu) pelo id, junto do módulo ao qual pertence. */
+export function findNavItemById(id: string): NavItemMatch | null {
+  for (const module of menuModules) {
+    const items = [
+      ...(module.flatItems ?? []),
+      ...(module.groups?.flatMap((g) => g.items) ?? []),
+    ]
+    for (const item of items) {
+      if (item.id === id) return { item, module }
+      const child = item.children?.find((c) => c.id === id)
+      if (child) return { item: child as NavSubItem, module }
+    }
+  }
+  return null
+}

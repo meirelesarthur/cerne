@@ -5,6 +5,7 @@ import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
 import { FarmProvider } from '../../context/FarmContext'
 import { t } from '../../design/tokens'
+import Favoritos from '../../pages/Favoritos'
 import PerfilUsuario from '../../pages/PerfilUsuario'
 import FazendasPage      from '../../pages/cadastros/fazendas/FazendasPage'
 import SafrasPage        from '../../pages/cadastros/safras/SafrasPage'
@@ -205,7 +206,9 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
 
   const pageContent = activeItemId
     ? renderPage(activeItemId, activeItemModule)
-    : children
+    : activeModuleId === 'favoritos'
+      ? <Favoritos />
+      : children
 
   return (
     <FarmProvider>

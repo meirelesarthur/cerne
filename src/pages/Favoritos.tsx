@@ -75,7 +75,7 @@ function getGreeting(): string {
   return 'Boa noite, vamos começar!'
 }
 
-export default function Dashboard() {
+export default function Favoritos() {
   const { navigateTo } = useNavigation()
   const { colors } = useTheme()
 

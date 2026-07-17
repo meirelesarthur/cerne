@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import AppLayout from './components/layout/AppLayout'
-import Dashboard from './pages/Dashboard'
+import OverviewPanel from './pages/dashboards/OverviewPanel'
 import Login from './pages/Login'
 import { SplashScreen } from './components/SplashScreen'
 import { ThemeProvider } from './context/ThemeContext'
@@ -23,7 +23,7 @@ export default function App() {
         <PermissionProvider>
           <SessionProvider onRelogin={() => setLoggedIn(false)}>
             <AppLayout onLogout={() => setLoggedIn(false)}>
-              <Dashboard />
+              <OverviewPanel />
             </AppLayout>
             <SessionExpiredModal />
           </SessionProvider>

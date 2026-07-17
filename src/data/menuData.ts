@@ -129,13 +129,7 @@ export const menuModules: NavModule[] = [
     label: 'Favoritos',
     emoji: '⭐',
     icon: Star,
-    flatItems: [
-      { id: 'fav-dfe', label: 'DFe Recebidas', path: '/favoritos/dfe', icon: FileInput },
-      { id: 'fav-pagar', label: 'C. a Pagar', path: '/favoritos/pagar', icon: ArrowUpCircle },
-      { id: 'fav-receber', label: 'C. a Receber', path: '/favoritos/receber', icon: ArrowDownCircle },
-      { id: 'fav-caixa', label: 'Mov. Caixa/Bancário', path: '/favoritos/caixa', icon: Wallet },
-      { id: 'fav-ofx', label: 'Importação OFX', path: '/favoritos/ofx', icon: Upload },
-    ],
+    path: '/favoritos',
   },
   {
     id: 'dashboards',

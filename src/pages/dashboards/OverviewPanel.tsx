@@ -3,7 +3,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
   Layers, ArrowRight, ChevronDown, TrendingUp, TrendingDown,
-  DollarSign, Wheat, BarChart2, MessageCircle, Settings2,
+  DollarSign, Wheat, BarChart2, MessageCircle, Settings2, Wallet,
 } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -14,6 +14,17 @@ import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Heading } from '../../components/ui/Heading'
 import { Trend } from '../../components/ui/Trend'
+import { Tabs } from '../../components/ui/Tabs'
+
+// ─── Formatação ───────────────────────────────────────────────────────────────
+
+function fmtCompact(v: number): string {
+  const abs = Math.abs(v)
+  const sign = v < 0 ? '-' : ''
+  if (abs >= 1_000_000) return `${sign}R$ ${(abs / 1_000_000).toFixed(1).replace('.', ',')}M`
+  if (abs >= 1_000) return `${sign}R$ ${(abs / 1_000).toFixed(1).replace('.', ',')}K`
+  return `${sign}R$ ${abs.toFixed(0)}`
+}
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -33,7 +44,7 @@ const TALHAOES: Talhao[] = [
   { id: 'T7', name: 'Talhão Água Limpa', area: '410 ha', crop: 'Soja', yieldForecast: '58 sc/ha', status: 'Enchimento de grãos', moisture: '76%', ndvi: '0.78', coords: [[-18.799,-52.630],[-18.799,-52.610],[-18.814,-52.610],[-18.814,-52.630]], color: '#059669', fillColor: '#059669', fillOpacity: 0.30 },
 ]
 
-// ─── Chart data ───────────────────────────────────────────────────────────────
+// ─── Séries mensais — realizado x previsto ────────────────────────────────────
 
 const AREA_DATA = [
   { month: 'Ago', receitas: 320,  despesas: 280 },
@@ -47,6 +58,24 @@ const AREA_DATA = [
   { month: 'Abr', receitas: 1320, despesas: 840 },
   { month: 'Mai', receitas: 1180, despesas: 660 },
 ]
+
+const FORECAST_DATA = [
+  { month: 'Jun', receitas: 980,  despesas: 640 },
+  { month: 'Jul', receitas: 1050, despesas: 700 },
+  { month: 'Ago', receitas: 1220, despesas: 760 },
+  { month: 'Set', receitas: 1380, despesas: 820 },
+  { month: 'Out', receitas: 1290, despesas: 900 },
+  { month: 'Nov', receitas: 1460, despesas: 940 },
+  { month: 'Dez', receitas: 1610, despesas: 1010 },
+  { month: 'Jan', receitas: 1180, despesas: 860 },
+  { month: 'Fev', receitas: 1340, despesas: 900 },
+  { month: 'Mar', receitas: 1500, despesas: 960 },
+]
+
+const SERIE_INFO = {
+  realizado: { hero: 'R$ 18,9M', label: 'Receitas mensais realizadas', trend: '27,4% nos últimos 30 dias', up: true },
+  previsto:  { hero: 'R$ 21,4M', label: 'Receitas mensais previstas',  trend: '13,2% acima do realizado', up: true },
+} as const
 
 // Cor de margem (3ª série do gráfico de área) — distinta de receita/despesa.
 const MARGEM_COLOR = t.color.accent.purple.text
@@ -80,6 +109,64 @@ const DRE_STAGES = [
   { label: 'Após COT',       value: 7400,  sublabel: '− c. total' },
   { label: 'Resultado',      value: 3500,  sublabel: 'R$ 3,5M'  },
 ]
+
+// ─── Previsão de fluxo (contas a receber/pagar em aberto) ─────────────────────
+
+const CASH_FORECAST = { aReceber: 3_084_785.19, aPagar: 3_975_108.84 }
+
+// ─── Resultado operacional realizado x previsto x atrasado ───────────────────
+
+const RESULTADO_OPERACIONAL = [
+  { label: 'Realizado', receitas: 117_770_940.25, despesas: 118_078_959.96 },
+  { label: 'Previsto',  receitas: 434_220.26,     despesas: 1_704_232.53 },
+  { label: 'Atrasado',  receitas: 11_289_853.67,  despesas: 7_661_796.79 },
+]
+const SALDO_TOTAL_OPERACIONAL = 2_050_030.84
+
+// ─── Composição de custo — COE x COT ──────────────────────────────────────────
+
+const COST_LABEL_COLOR: Record<string, string> = {
+  'Insumos':                    t.chart.series[0],
+  'Operações mecanizadas':      t.chart.series[1],
+  'Mão de obra':                t.chart.series[2],
+  'Arrendamento':                t.chart.series[3],
+  'Despesas administrativas':   t.chart.series[4],
+  'Financeiras':                 t.chart.series[5],
+  'Outros':                      t.chart.series[6],
+}
+
+const COE_COMPOSITION = [
+  { label: 'Insumos',               pct: 42 },
+  { label: 'Operações mecanizadas', pct: 26 },
+  { label: 'Mão de obra',           pct: 19 },
+  { label: 'Arrendamento',          pct: 9  },
+  { label: 'Outros',                pct: 4  },
+]
+
+const COT_COMPOSITION = [
+  { label: 'Insumos',                  pct: 33 },
+  { label: 'Operações mecanizadas',    pct: 20 },
+  { label: 'Mão de obra',              pct: 15 },
+  { label: 'Arrendamento',             pct: 7  },
+  { label: 'Despesas administrativas', pct: 14 },
+  { label: 'Financeiras',              pct: 8  },
+  { label: 'Outros',                   pct: 3  },
+]
+
+const COST_LEGEND_LABELS = [...new Set([...COE_COMPOSITION, ...COT_COMPOSITION].map(s => s.label))]
+
+// ─── Resultado por cultura ─────────────────────────────────────────────────────
+
+const CROP_PERFORMANCE: Record<string, {
+  realizada: number; aRealizar: number
+  produtividade: number; unidProd: string
+  margemHa: number; precoMedio: number; unidPreco: string
+}> = {
+  'Soja':           { realizada: 42_300_000, aRealizar: 8_200_000, produtividade: 62,  unidProd: 'sc/ha', margemHa: 3_850, precoMedio: 132, unidPreco: 'R$/sc' },
+  'Milho':          { realizada: 31_800_000, aRealizar: 5_100_000, produtividade: 136, unidProd: 'sc/ha', margemHa: 2_640, precoMedio: 58,  unidPreco: 'R$/sc' },
+  'Cana-de-açúcar': { realizada: 9_400_000,  aRealizar: 1_600_000, produtividade: 85,  unidProd: 't/ha',  margemHa: 1_980, precoMedio: 118, unidPreco: 'R$/t'  },
+  'Pastagem':       { realizada: 0,          aRealizar: 0,         produtividade: 0,   unidProd: '—',     margemHa: 0,    precoMedio: 0,   unidPreco: '—'    },
+}
 
 // ─── Talhões Map ──────────────────────────────────────────────────────────────
 
@@ -315,6 +402,115 @@ function SegmentedBar({ segments, colors }: {
   )
 }
 
+// ─── Mini diverging bar (receitas x despesas, escala local) ──────────────────
+
+function MiniDivergingBar({ label, positive, negative, colors }: {
+  label: string; positive: number; negative: number; colors: ThemeColors
+}) {
+  const max = Math.max(positive, negative) || 1
+  const saldo = positive - negative
+  const saldoUp = saldo >= 0
+
+  return (
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[2] }}>{label}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: t.space[2] }}>
+        <div style={{ height: 6, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${(positive / max) * 100}%`, background: t.color.brand[600], borderRadius: t.radius.full }} />
+        </div>
+        <div style={{ height: 6, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${(negative / max) * 100}%`, background: t.color.feedback.error.solid, borderRadius: t.radius.full }} />
+        </div>
+      </div>
+      <div style={{
+        fontSize: t.font.size.sm, fontWeight: t.font.weight.bold,
+        color: saldoUp ? t.color.feedback.success.text : t.color.feedback.error.text,
+      }}>
+        {fmtCompact(saldo)}
+      </div>
+    </div>
+  )
+}
+
+// ─── Barra de composição de custo (segmentos categóricos, ordem fixa) ────────
+
+function CostCompositionBar({ label, total, segments, colors }: {
+  label: string; total: string
+  segments: { label: string; pct: number }[]
+  colors: ThemeColors
+}) {
+  return (
+    <div style={{ marginBottom: t.space[3] }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+        <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{label}</span>
+        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{total}</span>
+      </div>
+      <div style={{ display: 'flex', height: 10, borderRadius: 2, overflow: 'hidden', gap: 2 }}>
+        {segments.map(s => (
+          <div
+            key={s.label}
+            title={`${s.label} — ${s.pct}%`}
+            style={{ flex: s.pct, background: COST_LABEL_COLOR[s.label] ?? t.color.neutral[400], borderRadius: 2 }}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Linha de desempenho por cultura ──────────────────────────────────────────
+
+function StatMini({ label, value, colors }: { label: string; value: string; colors: ThemeColors }) {
+  return (
+    <div style={{ textAlign: 'right', minWidth: 76, flexShrink: 0 }}>
+      <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{label}</div>
+      <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{value}</div>
+    </div>
+  )
+}
+
+function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; colors: ThemeColors }) {
+  const perf = CROP_PERFORMANCE[crop] ?? { realizada: 0, aRealizar: 0, produtividade: 0, unidProd: '—', margemHa: 0, precoMedio: 0, unidPreco: '—' }
+  const total = perf.realizada + perf.aRealizar
+  const color = CROP_COLOR[crop] ?? t.color.neutral[400]
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], padding: `${t.space[2] + 2}px 0`, borderBottom: `1px solid ${colors.border.subtle}` }}>
+      <div style={{ width: 130, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: color, flexShrink: 0 }} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{crop}</div>
+          <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{ha.toLocaleString('pt-BR')} ha</div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {total > 0 ? (
+          <>
+            <div style={{ display: 'flex', height: 8, borderRadius: t.radius.full, overflow: 'hidden', gap: 2 }}>
+              <div style={{ flex: perf.realizada, background: t.color.brand[600], borderRadius: t.radius.full }} />
+              <div style={{ flex: perf.aRealizar, background: t.color.brand[200], borderRadius: t.radius.full }} />
+            </div>
+            <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle, marginTop: 4 }}>
+              {fmtCompact(total)} em receita
+            </div>
+          </>
+        ) : (
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Sem produção comercial no período</div>
+        )}
+      </div>
+
+      {total > 0 && (
+        <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0 }}>
+          <StatMini label="Produtividade" value={`${perf.produtividade} ${perf.unidProd}`} colors={colors} />
+          <StatMini label="Margem/ha"     value={`R$ ${perf.margemHa.toLocaleString('pt-BR')}`} colors={colors} />
+          <StatMini label="Preço médio"   value={`${perf.precoMedio} ${perf.unidPreco}`} colors={colors} />
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Divider ──────────────────────────────────────────────────────────────────
 
 function Div({ colors }: { colors: ThemeColors }) {
@@ -327,12 +523,17 @@ export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('10')
+  const [serie, setSerie] = useState<'realizado' | 'previsto'>('realizado')
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
-  // Período fatia os últimos N meses da série de receitas/despesas
-  const areaData = AREA_DATA.slice(-Number(periodo))
+  // Período fatia os últimos N meses da série ativa (realizado ou previsto)
+  const activeData = (serie === 'realizado' ? AREA_DATA : FORECAST_DATA).slice(-Number(periodo))
+  const serieInfo = SERIE_INFO[serie]
+
+  const saldoPrevisto = CASH_FORECAST.aReceber - CASH_FORECAST.aPagar
+  const fluxoMax = Math.max(CASH_FORECAST.aReceber, CASH_FORECAST.aPagar)
 
   const bc = colors.border.default as string
 
@@ -423,19 +624,26 @@ export default function OverviewPanel() {
 
           <HDivider color={bc} />
 
-          {/* Area chart — Receitas mensais */}
+          {/* Area chart — Receitas mensais (realizado x previsto) */}
           <div style={{ padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            {/* MRR header */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4], gap: t.space[4] }}>
               <div>
                 <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1 }}>
-                  R$ 18,9M
+                  {serieInfo.hero}
                 </div>
                 <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[1] }}>
-                  Receitas mensais realizadas
+                  {serieInfo.label}
                 </div>
               </div>
-              <Trend value="27,4% nos últimos 30 dias" up />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: t.space[2], flexShrink: 0 }}>
+                <Tabs
+                  label="Série"
+                  items={[{ id: 'realizado', label: 'Realizado' }, { id: 'previsto', label: 'Previsto' }]}
+                  activeId={serie}
+                  onChange={(id) => setSerie(id as 'realizado' | 'previsto')}
+                />
+                <Trend value={serieInfo.trend} up={serieInfo.up} />
+              </div>
             </div>
             {/* Legend */}
             <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[3] }}>
@@ -450,7 +658,7 @@ export default function OverviewPanel() {
                 </div>
               ))}
             </div>
-            <AreaChart colors={colors} isGbMode={isGbMode} data={areaData} />
+            <AreaChart colors={colors} isGbMode={isGbMode} data={activeData} />
           </div>
 
           <HDivider color={bc} />
@@ -493,6 +701,41 @@ export default function OverviewPanel() {
 
           <HDivider color={bc} />
 
+          {/* Resultado operacional — realizado x previsto x atrasado */}
+          <div style={{ padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
+              <div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[1] }}>
+                  Resultado operacional · saldo total no período
+                </div>
+                <div style={{
+                  fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, lineHeight: 1.1,
+                  color: SALDO_TOTAL_OPERACIONAL >= 0 ? t.color.feedback.success.text : t.color.feedback.error.text,
+                }}>
+                  {fmtCompact(SALDO_TOTAL_OPERACIONAL)}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0, paddingTop: t.space[1] }}>
+                {[
+                  { color: t.color.brand[600], label: 'Receitas' },
+                  { color: t.color.feedback.error.solid, label: 'Despesas' },
+                ].map(s => (
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
+                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: t.space[6] }}>
+              {RESULTADO_OPERACIONAL.map(r => (
+                <MiniDivergingBar key={r.label} label={r.label} positive={r.receitas} negative={r.despesas} colors={colors} />
+              ))}
+            </div>
+          </div>
+
+          <HDivider color={bc} />
+
           {/* Área plantada por cultura — cruza os talhões (ha × cultura) */}
           <div style={{ padding: `${t.space[4]}px ${t.space[5]}px` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
@@ -509,6 +752,24 @@ export default function OverviewPanel() {
                 label: `${crop} — ${Math.round((ha / TOTAL_HA) * 100)}%`,
               }))}
             />
+          </div>
+
+          <HDivider color={bc} />
+
+          {/* Resultado por cultura — receita realizada/a realizar + indicadores agronômicos */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[5]}px ${t.space[5]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[2] }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Resultado por cultura</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: t.color.brand[600], display: 'inline-block' }} />
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Realizada</span>
+                <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: t.color.brand[200], display: 'inline-block', marginLeft: t.space[2] }} />
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>A realizar</span>
+              </div>
+            </div>
+            {AREA_BY_CROP.map(([crop, ha]) => (
+              <CropPerformanceRow key={crop} crop={crop} ha={ha} colors={colors} />
+            ))}
           </div>
 
         </div>
@@ -570,50 +831,79 @@ export default function OverviewPanel() {
 
           <HDivider color={bc} />
 
-          {/* Cost summary card */}
-          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
+          {/* Custo de produção — composição COE x COT */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[3] }}>
+              <TrendingUp size={11} color={t.color.brand[600]} />
               <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
-                <TrendingUp size={11} color={t.color.brand[600]} style={{ marginRight: 4 }} />
-                Margem — última apuração
+                Custo de produção — COE x COT
               </span>
             </div>
-            {[
-              { label: 'Período',        value: 'Set/24 – Mai/25' },
-              { label: 'Margem bruta',   value: 'R$ 1.218.669' },
-              { label: 'Margem líquida', value: 'R$ 790.978' },
-              { label: 'Status',         value: 'Concluído', green: true },
-            ].map(row => (
-              <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: t.space[2], marginBottom: t.space[2], borderBottom: `1px solid ${colors.border.default}` }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{row.label}:</span>
-                <span style={{
-                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                  color: row.green ? t.color.feedback.success.text : colors.fg.default,
-                }}>
-                  {row.value}
-                </span>
+
+            <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[4] }}>
+              <div>
+                <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>Margem bruta</div>
+                <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.fg.default }}>R$ 56,1M</div>
               </div>
-            ))}
-            <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[1] }}>
+              <div>
+                <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>Margem líquida</div>
+                <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.fg.default }}>R$ 56,0M</div>
+              </div>
+            </div>
+
+            <CostCompositionBar label="COE — Custo Operacional Efetivo" total="R$ 62,4M" segments={COE_COMPOSITION} colors={colors} />
+            <CostCompositionBar label="COT — Custo Operacional Total"   total="R$ 73,4M" segments={COT_COMPOSITION} colors={colors} />
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: t.space[2], marginTop: t.space[1] }}>
+              {COST_LEGEND_LABELS.map(label => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: COST_LABEL_COLOR[label], display: 'inline-block', flexShrink: 0 }} />
+                  <span style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{label}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[3] }}>
               Ver detalhes
             </Button>
           </div>
 
-          {/* Needs attention */}
-          <div style={{ padding: `${t.space[3]}px ${t.space[4]}px` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[2] }}>
-              <TrendingDown size={11} color={t.color.feedback.error.text} />
-              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Requer atenção</span>
+          <HDivider color={bc} />
+
+          {/* Previsão de receitas x despesas (contas em aberto) */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[3] }}>
+              <Wallet size={11} color={colors.fg.subtle as string} />
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Previsão de receitas x despesas</span>
             </div>
+
             {[
-              { label: 'Saldo atrasado', value: 'R$ 1.940,73', color: t.color.feedback.error.text },
-              { label: 'Desp. previstas', value: 'R$ 82.339,92', color: t.color.feedback.warning.text },
-            ].map(item => (
-              <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: t.space[1] }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{item.label}</span>
-                <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: item.color }}>{item.value}</span>
+              { label: 'A receber', value: CASH_FORECAST.aReceber, color: t.color.brand[600] },
+              { label: 'A pagar',   value: CASH_FORECAST.aPagar,   color: t.color.feedback.error.solid },
+            ].map(row => (
+              <div key={row.label} style={{ marginBottom: t.space[3] }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{row.label}</span>
+                  <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{fmtCompact(row.value)}</span>
+                </div>
+                <div style={{ height: 6, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${(row.value / fluxoMax) * 100}%`, background: row.color, borderRadius: t.radius.full }} />
+                </div>
               </div>
             ))}
+
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              paddingTop: t.space[2], borderTop: `1px solid ${colors.border.default}`,
+            }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Saldo previsto</span>
+              <span style={{
+                fontSize: t.font.size.base, fontWeight: t.font.weight.bold,
+                color: saldoPrevisto >= 0 ? t.color.feedback.success.text : t.color.feedback.error.text,
+              }}>
+                {fmtCompact(saldoPrevisto)}
+              </span>
+            </div>
           </div>
 
         </div>

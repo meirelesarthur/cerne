@@ -15,16 +15,12 @@ import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Heading } from '../../components/ui/Heading'
 import { Trend } from '../../components/ui/Trend'
 import { Tabs } from '../../components/ui/Tabs'
-
-// ─── Formatação ───────────────────────────────────────────────────────────────
-
-function fmtCompact(v: number): string {
-  const abs = Math.abs(v)
-  const sign = v < 0 ? '-' : ''
-  if (abs >= 1_000_000) return `${sign}R$ ${(abs / 1_000_000).toFixed(1).replace('.', ',')}M`
-  if (abs >= 1_000) return `${sign}R$ ${(abs / 1_000).toFixed(1).replace('.', ',')}K`
-  return `${sign}R$ ${abs.toFixed(0)}`
-}
+import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
+import {
+  buildOverviewCarta, headlineInsight, fmtCompact,
+  type OverviewDataset,
+} from '../../insights/overviewInsights'
+import { useFarm } from '../../context/FarmContext'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -77,6 +73,10 @@ const SERIE_INFO = {
   previsto:  { hero: 'R$ 21,4M', label: 'Receitas mensais previstas',  trend: '13,2% acima do realizado', up: true },
 } as const
 
+// Receitas da safra anterior, alinhadas mês a mês — linha fantasma para
+// comparação YoY no gráfico de área (apenas na série "Realizado").
+const PREV_SAFRA_RECEITAS = [280, 3400, 520, 700, 690, 820, 1010, 870, 1150, 1040]
+
 // Cor de margem (3ª série do gráfico de área) — distinta de receita/despesa.
 const MARGEM_COLOR = t.color.accent.purple.text
 
@@ -113,6 +113,48 @@ const DRE_STAGES = [
 // ─── Previsão de fluxo (contas a receber/pagar em aberto) ─────────────────────
 
 const CASH_FORECAST = { aReceber: 3_084_785.19, aPagar: 3_975_108.84 }
+
+// Aging dos títulos em aberto — mesma lógica do "backlog por idade": título
+// envelhecendo silenciosamente é o maior risco de caixa.
+const AGING_BUCKETS = [
+  { label: 'até 7 dias', receber: 1_240_000, pagar: 1_610_000 },
+  { label: '8–15 dias',  receber: 830_000,   pagar: 1_120_000 },
+  { label: '16–30 dias', receber: 620_000,   pagar: 890_000 },
+  { label: '+30 dias',   receber: 394_785.19, pagar: 355_108.84 },
+]
+
+// Fluxo líquido projetado (mil R$) — a curva acumulada revela QUANDO o caixa
+// cruza o zero, não só o saldo pontual.
+const CASHFLOW_12M = [
+  { month: 'Jun', net: -320 }, { month: 'Jul', net: -410 }, { month: 'Ago', net: 180 },
+  { month: 'Set', net: -540 }, { month: 'Out', net: -620 }, { month: 'Nov', net: 240 },
+  { month: 'Dez', net: 1600 }, { month: 'Jan', net: -380 }, { month: 'Fev', net: 440 },
+  { month: 'Mar', net: 540 },  { month: 'Abr', net: 620 },  { month: 'Mai', net: 520 },
+]
+
+// Cobertura de estoque dos insumos críticos (dias) contra o mínimo operacional.
+const STOCK_COVERAGE = [
+  { item: 'Fertilizante NPK',      dias: 12, min: 15 },
+  { item: 'Óleo diesel',           dias: 9,  min: 10 },
+  { item: 'Defensivo — glifosato', dias: 34, min: 15 },
+  { item: 'Semente de milho',      dias: 58, min: 20 },
+]
+
+// Concentração de receita por comprador — >40% em um único canal é risco estrutural.
+const REVENUE_SHARE = [
+  { label: 'Coop. Vale Verde', pct: 44 },
+  { label: 'Trading AgroSul',  pct: 27 },
+  { label: 'Nutrien',          pct: 17 },
+  { label: 'Outros',           pct: 12 },
+]
+
+// Exceções da semana — gestão por exceção, não por relatório.
+const EXCEPTIONS: { label: string; value?: string; tone: 'error' | 'warning' | 'info' }[] = [
+  { label: '7 títulos vencem nos próximos 5 dias', value: 'R$ 412,3K', tone: 'warning' },
+  { label: 'Óleo diesel abaixo da cobertura mínima', value: '9 dias', tone: 'error' },
+  { label: '3 DFe recebidas aguardam manifestação', tone: 'info' },
+  { label: 'Safra 25/26 sem configuração de semanas', tone: 'info' },
+]
 
 // ─── Resultado operacional realizado x previsto x atrasado ───────────────────
 
@@ -160,12 +202,33 @@ const COST_LEGEND_LABELS = [...new Set([...COE_COMPOSITION, ...COT_COMPOSITION].
 const CROP_PERFORMANCE: Record<string, {
   realizada: number; aRealizar: number
   produtividade: number; unidProd: string
-  margemHa: number; precoMedio: number; unidPreco: string
+  margemHa: number; custoMedio: number; precoMedio: number; unidPreco: string
 }> = {
-  'Soja':           { realizada: 42_300_000, aRealizar: 8_200_000, produtividade: 62,  unidProd: 'sc/ha', margemHa: 3_850, precoMedio: 132, unidPreco: 'R$/sc' },
-  'Milho':          { realizada: 31_800_000, aRealizar: 5_100_000, produtividade: 136, unidProd: 'sc/ha', margemHa: 2_640, precoMedio: 58,  unidPreco: 'R$/sc' },
-  'Cana-de-açúcar': { realizada: 9_400_000,  aRealizar: 1_600_000, produtividade: 85,  unidProd: 't/ha',  margemHa: 1_980, precoMedio: 118, unidPreco: 'R$/t'  },
-  'Pastagem':       { realizada: 0,          aRealizar: 0,         produtividade: 0,   unidProd: '—',     margemHa: 0,    precoMedio: 0,   unidPreco: '—'    },
+  'Soja':           { realizada: 42_300_000, aRealizar: 8_200_000, produtividade: 62,  unidProd: 'sc/ha', margemHa: 3_850, custoMedio: 108, precoMedio: 132, unidPreco: 'R$/sc' },
+  'Milho':          { realizada: 31_800_000, aRealizar: 5_100_000, produtividade: 136, unidProd: 'sc/ha', margemHa: 2_640, custoMedio: 52,  precoMedio: 58,  unidPreco: 'R$/sc' },
+  'Cana-de-açúcar': { realizada: 9_400_000,  aRealizar: 1_600_000, produtividade: 85,  unidProd: 't/ha',  margemHa: 1_980, custoMedio: 96,  precoMedio: 118, unidPreco: 'R$/t'  },
+  'Pastagem':       { realizada: 0,          aRealizar: 0,         produtividade: 0,   unidProd: '—',     margemHa: 0,    custoMedio: 0,   precoMedio: 0,   unidPreco: '—'    },
+}
+
+// ─── Dataset consolidado para o motor de interpretação ───────────────────────
+
+const OVERVIEW_DATASET: OverviewDataset = {
+  monthly: AREA_DATA,
+  resultado: RESULTADO_OPERACIONAL,
+  saldoTotal: SALDO_TOTAL_OPERACIONAL,
+  aReceber: CASH_FORECAST.aReceber,
+  aPagar: CASH_FORECAST.aPagar,
+  aging: AGING_BUCKETS,
+  crops: AREA_BY_CROP.map(([crop, ha]) => {
+    const p = CROP_PERFORMANCE[crop]
+    return {
+      crop, ha,
+      realizada: p?.realizada ?? 0, aRealizar: p?.aRealizar ?? 0,
+      margemHa: p?.margemHa ?? 0, custoMedio: p?.custoMedio ?? 0,
+      precoMedio: p?.precoMedio ?? 0, unidPreco: p?.unidPreco ?? '—',
+    }
+  }),
+  cashflow12m: CASHFLOW_12M,
 }
 
 // ─── Talhões Map ──────────────────────────────────────────────────────────────
@@ -227,16 +290,24 @@ function smoothPath(pts: [number, number][]): string {
   return d
 }
 
-function AreaChart({ colors, isGbMode, data = AREA_DATA }: { colors: ThemeColors; isGbMode: boolean; data?: typeof AREA_DATA }) {
+function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
+  colors: ThemeColors; isGbMode: boolean; data?: typeof AREA_DATA
+  /** Receitas da safra anterior alinhadas por índice — linha fantasma YoY. */
+  prevSeries?: number[]
+}) {
   const [hov, setHov] = useState<number | null>(null)
   const W = 700; const H = 200; const PL = 40; const PT = 16; const PR = 8; const PB = 32
   const cW = W - PL - PR; const cH = H - PT - PB
-  const maxV = Math.max(...data.map(d => d.receitas)) * 1.12
+  const maxV = Math.max(...data.map(d => d.receitas), ...(prevSeries ?? [])) * 1.12
   const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
     data.map((d, i) => [PL + (i / (data.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
 
   const recPts = pts('receitas')
   const dspPts = pts('despesas')
+  const prevPts: [number, number][] = (prevSeries ?? []).slice(-data.length).map((v, i) => [
+    PL + (i / (data.length - 1)) * cW,
+    PT + cH - (v / maxV) * cH,
+  ])
   // Margem = receitas − despesas (cruzamento dos dois totais numa 3ª série)
   const mgPts: [number, number][] = data.map((d, i) => [
     PL + (i / (data.length - 1)) * cW,
@@ -287,6 +358,10 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA }: { colors: ThemeColors
         <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />
 
         {/* Lines */}
+        {prevPts.length > 1 && (
+          <path d={smoothPath(prevPts)} fill="none" stroke={colors.fg.subtle as string} strokeWidth={1.25}
+            strokeLinejoin="round" strokeLinecap="round" strokeDasharray="2 4" opacity={0.7} />
+        )}
         <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
         <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
@@ -458,7 +533,111 @@ function CostCompositionBar({ label, total, segments, colors }: {
   )
 }
 
-// ─── Linha de desempenho por cultura ──────────────────────────────────────────
+// ─── Fluxo de caixa projetado — barras líquidas + curva acumulada ─────────────
+
+function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
+  const [hov, setHov] = useState<number | null>(null)
+  const W = 700; const H = 170; const PL = 44; const PT = 12; const PR = 8; const PB = 26
+  const cW = W - PL - PR; const cH = H - PT - PB
+  const data = CASHFLOW_12M
+
+  const cum: number[] = []
+  data.reduce((acc, m) => { const v = acc + m.net; cum.push(v); return v }, 0)
+
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.net)), ...cum.map(Math.abs)) * 1.15
+  const y = (v: number) => PT + cH / 2 - (v / maxAbs) * (cH / 2)
+  const x = (i: number) => PL + (i / (data.length - 1)) * cW
+  const barW = (cW / data.length) * 0.42
+
+  const cumPts: [number, number][] = cum.map((v, i) => [x(i), y(v)])
+  const zeroY = y(0)
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
+      {/* Zona negativa */}
+      <rect x={PL} y={zeroY} width={cW} height={PT + cH - zeroY}
+        fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
+      {/* Linha do zero */}
+      <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
+      <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={9} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
+
+      {/* Barras de fluxo líquido mensal */}
+      {data.map((d, i) => {
+        const bx = x(i) - barW / 2
+        const by = d.net >= 0 ? y(d.net) : zeroY
+        const bh = Math.abs(y(d.net) - zeroY)
+        const isH = hov === i
+        return (
+          <g key={d.month}>
+            <rect x={bx} y={by} width={barW} height={Math.max(bh, 1)} rx={2}
+              fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
+              opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
+              style={{ transition: `opacity ${t.transition.fast}` }} />
+            <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={9}
+              fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
+              fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
+              {d.month}
+            </text>
+            <rect x={x(i) - cW / data.length / 2} y={PT} width={cW / data.length} height={cH} fill="transparent"
+              onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ cursor: 'crosshair' }} />
+          </g>
+        )
+      })}
+
+      {/* Curva acumulada */}
+      <path d={smoothPath(cumPts)} fill="none" stroke={t.color.accent.purple.text} strokeWidth={2}
+        strokeLinejoin="round" strokeLinecap="round" />
+
+      {/* Hover: valores */}
+      {hov !== null && (
+        <g>
+          <circle cx={cumPts[hov][0]} cy={cumPts[hov][1]} r={4} fill={t.color.accent.purple.text} stroke={colors.bg.surface} strokeWidth={2} />
+          <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={9} fontWeight={600}
+            fill={colors.fg.default as string} fontFamily="Outfit,sans-serif">
+            {`líq. ${fmtCompact(data[hov].net * 1000)} · acum. ${fmtCompact(cum[hov] * 1000)}`}
+          </text>
+        </g>
+      )}
+    </svg>
+  )
+}
+
+// ─── Aging de títulos em aberto ───────────────────────────────────────────────
+
+function AgingRows({ colors }: { colors: ThemeColors }) {
+  const max = Math.max(...AGING_BUCKETS.flatMap(b => [b.receber, b.pagar])) || 1
+  return (
+    <div>
+      {AGING_BUCKETS.map((b, i) => {
+        const isOld = i === AGING_BUCKETS.length - 1
+        return (
+          <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[1] + 2 }}>
+            <span style={{
+              width: 68, flexShrink: 0, fontSize: t.font.size['3xs'],
+              color: isOld ? t.color.feedback.error.text : colors.fg.subtle,
+              fontWeight: isOld ? t.font.weight.semibold : t.font.weight.normal,
+            }}>
+              {b.label}
+            </span>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ height: 5, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}
+                title={`A receber ${b.label}: ${fmtCompact(b.receber)}`}>
+                <div style={{ height: '100%', width: `${(b.receber / max) * 100}%`, background: t.color.brand[600], borderRadius: t.radius.full }} />
+              </div>
+              <div style={{ height: 5, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}
+                title={`A pagar ${b.label}: ${fmtCompact(b.pagar)}`}>
+                <div style={{ height: '100%', width: `${(b.pagar / max) * 100}%`, background: t.color.feedback.error.solid, borderRadius: t.radius.full }} />
+              </div>
+            </div>
+            <span style={{ width: 60, flexShrink: 0, textAlign: 'right', fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>
+              {fmtCompact(b.receber)}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function StatMini({ label, value, colors }: { label: string; value: string; colors: ThemeColors }) {
   return (
@@ -470,9 +649,13 @@ function StatMini({ label, value, colors }: { label: string; value: string; colo
 }
 
 function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; colors: ThemeColors }) {
-  const perf = CROP_PERFORMANCE[crop] ?? { realizada: 0, aRealizar: 0, produtividade: 0, unidProd: '—', margemHa: 0, precoMedio: 0, unidPreco: '—' }
+  const perf = CROP_PERFORMANCE[crop] ?? { realizada: 0, aRealizar: 0, produtividade: 0, unidProd: '—', margemHa: 0, custoMedio: 0, precoMedio: 0, unidPreco: '—' }
   const total = perf.realizada + perf.aRealizar
   const color = CROP_COLOR[crop] ?? t.color.neutral[400]
+  // Folga de breakeven — distância entre preço médio e custo médio; abaixo de
+  // 15% uma oscilação de mercado dessa ordem zera a margem da cultura.
+  const folga = perf.custoMedio > 0 ? ((perf.precoMedio - perf.custoMedio) / perf.custoMedio) * 100 : null
+  const folgaApertada = folga !== null && folga < 15
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], padding: `${t.space[2] + 2}px 0`, borderBottom: `1px solid ${colors.border.subtle}` }}>
@@ -501,10 +684,26 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
       </div>
 
       {total > 0 && (
-        <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0, alignItems: 'center' }}>
           <StatMini label="Produtividade" value={`${perf.produtividade} ${perf.unidProd}`} colors={colors} />
           <StatMini label="Margem/ha"     value={`R$ ${perf.margemHa.toLocaleString('pt-BR')}`} colors={colors} />
+          <StatMini label="Custo médio"   value={`${perf.custoMedio} ${perf.unidPreco}`} colors={colors} />
           <StatMini label="Preço médio"   value={`${perf.precoMedio} ${perf.unidPreco}`} colors={colors} />
+          {folga !== null && (
+            <div
+              title={`Folga do preço médio sobre o custo médio (breakeven)${folgaApertada ? ' — abaixo de 15%: oscilação de preço dessa ordem zera a margem' : ''}`}
+              style={{
+                textAlign: 'center', minWidth: 64, flexShrink: 0,
+                padding: `${t.space[1]}px ${t.space[2]}px`, borderRadius: t.radius.md,
+                background: folgaApertada ? t.color.feedback.warning.bg : t.color.feedback.success.bg,
+              }}
+            >
+              <div style={{ fontSize: t.font.size['3xs'], color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>Folga s/ custo</div>
+              <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>
+                {folga.toFixed(0)}%
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -521,9 +720,11 @@ function Div({ colors }: { colors: ThemeColors }) {
 
 export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
+  const { currentFarm } = useFarm()
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('10')
   const [serie, setSerie] = useState<'realizado' | 'previsto'>('realizado')
+  const [cartaOpen, setCartaOpen] = useState(false)
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
@@ -531,6 +732,11 @@ export default function OverviewPanel() {
   // Período fatia os últimos N meses da série ativa (realizado ou previsto)
   const activeData = (serie === 'realizado' ? AREA_DATA : FORECAST_DATA).slice(-Number(periodo))
   const serieInfo = SERIE_INFO[serie]
+
+  // Motor de interpretação — insight de destaque e carta completa, ambos
+  // computados dos mesmos dados que alimentam os charts (nunca inventados).
+  const insight = headlineInsight(OVERVIEW_DATASET)
+  const carta = buildOverviewCarta(OVERVIEW_DATASET)
 
   const saldoPrevisto = CASH_FORECAST.aReceber - CASH_FORECAST.aPagar
   const fluxoMax = Math.max(CASH_FORECAST.aReceber, CASH_FORECAST.aPagar)
@@ -651,6 +857,7 @@ export default function OverviewPanel() {
                 { color: t.color.brand[600], label: 'Receitas' },
                 { color: t.color.feedback.error.solid, label: 'Despesas' },
                 { color: MARGEM_COLOR, label: 'Margem' },
+                ...(serie === 'realizado' ? [{ color: colors.fg.subtle as string, label: 'Safra anterior' }] : []),
               ].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
@@ -658,7 +865,12 @@ export default function OverviewPanel() {
                 </div>
               ))}
             </div>
-            <AreaChart colors={colors} isGbMode={isGbMode} data={activeData} />
+            <AreaChart
+              colors={colors}
+              isGbMode={isGbMode}
+              data={activeData}
+              prevSeries={serie === 'realizado' ? PREV_SAFRA_RECEITAS.slice(-Number(periodo)) : undefined}
+            />
           </div>
 
           <HDivider color={bc} />
@@ -666,21 +878,21 @@ export default function OverviewPanel() {
           {/* Bottom row: Insight + Budget */}
           <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
 
-            {/* AI Insight */}
+            {/* Insight computado pelo motor de interpretação */}
             <div style={{ flex: 1, padding: t.space[5] }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                   <BarChart2 size={13} color={colors.fg.subtle as string} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Insights</span>
                 </div>
-                <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />}>
-                  Perguntar
+                <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
+                  Ver carta completa
                 </Button>
               </div>
               <p style={{ fontSize: t.font.size.lg, color: colors.fg.subtle, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
-                A margem bruta melhorou{' '}
-                <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>3,5% neste mês</strong>{' '}
-                em relação ao burn dos últimos 30 dias.
+                {insight.text}
+                <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>{insight.strong}</strong>
+                {insight.tail}
               </p>
             </div>
 
@@ -732,6 +944,30 @@ export default function OverviewPanel() {
                 <MiniDivergingBar key={r.label} label={r.label} positive={r.receitas} negative={r.despesas} colors={colors} />
               ))}
             </div>
+          </div>
+
+          <HDivider color={bc} />
+
+          {/* Fluxo de caixa projetado — acumulado 12 meses */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[5]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[2] }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>
+                Fluxo de caixa projetado — próximos 12 meses
+              </span>
+              <div style={{ display: 'flex', gap: t.space[3] }}>
+                {[
+                  { color: t.color.brand[600], label: 'Fluxo líquido +' },
+                  { color: t.color.feedback.error.solid, label: 'Fluxo líquido −' },
+                  { color: t.color.accent.purple.text, label: 'Acumulado' },
+                ].map(s => (
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
+                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <CashflowChart colors={colors} isGbMode={isGbMode} />
           </div>
 
           <HDivider color={bc} />
@@ -895,6 +1131,7 @@ export default function OverviewPanel() {
             <div style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               paddingTop: t.space[2], borderTop: `1px solid ${colors.border.default}`,
+              marginBottom: t.space[3],
             }}>
               <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Saldo previsto</span>
               <span style={{
@@ -904,10 +1141,104 @@ export default function OverviewPanel() {
                 {fmtCompact(saldoPrevisto)}
               </span>
             </div>
+
+            {/* Aging dos títulos em aberto */}
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[2] }}>
+              Aging dos títulos em aberto
+            </div>
+            <AgingRows colors={colors} />
+          </div>
+
+          <HDivider color={bc} />
+
+          {/* Cobertura de estoque — insumos críticos */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px` }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[3] }}>
+              Cobertura de estoque — insumos críticos
+            </div>
+            {STOCK_COVERAGE.map(s => {
+              const abaixo = s.dias < s.min
+              return (
+                <div key={s.item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[2] }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.item}
+                    </div>
+                    <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>mínimo {s.min} dias</div>
+                  </div>
+                  <span style={{
+                    flexShrink: 0, fontSize: t.font.size.xs, fontWeight: t.font.weight.bold,
+                    padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
+                    color: abaixo ? t.color.feedback.error.text : t.color.feedback.success.text,
+                    background: abaixo ? t.color.feedback.error.bg : t.color.feedback.success.bg,
+                  }}>
+                    {s.dias} dias
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+
+          <HDivider color={bc} />
+
+          {/* Concentração de receita por comprador */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[3] }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Concentração de receita</span>
+              {REVENUE_SHARE[0].pct > 40 && (
+                <span style={{
+                  fontSize: t.font.size['3xs'], fontWeight: t.font.weight.semibold,
+                  color: t.color.feedback.warning.text, background: t.color.feedback.warning.bg,
+                  padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
+                }}>
+                  {REVENUE_SHARE[0].pct}% em 1 comprador
+                </span>
+              )}
+            </div>
+            <SegmentedBar
+              colors={colors}
+              segments={REVENUE_SHARE.map((r, i) => ({
+                color: t.chart.series[i],
+                pct: r.pct,
+                label: `${r.label} — ${r.pct}%`,
+              }))}
+            />
+          </div>
+
+          <HDivider color={bc} />
+
+          {/* Exceções da semana */}
+          <div style={{ padding: `${t.space[4]}px ${t.space[4]}px`, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], marginBottom: t.space[2] }}>
+              <TrendingDown size={11} color={t.color.feedback.error.text} />
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Exceções da semana</span>
+            </div>
+            {EXCEPTIONS.map(ex => (
+              <div key={ex.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[1] + 2 }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: t.radius.full, flexShrink: 0,
+                  background: t.color.feedback[ex.tone].solid,
+                }} aria-hidden="true" />
+                <span style={{ flex: 1, minWidth: 0, fontSize: t.font.size.xs, color: colors.fg.muted }}>{ex.label}</span>
+                {ex.value && (
+                  <span style={{ flexShrink: 0, fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.feedback[ex.tone].text }}>
+                    {ex.value}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
 
         </div>
       </div>
+
+      {/* Carta de Interpretação — leitura técnica dos dados do painel */}
+      <InterpretationLetter
+        open={cartaOpen}
+        onClose={() => setCartaOpen(false)}
+        carta={carta}
+        fonte={currentFarm ? `${currentFarm.name} · base do painel` : undefined}
+      />
     </div>
   )
 }

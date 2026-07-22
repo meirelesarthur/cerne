@@ -3,6 +3,7 @@ import PlanoContasLista   from './PlanoContasLista'
 import PlanoContaCadastro from './PlanoContaCadastro'
 import { mockPlanoContas } from './planoContas.mock'
 import type { Conta } from './planoContas.types'
+import type { ImportResult } from './planoContas.io'
 
 type View = 'list' | 'form'
 
@@ -42,6 +43,10 @@ export default function PlanoContasPage() {
     setView('form')
   }
 
+  const handleImport = (result: ImportResult) => {
+    setContas(result.contas)
+  }
+
   if (view === 'form') {
     return (
       <PlanoContaCadastro
@@ -64,6 +69,7 @@ export default function PlanoContasPage() {
       onCreateDescendant={handleCreateDescendant}
       onDelete={handleDelete}
       onToggleAtivo={handleToggleAtivo}
+      onImport={handleImport}
     />
   )
 }

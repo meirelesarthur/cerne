@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Download, Printer,
+  Plus, Pencil, Trash2, Printer, FileSpreadsheet,
   HelpCircle, Power, GitBranchPlus,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -18,6 +18,7 @@ import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { DropdownMenu, type DropdownMenuItem } from '../../../components/ui/DropdownMenu'
+import { IconButton }      from '../../../components/ui/IconButton'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
@@ -27,6 +28,8 @@ import {
   CONDICAO_LABEL, CLASSE_LABEL, TIPO_LABEL, getAllDescendantContaIds,
   type Conta,
 } from './planoContas.types'
+import { openPlanoContasReport, type ImportResult } from './planoContas.io'
+import { PlanoContasImportModal } from './PlanoContasImportModal'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -37,6 +40,7 @@ interface PlanoContasListaProps {
   onCreateDescendant: (parentId: number) => void
   onDelete:       (id: number) => void
   onToggleAtivo:  (id: number) => void
+  onImport:       (result: ImportResult) => void
 }
 
 // ─── Paginação ────────────────────────────────────────────────────────────────
@@ -46,7 +50,7 @@ const PAGE_SIZE = 10
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PlanoContasLista({
-  contas, onNew, onEdit, onCreateDescendant, onDelete, onToggleAtivo,
+  contas, onNew, onEdit, onCreateDescendant, onDelete, onToggleAtivo, onImport,
 }: PlanoContasListaProps) {
   const { colors } = useTheme()
 
@@ -59,9 +63,20 @@ export default function PlanoContasLista({
   const [blockedDeleteId, setBlockedDeleteId] = useState<number | null>(null)
   const [inativarWarnId,  setInativarWarnId]  = useState<number | null>(null)
   const [saibaMais,  setSaibaMais]  = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   // Mock síncrono — sem chamada real, não há motivo para simular loading.
   const [isLoading]  = useState(false)
   const { toasts, show, dismiss } = useToast()
+
+  const handlePrint = () => {
+    const ok = openPlanoContasReport(contas)
+    if (!ok) show('Não foi possível abrir o relatório — verifique se pop-ups estão bloqueados.', 'error')
+  }
+
+  const handleImport = (result: ImportResult) => {
+    onImport(result)
+    show(`Plano de contas sincronizado — ${result.criadas} criada${result.criadas === 1 ? '' : 's'}, ${result.atualizadas} atualizada${result.atualizadas === 1 ? '' : 's'}, ${result.excluidas} excluída${result.excluidas === 1 ? '' : 's'}.`, 'success')
+  }
 
   const activeFilterCount = [filters.condicao, filters.classe, filters.ativo, filters.dtIni, filters.dtFim].filter(Boolean).length
   const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '', dtIni: '', dtFim: '' })
@@ -146,12 +161,21 @@ export default function PlanoContasLista({
                 <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
                   Saiba mais
                 </Button>
-                <Button variant="secondary" size="md" icon={<Printer size={14} />} disabled title="Em breve">
-                  Imprimir
-                </Button>
-                <Button variant="secondary" size="md" icon={<Download size={14} />} disabled title="Em breve">
-                  Exportar
-                </Button>
+                <IconButton
+                  icon={<Printer size={15} />}
+                  aria-label="Imprimir relatório do plano de contas"
+                  tooltip="Imprimir relatório"
+                  variant="outline"
+                  onClick={handlePrint}
+                />
+                <DropdownMenu
+                  align="right"
+                  ariaLabel="Importar ou exportar planilha do plano de contas"
+                  triggerIcon={<FileSpreadsheet size={15} />}
+                  items={[
+                    { id: 'importar', label: 'Importar', icon: <FileSpreadsheet size={13} />, onClick: () => setImportOpen(true) },
+                  ]}
+                />
                 <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
                   Adicionar Novo
                 </Button>
@@ -352,6 +376,14 @@ export default function PlanoContasLista({
       </Modal>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
+
+      {/* ── Modal: Importar Plano de Contas ──────────────────────────────── */}
+      <PlanoContasImportModal
+        open={importOpen}
+        contas={contas}
+        onClose={() => setImportOpen(false)}
+        onImport={handleImport}
+      />
 
       {/* ── Filter Drawer ─────────────────────────────────────────────────── */}
       <FilterDrawer

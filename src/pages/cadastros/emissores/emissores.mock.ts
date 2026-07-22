@@ -1,0 +1,63 @@
+import type { Emissor } from './emissores.types'
+
+/** Data de referência do mock (simula "hoje") — usada para status de certificado. */
+export const MOCK_TODAY = '2026-07-22'
+
+export const mockEmissores: Emissor[] = [
+  {
+    id: 1, logoUrl: null,
+    cpfCnpj: '12.345.678/0001-90', razaoSocial: 'Agropecuária Bom Gosto Ltda', nomeFantasia: 'Fazenda Bom Gosto',
+    email: 'fiscal@bomgosto.com.br', ativo: 'sim',
+    cep: '78700-000', rua: 'Rodovia BR-364', numero: 'km 12', bairro: 'Zona Rural', cidade: 'Rondonópolis',
+    emiteNfe: 'sim',
+    ultimoNumeroNfe: '482', ultimoNumeroCte: '12', ultimoNumeroMdfe: '3',
+    numeroSerieNfe: '1', numeroSerieCte: '1', numeroSerieMdfe: '1',
+    ambiente: 'producao', regime: 'normal',
+    fazendas: ['1'],
+    inscricoesEstaduais: [{ id: 'ie1', uf: 'MT', numero: '13.123.456-7', isento: false }],
+    certificado: { titular: 'AGROPECUARIA BOM GOSTO LTDA', documento: '12.345.678/0001-90', validade: '2026-11-30', arquivoNome: 'certificado_bomgosto.pfx' },
+    dataCriacao: '2026-01-05', usuarioCriacao: 'Silvio Ventura',
+  },
+  {
+    id: 2, logoUrl: null,
+    cpfCnpj: '98.765.432/0001-11', razaoSocial: 'Fazenda Esperança Agronegócios S.A.', nomeFantasia: 'Fazenda Esperança',
+    email: 'contabil@esperanca.agr.br', ativo: 'sim',
+    cep: '74000-010', rua: 'Av. Perimetral Norte', numero: '540', bairro: 'Setor Industrial', cidade: 'Goiânia',
+    emiteNfe: 'sim',
+    ultimoNumeroNfe: '55', ultimoNumeroCte: '0', ultimoNumeroMdfe: '0',
+    numeroSerieNfe: '1', numeroSerieCte: '1', numeroSerieMdfe: '1',
+    ambiente: 'producao', regime: 'simples',
+    fazendas: ['2'],
+    inscricoesEstaduais: [{ id: 'ie2', uf: 'GO', numero: '10.987.654-3', isento: false }],
+    certificado: { titular: 'FAZENDA ESPERANCA AGRONEGOCIOS SA', documento: '98.765.432/0001-11', validade: '2026-08-05', arquivoNome: 'certificado_esperanca.pfx' },
+    dataCriacao: '2026-01-06', usuarioCriacao: 'Silvio Ventura',
+  },
+  {
+    id: 3, logoUrl: null,
+    cpfCnpj: '456.789.123-00', razaoSocial: 'Carlos Andrade', nomeFantasia: 'Sítio Rio Verde',
+    email: 'carlos.andrade@email.com', ativo: 'sim',
+    cep: '78100-000', rua: 'Estrada Vicinal', numero: 's/n', bairro: 'Distrito Rio Verde', cidade: 'Cuiabá',
+    emiteNfe: 'nao',
+    ultimoNumeroNfe: '0', ultimoNumeroCte: '0', ultimoNumeroMdfe: '0',
+    numeroSerieNfe: '1', numeroSerieCte: '1', numeroSerieMdfe: '1',
+    ambiente: '', regime: '',
+    fazendas: [],
+    inscricoesEstaduais: [{ id: 'ie3', uf: 'MT', numero: '', isento: true }],
+    certificado: null,
+    dataCriacao: '2026-01-07', usuarioCriacao: 'Silvio Ventura',
+  },
+  {
+    id: 4, logoUrl: null,
+    cpfCnpj: '11.222.333/0001-44', razaoSocial: 'Cooperativa Grãos Unidos', nomeFantasia: 'Grãos Unidos',
+    email: 'nfe@graosunidos.coop.br', ativo: 'nao',
+    cep: '79000-020', rua: 'Rua das Cooperativas', numero: '88', bairro: 'Centro', cidade: 'Campo Grande',
+    emiteNfe: 'sim',
+    ultimoNumeroNfe: '910', ultimoNumeroCte: '44', ultimoNumeroMdfe: '9',
+    numeroSerieNfe: '1', numeroSerieCte: '1', numeroSerieMdfe: '1',
+    ambiente: 'homologacao', regime: 'normal',
+    fazendas: [],
+    inscricoesEstaduais: [{ id: 'ie4', uf: 'MS', numero: '28.111.222-9', isento: false }],
+    certificado: { titular: 'COOPERATIVA GRAOS UNIDOS', documento: '11.222.333/0001-44', validade: '2026-05-10', arquivoNome: 'certificado_graosunidos.pfx' },
+    dataCriacao: '2026-01-08', usuarioCriacao: 'Silvio Ventura',
+  },
+]

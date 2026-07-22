@@ -19,6 +19,7 @@ import EstoquesIniciaisPage from '../../pages/cadastros/estoques-iniciais/Estoqu
 import PessoasPage        from '../../pages/cadastros/pessoas/PessoasPage'
 import PlanoContasPage    from '../../pages/cadastros/plano-contas/PlanoContasPage'
 import ContasBancariasPage from '../../pages/cadastros/contas-bancarias/ContasBancariasPage'
+import EmissoresPage      from '../../pages/cadastros/emissores/EmissoresPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -110,6 +111,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-est-sal-ini')  return <EstoquesIniciaisPage />
   if (itemId === 'cad-fis-pla')      return <PlanoContasPage />
   if (itemId === 'cad-fin-bco')      return <ContasBancariasPage />
+  if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />
   if (itemId === 'dash-fin')  return <DashFinanceiro />

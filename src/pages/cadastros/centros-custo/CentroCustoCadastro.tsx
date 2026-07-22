@@ -1,21 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
-import { Checkbox }      from '../../../components/ui/Checkbox'
+import { CategoryTreeField } from '../../../components/ui/CategoryTreeField'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { CATEGORIAS_FINANCEIRAS_TREE } from '../../../data/categoriasFinanceiras'
 import {
   gerarCodigo, classeOf, CLASSE_LABEL, antecessorLabel,
-  CONDICAO_OPTS, TIPO_OPTS, ATIVO_OPTS, CATEGORIAS_TREE,
-  type CentroCusto, type CondicaoCC, type TipoCC, type Categoria,
+  CONDICAO_OPTS, TIPO_OPTS, ATIVO_OPTS,
+  type CentroCusto, type CondicaoCC, type TipoCC,
 } from './centrosCusto.types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -236,10 +237,10 @@ export default function CentroCustoCadastro({
             />
 
             {/* Seção: Categorias */}
-            <CategoriasSection
+            <CategoryTreeField
+              tree={CATEGORIAS_FINANCEIRAS_TREE}
               selected={form.categorias}
               onChange={cats => set('categorias', cats)}
-              colors={colors}
             />
 
           </div>
@@ -261,179 +262,3 @@ export default function CentroCustoCadastro({
     </PageContainer>
   )
 }
-
-// ─── Seção de Categorias ──────────────────────────────────────────────────────
-
-function CategoriasSection({
-  selected,
-  onChange,
-  colors,
-}: {
-  selected: string[]
-  onChange: (ids: string[]) => void
-  colors:   ReturnType<typeof useTheme>['colors']
-}) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-
-  const expandAll = () => {
-    const state: Record<string, boolean> = {}
-    CATEGORIAS_TREE.forEach(c => { state[c.id] = true })
-    setExpanded(state)
-  }
-
-  const collapseAll = () => setExpanded({})
-
-  const allExpanded = CATEGORIAS_TREE.every(c => expanded[c.id])
-
-  const allIds = CATEGORIAS_TREE.flatMap(c => [c.id, ...c.children.map(ch => ch.id)])
-  const allSelected = allIds.every(id => selected.includes(id))
-
-  const markAll = () => {
-    if (allSelected) {
-      onChange([])
-    } else {
-      onChange(allIds)
-    }
-  }
-
-  const toggleItem = (id: string) => {
-    onChange(selected.includes(id) ? selected.filter(s => s !== id) : [...selected, id])
-  }
-
-  const toggleGroup = (cat: Categoria) => {
-    const groupIds = [cat.id, ...cat.children.map(c => c.id)]
-    const allGroupSelected = groupIds.every(id => selected.includes(id))
-    if (allGroupSelected) {
-      onChange(selected.filter(s => !groupIds.includes(s)))
-    } else {
-      const toAdd = groupIds.filter(id => !selected.includes(id))
-      onChange([...selected, ...toAdd])
-    }
-  }
-
-  return (
-    <div style={{
-      border: `1px solid ${colors.border.default}`,
-      borderRadius: t.radius.xl,
-      overflow: 'hidden',
-    }}>
-      {/* Header da seção */}
-      <div style={{
-        padding: '14px 18px',
-        borderBottom: `1px solid ${colors.border.default}`,
-        background: colors.bg.subtle,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <span style={{
-          fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-          color: colors.fg.default, fontFamily: t.font.family.sans,
-        }}>
-          Categorias Financeiras
-          {selected.length > 0 && (
-            <span style={{
-              marginLeft: 8,
-              fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-              padding: '1px 7px', borderRadius: t.radius.full,
-              background: colors.accent.subtle, color: colors.accent.default,
-            }}>
-              {selected.length} selecionada{selected.length !== 1 ? 's' : ''}
-            </span>
-          )}
-        </span>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="secondary" size="sm" onClick={allExpanded ? collapseAll : expandAll}>
-            {allExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
-          </Button>
-          <Button variant={allSelected ? 'secondary' : 'primary'} size="sm" onClick={markAll}>
-            {allSelected ? 'Desmarcar Todos' : 'Marcar Todos'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Tree */}
-      <div style={{ padding: '12px 18px 16px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {CATEGORIAS_TREE.map(cat => {
-          const groupIds      = [cat.id, ...cat.children.map(c => c.id)]
-          const groupSelected = groupIds.every(id => selected.includes(id))
-          const groupPartial  = !groupSelected && groupIds.some(id => selected.includes(id))
-          const isOpen        = expanded[cat.id] ?? false
-
-          return (
-            <div key={cat.id}>
-              {/* Linha do grupo */}
-              <div
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '7px 6px',
-                  borderRadius: t.radius.base,
-                  cursor: 'pointer',
-                  transition: `background ${t.animation.duration.faster}`,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-                onClick={() => setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] }))}
-              >
-                <Checkbox
-                  checked={groupSelected}
-                  indeterminate={groupPartial}
-                  onChange={() => toggleGroup(cat)}
-                  aria-label={cat.label}
-                />
-                <span style={{
-                  flex: 1, fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-                  color: colors.fg.default, fontFamily: t.font.family.sans,
-                  letterSpacing: '0.01em',
-                }}>
-                  {cat.label}
-                </span>
-                <ChevronDown
-                  size={14}
-                  color={colors.fg.subtle}
-                  style={{
-                    transform: isOpen ? 'rotate(180deg)' : 'none',
-                    transition: `transform ${t.animation.duration.fast}`,
-                    flexShrink: 0,
-                  }}
-                />
-              </div>
-
-              {/* Filhos */}
-              {isOpen && (
-                <div style={{ marginLeft: 28, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {cat.children.map(child => (
-                    <div
-                      key={child.id}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        padding: '5px 6px',
-                        borderRadius: t.radius.base,
-                        cursor: 'pointer',
-                        transition: `background ${t.animation.duration.faster}`,
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-                      onClick={() => toggleItem(child.id)}
-                    >
-                      <Checkbox
-                        checked={selected.includes(child.id)}
-                        onChange={() => toggleItem(child.id)}
-                        aria-label={child.label}
-                      />
-                      <span style={{
-                        fontSize: t.font.size.sm, color: colors.fg.muted,
-                        fontFamily: t.font.family.sans,
-                      }}>
-                        {child.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-

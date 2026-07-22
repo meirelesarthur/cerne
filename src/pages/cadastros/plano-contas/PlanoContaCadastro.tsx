@@ -6,12 +6,14 @@ import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button }        from '../../../components/ui/Button'
 import { FormField }     from '../../../components/ui/FormField'
 import { FormSelect }    from '../../../components/ui/FormSelect'
+import { CategoryTreeField } from '../../../components/ui/CategoryTreeField'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
 import { focusFirstError } from '../../../hooks/focusFirstError'
 import { t }             from '../../../design/tokens'
 import { useTheme }      from '../../../context/ThemeContext'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { CATEGORIAS_FINANCEIRAS_TREE } from '../../../data/categoriasFinanceiras'
 import {
   gerarCodigo, antecessorLabel, getAllDescendantContaIds,
   CONDICAO_OPTS, CLASSE_OPTS, TIPO_OPTS, ATIVO_OPTS,
@@ -40,6 +42,7 @@ interface FormData {
   ativo:        'sim' | 'nao'
   tipo:         TipoPC | ''
   antecessorId: number | null
+  categorias:   string[]
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -59,6 +62,7 @@ export default function PlanoContaCadastro({
           ativo:        initialData.ativo,
           tipo:         initialData.tipo,
           antecessorId: initialData.antecessorId,
+          categorias:   initialData.categorias,
         }
       : {
           descricao:    '',
@@ -67,6 +71,7 @@ export default function PlanoContaCadastro({
           ativo:        'sim',
           tipo:         '',
           antecessorId: presetAntecessorId ?? null,
+          categorias:   [],
         }
   )
 
@@ -147,6 +152,7 @@ export default function PlanoContaCadastro({
     ativo:          form.ativo,
     tipo:           form.tipo,
     antecessorId:   form.antecessorId,
+    categorias:     form.categorias,
     dataCriacao:    initialData?.dataCriacao ?? new Date().toISOString().slice(0, 10),
     usuarioCriacao: initialData?.usuarioCriacao ?? 'Silvio Ventura',
   })
@@ -267,6 +273,13 @@ export default function PlanoContaCadastro({
               value={form.antecessorId === null ? '' : String(form.antecessorId)}
               onChange={e => set('antecessorId', e.target.value === '' ? null : Number(e.target.value))}
               disabled={!antecessorHabilitado}
+            />
+
+            {/* Categorias */}
+            <CategoryTreeField
+              tree={CATEGORIAS_FINANCEIRAS_TREE}
+              selected={form.categorias}
+              onChange={cats => set('categorias', cats)}
             />
 
             {isEdit && (

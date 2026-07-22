@@ -13,6 +13,7 @@ export interface Conta {
   ativo:         'sim' | 'nao'
   tipo:          TipoPC | ''
   antecessorId:  number | null
+  categorias:    string[]
   dataCriacao:   string
   usuarioCriacao: string
 }

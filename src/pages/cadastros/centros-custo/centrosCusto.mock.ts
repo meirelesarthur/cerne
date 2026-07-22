@@ -10,12 +10,12 @@ export const mockCentrosCusto: CentroCusto[] = [
   {
     id: 2, codigo: '1.01.001', condicao: 'ambos', descricao: 'Sede',
     ativo: 'sim', apontamento: 'sim', tipo: 'administrativo',
-    antecessorId: 1, categorias: ['des-adm', 'des-adm-sal'],
+    antecessorId: 1, categorias: ['cat-16', 'cat-28-1'],
   },
   {
     id: 3, codigo: '1.01.002', condicao: 'ambos', descricao: 'Escritório Pompéu',
     ativo: 'sim', apontamento: 'sim', tipo: 'administrativo',
-    antecessorId: 1, categorias: ['des-adm'],
+    antecessorId: 1, categorias: ['cat-16'],
   },
   {
     id: 4, codigo: '1.01.003', condicao: 'ambos', descricao: 'Investimentos',
@@ -25,7 +25,7 @@ export const mockCentrosCusto: CentroCusto[] = [
   {
     id: 5, codigo: '1.01.004', condicao: 'ambos', descricao: 'Administração Geral',
     ativo: 'sim', apontamento: 'sim', tipo: 'administrativo',
-    antecessorId: 1, categorias: ['des-adm'],
+    antecessorId: 1, categorias: ['cat-16'],
   },
   {
     id: 6, codigo: '1.01.005', condicao: 'ambos', descricao: 'Edifício São Francisco',
@@ -61,17 +61,17 @@ export const mockCentrosCusto: CentroCusto[] = [
   {
     id: 12, codigo: '1.02.001', condicao: 'receita', descricao: 'Lavoura de Soja',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 11, categorias: ['rec-agr', 'rec-agr-gra'],
+    antecessorId: 11, categorias: ['cat-1', 'cat-1-1'],
   },
   {
     id: 13, codigo: '1.02.002', condicao: 'receita', descricao: 'Lavoura de Milho',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 11, categorias: ['rec-agr', 'rec-agr-gra'],
+    antecessorId: 11, categorias: ['cat-1', 'cat-1-1'],
   },
   {
     id: 14, codigo: '1.02.003', condicao: 'receita', descricao: 'Lavoura de Café',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 11, categorias: ['rec-agr', 'rec-agr-caf'],
+    antecessorId: 11, categorias: ['cat-1'],
   },
   // ── Raiz 1.03 — Pecuária (Sintética) ─────────────────────────────────────
   {
@@ -82,17 +82,17 @@ export const mockCentrosCusto: CentroCusto[] = [
   {
     id: 16, codigo: '1.03.001', condicao: 'receita', descricao: 'Bovinocultura de Corte',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 15, categorias: ['rec-pec', 'rec-pec-bov'],
+    antecessorId: 15, categorias: ['cat-3', 'cat-3-6'],
   },
   {
     id: 17, codigo: '1.03.002', condicao: 'receita', descricao: 'Bovinocultura de Leite',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 15, categorias: ['rec-pec', 'rec-pec-lei'],
+    antecessorId: 15, categorias: ['cat-3', 'cat-3-10'],
   },
   {
     id: 18, codigo: '1.03.003', condicao: 'receita', descricao: 'Suinocultura',
     ativo: 'sim', apontamento: 'sim', tipo: 'produtivo',
-    antecessorId: 15, categorias: ['rec-pec', 'rec-pec-sui'],
+    antecessorId: 15, categorias: ['cat-7'],
   },
   // ── Raiz 1.04 — Custos Fixos (Sintética, Inativa) ─────────────────────────
   {
@@ -103,6 +103,6 @@ export const mockCentrosCusto: CentroCusto[] = [
   {
     id: 20, codigo: '1.04.001', condicao: 'despesa', descricao: 'Energia Elétrica',
     ativo: 'nao', apontamento: 'nao', tipo: 'administrativo',
-    antecessorId: 19, categorias: ['des-adm', 'des-adm-ser'],
+    antecessorId: 19, categorias: ['cat-16', 'cat-16-1'],
   },
 ]

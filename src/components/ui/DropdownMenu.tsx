@@ -19,6 +19,17 @@ interface DropdownMenuProps {
   ariaLabel?: string
   /** Botão gatilho customizado; default = botão MoreVertical */
   triggerIcon?: React.ReactNode
+  /**
+   * Altura do gatilho — 'sm' (default, t.size.pageBtn = 32px) para ações de
+   * linha de tabela; 'md' (t.size.iconBtn.lg = 36px) para alinhar com
+   * `Button size="md"` em barras de ação de cabeçalho.
+   */
+  size?: 'sm' | 'md'
+}
+
+const triggerSizeValues: Record<'sm' | 'md', number> = {
+  sm: t.size.pageBtn,
+  md: t.size.iconBtn.lg,
 }
 
 interface MenuPos {
@@ -41,12 +52,14 @@ export function DropdownMenu({
   align       = 'right',
   ariaLabel   = 'Abrir menu de ações',
   triggerIcon,
+  size        = 'sm',
 }: DropdownMenuProps) {
   const { colors, isGbMode } = useTheme()
   const [open, setOpen] = useState(false)
   const [menuPos, setMenuPos] = useState<MenuPos | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const triggerDim = triggerSizeValues[size]
 
   const computePosition = useCallback(() => {
     const rect = rootRef.current?.getBoundingClientRect()
@@ -140,8 +153,8 @@ export function DropdownMenu({
         aria-expanded={open}
         onClick={toggleOpen}
         style={{
-          width:          t.size.pageBtn,
-          height:         t.size.pageBtn,
+          width:          triggerDim,
+          height:         triggerDim,
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'center',

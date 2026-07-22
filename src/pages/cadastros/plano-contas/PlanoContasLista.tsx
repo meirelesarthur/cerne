@@ -166,12 +166,14 @@ export default function PlanoContasLista({
                   aria-label="Imprimir relatório do plano de contas"
                   tooltip="Imprimir relatório"
                   variant="outline"
+                  size="md"
                   onClick={handlePrint}
                 />
                 <DropdownMenu
                   align="right"
                   ariaLabel="Importar ou exportar planilha do plano de contas"
                   triggerIcon={<FileSpreadsheet size={15} />}
+                  size="md"
                   items={[
                     { id: 'importar', label: 'Importar', icon: <FileSpreadsheet size={13} />, onClick: () => setImportOpen(true) },
                   ]}

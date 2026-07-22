@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, Download, Printer,
-  HelpCircle, Power,
+  HelpCircle, Power, GitBranchPlus,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -34,6 +34,7 @@ interface PlanoContasListaProps {
   contas:         Conta[]
   onNew:          () => void
   onEdit:         (id: number) => void
+  onCreateDescendant: (parentId: number) => void
   onDelete:       (id: number) => void
   onToggleAtivo:  (id: number) => void
 }
@@ -45,7 +46,7 @@ const PAGE_SIZE = 10
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PlanoContasLista({
-  contas, onNew, onEdit, onDelete, onToggleAtivo,
+  contas, onNew, onEdit, onCreateDescendant, onDelete, onToggleAtivo,
 }: PlanoContasListaProps) {
   const { colors } = useTheme()
 
@@ -244,6 +245,7 @@ export default function PlanoContasLista({
                     conta={conta}
                     isLast={idx === paginated.length - 1}
                     onEdit={() => onEdit(conta.id)}
+                    onCreateDescendant={() => onCreateDescendant(conta.id)}
                     onDelete={() => handleDeleteClick(conta.id)}
                     onToggleAtivo={() => handleToggleClick(conta.id)}
                     colors={colors}
@@ -400,11 +402,12 @@ export default function PlanoContasLista({
 // ─── Linha da tabela ──────────────────────────────────────────────────────────
 
 function ContaRow({
-  conta, isLast, onEdit, onDelete, onToggleAtivo, colors, border,
+  conta, isLast, onEdit, onCreateDescendant, onDelete, onToggleAtivo, colors, border,
 }: {
   conta:         Conta
   isLast:        boolean
   onEdit:        () => void
+  onCreateDescendant: () => void
   onDelete:      () => void
   onToggleAtivo: () => void
   colors:        ReturnType<typeof useTheme>['colors']
@@ -484,8 +487,9 @@ function ContaRow({
           align="right"
           ariaLabel="Ações da conta"
           items={[
-            { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />, onClick: onEdit },
-            { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Power size={13} />,  onClick: onToggleAtivo },
+            { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />,       onClick: onEdit },
+            { id: 'desc',   label: 'Criar Descendente',                          icon: <GitBranchPlus size={13} />, onClick: onCreateDescendant },
+            { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Power size={13} />,        onClick: onToggleAtivo },
             { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
           ]}
         />

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, GitBranchPlus } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -23,8 +23,12 @@ import {
 interface PlanoContaCadastroProps {
   initialData?: Conta
   allContas:    Conta[]
+  /** Pré-preenche o Antecessor ao criar uma conta via "Criar Descendente". Ignorado em edição. */
+  presetAntecessorId?: number
   onBack:       () => void
   onSave:       (conta: Conta) => void
+  /** Exibido apenas em edição — abre uma nova conta com este registro já selecionado como Antecessor. */
+  onCreateDescendant?: () => void
 }
 
 // ─── Form state ───────────────────────────────────────────────────────────────
@@ -41,7 +45,7 @@ interface FormData {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PlanoContaCadastro({
-  initialData, allContas, onBack, onSave,
+  initialData, allContas, presetAntecessorId, onBack, onSave, onCreateDescendant,
 }: PlanoContaCadastroProps) {
   const { colors } = useTheme()
   const isEdit     = !!initialData
@@ -62,7 +66,7 @@ export default function PlanoContaCadastro({
           classe:       '',
           ativo:        'sim',
           tipo:         '',
-          antecessorId: null,
+          antecessorId: presetAntecessorId ?? null,
         }
   )
 
@@ -180,6 +184,11 @@ export default function PlanoContaCadastro({
             <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
               Voltar
             </Button>
+            {onCreateDescendant && (
+              <Button variant="secondary" onClick={onCreateDescendant} icon={<GitBranchPlus size={14} />} disabled={submitting}>
+                Criar Descendente
+              </Button>
+            )}
             <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
               {isEdit ? 'Salvar alterações' : 'Salvar'}
             </Button>

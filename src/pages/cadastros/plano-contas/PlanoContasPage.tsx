@@ -10,6 +10,7 @@ export default function PlanoContasPage() {
   const [view,       setView]       = useState<View>('list')
   const [contas,     setContas]     = useState<Conta[]>(mockPlanoContas)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [presetAntecessorId, setPresetAntecessorId] = useState<number | null>(null)
 
   const selected = contas.find(c => c.id === selectedId) ?? null
 
@@ -35,13 +36,22 @@ export default function PlanoContasPage() {
     setContas(prev => prev.map(c => c.id === id ? { ...c, ativo: c.ativo === 'sim' ? 'nao' : 'sim' } : c))
   }
 
+  const handleCreateDescendant = (parentId: number) => {
+    setSelectedId(null)
+    setPresetAntecessorId(parentId)
+    setView('form')
+  }
+
   if (view === 'form') {
     return (
       <PlanoContaCadastro
+        key={`${selectedId ?? 'new'}-${presetAntecessorId ?? ''}`}
         initialData={selected ?? undefined}
         allContas={contas}
-        onBack={() => setView('list')}
-        onSave={handleSave}
+        presetAntecessorId={selected ? undefined : presetAntecessorId ?? undefined}
+        onBack={() => { setPresetAntecessorId(null); setView('list') }}
+        onSave={(conta) => { setPresetAntecessorId(null); handleSave(conta) }}
+        onCreateDescendant={selected ? () => handleCreateDescendant(selected.id) : undefined}
       />
     )
   }
@@ -49,8 +59,9 @@ export default function PlanoContasPage() {
   return (
     <PlanoContasLista
       contas={contas}
-      onNew={() => { setSelectedId(null); setView('form') }}
-      onEdit={(id) => { setSelectedId(id); setView('form') }}
+      onNew={() => { setSelectedId(null); setPresetAntecessorId(null); setView('form') }}
+      onEdit={(id) => { setSelectedId(id); setPresetAntecessorId(null); setView('form') }}
+      onCreateDescendant={handleCreateDescendant}
       onDelete={handleDelete}
       onToggleAtivo={handleToggleAtivo}
     />

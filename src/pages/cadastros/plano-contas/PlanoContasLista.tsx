@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, Download, Printer,
-  TrendingUp, TrendingDown, HelpCircle, Power,
+  HelpCircle, Power,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -47,7 +47,7 @@ const PAGE_SIZE = 10
 export default function PlanoContasLista({
   contas, onNew, onEdit, onDelete, onToggleAtivo,
 }: PlanoContasListaProps) {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
 
   const [searchRaw,  setSearchRaw]  = useState('')
   const search = useDebouncedValue(searchRaw, 300)
@@ -64,16 +64,6 @@ export default function PlanoContasLista({
 
   const activeFilterCount = [filters.condicao, filters.classe, filters.ativo, filters.dtIni, filters.dtFim].filter(Boolean).length
   const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '', dtIni: '', dtFim: '' })
-
-  // ── KPIs ─────────────────────────────────────────────────────────────────
-  const kpis = useMemo(() => {
-    const total      = contas.length
-    const sinteticas = contas.filter(c => c.classe === 'sintetica').length
-    const analiticas = contas.filter(c => c.classe === 'analitica').length
-    const ativas     = contas.filter(c => c.ativo === 'sim').length
-    const ativasPct  = total > 0 ? Math.round((ativas / total) * 100) : 0
-    return { total, sinteticas, analiticas, ativas, ativasPct }
-  }, [contas])
 
   // ── Dados filtrados ───────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -94,7 +84,6 @@ export default function PlanoContasLista({
 
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface
   const border = colors.border.default
 
   // ── Exclusão ─────────────────────────────────────────────────────────────
@@ -168,86 +157,6 @@ export default function PlanoContasLista({
               </div>
             }
           />
-
-          {/* ── KPI Bar ───────────────────────────────────────────────── */}
-          {isLoading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} variant="rect" width="100%" height={80} />
-              ))}
-            </div>
-          ) : null}
-          {!isLoading && <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 1,
-            border: `1px solid ${border}`,
-            borderRadius: t.radius.lg,
-            overflow: 'hidden',
-            marginBottom: 16,
-          }}>
-            {[
-              { label: 'Total de Contas', value: String(kpis.total), sub: 'cadastradas' },
-              {
-                label: 'Sintéticas', value: String(kpis.sinteticas),
-                trendValue: kpis.total > 0 ? `${Math.round(kpis.sinteticas / kpis.total * 100)}%` : '0%',
-                trend: 'neutral' as const,
-              },
-              {
-                label: 'Analíticas', value: String(kpis.analiticas),
-                trendValue: kpis.total > 0 ? `${Math.round(kpis.analiticas / kpis.total * 100)}%` : '0%',
-                trend: 'up' as const,
-              },
-              {
-                label: 'Ativas', value: String(kpis.ativas),
-                trendValue: `${kpis.ativasPct}%`,
-                trend: (kpis.ativasPct >= 80 ? 'up' : 'down') as 'up' | 'down',
-              },
-            ].map((item, idx, arr) => (
-              <div
-                key={item.label}
-                style={{
-                  padding: `${t.space[4]}px ${t.space[5]}px`,
-                  background: cardBg,
-                  borderRight: idx < arr.length - 1 ? `1px solid ${border}` : undefined,
-                  display: 'flex', flexDirection: 'column', gap: 6,
-                }}
-              >
-                <span style={{
-                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.subtle,
-                  fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em',
-                }}>
-                  {item.label}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{
-                    fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default,
-                    fontFamily: t.font.family.sans, lineHeight: 1,
-                  }}>
-                    {item.value}
-                  </span>
-                  {'trendValue' in item && item.trendValue && (
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 3,
-                      fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                      color: item.trend === 'up' ? t.color.feedback.success.text : item.trend === 'down' ? t.color.feedback.error.text : colors.fg.subtle,
-                      background: item.trend === 'up' ? t.color.feedback.success.bg : item.trend === 'down' ? t.color.feedback.error.bg : colors.bg.subtle,
-                      padding: '2px 6px', borderRadius: t.radius.full,
-                    }}>
-                      {item.trend === 'up'   && <TrendingUp  size={10} />}
-                      {item.trend === 'down' && <TrendingDown size={10} />}
-                      {item.trendValue}
-                    </span>
-                  )}
-                  {'sub' in item && item.sub && (
-                    <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
-                      {item.sub}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>}
 
           {/* ── Toolbar ───────────────────────────────────────────────── */}
           <ListToolbar

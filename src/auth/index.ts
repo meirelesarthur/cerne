@@ -28,9 +28,13 @@ export { PermissionGuard }                  from './PermissionGuard'
 export {
   SessionProvider,
   useSession,
+}                                           from './SessionContext'
+
+// ─── Bridge de expiração (fora da árvore React) ────────────────────────────────
+export {
   setSessionExpireHandler,
   triggerSessionExpire,
-}                                           from './SessionContext'
+}                                           from './sessionExpireBridge'
 
 // ─── SessionExpiredModal ──────────────────────────────────────────────────────
 export { SessionExpiredModal }              from './SessionExpiredModal'

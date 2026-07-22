@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
+import { setSessionExpireHandler } from './sessionExpireBridge'
 
 // ─── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -22,44 +23,7 @@ interface SessionContextValue extends SessionState {
   clear(): void
 }
 
-// ─── Singleton para uso fora de componentes React ────────────────────────────
-//
-// Camadas que não vivem na árvore React (interceptores fetch/axios, websockets,
-// workers) precisam disparar `expire()` sem acesso ao hook.
-// Solução: um registrador de módulo que armazena a referência à função e a
-// expõe via `setSessionExpireHandler` / `triggerSessionExpire`.
-//
-// Exemplo de uso em um interceptor fetch:
-//
-//   import { triggerSessionExpire } from '@/auth'
-//
-//   async function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
-//     const res = await fetch(input, init)
-//     if (res.status === 401) {
-//       triggerSessionExpire(`401 ${typeof input === 'string' ? input : input.url}`)
-//     }
-//     return res
-//   }
-
-let _expireHandler: ((reason?: string) => void) | null = null
-
-/**
- * Registra o handler de expiração exposto pelo `SessionProvider`.
- * Chamado internamente pelo provider — não chamar manualmente.
- */
-export function setSessionExpireHandler(fn: (reason?: string) => void): void {
-  _expireHandler = fn
-}
-
-/**
- * Dispara a expiração de sessão de fora da árvore React.
- * Seguro chamar mesmo antes do provider montar (não-op nesse caso).
- */
-export function triggerSessionExpire(reason?: string): void {
-  _expireHandler?.(reason)
-}
-
-// ─── Contexto ────────────────────────────────────────────────────────────────
+// ─── Contexto ─────────────────────────────────────────────────────────────
 
 const SessionContext = createContext<SessionContextValue>({
   expired: false,

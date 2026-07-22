@@ -1,0 +1,586 @@
+import { useState, useMemo, useEffect } from 'react'
+import {
+  Plus, Pencil, Trash2, Download, Printer,
+  TrendingUp, TrendingDown, HelpCircle, Power,
+} from 'lucide-react'
+import { PageHeader }      from '../../../components/ui/PageHeader'
+import { PageContainer }   from '../../../components/ui/PageContainer'
+import { PageCard }        from '../../../components/ui/PageCard'
+import { Button }          from '../../../components/ui/Button'
+import { Heading }         from '../../../components/ui/Heading'
+import { Modal }           from '../../../components/ui/Modal'
+import { Badge }           from '../../../components/ui/Badge'
+import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
+import { FormSelect }      from '../../../components/ui/FormSelect'
+import { FormField }       from '../../../components/ui/FormField'
+import { ListToolbar }     from '../../../components/ui/ListToolbar'
+import { Pagination }      from '../../../components/ui/Pagination'
+import { Skeleton }        from '../../../components/ui/Skeleton'
+import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
+import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
+import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
+import { t }               from '../../../design/tokens'
+import { useTheme }        from '../../../context/ThemeContext'
+import { useToast, ToastContainer } from '../../../components/ui/Toast'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
+import {
+  CONDICAO_LABEL, CLASSE_LABEL, TIPO_LABEL, getAllDescendantContaIds,
+  type Conta,
+} from './planoContas.types'
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+interface PlanoContasListaProps {
+  contas:         Conta[]
+  onNew:          () => void
+  onEdit:         (id: number) => void
+  onDelete:       (id: number) => void
+  onToggleAtivo:  (id: number) => void
+}
+
+// ─── Paginação ────────────────────────────────────────────────────────────────
+
+const PAGE_SIZE = 10
+
+// ─── Componente principal ─────────────────────────────────────────────────────
+
+export default function PlanoContasLista({
+  contas, onNew, onEdit, onDelete, onToggleAtivo,
+}: PlanoContasListaProps) {
+  const { colors, isGbMode } = useTheme()
+
+  const [searchRaw,  setSearchRaw]  = useState('')
+  const search = useDebouncedValue(searchRaw, 300)
+  const [filters,    setFilters]    = useState({ condicao: '', classe: '', ativo: '', dtIni: '', dtFim: '' })
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [page,       setPage]       = useState(1)
+  const [deleteId,   setDeleteId]   = useState<number | null>(null)
+  const [blockedDeleteId, setBlockedDeleteId] = useState<number | null>(null)
+  const [inativarWarnId,  setInativarWarnId]  = useState<number | null>(null)
+  const [saibaMais,  setSaibaMais]  = useState(false)
+  // Mock síncrono — sem chamada real, não há motivo para simular loading.
+  const [isLoading]  = useState(false)
+  const { toasts, show, dismiss } = useToast()
+
+  const activeFilterCount = [filters.condicao, filters.classe, filters.ativo, filters.dtIni, filters.dtFim].filter(Boolean).length
+  const clearFilters = () => setFilters({ condicao: '', classe: '', ativo: '', dtIni: '', dtFim: '' })
+
+  // ── KPIs ─────────────────────────────────────────────────────────────────
+  const kpis = useMemo(() => {
+    const total      = contas.length
+    const sinteticas = contas.filter(c => c.classe === 'sintetica').length
+    const analiticas = contas.filter(c => c.classe === 'analitica').length
+    const ativas     = contas.filter(c => c.ativo === 'sim').length
+    const ativasPct  = total > 0 ? Math.round((ativas / total) * 100) : 0
+    return { total, sinteticas, analiticas, ativas, ativasPct }
+  }, [contas])
+
+  // ── Dados filtrados ───────────────────────────────────────────────────────
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return contas.filter(c => {
+      const matchSearch   = !q || c.codigo.toLowerCase().includes(q) || c.descricao.toLowerCase().includes(q)
+      const matchCondicao = !filters.condicao || c.condicao === filters.condicao
+      const matchClasse   = !filters.classe   || c.classe === filters.classe
+      const matchAtivo    = !filters.ativo    || c.ativo === filters.ativo
+      const matchDtIni    = !filters.dtIni    || c.dataCriacao >= filters.dtIni
+      const matchDtFim    = !filters.dtFim    || c.dataCriacao <= filters.dtFim
+      return matchSearch && matchCondicao && matchClasse && matchAtivo && matchDtIni && matchDtFim
+    })
+  }, [contas, search, filters])
+
+  // Reset para página 1 ao filtrar
+  useEffect(() => { setPage(1) }, [search, filters.condicao, filters.classe, filters.ativo, filters.dtIni, filters.dtFim])
+
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface
+  const border = colors.border.default
+
+  // ── Exclusão ─────────────────────────────────────────────────────────────
+  const handleDeleteClick = (id: number) => {
+    const descendants = getAllDescendantContaIds(contas, id)
+    if (descendants.length > 0) {
+      setBlockedDeleteId(id)
+    } else {
+      setDeleteId(id)
+    }
+  }
+
+  const handleConfirmDelete = () => {
+    if (deleteId !== null) {
+      onDelete(deleteId)
+      setDeleteId(null)
+      show('Conta excluída com sucesso.', 'info')
+    }
+  }
+
+  // ── Inativação ───────────────────────────────────────────────────────────
+  const handleToggleClick = (id: number) => {
+    const conta = contas.find(c => c.id === id)
+    if (!conta) return
+    const descendants = getAllDescendantContaIds(contas, id)
+    if (conta.ativo === 'sim' && descendants.length > 0) {
+      setInativarWarnId(id)
+    } else {
+      onToggleAtivo(id)
+      show(conta.ativo === 'sim' ? 'Conta inativada.' : 'Conta ativada.', 'info')
+    }
+  }
+
+  const handleConfirmInativar = () => {
+    if (inativarWarnId !== null) {
+      onToggleAtivo(inativarWarnId)
+      setInativarWarnId(null)
+      show('Conta inativada.', 'info')
+    }
+  }
+
+  const deleteTarget    = contas.find(c => c.id === deleteId)
+  const blockedTarget   = contas.find(c => c.id === blockedDeleteId)
+  const inativarTarget  = contas.find(c => c.id === inativarWarnId)
+  const blockedCount    = blockedTarget ? getAllDescendantContaIds(contas, blockedTarget.id).length : 0
+  const inativarCount   = inativarTarget ? getAllDescendantContaIds(contas, inativarTarget.id).length : 0
+
+  return (
+    <PageContainer style={{ paddingBottom: 0 }}>
+
+      <PageCard>
+
+          {/* ── Header ────────────────────────────────────────────────── */}
+          <PageHeader
+            title="Plano de Contas"
+            count={contas.length}
+            actions={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+                  Saiba mais
+                </Button>
+                <Button variant="secondary" size="md" icon={<Printer size={14} />} disabled title="Em breve">
+                  Imprimir
+                </Button>
+                <Button variant="secondary" size="md" icon={<Download size={14} />} disabled title="Em breve">
+                  Exportar
+                </Button>
+                <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                  Adicionar Novo
+                </Button>
+              </div>
+            }
+          />
+
+          {/* ── KPI Bar ───────────────────────────────────────────────── */}
+          {isLoading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} variant="rect" width="100%" height={80} />
+              ))}
+            </div>
+          ) : null}
+          {!isLoading && <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 1,
+            border: `1px solid ${border}`,
+            borderRadius: t.radius.lg,
+            overflow: 'hidden',
+            marginBottom: 16,
+          }}>
+            {[
+              { label: 'Total de Contas', value: String(kpis.total), sub: 'cadastradas' },
+              {
+                label: 'Sintéticas', value: String(kpis.sinteticas),
+                trendValue: kpis.total > 0 ? `${Math.round(kpis.sinteticas / kpis.total * 100)}%` : '0%',
+                trend: 'neutral' as const,
+              },
+              {
+                label: 'Analíticas', value: String(kpis.analiticas),
+                trendValue: kpis.total > 0 ? `${Math.round(kpis.analiticas / kpis.total * 100)}%` : '0%',
+                trend: 'up' as const,
+              },
+              {
+                label: 'Ativas', value: String(kpis.ativas),
+                trendValue: `${kpis.ativasPct}%`,
+                trend: (kpis.ativasPct >= 80 ? 'up' : 'down') as 'up' | 'down',
+              },
+            ].map((item, idx, arr) => (
+              <div
+                key={item.label}
+                style={{
+                  padding: `${t.space[4]}px ${t.space[5]}px`,
+                  background: cardBg,
+                  borderRight: idx < arr.length - 1 ? `1px solid ${border}` : undefined,
+                  display: 'flex', flexDirection: 'column', gap: 6,
+                }}
+              >
+                <span style={{
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.subtle,
+                  fontFamily: t.font.family.sans, textTransform: 'uppercase', letterSpacing: '0.06em',
+                }}>
+                  {item.label}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{
+                    fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default,
+                    fontFamily: t.font.family.sans, lineHeight: 1,
+                  }}>
+                    {item.value}
+                  </span>
+                  {'trendValue' in item && item.trendValue && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 3,
+                      fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                      color: item.trend === 'up' ? t.color.feedback.success.text : item.trend === 'down' ? t.color.feedback.error.text : colors.fg.subtle,
+                      background: item.trend === 'up' ? t.color.feedback.success.bg : item.trend === 'down' ? t.color.feedback.error.bg : colors.bg.subtle,
+                      padding: '2px 6px', borderRadius: t.radius.full,
+                    }}>
+                      {item.trend === 'up'   && <TrendingUp  size={10} />}
+                      {item.trend === 'down' && <TrendingDown size={10} />}
+                      {item.trendValue}
+                    </span>
+                  )}
+                  {'sub' in item && item.sub && (
+                    <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
+                      {item.sub}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>}
+
+          {/* ── Toolbar ───────────────────────────────────────────────── */}
+          <ListToolbar
+            search={searchRaw}
+            onSearch={v => { setSearchRaw(v); setPage(1) }}
+            searchPlaceholder="Pesquisar por nome ou código..."
+            onOpenFilter={() => setDrawerOpen(true)}
+            filterCount={activeFilterCount}
+            onClearAll={clearFilters}
+            chips={[
+              filters.condicao && {
+                label: `Condição: ${CONDICAO_LABEL[filters.condicao as keyof typeof CONDICAO_LABEL]}`,
+                onRemove: () => setFilters(f => ({ ...f, condicao: '' })),
+              },
+              filters.classe && {
+                label: `Classe: ${CLASSE_LABEL[filters.classe as keyof typeof CLASSE_LABEL]}`,
+                onRemove: () => setFilters(f => ({ ...f, classe: '' })),
+              },
+              filters.ativo && {
+                label: filters.ativo === 'sim' ? 'Ativo' : 'Inativo',
+                onRemove: () => setFilters(f => ({ ...f, ativo: '' })),
+              },
+              (filters.dtIni || filters.dtFim) && {
+                label: `Período: ${filters.dtIni || '…'} a ${filters.dtFim || '…'}`,
+                onRemove: () => setFilters(f => ({ ...f, dtIni: '', dtFim: '' })),
+              },
+            ]}
+          />
+
+          {/* ── Tabela ────────────────────────────────────────────────── */}
+          {isLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} variant="rect" width="100%" height={48} />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            (() => {
+              const hasSearch = search.trim().length > 0 || activeFilterCount > 0
+              return (
+                <EmptyStateUI
+                  message={hasSearch ? 'Nenhuma informação encontrada.' : 'Nenhuma informação cadastrada.'}
+                  description={hasSearch ? 'Tente ajustar os filtros ou limpar a busca.' : 'Comece adicionando a primeira conta do plano.'}
+                  action={hasSearch ? undefined : { label: 'Adicionar Novo', onClick: onNew }}
+                />
+              )
+            })()
+          ) : (
+            <>
+              <div style={{
+                background: colors.bg.surface,
+                border: `1px solid ${border}`,
+                borderRadius: t.radius.lg,
+                overflow: 'hidden',
+              }}>
+                {/* Cabeçalho */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '90px 100px 90px 1fr 80px 80px 60px',
+                  padding: '10px 16px',
+                  borderBottom: `1px solid ${border}`,
+                  background: colors.bg.subtle,
+                }}>
+                  {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'TIPO', 'ATIVO', 'AÇÃO'].map((h, i) => (
+                    <div
+                      key={h}
+                      style={{
+                        fontSize: t.font.size.xs,
+                        fontWeight: t.font.weight.semibold,
+                        color: colors.fg.subtle,
+                        fontFamily: t.font.family.sans,
+                        letterSpacing: '0.06em',
+                        textAlign: i >= 4 ? 'center' : 'left',
+                      }}
+                    >
+                      {h}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Linhas */}
+                {paginated.map((conta, idx) => (
+                  <ContaRow
+                    key={conta.id}
+                    conta={conta}
+                    isLast={idx === paginated.length - 1}
+                    onEdit={() => onEdit(conta.id)}
+                    onDelete={() => handleDeleteClick(conta.id)}
+                    onToggleAtivo={() => handleToggleClick(conta.id)}
+                    colors={colors}
+                    border={border}
+                  />
+                ))}
+              </div>
+
+              {/* ── Paginação ───────────────────────────────────────── */}
+              {filtered.length > PAGE_SIZE && (
+                <div style={{
+                  marginTop: t.space[4],
+                  paddingTop: t.space[4],
+                  borderTop: `1px solid ${colors.border.subtle}`,
+                }}>
+                  <Pagination
+                    page={page}
+                    total={filtered.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setPage}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+      </PageCard>
+
+      {/* ── ConfirmDialog: Excluir (sem dependentes) ─────────────────────── */}
+      <ConfirmDialog
+        open={deleteId !== null}
+        tone="destructive"
+        title="Excluir conta?"
+        message={deleteTarget ? `${deleteTarget.codigo} — ${deleteTarget.descricao}. Esta ação não pode ser desfeita.` : ''}
+        confirmLabel="Excluir"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
+
+      {/* ── ConfirmDialog: Exclusão bloqueada (há descendentes) ──────────── */}
+      <ConfirmDialog
+        open={blockedDeleteId !== null}
+        tone="default"
+        title="Não é possível excluir esta conta"
+        message={blockedTarget
+          ? `${blockedTarget.codigo} — ${blockedTarget.descricao} possui ${blockedCount} conta${blockedCount > 1 ? 's' : ''} vinculada${blockedCount > 1 ? 's' : ''}. Trate as contas dependentes antes de excluir, ou inative esta conta em vez de excluí-la.`
+          : ''}
+        confirmLabel="Inativar em vez disso"
+        cancelLabel="Entendido"
+        onConfirm={() => { if (blockedDeleteId !== null) handleToggleClick(blockedDeleteId); setBlockedDeleteId(null) }}
+        onCancel={() => setBlockedDeleteId(null)}
+      />
+
+      {/* ── ConfirmDialog: Inativar conta com dependentes ────────────────── */}
+      <ConfirmDialog
+        open={inativarWarnId !== null}
+        tone="default"
+        title="Inativar conta com contas vinculadas?"
+        message={inativarTarget
+          ? `${inativarTarget.codigo} — ${inativarTarget.descricao} possui ${inativarCount} conta${inativarCount > 1 ? 's' : ''} vinculada${inativarCount > 1 ? 's' : ''}. Elas permanecerão ativas, mas esta conta deixará de aceitar novos vínculos. Deseja continuar?`
+          : ''}
+        confirmLabel="Inativar"
+        onConfirm={handleConfirmInativar}
+        onCancel={() => setInativarWarnId(null)}
+      />
+
+      {/* ── Modal: Saiba mais ────────────────────────────────────────────── */}
+      <Modal
+        open={saibaMais}
+        onClose={() => setSaibaMais(false)}
+        size="lg"
+        footer={
+          <Button variant="primary" onClick={() => setSaibaMais(false)}>
+            Entendido
+          </Button>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
+            <div style={{
+              width: t.space[10], height: t.space[10], borderRadius: t.radius.xl,
+              background: colors.accent.subtle,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <HelpCircle size={22} color={colors.accent.default} />
+            </div>
+            <Heading level={2} size="xl" weight="bold">
+              Plano de Contas
+            </Heading>
+          </div>
+          <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed }}>
+            <p style={{ margin: `0 0 ${t.space[3]}px` }}>
+              O <strong style={{ color: colors.fg.default }}>Plano de Contas</strong> organiza a estrutura contábil e
+              financeira da fazenda em formato hierárquico, agrupando contas sintéticas e analíticas.
+            </p>
+            <ul style={{ margin: 0, padding: `0 0 0 ${t.space[5]}px`, display: 'flex', flexDirection: 'column', gap: t.space[2] - 2 }}>
+              <li><strong>Sintética:</strong> conta "pai", apenas agrupadora — não recebe lançamentos diretos.</li>
+              <li><strong>Analítica:</strong> conta "folha", recebe lançamentos financeiros.</li>
+              <li><strong>Condição:</strong> define a natureza contábil (Débito, Crédito ou Ambos).</li>
+              <li><strong>Inativar</strong> preserva o histórico; a exclusão é bloqueada quando há contas vinculadas.</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
+
+      {/* ── Filter Drawer ─────────────────────────────────────────────────── */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onClear={clearFilters}
+        title="Filtrar Plano de Contas"
+        activeCount={activeFilterCount}
+      >
+        <FormSelect
+          label="Condição"
+          options={[{ value: '', label: 'Todas' }, ...Object.entries(CONDICAO_LABEL).map(([value, label]) => ({ value, label }))]}
+          value={filters.condicao}
+          onChange={e => setFilters(f => ({ ...f, condicao: e.target.value }))}
+        />
+        <FormSelect
+          label="Classe"
+          options={[{ value: '', label: 'Todas' }, ...Object.entries(CLASSE_LABEL).map(([value, label]) => ({ value, label }))]}
+          value={filters.classe}
+          onChange={e => setFilters(f => ({ ...f, classe: e.target.value }))}
+        />
+        <FormSelect
+          label="Status"
+          options={[{ value: '', label: 'Todos' }, { value: 'sim', label: 'Ativo' }, { value: 'nao', label: 'Inativo' }]}
+          value={filters.ativo}
+          onChange={e => setFilters(f => ({ ...f, ativo: e.target.value }))}
+        />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <FormField
+            label="Dt. Ini."
+            type="date"
+            value={filters.dtIni}
+            onChange={e => setFilters(f => ({ ...f, dtIni: e.target.value }))}
+          />
+          <FormField
+            label="Dt. Fim."
+            type="date"
+            value={filters.dtFim}
+            onChange={e => setFilters(f => ({ ...f, dtFim: e.target.value }))}
+          />
+        </div>
+      </FilterDrawer>
+
+    </PageContainer>
+  )
+}
+
+// ─── Linha da tabela ──────────────────────────────────────────────────────────
+
+function ContaRow({
+  conta, isLast, onEdit, onDelete, onToggleAtivo, colors, border,
+}: {
+  conta:         Conta
+  isLast:        boolean
+  onEdit:        () => void
+  onDelete:      () => void
+  onToggleAtivo: () => void
+  colors:        ReturnType<typeof useTheme>['colors']
+  border:        string
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '90px 100px 90px 1fr 80px 80px 60px',
+        padding: '0 16px',
+        height: t.size.tableRow,
+        borderBottom: isLast ? 'none' : `1px solid ${border}`,
+        alignItems: 'center',
+        transition: `background ${t.animation.duration.faster}`,
+      }}
+      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+    >
+      {/* Código */}
+      <span title={conta.codigo} style={{
+        fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default,
+        fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums',
+        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>
+        {conta.codigo}
+      </span>
+
+      {/* Classe */}
+      <span style={{
+        display: 'inline-flex', alignItems: 'center',
+        fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+        padding: '2px 8px', borderRadius: t.radius.full,
+        background: conta.classe === 'sintetica' ? t.color.feedback.info.bg : t.color.brand[50],
+        color:      conta.classe === 'sintetica' ? t.color.feedback.info.text : t.color.brand[600],
+        fontFamily: t.font.family.sans,
+        width: 'fit-content',
+      }}>
+        {CLASSE_LABEL[conta.classe]}
+      </span>
+
+      {/* Condição */}
+      <span title={CONDICAO_LABEL[conta.condicao]} style={{
+        fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans,
+        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>
+        {CONDICAO_LABEL[conta.condicao]}
+      </span>
+
+      {/* Descrição */}
+      <span title={conta.descricao} style={{
+        fontSize: t.font.size.base, color: colors.fg.default, fontFamily: t.font.family.sans,
+        paddingLeft: conta.antecessorId !== null ? 16 : 0,
+        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>
+        {conta.descricao}
+      </span>
+
+      {/* Tipo */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {conta.tipo
+          ? <Badge label={TIPO_LABEL[conta.tipo]} variant={conta.tipo === 'capex' ? 'purple' : 'cyan'} />
+          : <span style={{ color: colors.fg.subtle, fontSize: t.font.size.sm }}>—</span>}
+      </div>
+
+      {/* Ativo */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Badge
+          label={conta.ativo === 'sim' ? 'Ativo' : 'Inativo'}
+          variant={conta.ativo === 'sim' ? 'success' : 'neutral'}
+        />
+      </div>
+
+      {/* Ação */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <DropdownMenu
+          align="right"
+          ariaLabel="Ações da conta"
+          items={[
+            { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />, onClick: onEdit },
+            { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Power size={13} />,  onClick: onToggleAtivo },
+            { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
+          ]}
+        />
+      </div>
+    </div>
+  )
+}

@@ -51,7 +51,7 @@ export default function PlanoContasPage() {
         presetAntecessorId={selected ? undefined : presetAntecessorId ?? undefined}
         onBack={() => { setPresetAntecessorId(null); setView('list') }}
         onSave={(conta) => { setPresetAntecessorId(null); handleSave(conta) }}
-        onCreateDescendant={selected ? () => handleCreateDescendant(selected.id) : undefined}
+        onCreateDescendant={selected?.classe === 'sintetica' ? () => handleCreateDescendant(selected.id) : undefined}
       />
     )
   }

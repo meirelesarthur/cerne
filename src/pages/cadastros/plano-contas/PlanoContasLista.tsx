@@ -17,7 +17,7 @@ import { ListToolbar }     from '../../../components/ui/ListToolbar'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
-import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
+import { DropdownMenu, type DropdownMenuItem } from '../../../components/ui/DropdownMenu'
 import { ConfirmDialog }   from '../../../components/ui/ConfirmDialog'
 import { t }               from '../../../design/tokens'
 import { useTheme }        from '../../../context/ThemeContext'
@@ -488,10 +488,12 @@ function ContaRow({
           ariaLabel="Ações da conta"
           items={[
             { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />,       onClick: onEdit },
-            { id: 'desc',   label: 'Criar Descendente',                          icon: <GitBranchPlus size={13} />, onClick: onCreateDescendant },
+            // "Criar Descendente" só se aplica a contas Sintéticas — Analíticas
+            // são folhas e não podem ter contas-filhas.
+            conta.classe === 'sintetica' && { id: 'desc', label: 'Criar Descendente', icon: <GitBranchPlus size={13} />, onClick: onCreateDescendant },
             { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Power size={13} />,        onClick: onToggleAtivo },
             { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
-          ]}
+          ].filter(Boolean) as DropdownMenuItem[]}
         />
       </div>
     </div>

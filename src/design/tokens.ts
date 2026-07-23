@@ -532,6 +532,8 @@ export const layout = {
   contentTop: 72,
   /** Folga externa do chassi (root pad 8 + card pad 8 = 16). */
   gutter: 16,
+  /** Largura máxima de cartões de autenticação e estados standalone. */
+  formMaxWidth: 480,
 }
 
 // ─── Gráficos ──────────────────────────────────────────────────────────────────

@@ -400,6 +400,7 @@ export const menuModules: NavModule[] = [
         icon: Wallet,
         items: [
           { id: 'fin-pag', label: 'Contas a Pagar',              path: '/financeiro/pagar',        icon: ArrowUpCircle },
+          { id: 'fin-bai', label: 'Baixa de Títulos',             path: '/financeiro/baixa-titulos', icon: FileCheck },
           { id: 'fin-rec', label: 'Contas a Receber',            path: '/financeiro/receber',       icon: ArrowDownCircle },
           { id: 'fin-cai', label: 'Mov. Caixa / Bancário',       path: '/financeiro/caixa',         icon: Wallet },
           { id: 'fin-flu', label: 'Fluxo Bancário',              path: '/financeiro/fluxo',         icon: Landmark },

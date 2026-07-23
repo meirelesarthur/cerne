@@ -54,7 +54,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
           fontWeight: t.font.weight.medium,
           color: disabled ? colors.fg.subtle : colors.fg.default,
           fontFamily: t.font.family.sans,
-          transition: 'color 0.2s',
+          transition: `color ${t.transition.smooth}`,
         }}>
           {label}
         </span>

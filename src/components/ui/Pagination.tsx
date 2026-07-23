@@ -99,7 +99,7 @@ export function Pagination(props: PaginationProps) {
           aria-label="Página anterior"
           style={hasPrev ? btnBase : btnDisabled}
         >
-          <ChevronLeft size={14} /> Anterior
+          <ChevronLeft size={t.icon.sm} /> Anterior
         </button>
         <button
           type="button"
@@ -109,7 +109,7 @@ export function Pagination(props: PaginationProps) {
           aria-label="Próxima página"
           style={hasNext ? btnBase : btnDisabled}
         >
-          Próximo <ChevronRight size={14} />
+          Próximo <ChevronRight size={t.icon.sm} />
         </button>
       </div>
     )
@@ -235,7 +235,7 @@ export function Pagination(props: PaginationProps) {
               if (page > 1) e.currentTarget.style.background = colors.bg.surface
             }}
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={t.icon.sm} />
           </button>
 
           {/* Page numbers */}
@@ -292,7 +292,7 @@ export function Pagination(props: PaginationProps) {
               if (page < totalPages) e.currentTarget.style.background = colors.bg.surface
             }}
           >
-            <ChevronRight size={14} />
+            <ChevronRight size={t.icon.sm} />
           </button>
         </div>
       </div>

@@ -62,7 +62,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
             padding: `${t.space[1]}px ${t.space[2] + 2}px`,
           }}
         >
-          <Icon size={12} color={colors.fg.subtle as string} />
+          <Icon size={t.icon.xs} color={colors.fg.subtle as string} />
           <Heading
             level={3}
             size="xs"
@@ -85,8 +85,8 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
             onMouseEnter={() => setBtnHov(true)}
             onMouseLeave={() => setBtnHov(false)}
             style={{
-              width: 28,
-              height: 28,
+              width: t.size.iconBtn.sm,
+              height: t.size.iconBtn.sm,
               borderRadius: t.radius.base,
               border: `1px solid ${colors.border.default}`,
               display: 'flex',
@@ -101,7 +101,7 @@ export function ChartCard({ icon: Icon, title, action, children, compact }: Char
               padding: 0,
             }}
           >
-            <ArrowUpRight size={13} color={colors.fg.subtle as string} />
+            <ArrowUpRight size={t.icon.xs} color={colors.fg.subtle as string} />
           </button>
         </div>
       </div>

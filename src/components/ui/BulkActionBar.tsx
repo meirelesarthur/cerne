@@ -56,7 +56,7 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
         whiteSpace:   'nowrap',
       }}
     >
-      <CheckSquare size={15} color={accentColor} aria-hidden="true" />
+      <CheckSquare size={t.icon.sm} color={accentColor} aria-hidden="true" />
       <span style={{
         fontSize:   t.font.size.sm,
         fontWeight: t.font.weight.semibold,
@@ -87,7 +87,7 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
           flexShrink: 0,
         }}
       >
-        <X size={14} />
+        <X size={t.icon.xs} />
       </button>
     </div>
   )

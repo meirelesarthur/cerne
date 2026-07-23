@@ -143,7 +143,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
     >
       {/* Main row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], padding: `${t.space[2] + 2}px ${t.space[3]}px` }}>
-        <Icon size={15} style={{ flexShrink: 0 }} />
+        <Icon size={t.icon.sm} style={{ flexShrink: 0 }} />
         <span style={{ flex: 1, lineHeight: t.font.lineHeight.snug }}>{toast.message}</span>
         {toast.action && (
           <button
@@ -186,7 +186,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             lineHeight:     1,
           }}
         >
-          <X size={13} />
+          <X size={t.icon.xs} />
         </button>
       </div>
 

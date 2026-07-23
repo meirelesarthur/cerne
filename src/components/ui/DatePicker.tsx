@@ -265,7 +265,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           }}
           className="gb-focusable"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={t.icon.sm} />
         </button>
 
         <span style={{
@@ -289,7 +289,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           }}
           className="gb-focusable"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={t.icon.sm} />
         </button>
       </div>
 
@@ -364,7 +364,7 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
         {displayValue || placeholder}
       </span>
       <Calendar
-        size={15}
+        size={t.icon.sm}
         color={open ? colors.accent.default : colors.fg.subtle}
         aria-hidden="true"
         style={{ flexShrink: 0, transition: `color ${t.transition.base}` }}
@@ -405,7 +405,7 @@ function FieldLabel({ htmlFor, label, required, hint, colors }: FieldLabelProps)
       {hint && (
         <Tooltip label={hint}>
           <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-            <HelpCircle size={12} color={t.color.neutral[400]} />
+            <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
           </span>
         </Tooltip>
       )}

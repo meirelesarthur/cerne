@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DatePicker, DateRangePicker } from './DatePicker'
 import { ThemeProvider } from '../../context/ThemeContext'
+import { t } from '../../design/tokens'
 
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
@@ -262,7 +263,7 @@ export const CombinacaoCompleta: Story = {
           min={plantio ?? undefined}
           max={colheita ?? undefined}
         />
-        <div style={{ fontSize: 11, color: '#6b7280', fontFamily: "'Outfit', sans-serif", paddingTop: 8, borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ fontSize: t.font.size.xs, color: t.color.neutral[500], fontFamily: t.font.family.sans, paddingTop: 8, borderTop: `1px solid ${t.color.neutral[200]}` }}>
           <div>Plantio: {plantio ?? '—'}</div>
           <div>Colheita: {colheita ?? '—'}</div>
           <div>Período: {periodo.start ?? '—'} → {periodo.end ?? '—'}</div>

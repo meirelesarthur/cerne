@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { useChartScale } from '../../hooks/useChartScale'
 
 export interface GroupedSeries {
   name: string
@@ -33,27 +34,30 @@ export function GroupedBarChart({
 
   const W = 800
   const H = height
+  const { ref, k } = useChartScale(W)
 
   const allData = series.flatMap((s) => s.data)
 
   // Guard: vazio
   if (series.length === 0 || labels.length === 0 || allData.every((v) => v === 0)) {
     return (
-      <svg
-        width="100%"
-        viewBox={`0 0 ${W} ${H}`}
-        style={{ display: 'block', fontFamily: t.font.family.sans }}
-      >
-        <text
-          x={W / 2}
-          y={H / 2}
-          textAnchor="middle"
-          fontSize={t.font.size.sm}
-          fill={colors.fg.subtle as string}
+      <div ref={ref} style={{ width: '100%' }}>
+        <svg
+          width="100%"
+          viewBox={`0 0 ${W} ${H}`}
+          style={{ display: 'block', fontFamily: t.font.family.sans }}
         >
-          Sem dados
-        </text>
-      </svg>
+          <text
+            x={W / 2}
+            y={H / 2}
+            textAnchor="middle"
+            fontSize={t.font.size.sm * k}
+            fill={colors.fg.subtle as string}
+          >
+            Sem dados
+          </text>
+        </svg>
+      </div>
     )
   }
 
@@ -94,6 +98,7 @@ export function GroupedBarChart({
   const ttH = 36
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
       viewBox={`0 0 ${W} ${H}`}
@@ -123,7 +128,7 @@ export function GroupedBarChart({
           x={PAD_LEFT - 6}
           y={yScale(tv) + 4}
           textAnchor="end"
-          fontSize={t.font.size.xs}
+          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
         >
@@ -139,7 +144,7 @@ export function GroupedBarChart({
             x={xOfGroup(gi)}
             y={PAD_TOP + chartH + 18}
             textAnchor="middle"
-            fontSize={t.font.size.xs}
+            fontSize={t.font.size.xs * k}
             fill={colors.fg.subtle as string}
             fontFamily={t.font.family.sans}
           >
@@ -199,7 +204,7 @@ export function GroupedBarChart({
             <text
               x={ttX + 18}
               y={ttY + 15}
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
@@ -209,7 +214,7 @@ export function GroupedBarChart({
             <text
               x={ttX + 10}
               y={ttY + 28}
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
             >
@@ -230,7 +235,7 @@ export function GroupedBarChart({
                 <text
                   x={14}
                   y={12}
-                  fontSize={t.font.size.xs}
+                  fontSize={t.font.size.xs * k}
                   fill={colors.fg.muted as string}
                   fontFamily={t.font.family.sans}
                 >
@@ -242,5 +247,6 @@ export function GroupedBarChart({
         </g>
       )}
     </svg>
+    </div>
   )
 }

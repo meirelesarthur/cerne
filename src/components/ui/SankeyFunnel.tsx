@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import type { ThemeColors } from '../../context/ThemeContext'
+import { useChartScale } from '../../hooks/useChartScale'
 
 export interface SankeyFunnelStage {
   label: string
@@ -27,6 +28,7 @@ export function SankeyFunnel({
 
   const W = 800
   const H = chartHeight
+  const { ref, k } = useChartScale(W)
   const n = stages.length
   const maxVal = stages[0]?.value || 1
   const blockW = 56
@@ -53,6 +55,7 @@ export function SankeyFunnel({
   const pct = (v: number) => Math.round((v / maxVal) * 100)
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
       viewBox={`0 0 ${W} ${H}`}
@@ -106,7 +109,7 @@ export function SankeyFunnel({
               x={cx}
               y={midY - 9}
               textAnchor="middle"
-              fontSize={t.font.size.base}
+              fontSize={t.font.size.base * k}
               fontWeight={700}
               fill={t.color.neutral[0]}
               opacity={dimmed ? 0.2 : 1}
@@ -132,7 +135,7 @@ export function SankeyFunnel({
                   x={cx}
                   y={midY + 13}
                   textAnchor="middle"
-                  fontSize={t.font.size['3xs']}
+                  fontSize={t.font.size['3xs'] * k}
                   fontWeight={600}
                   fill={t.color.neutral[0]}
                   opacity={dimmed ? 0 : 1}
@@ -148,7 +151,7 @@ export function SankeyFunnel({
               x={cx}
               y={H - 4}
               textAnchor="middle"
-              fontSize={t.font.size['3xs']}
+              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
               style={{ transition: 'opacity 0.18s ease' }}
@@ -162,7 +165,7 @@ export function SankeyFunnel({
                 x={cx}
                 y={topY[i] - 6}
                 textAnchor="middle"
-                fontSize={8}
+                fontSize={t.font.size['3xs'] * k}
                 fill={colors.fg.subtle as string}
               >
                 {stage.sublabel}
@@ -199,7 +202,7 @@ export function SankeyFunnel({
             <text
               x={ttX + 8}
               y={finalY + 14}
-              fontSize={t.font.size['3xs']}
+              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
               fontWeight={600}
@@ -210,7 +213,7 @@ export function SankeyFunnel({
               <text
                 x={ttX + 8}
                 y={finalY + 27}
-                fontSize={t.font.size['3xs']}
+                fontSize={t.font.size['3xs'] * k}
                 fill={color}
                 fontFamily={t.font.family.sans}
               >
@@ -221,5 +224,6 @@ export function SankeyFunnel({
         )
       })()}
     </svg>
+    </div>
   )
 }

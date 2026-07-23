@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { useChartScale } from '../../hooks/useChartScale'
 
 export interface DonutSlice {
   label: string
@@ -36,27 +37,30 @@ export function DonutChart({
 
   const W = 800
   const H = height
+  const { ref, k } = useChartScale(W)
 
   const total = data.reduce((sum, d) => sum + d.value, 0)
 
   // Guard: vazio
   if (data.length === 0 || total === 0) {
     return (
-      <svg
-        width="100%"
-        viewBox={`0 0 ${W} ${H}`}
-        style={{ display: 'block', fontFamily: t.font.family.sans }}
-      >
-        <text
-          x={W / 2}
-          y={H / 2}
-          textAnchor="middle"
-          fontSize={t.font.size.sm}
-          fill={colors.fg.subtle as string}
+      <div ref={ref} style={{ width: '100%' }}>
+        <svg
+          width="100%"
+          viewBox={`0 0 ${W} ${H}`}
+          style={{ display: 'block', fontFamily: t.font.family.sans }}
         >
-          Sem dados
-        </text>
-      </svg>
+          <text
+            x={W / 2}
+            y={H / 2}
+            textAnchor="middle"
+            fontSize={t.font.size.sm * k}
+            fill={colors.fg.subtle as string}
+          >
+            Sem dados
+          </text>
+        </svg>
+      </div>
     )
   }
 
@@ -126,6 +130,7 @@ export function DonutChart({
   const ttH = 48
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
       viewBox={`0 0 ${W} ${H}`}
@@ -159,7 +164,7 @@ export function DonutChart({
               x={cx}
               y={cy + (centerLabel ? -2 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size['2xl']}
+              fontSize={t.font.size['2xl'] * k}
               fontWeight={t.font.weight.bold}
               fill={colors.fg.default as string}
               fontFamily={t.font.family.sans}
@@ -172,7 +177,7 @@ export function DonutChart({
               x={cx}
               y={cy + (centerValue ? 20 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
             >
@@ -206,7 +211,7 @@ export function DonutChart({
             <text
               x={ttX + 18}
               y={ttY + 16}
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
@@ -216,7 +221,7 @@ export function DonutChart({
             <text
               x={ttX + 10}
               y={ttY + 30}
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
             >
@@ -244,7 +249,7 @@ export function DonutChart({
                   <text
                     x={lx + 16}
                     y={ly + 12}
-                    fontSize={t.font.size.xs}
+                    fontSize={t.font.size.xs * k}
                     fill={colors.fg.muted as string}
                     fontFamily={t.font.family.sans}
                   >
@@ -257,5 +262,6 @@ export function DonutChart({
         )
       })()}
     </svg>
+    </div>
   )
 }

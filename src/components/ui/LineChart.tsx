@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { useChartScale } from '../../hooks/useChartScale'
 
 export interface LineSeries {
   name: string
@@ -37,30 +38,33 @@ export function LineChart({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
   const showLegendFinal = showLegend ?? series.length > 1
+  const W = 800
+  const { ref, k } = useChartScale(W)
 
   // Guard: vazio ou todos zero
   const allData = series.flatMap((s) => s.data)
   if (series.length === 0 || allData.every((v) => v === 0) || labels.length === 0) {
     return (
-      <svg
-        width="100%"
-        viewBox={`0 0 800 ${height}`}
-        style={{ display: 'block', fontFamily: t.font.family.sans }}
-      >
-        <text
-          x={400}
-          y={height / 2}
-          textAnchor="middle"
-          fontSize={t.font.size.sm}
-          fill={colors.fg.subtle as string}
+      <div ref={ref} style={{ width: '100%' }}>
+        <svg
+          width="100%"
+          viewBox={`0 0 800 ${height}`}
+          style={{ display: 'block', fontFamily: t.font.family.sans }}
         >
-          Sem dados
-        </text>
-      </svg>
+          <text
+            x={400}
+            y={height / 2}
+            textAnchor="middle"
+            fontSize={t.font.size.sm * k}
+            fill={colors.fg.subtle as string}
+          >
+            Sem dados
+          </text>
+        </svg>
+      </div>
     )
   }
 
-  const W = 800
   const LEGEND_H = showLegendFinal ? 28 : 0
   const PAD_TOP = 16
   const PAD_BOTTOM = 32
@@ -129,6 +133,7 @@ export function LineChart({
   const ttH = ttPad * 2 + ttLineH * (series.length + 1) + 4
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
       viewBox={`0 0 ${W} ${height}`}
@@ -174,7 +179,7 @@ export function LineChart({
           x={PAD_LEFT - 6}
           y={yOf(tick) + 4}
           textAnchor="end"
-          fontSize={t.font.size.xs}
+          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
         >
@@ -189,7 +194,7 @@ export function LineChart({
           x={xOf(i)}
           y={PAD_TOP + chartH + 20}
           textAnchor="middle"
-          fontSize={t.font.size.xs}
+          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
         >
@@ -268,7 +273,7 @@ export function LineChart({
             <text
               x={ttXPos + ttPad}
               y={ttYPos + ttPad + ttLineH - 4}
-              fontSize={t.font.size.xs}
+              fontSize={t.font.size.xs * k}
               fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
@@ -289,7 +294,7 @@ export function LineChart({
                   <text
                     x={ttXPos + ttPad + 14}
                     y={ttYPos + ttPad + ttLineH + si * ttLineH + 12}
-                    fontSize={t.font.size.xs}
+                    fontSize={t.font.size.xs * k}
                     fill={colors.fg.muted as string}
                     fontFamily={t.font.family.sans}
                   >
@@ -314,7 +319,7 @@ export function LineChart({
                 <text
                   x={14}
                   y={12}
-                  fontSize={t.font.size.xs}
+                  fontSize={t.font.size.xs * k}
                   fill={colors.fg.muted as string}
                   fontFamily={t.font.family.sans}
                 >
@@ -326,5 +331,6 @@ export function LineChart({
         </g>
       )}
     </svg>
+    </div>
   )
 }

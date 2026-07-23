@@ -1,5 +1,6 @@
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { useChartScale } from '../../hooks/useChartScale'
 
 // ─── GaugeChart ────────────────────────────────────────────────────────────────
 // Medidor semicircular (180°): arco de trilho + arco de preenchimento proporcional
@@ -34,6 +35,7 @@ export function GaugeChart({
 
   const W = 260
   const H = height
+  const { ref, k } = useChartScale(W)
   const cx = W / 2
   const cy = H - 20
   const r = 100
@@ -52,6 +54,7 @@ export function GaugeChart({
   const bigText = centerValue ?? `${Math.round(pct * 100)}%`
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
       viewBox={`0 0 ${W} ${H}`}
@@ -80,7 +83,7 @@ export function GaugeChart({
         x={cx}
         y={cy - 14}
         textAnchor="middle"
-        fontSize={t.font.size['2xl']}
+        fontSize={t.font.size['2xl'] * k}
         fontWeight={t.font.weight.bold}
         fill={isGbMode ? t.color.gb.accent : (colors.fg.default as string)}
         fontFamily={t.font.family.sans}
@@ -92,7 +95,7 @@ export function GaugeChart({
           x={cx}
           y={cy}
           textAnchor="middle"
-          fontSize={t.font.size.xs}
+          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
         >
@@ -100,5 +103,6 @@ export function GaugeChart({
         </text>
       )}
     </svg>
+    </div>
   )
 }

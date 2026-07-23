@@ -30,6 +30,7 @@ import OfxImportPage       from '../../pages/financeiro/ofx/OfxImportPage'
 import IntegracaoDominioPage from '../../pages/integracoes/dominio/IntegracaoDominioPage'
 import AgrupadoresContabeisPage from '../../pages/cadastros/agrupadores-contabeis/AgrupadoresContabeisPage'
 import PlanejamentoPecuarioPage from '../../pages/operacional/planejamento-pecuario/PlanejamentoPecuarioPage'
+import MapaConfinamentoPage from '../../pages/operacional/mapa-confinamento/MapaConfinamentoPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -131,6 +132,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'int-dom-soft')     return <IntegracaoDominioPage />
   if (itemId === 'cad-fin-agr')      return <AgrupadoresContabeisPage />
   if (itemId === 'ope-pec-pla')      return <PlanejamentoPecuarioPage />
+  if (itemId === 'ope-pec-map')      return <MapaConfinamentoPage />
   if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />

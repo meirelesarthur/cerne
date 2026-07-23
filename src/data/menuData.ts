@@ -352,6 +352,7 @@ export const menuModules: NavModule[] = [
           { id: 'ope-pec-ges', label: 'Gestão Animais',          path: '/operacional/gestao-animais',        icon: Beef },
           { id: 'ope-pec-inv', label: 'Inventariado',            path: '/operacional/inventariado',          icon: ClipboardCheck },
           { id: 'ope-pec-pla', label: 'Planejamento Pecuário',   path: '/operacional/planejamento-pecuario', icon: ClipboardList },
+          { id: 'ope-pec-map', label: 'Mapa de Confinamento',    path: '/operacional/mapa-confinamento',    icon: Map },
           { id: 'ope-pec-tra', label: 'Transferências',          path: '/operacional/transferencias',        icon: ArrowLeftRight },
           { id: 'ope-pec-mov', label: 'Movimentações',           path: '/operacional/movimentacoes',         icon: Repeat },
           { id: 'ope-pec-man', label: 'Manejo',                  path: '/operacional/manejo',                icon: Settings2 },

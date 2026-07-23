@@ -613,7 +613,7 @@ function AgingRows({ colors }: { colors: ThemeColors }) {
         return (
           <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[1] + 2 }}>
             <span style={{
-              width: 68, flexShrink: 0, fontSize: t.font.size['3xs'],
+              width: 68, flexShrink: 0, fontSize: t.font.size.xs,
               color: isOld ? t.color.feedback.error.text : colors.fg.subtle,
               fontWeight: isOld ? t.font.weight.semibold : t.font.weight.normal,
             }}>
@@ -629,7 +629,7 @@ function AgingRows({ colors }: { colors: ThemeColors }) {
                 <div style={{ height: '100%', width: `${(b.pagar / max) * 100}%`, background: t.color.feedback.error.solid, borderRadius: t.radius.full }} />
               </div>
             </div>
-            <span style={{ width: 60, flexShrink: 0, textAlign: 'right', fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>
+            <span style={{ width: 60, flexShrink: 0, textAlign: 'right', fontSize: t.font.size.xs, color: colors.fg.subtle }}>
               {fmtCompact(b.receber)}
             </span>
           </div>
@@ -642,8 +642,8 @@ function AgingRows({ colors }: { colors: ThemeColors }) {
 function StatMini({ label, value, colors }: { label: string; value: string; colors: ThemeColors }) {
   return (
     <div style={{ textAlign: 'right', minWidth: 76, flexShrink: 0 }}>
-      <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{label}</div>
-      <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{value}</div>
+      <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{label}</div>
+      <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{value}</div>
     </div>
   )
 }
@@ -663,7 +663,7 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
         <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: color, flexShrink: 0 }} />
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{crop}</div>
-          <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{ha.toLocaleString('pt-BR')} ha</div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{ha.toLocaleString('pt-BR')} ha</div>
         </div>
       </div>
 
@@ -674,7 +674,7 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
               <div style={{ flex: perf.realizada, background: t.color.brand[600], borderRadius: t.radius.full }} />
               <div style={{ flex: perf.aRealizar, background: t.color.brand[200], borderRadius: t.radius.full }} />
             </div>
-            <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle, marginTop: 4 }}>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 4 }}>
               {fmtCompact(total)} em receita
             </div>
           </>
@@ -698,7 +698,7 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
                 background: folgaApertada ? t.color.feedback.warning.bg : t.color.feedback.success.bg,
               }}
             >
-              <div style={{ fontSize: t.font.size['3xs'], color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>Folga s/ custo</div>
+              <div style={{ fontSize: t.font.size.xs, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>Folga s/ custo</div>
               <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>
                 {folga.toFixed(0)}%
               </div>
@@ -1078,11 +1078,11 @@ export default function OverviewPanel() {
 
             <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[4] }}>
               <div>
-                <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>Margem bruta</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Margem bruta</div>
                 <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.fg.default }}>R$ 56,1M</div>
               </div>
               <div>
-                <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>Margem líquida</div>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Margem líquida</div>
                 <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: colors.fg.default }}>R$ 56,0M</div>
               </div>
             </div>
@@ -1094,7 +1094,7 @@ export default function OverviewPanel() {
               {COST_LEGEND_LABELS.map(label => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: COST_LABEL_COLOR[label], display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>{label}</span>
+                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{label}</span>
                 </div>
               ))}
             </div>
@@ -1164,7 +1164,7 @@ export default function OverviewPanel() {
                     <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {s.item}
                     </div>
-                    <div style={{ fontSize: t.font.size['3xs'], color: colors.fg.subtle }}>mínimo {s.min} dias</div>
+                    <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>mínimo {s.min} dias</div>
                   </div>
                   <span style={{
                     flexShrink: 0, fontSize: t.font.size.xs, fontWeight: t.font.weight.bold,
@@ -1187,7 +1187,7 @@ export default function OverviewPanel() {
               <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Concentração de receita</span>
               {REVENUE_SHARE[0].pct > 40 && (
                 <span style={{
-                  fontSize: t.font.size['3xs'], fontWeight: t.font.weight.semibold,
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
                   color: t.color.feedback.warning.text, background: t.color.feedback.warning.bg,
                   padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
                 }}>

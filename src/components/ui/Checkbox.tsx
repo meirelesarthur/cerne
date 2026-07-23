@@ -32,6 +32,13 @@ export function Checkbox({
 
   const filled = checked || indeterminate
 
+  // Hit target mínimo (24×24) sem alterar o tamanho visual do quadrado
+  // (t.size.checkbox = 20). Quando não há label clicável ao lado, o wrapper
+  // ganha padding transparente extra para atingir a área mínima — o quadrado
+  // visual permanece 20×20, centralizado.
+  const hitTarget = Math.max(24, t.size.checkbox)
+  const hitPad = (hitTarget - t.size.checkbox) / 2
+
   return (
     <label
       htmlFor={id}
@@ -44,8 +51,17 @@ export function Checkbox({
         opacity: disabled ? 0.5 : 1,
       }}
     >
-      <span style={{ position: 'relative', width: t.size.checkbox, height: t.size.checkbox, flexShrink: 0 }}>
-        {/* Input nativo visualmente oculto mas totalmente acessível */}
+      <span
+        style={{
+          position: 'relative',
+          width: t.size.checkbox,
+          height: t.size.checkbox,
+          flexShrink: 0,
+        }}
+      >
+        {/* Input nativo visualmente oculto mas totalmente acessível — a área
+            clicável se estende além do quadrado visual (hit target ≥ 24px)
+            quando não há label ao lado para cobrir essa área. */}
         <input
           id={id}
           ref={inputRef}
@@ -57,10 +73,10 @@ export function Checkbox({
           onChange={e => onChange(e.target.checked)}
           style={{
             position: 'absolute',
-            inset: 0,
+            inset: label ? 0 : -hitPad,
             opacity: 0,
-            width: '100%',
-            height: '100%',
+            width: label ? '100%' : hitTarget,
+            height: label ? '100%' : hitTarget,
             margin: 0,
             cursor: disabled ? 'not-allowed' : 'pointer',
             zIndex: 1,
@@ -110,7 +126,7 @@ export function Checkbox({
             fontSize: t.font.size.base,
             fontFamily: t.font.family.sans,
             color: colors.fg.default,
-            lineHeight: 1,
+            lineHeight: t.font.lineHeight.tight,
           }}
         >
           {label}

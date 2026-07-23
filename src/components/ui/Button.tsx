@@ -56,6 +56,17 @@ const sizeStyle: Record<ButtonSize, React.CSSProperties> = {
   lg: { height: t.size.btn.lg, padding: `0 ${t.space[5]}px`, fontSize: t.font.size.md },
 }
 
+// Tamanho do spinner interno (Spinner só aceita sm|md|lg, escala própria em px
+// fixo — não referencia t.icon diretamente). Mapeado por tamanho do botão para
+// que o indicador de carregamento cresça junto com o botão, aproximando-se de
+// t.icon.xs/sm (sm) e t.icon.md (lg). Mesma ressalva de escala documentada em
+// IconButton: os enums não casam 1:1 com t.icon, mas a progressão é coerente.
+const spinnerSizeBySize: Record<ButtonSize, 'sm' | 'md' | 'lg'> = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+}
+
 export function Button({
   variant = 'primary',
   size    = 'md',
@@ -110,11 +121,20 @@ export function Button({
       }}
     >
       {loading
-        ? <Spinner size="sm" />
-        : icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
-      {children}
+        ? <Spinner size={spinnerSizeBySize[size]} />
+        : icon && <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{icon}</span>}
+      <span
+        style={{
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {children}
+      </span>
       {!loading && iconRight && (
-        <span style={{ display: 'flex', alignItems: 'center' }}>{iconRight}</span>
+        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{iconRight}</span>
       )}
     </button>
   )

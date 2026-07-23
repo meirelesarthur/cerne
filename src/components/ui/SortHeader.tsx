@@ -49,7 +49,7 @@ export function SortHeader({
         cursor: 'pointer',
         padding: 0,
         margin: 0,
-        fontSize: t.font.size.xs,
+        fontSize: t.font.size.sm,
         fontWeight: t.font.weight.semibold,
         color: isActive ? colors.fg.default : colors.fg.subtle,
         fontFamily: t.font.family.sans,
@@ -61,8 +61,8 @@ export function SortHeader({
     >
       {label}
       <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }} aria-hidden="true">
-        <ChevronUp   size={9} style={{ opacity: isActive && direction === 'asc'  ? 1 : 0.3 }} />
-        <ChevronDown size={9} style={{ opacity: isActive && direction === 'desc' ? 1 : 0.3 }} />
+        <ChevronUp   size={t.icon.xs} style={{ opacity: isActive && direction === 'asc'  ? 1 : 0.3 }} />
+        <ChevronDown size={t.icon.xs} style={{ opacity: isActive && direction === 'desc' ? 1 : 0.3 }} />
       </span>
     </button>
   )

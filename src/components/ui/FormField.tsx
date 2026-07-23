@@ -8,7 +8,7 @@ import type { BaseFieldProps } from './fieldTypes'
 
 interface FormFieldProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'rows' | 'size'>, BaseFieldProps {
-  /** Altura do controle: 'md' = t.size.control (36, padrão) · 'lg' = t.size.controlLg (40) */
+  /** Altura do controle: 'md' = t.size.control (40, padrão) · 'lg' = t.size.controlLg (44) */
   size?: 'md' | 'lg'
   /** Renderiza um <textarea> multi-linha em vez de <input> */
   multiline?: boolean
@@ -103,12 +103,12 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             </span>
           )}
           {required && (
-            <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+            <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: t.font.lineHeight.tight }}>*</span>
           )}
           {hint && (
             <Tooltip label={hint}>
               <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-                <HelpCircle size={12} color={t.color.neutral[400]} />
+                <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
               </span>
             </Tooltip>
           )}

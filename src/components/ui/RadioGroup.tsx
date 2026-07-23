@@ -26,6 +26,14 @@ export interface RadioGroupProps {
   disabled?: boolean
 }
 
+// Círculo visual usa t.size.checkbox (mesma escala do Checkbox); o dot interno
+// é proporcional (~44%) — derivado, nunca um número solto.
+const RADIO_CIRCLE_SIZE = t.size.checkbox
+const RADIO_DOT_SIZE = Math.round(t.size.checkbox * 0.44)
+// Hit target mínimo 24×24 (público idoso) sem alterar o tamanho visual do círculo.
+const RADIO_HIT_TARGET = Math.max(24, RADIO_CIRCLE_SIZE)
+const RADIO_HIT_PAD = (RADIO_HIT_TARGET - RADIO_CIRCLE_SIZE) / 2
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function RadioGroup({
@@ -64,7 +72,7 @@ export function RadioGroup({
           {required && (
             <span
               aria-hidden="true"
-              style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}
+              style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: t.font.lineHeight.tight }}
             >
               *
             </span>
@@ -179,14 +187,15 @@ function RadioOption({
       <span
         style={{
           position: 'relative',
-          width: 18,
-          height: 18,
+          width: RADIO_CIRCLE_SIZE,
+          height: RADIO_CIRCLE_SIZE,
           flexShrink: 0,
           // Alinha verticalmente com a primeira linha do label (line-height ≈ 1)
           marginTop: 1,
         }}
       >
-        {/* Input nativo — visualmente oculto, totalmente acessível */}
+        {/* Input nativo — visualmente oculto, totalmente acessível. Área
+            clicável estendida além do círculo visual (hit target ≥ 24px). */}
         <input
           id={inputId}
           type="radio"
@@ -198,10 +207,10 @@ function RadioOption({
           onChange={() => onChange(opt.value)}
           style={{
             position: 'absolute',
-            inset: 0,
+            inset: -RADIO_HIT_PAD,
             opacity: 0,
-            width: '100%',
-            height: '100%',
+            width: RADIO_HIT_TARGET,
+            height: RADIO_HIT_TARGET,
             margin: 0,
             cursor: isDisabled ? 'not-allowed' : 'pointer',
             zIndex: 1,
@@ -230,8 +239,8 @@ function RadioOption({
           {/* Dot interno — visível apenas quando selecionado */}
           <span
             style={{
-              width: 8,
-              height: 8,
+              width: RADIO_DOT_SIZE,
+              height: RADIO_DOT_SIZE,
               borderRadius: t.radius.full,
               background: isSelected ? t.color.brand[600] : 'transparent',
               transition: [
@@ -268,7 +277,7 @@ function RadioOption({
         {opt.description && (
           <span
             style={{
-              fontSize: t.font.size.xs,
+              fontSize: t.font.size.sm,
               fontFamily: t.font.family.sans,
               color: colors.fg.subtle,
               lineHeight: t.font.lineHeight.normal,

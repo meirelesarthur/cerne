@@ -9,10 +9,11 @@ interface IconButtonProps {
   icon:       React.ReactNode
   onClick?:   () => void
   /**
-   * Mapeia para `t.size.iconBtn.{sm,md,lg}` (24/30/36px) — a escala NÃO
-   * corresponde à de `Button` (`sm|md|lg` → 32/36/40px). Mesmo nome de token
+   * Mapeia para `t.size.iconBtn.{sm,md,lg}` (28/34/40px) — a escala NÃO
+   * corresponde à de `Button` (`sm|md|lg` → 36/40/44px). Mesmo nome de token
    * de tamanho, alvos diferentes; confira `sizeValues` abaixo ao alinhar
-   * visualmente um `IconButton` ao lado de um `Button`.
+   * visualmente um `IconButton` ao lado de um `Button`. Todas as três
+   * variantes já superam o hit target mínimo de 24px em desktop.
    */
   size?:      IconButtonSize
   variant?:   IconButtonVariant
@@ -26,6 +27,26 @@ const sizeValues: Record<IconButtonSize, number> = {
   xs: t.size.iconBtn.sm,
   sm: t.size.iconBtn.md,
   md: t.size.iconBtn.lg,
+}
+
+// Tamanho do ícone interno proporcional ao tamanho do botão — evita ícone
+// desproporcional (grande demais/pequeno demais) dentro do hit target.
+// Só se aplica quando o elemento passado em `icon` ainda não define seu
+// próprio `size` explicitamente (Lei 2: extensão com default que preserva o
+// comportamento atual dos call sites existentes).
+const iconSizeValues: Record<IconButtonSize, number> = {
+  xs: t.icon.xs,
+  sm: t.icon.sm,
+  md: t.icon.md,
+}
+
+function withDefaultIconSize(icon: React.ReactNode, size: IconButtonSize): React.ReactNode {
+  if (!React.isValidElement(icon)) return icon
+  const props = icon.props as { size?: unknown }
+  if (props?.size !== undefined) return icon
+  return React.cloneElement(icon as React.ReactElement<{ size?: number }>, {
+    size: iconSizeValues[size],
+  })
 }
 
 export function IconButton({

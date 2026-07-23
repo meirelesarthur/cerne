@@ -25,11 +25,12 @@ export function Badge({ label, variant }: BadgeProps) {
     <span
       style={{
         display: 'inline-block',
-        padding: `${t.space[1] / 2}px ${t.space[2] + t.space[1] / 2}px`,
+        padding: `${t.space[1]}px ${t.space[2] + t.space[1] / 2}px`,
         borderRadius: t.radius.full,
         fontSize: t.font.size.xs,
         fontWeight: t.font.weight.medium,
         fontFamily: t.font.family.sans,
+        lineHeight: t.font.lineHeight.snug,
         background: style.background,
         color: style.color,
         whiteSpace: 'nowrap',

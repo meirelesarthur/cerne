@@ -13,6 +13,18 @@ interface KpiStatCardProps {
   trend?: string
   trendUp?: boolean
   accentColor?: string
+  /** Tamanho do valor principal — default aplica degraus graduais conforme o
+   *  comprimento do texto (ver `defaultValueSize`). Informe para forçar um
+   *  tamanho fixo (ex.: padronizar todos os cards de um dashboard). */
+  valueSize?: keyof typeof t.font.size
+}
+
+/** Degraus graduais de tamanho do valor — número sempre grande e legível,
+ *  nunca dois tamanhos diferentes para o mesmo comprimento de string. */
+function defaultValueSize(value: string): keyof typeof t.font.size {
+  if (value.length > 16) return 'xl'
+  if (value.length > 10) return '2xl'
+  return '3xl'
 }
 
 export function KpiStatCard({
@@ -23,11 +35,12 @@ export function KpiStatCard({
   trend,
   trendUp,
   accentColor,
+  valueSize,
 }: KpiStatCardProps) {
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState(false)
   const ac = accentColor ?? (isGbMode ? t.color.brand[500] : t.color.brand[600])
-  const isLong = value.length > 10
+  const resolvedValueSize = valueSize ?? defaultValueSize(value)
 
   return (
     <div
@@ -98,18 +111,18 @@ export function KpiStatCard({
             flexShrink: 0,
           }}
         >
-          <Icon size={17} color={ac} />
+          <Icon size={t.icon.md} color={ac} />
         </div>
       </div>
 
       {/* Value */}
       <span
         style={{
-          fontSize: isLong ? t.font.size.lg : t.font.size['3xl'],
+          fontSize: t.font.size[resolvedValueSize],
           fontWeight: t.font.weight.bold,
           color: isGbMode ? t.color.gb.accent : colors.fg.default,
           fontFamily: t.font.family.sans,
-          lineHeight: 1.1,
+          lineHeight: t.font.lineHeight.tight,
           textShadow: isGbMode ? `0 0 24px ${ac}55` : undefined,
         }}
       >

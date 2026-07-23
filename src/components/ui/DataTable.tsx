@@ -29,7 +29,7 @@ interface DataTableProps<T> {
 
 function SortIcon({ active, color }: { active?: boolean; color: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: active ? 1 : 0.35 }}>
+    <svg width={t.icon.xs} height={t.icon.xs} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: active ? 1 : 0.35 }}>
       <path d="M7 15l5 5 5-5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M7 9l5-5 5 5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -195,11 +195,12 @@ export function DataTable<T extends object>({
                               {hasChildren ? (
                                 <button
                                   type="button"
+                                  className="gb-focusable"
                                   aria-label={isExpanded ? 'Recolher' : 'Expandir'}
                                   onClick={(e) => { e.stopPropagation(); toggleExpand(rowKey) }}
                                   style={{
-                                    width: 16,
-                                    height: 16,
+                                    width: t.size.iconBtn.sm,
+                                    height: t.size.iconBtn.sm,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -209,14 +210,15 @@ export function DataTable<T extends object>({
                                     color: colors.fg.subtle,
                                     flexShrink: 0,
                                     padding: 0,
+                                    borderRadius: t.radius.sm,
                                     transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                                     transition: `transform ${t.transition.fast}`,
                                   }}
                                 >
-                                  <ChevronRight size={13} />
+                                  <ChevronRight size={t.icon.xs} />
                                 </button>
                               ) : (
-                                <span style={{ width: 16, flexShrink: 0 }} />
+                                <span style={{ width: t.size.iconBtn.sm, flexShrink: 0 }} />
                               )}
                               <div
                                 title={typeof content === 'string' ? content : undefined}

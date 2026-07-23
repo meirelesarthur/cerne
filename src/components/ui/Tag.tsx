@@ -42,7 +42,7 @@ export function Tag({ label, variant = 'neutral', icon, onRemove }: TagProps) {
         fontFamily:   t.font.family.sans,
         padding:      `${t.space[1]}px ${t.space[2]}px`,
         borderRadius: t.radius.full,
-        lineHeight:   1,
+        lineHeight:   t.font.lineHeight.snug,
         whiteSpace:   'nowrap',
       }}
     >
@@ -57,20 +57,23 @@ export function Tag({ label, variant = 'neutral', icon, onRemove }: TagProps) {
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'center',
+            width:          t.space[6],
+            height:         t.space[6],
             background:     'none',
             border:         'none',
             cursor:         'pointer',
             color:          'inherit',
             opacity:        0.7,
             padding:        0,
-            marginLeft:     t.space[1] / 2,
+            margin:         `0 -${t.space[1]}px 0 0`,
             borderRadius:   t.radius.full,
-            lineHeight:     1,
+            lineHeight:     t.font.lineHeight.snug,
+            flexShrink:     0,
           }}
           onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
           onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
         >
-          <X size={11} />
+          <X size={t.icon.xs} />
         </button>
       )}
     </span>

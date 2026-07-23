@@ -61,7 +61,7 @@ export function StepFooter({
         <Button
           variant="secondary"
           size="md"
-          style={{ width: t.size.stepBtn }}
+          style={{ minWidth: t.size.stepBtn }}
           onClick={onBack}
           disabled={isBackDisabled}
         >
@@ -70,7 +70,7 @@ export function StepFooter({
         <Button
           variant="primary"
           size="md"
-          style={{ width: t.size.stepBtn }}
+          style={{ minWidth: t.size.stepBtn }}
           onClick={onNext}
           loading={nextLoading}
           disabled={nextLoading}

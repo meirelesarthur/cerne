@@ -13,8 +13,10 @@ interface SelectOption {
 // O `<select>` reserva a direita para o chevron nativo do controle, então
 // `iconRight` não se aplica — daí o Omit. `iconLeft` é suportado normalmente.
 interface FormSelectProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement>, Omit<BaseFieldProps, 'iconRight'> {
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'>, Omit<BaseFieldProps, 'iconRight'> {
   options: SelectOption[]
+  /** Altura do controle: 'md' = t.size.control (40, padrão) · 'lg' = t.size.controlLg (44) — espelha FormField, alinha na mesma linha */
+  size?: 'md' | 'lg'
 }
 
 export function FormSelect({
@@ -25,11 +27,13 @@ export function FormSelect({
   status,
   iconLeft,
   options,
+  size = 'md',
   style,
   className,
   ...selectProps
 }: FormSelectProps) {
   const { colors } = useTheme()
+  const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
 
   const isError = !!error || status === 'err'
   const isOk = !isError && status === 'ok'
@@ -57,12 +61,12 @@ export function FormSelect({
             </span>
           )}
           {required && (
-            <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: 1 }}>*</span>
+            <span style={{ color: t.color.feedback.error.text, fontSize: t.font.size.sm, lineHeight: t.font.lineHeight.tight }}>*</span>
           )}
           {hint && (
             <Tooltip label={hint}>
               <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-                <HelpCircle size={12} color={t.color.neutral[400]} />
+                <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
               </span>
             </Tooltip>
           )}
@@ -90,7 +94,7 @@ export function FormSelect({
           className={['gb-focusable', className].filter(Boolean).join(' ')}
           style={{
             width: '100%',
-            height: t.size.control,
+            height: controlHeight,
             border: `1.5px solid ${borderColor}`,
             borderRadius: t.radius.base,
             paddingTop: 0,
@@ -127,7 +131,7 @@ export function FormSelect({
           ))}
         </select>
         <ChevronDown
-          size={14}
+          size={t.icon.sm}
           color={t.color.neutral[400]}
           style={{
             position: 'absolute',

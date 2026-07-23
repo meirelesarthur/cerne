@@ -60,6 +60,7 @@ interface CrudPatternProps<T extends CrudEntity> {
   error?: string | null
   onRetry?: () => void
   pageSize?: number
+  headerActions?: React.ReactNode
 }
 
 type EditorMode = 'create' | 'edit' | 'show' | null
@@ -78,6 +79,7 @@ export function CrudPattern<T extends CrudEntity>({
   error,
   onRetry,
   pageSize = 10,
+  headerActions,
 }: CrudPatternProps<T>) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -181,7 +183,12 @@ export function CrudPattern<T extends CrudEntity>({
           title={title}
           description={description}
           count={filtered.length}
-          actions={!readOnly && permissions.create ? <Button icon={<Plus size={16} />} onClick={openCreate}>Novo {singular}</Button> : undefined}
+          actions={(headerActions || (!readOnly && permissions.create)) ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap' }}>
+              {headerActions}
+              {!readOnly && permissions.create && <Button icon={<Plus size={16} />} onClick={openCreate}>Novo {singular}</Button>}
+            </div>
+          ) : undefined}
         />
         <ListToolbar search={search} onSearch={setSearch} searchPlaceholder={`Buscar ${title.toLocaleLowerCase('pt-BR')}…`} />
 

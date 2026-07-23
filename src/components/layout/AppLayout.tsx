@@ -22,6 +22,7 @@ import ContasBancariasPage from '../../pages/cadastros/contas-bancarias/ContasBa
 import EmissoresPage      from '../../pages/cadastros/emissores/EmissoresPage'
 import BancosPage         from '../../pages/cadastros/bancos/BancosPage'
 import CidadesPage        from '../../pages/cadastros/cidades/CidadesPage'
+import AnimaisPage        from '../../pages/cadastros/animais/AnimaisPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -115,6 +116,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-fin-bco')      return <ContasBancariasPage />
   if (itemId === 'cad-fin-ban')      return <BancosPage />
   if (itemId === 'cad-ger-cid')      return <CidadesPage />
+  if (itemId === 'cad-pec-reb')      return <AnimaisPage />
   if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />

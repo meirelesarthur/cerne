@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { Download, Upload } from 'lucide-react'
 import { Button } from './Button'
 import { FeedbackBanner } from './FeedbackBanner'
@@ -21,6 +21,7 @@ interface ImportDialogProps {
   templateLabel?: string
   onDownloadTemplate?: () => void
   onImport: (file: File) => Promise<ImportValidationIssue[] | void>
+  children?: ReactNode
 }
 
 /** Fluxo padrão modelo → seleção → validação → importação. */
@@ -34,6 +35,7 @@ export function ImportDialog({
   templateLabel = 'Baixar modelo',
   onDownloadTemplate,
   onImport,
+  children,
 }: ImportDialogProps) {
   const [file, setFile] = useState<File | null>(null)
   const [issues, setIssues] = useState<ImportValidationIssue[]>([])
@@ -84,6 +86,7 @@ export function ImportDialog({
         {onDownloadTemplate && (
           <div><Button variant="ghost" icon={<Download size={16} />} onClick={onDownloadTemplate}>{templateLabel}</Button></div>
         )}
+        {children}
         <FileUpload
           label="Arquivo para importação"
           hint={`Formatos aceitos: ${accept}`}

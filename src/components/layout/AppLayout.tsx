@@ -26,6 +26,7 @@ import AnimaisPage        from '../../pages/cadastros/animais/AnimaisPage'
 import UsuariosPage       from '../../pages/cadastros/usuarios/UsuariosPage'
 import BaixaTitulosPage   from '../../pages/financeiro/baixa-titulos/BaixaTitulosPage'
 import AutorizacaoCompraPage from '../../pages/administrativo/autorizacao/AutorizacaoCompraPage'
+import OfxImportPage       from '../../pages/financeiro/ofx/OfxImportPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -123,6 +124,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-pes-usr')      return <UsuariosPage />
   if (itemId === 'fin-bai')          return <BaixaTitulosPage />
   if (itemId === 'adm-sup-aut')      return <AutorizacaoCompraPage />
+  if (itemId === 'fin-cnc-ofx')      return <OfxImportPage />
   if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />

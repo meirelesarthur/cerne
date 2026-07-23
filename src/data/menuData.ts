@@ -190,6 +190,7 @@ export const menuModules: NavModule[] = [
         label: 'Financeiros',
         icon: CreditCard,
         items: [
+          { id: 'cad-fin-ban', label: 'Bancos',                  path: '/cadastros/bancos',               icon: Landmark },
           { id: 'cad-fin-bco', label: 'Contas Bancárias',        path: '/cadastros/contas-bancarias',     icon: Landmark },
           { id: 'cad-fin-sal', label: 'Saldo Inicial',           path: '/cadastros/saldo-inicial',        icon: Wallet },
           { id: 'cad-fin-cnd', label: 'Condições de Pagamento',  path: '/cadastros/condicoes-pagamento',  icon: CreditCard },
@@ -251,6 +252,7 @@ export const menuModules: NavModule[] = [
         label: 'Gerais',
         icon: SlidersHorizontal,
         items: [
+          { id: 'cad-ger-cid', label: 'Cidades',                   path: '/cadastros/cidades',            icon: MapPin },
           { id: 'cad-ger-par', label: 'Parametrizações do sistema', path: '/cadastros/parametrizacoes', icon: Settings },
         ],
       },

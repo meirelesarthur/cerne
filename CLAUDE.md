@@ -242,8 +242,29 @@ Se o valor que você precisa não tem token e é reutilizável, **adicione o tok
 - Tamanho de fonte **sempre** de `t.font.size.*` — não usar `18`/`20`px soltos. Se faltar um degrau
   na escala, ajustar a escala em `tokens.ts`, não hardcodar na tela.
 
+### Regra G — Escada de reuso antes de escrever código novo
+
+Antes de qualquer linha nova, resolva na ordem — pare no primeiro degrau que resolver:
+
+1. **Precisa existir agora?** Não implemente para casos hipotéticos ou futuros — YAGNI.
+2. **Já existe no projeto?** Componente em `ui/`, hook em `hooks/`, util em `utils/`, token em
+   `tokens.ts` — reutilize, não reescreva.
+3. **É lógica não-visual** (parsing, formatação, validação, data)? Prefira stdlib do JS/uma
+   dependência já instalada antes de escrever um helper novo.
+4. **É markup de tela?** Nunca elemento HTML cru nem lib nova — sempre um componente do catálogo
+   `ui/` (Lei 1). Se não existir, criar lá primeiro.
+5. **Resolve em poucas linhas sem nova abstração?** Não crie hook/util genérico para um único
+   caso de uso.
+6. **Só então:** implemente o mínimo que a tarefa pede — sem props, estados ou validações
+   hipotéticas.
+
+Preguiça é na solução, nunca na leitura: entenda o fluxo real que o código toca antes de escolher
+o degrau. E nunca é desculpa para cortar validação de fronteira de confiança, tratamento de perda
+de dados, segurança ou acessibilidade — esses ficam de fora da escada.
+
 ### Checklist rápido antes de abrir/escalar uma tela
 
+- [ ] Passei pela escada de reuso (Regra G) antes de escrever componente novo
 - [ ] Nenhuma primitiva reimplementada localmente (consultei a tabela da Regra A)
 - [ ] Listagem segue a composição da Regra B / formulário segue a Regra C
 - [ ] Exclusão usa `ConfirmDialog`; ações de linha usam `IconButton`/`DropdownMenu`
@@ -343,6 +364,7 @@ Todo componente e toda tela deve ter **todos os estados** implementados antes de
 
 ### Checklist antes de todo PR
 
+- [ ] Nenhum código escrito sem passar pela escada de reuso (Regra G)
 - [ ] Todos os valores de design usam `t.*` (sem hardcode)
 - [ ] Todos os componentes vêm de `src/components/ui/`
 - [ ] Suporte a ambos os temas (light e GBMode)

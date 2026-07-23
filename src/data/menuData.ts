@@ -191,6 +191,7 @@ export const menuModules: NavModule[] = [
         icon: CreditCard,
         items: [
           { id: 'cad-fin-ban', label: 'Bancos',                  path: '/cadastros/bancos',               icon: Landmark },
+          { id: 'cad-fin-agr', label: 'Agrupadores Contábeis',   path: '/cadastros/agrupadores-contabeis', icon: ListTree },
           { id: 'cad-fin-bco', label: 'Contas Bancárias',        path: '/cadastros/contas-bancarias',     icon: Landmark },
           { id: 'cad-fin-sal', label: 'Saldo Inicial',           path: '/cadastros/saldo-inicial',        icon: Wallet },
           { id: 'cad-fin-cnd', label: 'Condições de Pagamento',  path: '/cadastros/condicoes-pagamento',  icon: CreditCard },

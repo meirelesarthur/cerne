@@ -201,6 +201,8 @@ const core: Record<string, DTCGNode> = {
 
   size: dimensionGroup(t.size as unknown as Record<string, unknown>),
 
+  icon: dimensionGroup(t.icon as unknown as Record<string, unknown>),
+
   // DTCG não tem tipo "borderRadius" — raios são "dimension".
   radius: Object.fromEntries(
     Object.entries(t.radius).map(([k, v]) => [k, { $value: px(v), $type: 'dimension' }])

@@ -96,9 +96,9 @@ export default function Topbar({ expandedModule, activeItemId, onLogout }: Topba
                     background: t.color.feedback.notice,
                     color: 'white',
                     borderRadius: t.radius.full,
-                    width: 14,
-                    height: 14,
-                    fontSize: t.font.size.xs - 3, // ~8px (badge de notificação, abaixo do mínimo do token)
+                    width: 16,
+                    height: 16,
+                    fontSize: t.font.size['3xs'], // 11px — piso legível para contador
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

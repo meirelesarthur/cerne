@@ -141,7 +141,7 @@ export function FilterButton({
         <span
           style={{
             background: colors.accent.default, color: 'white',
-            fontSize: 10, fontWeight: 700,
+            fontSize: t.font.size['2xs'], fontWeight: 700,
             padding: '1px 6px', borderRadius: 9999,
           }}
         >

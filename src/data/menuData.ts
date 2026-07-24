@@ -88,6 +88,14 @@ import {
   FileCode,
   GitCompare,
   Banknote,
+  Contact,
+  HardHat,
+  Handshake,
+  FlaskConical,
+  Blend,
+  Fence,
+  Utensils,
+  Share2,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -172,6 +180,7 @@ export const menuModules: NavModule[] = [
           { id: 'cad-est-arm',       label: 'Armazéns',         path: '/cadastros/armazens',         icon: Warehouse },
           { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',    path: '/cadastros/estoques-iniciais', icon: Wallet },
           { id: 'cad-est-end',       label: 'Endereçamentos',   path: '/cadastros/enderecos',        icon: MapPin },
+          { id: 'cad-est-rat',       label: 'Rateios / Categorias', path: '/cadastros/rateios-categorias', icon: Percent },
         ],
       },
       {
@@ -181,6 +190,10 @@ export const menuModules: NavModule[] = [
         items: [
           { id: 'cad-pes-per', label: 'Perfil de Usuário', path: '/cadastros/perfil',      icon: UserCog },
           { id: 'cad-pes-uni', label: 'Pessoas',           path: '/cadastros/pessoas',     icon: Users },
+          { id: 'cad-pes-pro', label: 'Proprietários',     path: '/cadastros/proprietarios', icon: Contact },
+          { id: 'cad-pes-fun', label: 'Funcionários',      path: '/cadastros/funcionarios', icon: HardHat },
+          { id: 'cad-pes-for', label: 'Fornecedores',      path: '/cadastros/fornecedores', icon: Truck },
+          { id: 'cad-pes-cli', label: 'Clientes',          path: '/cadastros/clientes',    icon: Handshake },
           { id: 'cad-pes-usr', label: 'Usuários',          path: '/cadastros/usuarios',    icon: UserCheck },
           { id: 'cad-pes-aut', label: 'Autorizadores',     path: '/cadastros/autorizadores', icon: ShieldCheck },
         ],
@@ -205,6 +218,7 @@ export const menuModules: NavModule[] = [
         items: [
           { id: 'cad-fis-emi', label: 'Emissores NFe',              path: '/cadastros/emissores',           icon: FileText },
           { id: 'cad-fis-sin', label: 'Sincronização DFe',          path: '/cadastros/sincronizacao-dfe',   icon: RefreshCw },
+          { id: 'cad-fis-nfse', label: 'Sincronização NFS-e',       path: '/cadastros/sincronizacao-nfse',  icon: RefreshCw },
           { id: 'cad-fis-reg', label: 'Regras Fiscais',             path: '/cadastros/regras-fiscais',      icon: Scale },
           { id: 'cad-fis-cnt', label: 'Contador',                   path: '/cadastros/contador',            icon: Calculator },
           { id: 'cad-fis-nat', label: 'Natureza de Operação',       path: '/cadastros/natureza-operacao',   icon: GitBranch },
@@ -254,6 +268,8 @@ export const menuModules: NavModule[] = [
         icon: SlidersHorizontal,
         items: [
           { id: 'cad-ger-cid', label: 'Cidades',                   path: '/cadastros/cidades',            icon: MapPin },
+          { id: 'cad-ger-ser', label: 'Serviços',                  path: '/cadastros/servicos',           icon: Briefcase },
+          { id: 'cad-ger-est', label: 'Estorno',                   path: '/cadastros/estorno',            icon: Undo2 },
           { id: 'cad-ger-par', label: 'Parametrizações do sistema', path: '/cadastros/parametrizacoes', icon: Settings },
         ],
       },
@@ -286,6 +302,7 @@ export const menuModules: NavModule[] = [
         icon: Warehouse,
         items: [
           { id: 'adm-est-dfe',  label: 'Doc. Fiscal / Entrada',            path: '/administrativo/doc-fiscal',      icon: FileInput },
+          { id: 'adm-est-ent',  label: 'Entrada / Insumos',                path: '/administrativo/entrada-insumos', icon: ArrowDownCircle },
           { id: 'adm-est-dfe2', label: 'DFe Recebidas',                    path: '/administrativo/dfe-recebidas',   icon: Inbox },
           { id: 'adm-est-bai',  label: 'Baixa de Estoque',                 path: '/administrativo/baixa-estoque',   icon: PackageMinus },
           { id: 'adm-est-req',  label: 'Requisição / Saída',               path: '/administrativo/requisicao',      icon: PackageOpen },
@@ -294,7 +311,13 @@ export const menuModules: NavModule[] = [
           { id: 'adm-est-trm',  label: 'Transferência entre Armazéns',     path: '/administrativo/transf-armazens', icon: ArrowLeftRight },
           { id: 'adm-est-trf',  label: 'Transferência entre Fazendas',     path: '/administrativo/transf-fazendas', icon: Repeat },
           { id: 'adm-est-sal',  label: 'Saldo de Estoque',                 path: '/administrativo/saldo-estoque',   icon: BarChart },
-          { id: 'adm-est-fab',  label: 'Fábrica',                         path: '/administrativo/fabrica',         icon: Factory },
+          {
+            id: 'adm-est-fab', label: 'Fábrica', path: '/administrativo/fabrica', icon: Factory,
+            children: [
+              { id: 'adm-est-fab-for', label: 'Formulação', path: '/administrativo/fabrica/formulacao', icon: FlaskConical },
+              { id: 'adm-est-fab-bat', label: 'Batida',     path: '/administrativo/fabrica/batida',     icon: Blend },
+            ],
+          },
         ],
       },
       {
@@ -337,11 +360,13 @@ export const menuModules: NavModule[] = [
           { id: 'ope-agr-pla', label: 'Planejamentos',            path: '/operacional/planejamentos',   icon: ClipboardList },
           { id: 'ope-agr-apo', label: 'Apontamentos',             path: '/operacional/apontamentos',    icon: PenLine },
           { id: 'ope-agr-rom', label: 'Romaneios',                path: '/operacional/romaneios',       icon: FileText },
+          { id: 'ope-agr-mar', label: 'Marcação',                 path: '/operacional/marcacao',        icon: Tag },
           { id: 'ope-agr-car', label: 'Carregamento',             path: '/operacional/carregamento',    icon: Truck },
           { id: 'ope-agr-ras', label: 'Rastreabilidade',          path: '/operacional/rastreabilidade', icon: Route },
           { id: 'ope-agr-des', label: 'Descontos / Classificação', path: '/operacional/descontos',      icon: Percent },
           { id: 'ope-agr-pes', label: 'Pesagem Rodoviária',       path: '/operacional/pesagem',         icon: Scale },
           { id: 'ope-agr-con', label: 'Contratos de Venda',       path: '/operacional/contratos-venda', icon: FileSignature },
+          { id: 'ope-agr-col', label: 'Colheita de Frutas',       path: '/operacional/colheita-frutas', icon: Sprout },
         ],
       },
       {
@@ -357,6 +382,24 @@ export const menuModules: NavModule[] = [
           { id: 'ope-pec-mov', label: 'Movimentações',           path: '/operacional/movimentacoes',         icon: Repeat },
           { id: 'ope-pec-man', label: 'Manejo',                  path: '/operacional/manejo',                icon: Settings2 },
           { id: 'ope-pec-rep', label: 'Reprodução',              path: '/operacional/reproducao',            icon: Heart },
+          {
+            id: 'ope-pec-cfc', label: 'Confinamento — Cadastros', path: '/operacional/confinamento/cadastros', icon: Warehouse,
+            children: [
+              { id: 'ope-pec-cfc-pat', label: 'Pátios',  path: '/operacional/confinamento/patios',  icon: Boxes },
+              { id: 'ope-pec-cfc-set', label: 'Setores', path: '/operacional/confinamento/setores', icon: Layers },
+              { id: 'ope-pec-cfc-cur', label: 'Currais', path: '/operacional/confinamento/currais', icon: Fence },
+            ],
+          },
+          {
+            id: 'ope-pec-cfn', label: 'Confinamento — Nutrição', path: '/operacional/confinamento/nutricao', icon: Wheat,
+            children: [
+              { id: 'ope-pec-cfn-die', label: 'Dieta',            path: '/operacional/confinamento/dieta',        icon: Utensils },
+              { id: 'ope-pec-cfn-fas', label: 'Fases / Regras Troca', path: '/operacional/confinamento/fases-troca', icon: Repeat },
+              { id: 'ope-pec-cfn-bat', label: 'Batelada',         path: '/operacional/confinamento/batelada',     icon: Blend },
+              { id: 'ope-pec-cfn-tra', label: 'Trato Diário',     path: '/operacional/confinamento/trato-diario', icon: ClipboardList },
+              { id: 'ope-pec-cfn-coc', label: 'Leitura de Cocho', path: '/operacional/confinamento/leitura-cocho', icon: Package2 },
+            ],
+          },
         ],
       },
       {
@@ -476,6 +519,7 @@ export const menuModules: NavModule[] = [
         label: 'Outros',
         icon: MoreHorizontal,
         items: [
+          { id: 'fis-nfse', label: 'NFSe Recebidas',              path: '/fiscal/nfse',            icon: Inbox },
           { id: 'fis-lcd', label: 'LCDPR — Livro Caixa Digital', path: '/fiscal/lcdpr',           icon: BookOpen },
           { id: 'fis-par', label: 'Partida Dobrada',             path: '/fiscal/partida-dobrada', icon: GitCompare },
         ],
@@ -491,6 +535,7 @@ export const menuModules: NavModule[] = [
       { id: 'rel-ben', label: 'Bens / Ativo',      path: '/relatorios/bens',            icon: Package },
       { id: 'rel-agr', label: 'Agricultura',       path: '/relatorios/agricultura',     icon: Wheat },
       { id: 'rel-pec', label: 'Pecuária',          path: '/relatorios/pecuaria',        icon: Beef },
+      { id: 'rel-plu', label: 'Pluviometria',      path: '/relatorios/pluviometria',    icon: CloudRain },
       { id: 'rel-fin', label: 'Financeiro',        path: '/relatorios/financeiro',      icon: Wallet },
       { id: 'rel-est', label: 'Estoque',           path: '/relatorios/estoque',         icon: Warehouse },
       { id: 'rel-sup', label: 'Suprimentos',       path: '/relatorios/suprimentos',     icon: ShoppingCart },
@@ -515,6 +560,15 @@ export const menuModules: NavModule[] = [
         ],
       },
       {
+        id: 'int-cta',
+        label: 'CTA Smart',
+        icon: Fuel,
+        items: [
+          { id: 'int-cta-cfg', label: 'Configuração',   path: '/integracoes/cta-smart',                icon: Settings2 },
+          { id: 'int-cta-aba', label: 'Abastecimentos', path: '/integracoes/cta-smart-abastecimentos', icon: Fuel },
+        ],
+      },
+      {
         id: 'int-exp-dom',
         label: 'Exportação / Domínio',
         icon: Upload,
@@ -523,6 +577,14 @@ export const menuModules: NavModule[] = [
           { id: 'int-exp-fol',  label: 'Folha Salarial',          path: '/integracoes/exp-folha',    icon: Banknote },
           { id: 'int-exp-cp',   label: 'Contas Pagar / Receber',  path: '/integracoes/exp-cp',       icon: CreditCard },
           { id: 'int-exp-nfse', label: 'NFSe',                    path: '/integracoes/exp-nfse',     icon: FileText },
+        ],
+      },
+      {
+        id: 'int-compartilhamento',
+        label: 'Compartilhamento',
+        icon: Share2,
+        items: [
+          { id: 'int-sha', label: 'Compartilhamento', path: '/integracoes/compartilhamento', icon: Share2 },
         ],
       },
       {

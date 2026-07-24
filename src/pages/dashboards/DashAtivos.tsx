@@ -7,6 +7,7 @@ import { FilterSelect } from '../../components/ui/FilterSelect'
 import { Heading } from '../../components/ui/Heading'
 import { Trend } from '../../components/ui/Trend'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
 
@@ -135,6 +136,8 @@ export default function DashAtivos() {
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
@@ -182,10 +185,10 @@ export default function DashAtivos() {
       <HDivider color={bc} />
 
       {/* KPI row */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {ATIVOS_KPIS.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             <Trend value={kpi.trend} up={kpi.up} />
@@ -195,7 +198,7 @@ export default function DashAtivos() {
       <HDivider color={bc} />
 
       {/* Row 2 — Grouped H-bar + Status */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
         <div style={{ flex: 3, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
           <GroupedBarChart
@@ -205,7 +208,7 @@ export default function DashAtivos() {
             showLegend
           />
         </div>
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
         <div style={{ flex: 2, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
           <StatusCards />

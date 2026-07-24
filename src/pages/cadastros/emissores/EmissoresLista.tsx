@@ -136,6 +136,9 @@ export default function EmissoresLista({
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 1240 }}>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1.6fr 130px 1fr 100px 90px 200px 70px 60px',
@@ -166,6 +169,8 @@ export default function EmissoresLista({
                   border={border}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {filtered.length > PAGE_SIZE && (

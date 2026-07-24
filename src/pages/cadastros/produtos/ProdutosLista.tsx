@@ -268,6 +268,9 @@ export default function ProdutosLista({
           })()
         ) : (
           <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+           {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+           <div style={{ overflowX: 'auto' }}>
+            <div style={{ minWidth: 820 }}>
             {/* Header */}
             <div style={{ display: 'grid', gridTemplateColumns: GRID, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
               {/* Checkbox all */}
@@ -300,6 +303,8 @@ export default function ProdutosLista({
                 border={border}
               />
             ))}
+            </div>
+           </div>
           </div>
         )}
 

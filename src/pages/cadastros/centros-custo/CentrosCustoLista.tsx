@@ -266,6 +266,9 @@ export default function CentrosCustoLista({
                 borderRadius: t.radius.lg,
                 overflow: 'hidden',
               }}>
+               {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+               <div style={{ overflowX: 'auto' }}>
+                <div style={{ minWidth: 700 }}>
                 {/* Cabeçalho */}
                 <div style={{
                   display: 'grid',
@@ -303,6 +306,8 @@ export default function CentrosCustoLista({
                     border={border}
                   />
                 ))}
+                </div>
+               </div>
               </div>
 
               {/* ── Paginação ───────────────────────────────────────── */}

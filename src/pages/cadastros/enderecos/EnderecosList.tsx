@@ -149,6 +149,9 @@ export default function EnderecosList({
             borderRadius: t.radius.lg,
             overflow: 'hidden',
           }}>
+           {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+           <div style={{ overflowX: 'auto' }}>
+            <div style={{ minWidth: 480 }}>
             {/* Cabeçalho */}
             <div style={{
               display: 'grid',
@@ -186,6 +189,8 @@ export default function EnderecosList({
                 forceExpand={search.length > 0}
               />
             ))}
+            </div>
+           </div>
           </div>
         )}
 

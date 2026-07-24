@@ -147,6 +147,9 @@ export default function ContasBancariasLista({
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 1200 }}>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1.4fr 110px 90px 100px 1.2fr 100px 110px 70px 70px 60px',
@@ -176,6 +179,8 @@ export default function ContasBancariasLista({
                   border={border}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {filtered.length > PAGE_SIZE && (

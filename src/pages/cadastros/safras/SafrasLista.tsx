@@ -224,6 +224,9 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
               borderRadius: t.radius.lg,
               overflow:     'hidden',
             }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 700 }}>
               {/* Cabeçalho */}
               <div style={{
                 display:         'grid',
@@ -260,6 +263,8 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
                   border={border}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {totalFiltered > PAGE_SIZE && (

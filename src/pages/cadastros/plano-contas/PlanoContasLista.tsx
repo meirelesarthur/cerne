@@ -239,6 +239,9 @@ export default function PlanoContasLista({
                 borderRadius: t.radius.lg,
                 overflow: 'hidden',
               }}>
+               {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+               <div style={{ overflowX: 'auto' }}>
+                <div style={{ minWidth: 720 }}>
                 {/* Cabeçalho */}
                 <div style={{
                   display: 'grid',
@@ -278,6 +281,8 @@ export default function PlanoContasLista({
                     border={border}
                   />
                 ))}
+                </div>
+               </div>
               </div>
 
               {/* ── Paginação ───────────────────────────────────────── */}

@@ -144,6 +144,9 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
               borderRadius: t.radius.lg,
               overflow: 'hidden',
             }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 640 }}>
               {/* Cabeçalho */}
               <div style={{
                 display: 'grid',
@@ -184,6 +187,8 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
                   border={border}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {totalFiltered > PAGE_SIZE && (

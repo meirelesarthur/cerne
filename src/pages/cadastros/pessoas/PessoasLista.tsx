@@ -206,6 +206,9 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
               background: colors.bg.surface, border: `1px solid ${colors.border.default}`,
               borderRadius: t.radius.lg, overflow: 'hidden',
             }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 900 }}>
               {/* Cabeçalho */}
               <div style={{
                 display: 'grid', gridTemplateColumns: GRID,
@@ -236,6 +239,8 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
                   colors={colors}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {filtered.length > PAGE_SIZE && (

@@ -205,6 +205,9 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 1520 }}>
               {/* Header row */}
               <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
                 <span style={colStyle}>Produto</span>
@@ -237,6 +240,8 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
                   colTemplate={colTemplate}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {/* Pagination */}

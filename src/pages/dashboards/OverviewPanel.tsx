@@ -351,7 +351,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           <g key={i}>
             <line x1={PL} y1={yl.y} x2={W - PR} y2={yl.y}
               stroke={colors.border.default} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
-            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={9 * k}
+            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
           </g>
         ))}
@@ -375,7 +375,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           const isH = hov === i
           return (
             <g key={i}>
-              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={9 * k}
+              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={t.font.size['3xs'] * k}
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
                 fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
                 {d.month}
@@ -564,7 +564,7 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
           fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
         {/* Linha do zero */}
         <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
-        <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={9 * k} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
+        <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={t.font.size['3xs'] * k} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
 
         {/* Barras de fluxo líquido mensal */}
         {data.map((d, i) => {
@@ -578,7 +578,7 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
                 fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
                 opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
                 style={{ transition: `opacity ${t.transition.fast}` }} />
-              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={9 * k}
+              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={t.font.size['3xs'] * k}
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
                 fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
                 {d.month}
@@ -597,7 +597,7 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
         {hov !== null && (
           <g>
             <circle cx={cumPts[hov][0]} cy={cumPts[hov][1]} r={4} fill={t.color.accent.purple.text} stroke={colors.bg.surface} strokeWidth={2} />
-            <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={9 * k} fontWeight={600}
+            <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={t.font.size['3xs'] * k} fontWeight={600}
               fill={colors.fg.default as string} fontFamily="Outfit,sans-serif">
               {`líq. ${fmtCompact(data[hov].net * 1000)} · acum. ${fmtCompact(cum[hov] * 1000)}`}
             </text>

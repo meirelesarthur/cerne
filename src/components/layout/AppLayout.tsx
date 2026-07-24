@@ -109,6 +109,38 @@ function getFirstItemId(module: NavModule): string | null {
   return firstGroupWithItems?.items[0]?.id ?? null
 }
 
+function getModuleItems(module: NavModule) {
+  return [
+    ...(module.flatItems ?? []),
+    ...(module.groups?.flatMap((group) => group.items) ?? []),
+  ]
+}
+
+function findItem(module: NavModule, itemId: string) {
+  for (const item of getModuleItems(module)) {
+    if (item.id === itemId) return item
+    const child = item.children?.find((candidate) => candidate.id === itemId)
+    if (child) return child
+  }
+  return undefined
+}
+
+function resolveMenuRoute(pathname: string) {
+  for (const module of menuModules) {
+    if (module.path === pathname) return { moduleId: module.id, itemId: null as string | null }
+    for (const item of getModuleItems(module)) {
+      if (item.path === pathname) return { moduleId: module.id, itemId: item.id }
+      const child = item.children?.find((candidate) => candidate.path === pathname)
+      if (child) return { moduleId: module.id, itemId: child.id }
+    }
+  }
+  return undefined
+}
+
+function updateBrowserPath(path?: string) {
+  if (path && window.location.pathname !== path) window.history.pushState({}, '', path)
+}
+
 function renderPage(itemId: string | null, module?: NavModule) {
   if (!itemId) return null
   if (itemId === 'cad-pes-per') return <PerfilUsuario />
@@ -156,10 +188,13 @@ function renderPage(itemId: string | null, module?: NavModule) {
 
 export default function AppLayout({ children, onLogout }: AppLayoutProps) {
   const { colors } = useTheme()
+  const initialRoute = resolveMenuRoute(window.location.pathname)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [activeModuleId, setActiveModuleId] = useState<string>('painel')
-  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null)
-  const [activeItemId, setActiveItemId] = useState<string | null>(null)
+  const [activeModuleId, setActiveModuleId] = useState<string>(initialRoute?.moduleId ?? 'painel')
+  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(
+    initialRoute?.itemId ? initialRoute.moduleId : null,
+  )
+  const [activeItemId, setActiveItemId] = useState<string | null>(initialRoute?.itemId ?? null)
 
   const expandedModule = menuModules.find((m) => m.id === expandedModuleId)
   const hasSecondaryNav = expandedModuleId !== null
@@ -190,11 +225,25 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
     document.title = parts.length > 0 ? `${parts.join(' — ')} — GB CERNE` : 'GB CERNE — Painel Administrativo'
   }, [activeItemId, activeModuleId, activeItemModule])
 
+  useEffect(() => {
+    const syncFromBrowser = () => {
+      const route = resolveMenuRoute(window.location.pathname)
+      if (!route) return
+      const module = menuModules.find((candidate) => candidate.id === route.moduleId)
+      setActiveModuleId(route.moduleId)
+      setActiveItemId(route.itemId)
+      setExpandedModuleId(route.itemId && !module?.path ? route.moduleId : null)
+    }
+    window.addEventListener('popstate', syncFromBrowser)
+    return () => window.removeEventListener('popstate', syncFromBrowser)
+  }, [])
+
   const handleModuleClick = (module: NavModule) => {
     if (module.path) {
       setActiveModuleId(module.id)
       setExpandedModuleId(null)
       setActiveItemId(null)
+      updateBrowserPath(module.path)
       return
     }
     // Toggle secondary nav independently — sidebar width unaffected
@@ -204,17 +253,24 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
     } else {
       setActiveModuleId(module.id)
       setExpandedModuleId(module.id)
-      setActiveItemId(getFirstItemId(module))
+      const firstItemId = getFirstItemId(module)
+      setActiveItemId(firstItemId)
+      updateBrowserPath(firstItemId ? findItem(module, firstItemId)?.path : undefined)
     }
   }
 
   const handleToggleSidebar = () => setSidebarCollapsed((c) => !c)
 
-  const handleItemClick = (id: string) => setActiveItemId(id)
+  const handleItemClick = (id: string) => {
+    setActiveItemId(id)
+    const module = menuModules.find((candidate) => candidate.id === expandedModuleId)
+    updateBrowserPath(module ? findItem(module, id)?.path : undefined)
+  }
 
   const handleOpenPlanos = () => {
     setExpandedModuleId(null)
     setActiveItemId('planos')
+    updateBrowserPath('/planos')
   }
 
   const handleCloseSecondary = () => {
@@ -229,9 +285,12 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
     if (module.path) {
       setExpandedModuleId(null)
       setActiveItemId(null)
+      updateBrowserPath(module.path)
     } else {
       setExpandedModuleId(moduleId)
-      setActiveItemId(itemId ?? getFirstItemId(module))
+      const nextItemId = itemId ?? getFirstItemId(module)
+      setActiveItemId(nextItemId)
+      updateBrowserPath(nextItemId ? findItem(module, nextItemId)?.path : undefined)
     }
   }, [])
 

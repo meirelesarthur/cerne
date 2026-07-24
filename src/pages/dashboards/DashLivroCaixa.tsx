@@ -7,6 +7,7 @@ import { FilterSelect } from '../../components/ui/FilterSelect'
 import { Heading } from '../../components/ui/Heading'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -189,6 +190,8 @@ export default function DashLivroCaixa() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -236,10 +239,10 @@ export default function DashLivroCaixa() {
       <HDivider color={bc} />
 
       {/* KPI row */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {LC_KPIS.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
             <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
             {kpi.trend && (
@@ -281,12 +284,12 @@ export default function DashLivroCaixa() {
       <HDivider color={bc} />
 
       {/* Row 3 — Movimentações + Saldo por Conta */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
         <div style={{ flex: 3, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
           <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
         </div>
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
         <div style={{ flex: 2, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />

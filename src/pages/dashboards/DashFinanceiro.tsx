@@ -18,6 +18,7 @@ import { Trend } from '../../components/ui/Trend'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -147,6 +148,8 @@ export default function DashFinanceiro() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -222,10 +225,10 @@ export default function DashFinanceiro() {
       <HDivider color={bc} />
 
       {/* ── KPI row ────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {kpis.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
@@ -240,7 +243,7 @@ export default function DashFinanceiro() {
       <HDivider color={bc} />
 
       {/* ── Chart row: Area (2/3) + Donut (1/3) ──────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
 
         {/* Area chart */}
         <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
@@ -272,7 +275,7 @@ export default function DashFinanceiro() {
           />
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         {/* Donut + Gauge stacked */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -302,7 +305,7 @@ export default function DashFinanceiro() {
       <HDivider color={bc} />
 
       {/* ── Bottom row: Heatmap (1/2) + Vencimentos (1/2) ────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
 
         {/* Heatmap */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
@@ -321,7 +324,7 @@ export default function DashFinanceiro() {
           />
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         {/* Vencimentos */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>

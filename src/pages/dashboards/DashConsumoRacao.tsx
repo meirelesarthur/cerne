@@ -26,6 +26,7 @@ import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,8 @@ export default function DashConsumoRacao() {
   const [periodo, setPeriodo] = useState('60')
   const [formulacao, setFormulacao] = useState('todas')
   const [lote, setLote] = useState('todos')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -211,10 +214,10 @@ export default function DashConsumoRacao() {
       <HDivider color={bc} />
 
       {/* ── KPI row ──────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {kpis.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
             <div style={{
               fontSize: t.font.size.xs, color: colors.fg.subtle as string,
               marginBottom: t.space[1], fontFamily: t.font.family.sans,
@@ -265,7 +268,7 @@ export default function DashConsumoRacao() {
       <HDivider color={bc} />
 
       {/* ── Gráficos 2 + 3 lado a lado ───────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
 
         {/* Gráfico 2 — Custo médio da batida por formulação */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
@@ -282,7 +285,7 @@ export default function DashConsumoRacao() {
           />
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         {/* Gráfico 3 — Composição de matérias-primas */}
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>

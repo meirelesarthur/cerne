@@ -17,6 +17,7 @@ import { Heading } from '../../components/ui/Heading'
 import { Trend } from '../../components/ui/Trend'
 import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -121,6 +122,8 @@ export default function DashSuprimentos() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [categoria, setCategoria] = useState('todas')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -182,10 +185,10 @@ export default function DashSuprimentos() {
       <HDivider color={bc} />
 
       {/* ── KPI row com sparklines ──────────────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {kpis.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
             <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
@@ -252,7 +255,7 @@ export default function DashSuprimentos() {
       <HDivider color={bc} />
 
       {/* ── Bottom row: HBar (1/2) + Fornecedores (1/2) ──────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
 
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
@@ -271,7 +274,7 @@ export default function DashSuprimentos() {
           />
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>

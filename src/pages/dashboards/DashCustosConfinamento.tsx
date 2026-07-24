@@ -27,6 +27,7 @@ import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -113,6 +114,8 @@ export default function DashCustosConfinamento() {
   const [categoria, setCategoria] = useState('todas')
   // Safra única nos mocks — o filtro existe para manter o recorte explícito
   const [safra, setSafra] = useState('25/26')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -232,10 +235,10 @@ export default function DashCustosConfinamento() {
       <HDivider color={bc} />
 
       {/* ── KPI row ─────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {kpis.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
             <div style={{
               fontSize: t.font.size.xs, color: colors.fg.subtle as string,
               marginBottom: t.space[1], fontFamily: t.font.family.sans,
@@ -266,7 +269,7 @@ export default function DashCustosConfinamento() {
       <HDivider color={bc} />
 
       {/* ── Gráficos: StackedBar (composição por mês) + LineChart (custo/@  e animal/dia) ── */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
 
         {/* Gráfico 1 — Composição de Custo por Mês */}
         <div style={{ flex: 3, padding: `${t.space[5]}px` }}>
@@ -287,7 +290,7 @@ export default function DashCustosConfinamento() {
           />
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         {/* Gráfico 2 — Custo/@ e Custo Animal/Dia ao longo do período */}
         <div style={{ flex: 2, padding: `${t.space[5]}px` }}>

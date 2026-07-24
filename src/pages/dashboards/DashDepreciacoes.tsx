@@ -9,6 +9,7 @@ import { Trend } from '../../components/ui/Trend'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Stacked Bar Data ─────────────────────────────────────────────────────────
 
@@ -94,6 +95,8 @@ export default function DashDepreciacoes() {
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600)
@@ -141,10 +144,10 @@ export default function DashDepreciacoes() {
       <HDivider color={bc} />
 
       {/* KPI row */}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
         {DEP_KPIS.flatMap((kpi, i) => [
-          i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
+          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
             <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
               {kpi.label}
             </div>
@@ -175,7 +178,7 @@ export default function DashDepreciacoes() {
       <HDivider color={bc} />
 
       {/* Donut + Projection */}
-      <div style={{ display: 'flex', alignItems: 'stretch' }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'stretch' }}>
         <div style={{ flex: 1, padding: t.space[5] }}>
           <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
             Composição por Tipo de Bem
@@ -189,7 +192,7 @@ export default function DashDepreciacoes() {
             valueFormat={(v) => `R$ ${(v / 1_000_000).toFixed(1)}M`}
           />
         </div>
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
         <div style={{ flex: 1, padding: t.space[5] }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
             <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>

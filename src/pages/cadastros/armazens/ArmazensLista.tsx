@@ -166,6 +166,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
         ) : (
           <>
             <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
+             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
+             <div style={{ overflowX: 'auto' }}>
+              <div style={{ minWidth: 680 }}>
               {/* Cabeçalho */}
               <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}` }}>
                 <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
@@ -186,6 +189,8 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
                   border={border}
                 />
               ))}
+              </div>
+             </div>
             </div>
 
             {totalFiltered > PAGE_SIZE && (

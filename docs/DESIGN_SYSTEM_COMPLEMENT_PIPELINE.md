@@ -55,3 +55,32 @@ Light e GBMode e cobrir os estados de carregamento, vazio, erro e sucesso.
 Uma spec só passa para concluída quando a tela âncora está navegável no shell, os
 componentes novos possuem stories, o build passa e os estados e permissões relevantes
 podem ser demonstrados sem depender de código local duplicado.
+
+## Entrega consolidada
+
+| Spec | Situação | Referência navegável |
+|---|---|---|
+| 01 · Bancos | Implementada | `src/pages/cadastros/bancos/BancosPage.tsx` |
+| 02 · Baixa de títulos | Implementada | `src/pages/financeiro/baixa-titulos/BaixaTitulosPage.tsx` |
+| 03 · Cidades | Implementada | `src/pages/cadastros/cidades/CidadesPage.tsx` |
+| 04 · Dashboard financeiro | Reuso validado | `src/pages/dashboards/DashFinanceiro.tsx` |
+| 05 · Autenticação | Complementada | `src/pages/Login.tsx` + `src/components/layout/PublicLayout.tsx` |
+| 06 · Mapa de confinamento | Implementada | `src/pages/operacional/mapa-confinamento/MapaConfinamentoPage.tsx` |
+| 07 · Autorização de compra | Implementada | `src/pages/administrativo/autorizacao/AutorizacaoCompraPage.tsx` |
+| 08 · Importação OFX | Implementada | `src/pages/financeiro/ofx/OfxImportPage.tsx` |
+| 09 · Integração Domínio | Implementada | `src/pages/integracoes/dominio/IntegracaoDominioPage.tsx` |
+| 10 · Planejamento pecuário | Implementada | `src/pages/operacional/planejamento-pecuario/PlanejamentoPecuarioPage.tsx` |
+| 11 · Layouts | Complementada | `src/components/layout/AppLayout.tsx` + fundações públicas/standalone |
+| 12 · Estoque consolidado | Implementada | `src/pages/relatorios/estoque-consolidado/EstoqueConsolidadoReportPage.tsx` |
+| 13 · Pessoas | Reuso validado | `src/pages/cadastros/pessoas/PessoasPage.tsx` |
+| 14 · Animais | Implementada | `src/pages/cadastros/animais/AnimaisPage.tsx` |
+| 15 · Agrupadores contábeis | Implementada | `src/pages/cadastros/agrupadores-contabeis/AgrupadoresContabeisPage.tsx` |
+| 16 · Produtos | Reuso validado | `src/pages/cadastros/produtos/ProdutosPage.tsx` |
+| 17 · Usuários | Implementada | `src/pages/cadastros/usuarios/UsuariosPage.tsx` |
+
+### Validação executada
+
+- Build de produção (`tsc -b` + Vite): aprovado.
+- Build completo do Storybook: aprovado.
+- Navegação e inspeção visual no shell: login, relatório consolidado e mapa de confinamento aprovados.
+- Saída conhecida: aviso de bundle acima de 500 kB, sem falha de compilação.

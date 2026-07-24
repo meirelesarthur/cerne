@@ -79,6 +79,9 @@ export function SankeyFunnel({
         const midY = (topY[i] + botY[i]) / 2
         const isH = hovIdx === i
         const dimmed = hovIdx !== null && !isH
+        // Rótulos das pontas ancoram na borda para não vazarem/cortarem no viewBox
+        const labelAnchor = i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'
+        const labelX = i === 0 ? 2 : i === n - 1 ? W - 2 : cx
 
         return (
           <g
@@ -148,9 +151,9 @@ export function SankeyFunnel({
 
             {/* Stage label below chart */}
             <text
-              x={cx}
+              x={labelX}
               y={H - 4}
-              textAnchor="middle"
+              textAnchor={labelAnchor}
               fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
@@ -162,9 +165,9 @@ export function SankeyFunnel({
             {/* Sublabel */}
             {stage.sublabel && !dimmed && (
               <text
-                x={cx}
+                x={labelX}
                 y={topY[i] - 6}
-                textAnchor="middle"
+                textAnchor={labelAnchor}
                 fontSize={t.font.size['3xs'] * k}
                 fill={colors.fg.subtle as string}
               >

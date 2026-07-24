@@ -21,6 +21,8 @@ import {
   type OverviewDataset,
 } from '../../insights/overviewInsights'
 import { useFarm } from '../../context/FarmContext'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { useChartScale } from '../../hooks/useChartScale'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -297,6 +299,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
 }) {
   const [hov, setHov] = useState<number | null>(null)
   const W = 700; const H = 200; const PL = 40; const PT = 16; const PR = 8; const PB = 32
+  const { ref: chartRef, k } = useChartScale(W)
   const cW = W - PL - PR; const cH = H - PT - PB
   const maxV = Math.max(...data.map(d => d.receitas), ...(prevSeries ?? [])) * 1.12
   const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
@@ -330,7 +333,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
   const dspGradId = isGbMode ? 'dspGbGrad' : 'dspGrad'
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div ref={chartRef} style={{ position: 'relative', width: '100%' }}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
         <defs>
           <linearGradient id={recGradId} x1="0" y1="0" x2="0" y2="1">
@@ -348,7 +351,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           <g key={i}>
             <line x1={PL} y1={yl.y} x2={W - PR} y2={yl.y}
               stroke={colors.border.default} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
-            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={9}
+            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={9 * k}
               fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
           </g>
         ))}
@@ -372,7 +375,7 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           const isH = hov === i
           return (
             <g key={i}>
-              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={9}
+              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={9 * k}
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
                 fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
                 {d.month}
@@ -538,6 +541,7 @@ function CostCompositionBar({ label, total, segments, colors }: {
 function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const [hov, setHov] = useState<number | null>(null)
   const W = 700; const H = 170; const PL = 44; const PT = 12; const PR = 8; const PB = 26
+  const { ref: chartRef, k } = useChartScale(W)
   const cW = W - PL - PR; const cH = H - PT - PB
   const data = CASHFLOW_12M
 
@@ -553,52 +557,54 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
   const zeroY = y(0)
 
   return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
-      {/* Zona negativa */}
-      <rect x={PL} y={zeroY} width={cW} height={PT + cH - zeroY}
-        fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
-      {/* Linha do zero */}
-      <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
-      <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={9} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
+    <div ref={chartRef} style={{ width: '100%' }}>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
+        {/* Zona negativa */}
+        <rect x={PL} y={zeroY} width={cW} height={PT + cH - zeroY}
+          fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
+        {/* Linha do zero */}
+        <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
+        <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={9 * k} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
 
-      {/* Barras de fluxo líquido mensal */}
-      {data.map((d, i) => {
-        const bx = x(i) - barW / 2
-        const by = d.net >= 0 ? y(d.net) : zeroY
-        const bh = Math.abs(y(d.net) - zeroY)
-        const isH = hov === i
-        return (
-          <g key={d.month}>
-            <rect x={bx} y={by} width={barW} height={Math.max(bh, 1)} rx={2}
-              fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
-              opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
-              style={{ transition: `opacity ${t.transition.fast}` }} />
-            <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={9}
-              fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
-              fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
-              {d.month}
+        {/* Barras de fluxo líquido mensal */}
+        {data.map((d, i) => {
+          const bx = x(i) - barW / 2
+          const by = d.net >= 0 ? y(d.net) : zeroY
+          const bh = Math.abs(y(d.net) - zeroY)
+          const isH = hov === i
+          return (
+            <g key={d.month}>
+              <rect x={bx} y={by} width={barW} height={Math.max(bh, 1)} rx={2}
+                fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
+                opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
+                style={{ transition: `opacity ${t.transition.fast}` }} />
+              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={9 * k}
+                fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
+                fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
+                {d.month}
+              </text>
+              <rect x={x(i) - cW / data.length / 2} y={PT} width={cW / data.length} height={cH} fill="transparent"
+                onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ cursor: 'crosshair' }} />
+            </g>
+          )
+        })}
+
+        {/* Curva acumulada */}
+        <path d={smoothPath(cumPts)} fill="none" stroke={t.color.accent.purple.text} strokeWidth={2}
+          strokeLinejoin="round" strokeLinecap="round" />
+
+        {/* Hover: valores */}
+        {hov !== null && (
+          <g>
+            <circle cx={cumPts[hov][0]} cy={cumPts[hov][1]} r={4} fill={t.color.accent.purple.text} stroke={colors.bg.surface} strokeWidth={2} />
+            <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={9 * k} fontWeight={600}
+              fill={colors.fg.default as string} fontFamily="Outfit,sans-serif">
+              {`líq. ${fmtCompact(data[hov].net * 1000)} · acum. ${fmtCompact(cum[hov] * 1000)}`}
             </text>
-            <rect x={x(i) - cW / data.length / 2} y={PT} width={cW / data.length} height={cH} fill="transparent"
-              onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)} style={{ cursor: 'crosshair' }} />
           </g>
-        )
-      })}
-
-      {/* Curva acumulada */}
-      <path d={smoothPath(cumPts)} fill="none" stroke={t.color.accent.purple.text} strokeWidth={2}
-        strokeLinejoin="round" strokeLinecap="round" />
-
-      {/* Hover: valores */}
-      {hov !== null && (
-        <g>
-          <circle cx={cumPts[hov][0]} cy={cumPts[hov][1]} r={4} fill={t.color.accent.purple.text} stroke={colors.bg.surface} strokeWidth={2} />
-          <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={9} fontWeight={600}
-            fill={colors.fg.default as string} fontFamily="Outfit,sans-serif">
-            {`líq. ${fmtCompact(data[hov].net * 1000)} · acum. ${fmtCompact(cum[hov] * 1000)}`}
-          </text>
-        </g>
-      )}
-    </svg>
+        )}
+      </svg>
+    </div>
   )
 }
 
@@ -725,6 +731,8 @@ export default function OverviewPanel() {
   const [periodo, setPeriodo] = useState('10')
   const [serie, setSerie] = useState<'realizado' | 'previsto'>('realizado')
   const [cartaOpen, setCartaOpen] = useState(false)
+  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
@@ -784,7 +792,7 @@ export default function OverviewPanel() {
       <HDivider color={bc} />
 
       {/* ── Content grid ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', flex: 1, minHeight: 0 }}>
 
         {/* ── Main column ────────────────────────────────────────────────────── */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
@@ -815,14 +823,14 @@ export default function OverviewPanel() {
           <HDivider color={bc} />
 
           {/* KPI top row */}
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
             {[
               { label: 'Margem bruta',         value: '12,5%',    trend: '2,7% vs 30 dias', up: true  },
               { label: 'Receitas realizadas',   value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true  },
               { label: 'Saldo operacional',     value: 'R$ 14,5M', trend: '1,3% vs 30 dias', up: false },
             ].flatMap((kpi, i) => [
-              i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-              <div key={kpi.label} style={{ flex: 1 }}>
+              i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
+              <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1 }}>
                 <KpiTop label={kpi.label} value={kpi.value} trend={kpi.trend} up={kpi.up} colors={colors} />
               </div>,
             ])}
@@ -876,7 +884,7 @@ export default function OverviewPanel() {
           <HDivider color={bc} />
 
           {/* Bottom row: Insight + Budget */}
-          <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+          <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', flex: 1, minHeight: 0 }}>
 
             {/* Insight computado pelo motor de interpretação */}
             <div style={{ flex: 1, padding: t.space[5] }}>
@@ -896,7 +904,7 @@ export default function OverviewPanel() {
               </p>
             </div>
 
-            <VDivider color={bc} />
+            {!stacked && <VDivider color={bc} />}
 
             {/* Resultado operacional (DRE) — receita → custos → resultado */}
             <div style={{ flex: 1, padding: t.space[5] }}>
@@ -939,7 +947,7 @@ export default function OverviewPanel() {
                 ))}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: t.space[6] }}>
+            <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', gap: t.space[6] }}>
               {RESULTADO_OPERACIONAL.map(r => (
                 <MiniDivergingBar key={r.label} label={r.label} positive={r.receitas} negative={r.despesas} colors={colors} />
               ))}
@@ -1010,10 +1018,10 @@ export default function OverviewPanel() {
 
         </div>
 
-        <VDivider color={bc} />
+        {!stacked && <VDivider color={bc} />}
 
         {/* ── Right aside ────────────────────────────────────────────────────── */}
-        <div style={{ width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: stacked ? 'auto' : 320, flexShrink: stacked ? 1 : 0, display: 'flex', flexDirection: 'column' }}>
 
           {/* Radial gauge */}
           <div style={{ padding: `${t.space[5]}px ${t.space[4]}px`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

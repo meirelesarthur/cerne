@@ -4,7 +4,7 @@
   // diretório `dist/` gerado por `npm run build`, sem acionar a autodetecção de
   // framework do Wrangler — que, sem config, exige Vite >= 6.0.0.
   // Não há script de Worker: nenhum campo `main` é necessário.
-  "name": "gb-cerne",
+  "name": "gb-cerne-web",
   "compatibility_date": "2026-06-08",
   "assets": {
     "directory": "./dist",

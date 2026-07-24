@@ -298,22 +298,22 @@ export const font = {
     sans: "'Outfit', sans-serif",
   },
 
-  /** Em pixels. Escala calibrada para legibilidade (público idoso / baixa acuidade):
-   *  corpo padrão `base = 16px` (mínimo WCAG). Texto de interface nunca abaixo de
-   *  `xs (13px)`; `2xs`/`3xs` (12/11px) são PISO DE CANVAS — uso restrito a rótulos
+  /** Em pixels. Escala calibrada para legibilidade (público idoso / baixa acuidade),
+   *  em rampa suave: corpo padrão `base = 14px`. Texto de interface não abaixo de
+   *  `xs (12px)`; `2xs`/`3xs` (11/10px) são PISO DE CANVAS — uso restrito a rótulos
    *  densos de gráfico/SVG, jamais em labels, valores, badges ou navegação. */
   size: {
-    '3xs': 11,
-    '2xs': 12,
-    xs:   13,
-    sm:   14,
-    base: 16,
-    md:   18,
-    lg:   20,
-    xl:   24,
-    '2xl': 28,
-    '3xl': 34,
-    '4xl': 44,
+    '3xs': 10,
+    '2xs': 11,
+    xs:   12,
+    sm:   13,
+    base: 14,
+    md:   16,
+    lg:   18,
+    xl:   20,
+    '2xl': 24,
+    '3xl': 30,
+    '4xl': 38,
   },
 
   weight: {
@@ -358,39 +358,39 @@ export const space = {
 
 export const size = {
   /** Altura de inputs/selects padrão — alinhada ao botão md (t.size.btn.md) */
-  control:   40,
-  controlSm: 36,
-  controlLg: 44,
+  control:   38,
+  controlSm: 34,
+  controlLg: 42,
   /** Alturas dos botões (sm/md/lg) — md é o padrão do sistema */
   btn: {
-    sm: 36,
-    md: 40,
-    lg: 44,
+    sm: 34,
+    md: 38,
+    lg: 42,
   },
   /** Botões apenas-ícone (sm/md/lg) */
   iconBtn: {
-    sm: 28,
-    md: 34,
-    lg: 40,
+    sm: 26,
+    md: 32,
+    lg: 38,
   },
   /** Switch (track: largura · trackHeight: altura · thumb) */
   toggle: {
-    track: 44,
-    trackHeight: 24,
-    thumb: 20,
+    track: 42,
+    trackHeight: 22,
+    thumb: 18,
   },
   /** Caixa do Checkbox (quadrada) */
-  checkbox: 20,
+  checkbox: 18,
   /** Célula de dia do calendário (DatePicker) */
-  calendarCell: 36,
+  calendarCell: 34,
   /** Botões de paginação (quadrados) */
-  pageBtn: 36,
+  pageBtn: 34,
   /** Altura fixa da linha de dados das tabelas (não cresce com quebra de texto) */
-  tableRow: 48,
+  tableRow: 44,
   /** Largura do FilterDrawer lateral */
-  drawer:  340,
+  drawer:  330,
   /** Largura mínima dos botões do StepFooter (usar como minWidth — o rótulo cresce o botão) */
-  stepBtn: 200,
+  stepBtn: 190,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────
@@ -399,11 +399,11 @@ export const size = {
 // `md`, etc. Nunca escolher tamanho de ícone ad-hoc na página.
 
 export const icon = {
-  xs: 14,  // ao lado de texto xs/sm — ações de linha densas
-  sm: 16,  // padrão — botões, inputs, itens de menu
-  md: 18,  // títulos de seção, ícones-chip
-  lg: 22,  // cabeçalhos, destaque
-  xl: 28,  // estados vazios, ilustração leve
+  xs: 13,  // ao lado de texto xs/sm — ações de linha densas
+  sm: 15,  // padrão — botões, inputs, itens de menu
+  md: 17,  // títulos de seção, ícones-chip
+  lg: 20,  // cabeçalhos, destaque
+  xl: 26,  // estados vazios, ilustração leve
 }
 
 // ─── Border radius ────────────────────────────────────────────────────────────

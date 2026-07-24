@@ -41,5 +41,7 @@ export function useChartScale(viewBoxWidth: number) {
 
   // Antes da 1ª medição (width=0), k=1 preserva o comportamento atual sem divisão por zero.
   const k = width > 0 ? viewBoxWidth / width : 1
-  return { ref, k }
+  // `width` (px real medido) é usado por gráficos que casam o viewBox à largura do
+  // container (ex.: DonutChart, para manter o donut quadrado e não achatado).
+  return { ref, k, width }
 }

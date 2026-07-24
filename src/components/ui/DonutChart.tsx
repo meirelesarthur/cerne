@@ -35,9 +35,12 @@ export function DonutChart({
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState<HoverState | null>(null)
 
-  const W = 800
   const H = height
-  const { ref, k } = useChartScale(W)
+  // O viewBox do donut acompanha a largura real do container (aspect 1:1), evitando
+  // o donut "achatado" quando renderizado numa coluna estreita. Com escala 1:1, o
+  // fontSize já sai em px real — sem necessidade de fator k.
+  const { ref, width } = useChartScale(0)
+  const W = width > 0 ? Math.round(width) : 640
 
   const total = data.reduce((sum, d) => sum + d.value, 0)
 
@@ -54,7 +57,7 @@ export function DonutChart({
             x={W / 2}
             y={H / 2}
             textAnchor="middle"
-            fontSize={t.font.size.sm * k}
+            fontSize={t.font.size.sm}
             fill={colors.fg.subtle as string}
           >
             Sem dados
@@ -164,7 +167,7 @@ export function DonutChart({
               x={cx}
               y={cy + (centerLabel ? -2 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size['2xl'] * k}
+              fontSize={t.font.size['2xl']}
               fontWeight={t.font.weight.bold}
               fill={colors.fg.default as string}
               fontFamily={t.font.family.sans}
@@ -177,7 +180,7 @@ export function DonutChart({
               x={cx}
               y={cy + (centerValue ? 20 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size.xs * k}
+              fontSize={t.font.size.xs}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
             >
@@ -211,7 +214,7 @@ export function DonutChart({
             <text
               x={ttX + 18}
               y={ttY + 16}
-              fontSize={t.font.size.xs * k}
+              fontSize={t.font.size.xs}
               fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
@@ -221,7 +224,7 @@ export function DonutChart({
             <text
               x={ttX + 10}
               y={ttY + 30}
-              fontSize={t.font.size.xs * k}
+              fontSize={t.font.size.xs}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
             >
@@ -249,7 +252,7 @@ export function DonutChart({
                   <text
                     x={lx + 16}
                     y={ly + 12}
-                    fontSize={t.font.size.xs * k}
+                    fontSize={t.font.size.xs}
                     fill={colors.fg.muted as string}
                     fontFamily={t.font.family.sans}
                   >

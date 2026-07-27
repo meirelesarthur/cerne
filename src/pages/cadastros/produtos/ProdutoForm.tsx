@@ -8,6 +8,7 @@ import { FormSection } from '../../../components/ui/FormSection'
 import { FormSelect } from '../../../components/ui/FormSelect'
 import { PageCard } from '../../../components/ui/PageCard'
 import { PageContainer } from '../../../components/ui/PageContainer'
+import { SearchSelect, type SearchSelectOption } from '../../../components/ui/SearchSelect'
 import { StepFooter } from '../../../components/ui/StepFooter'
 import { StepHeader } from '../../../components/ui/StepHeader'
 import { Stepper } from '../../../components/ui/Stepper'
@@ -44,6 +45,17 @@ const STEPS = [
   { id: 3, label: 'Financeiro e operação' },
 ]
 
+const NCM_SEARCH_OPTIONS: SearchSelectOption[] = NCM_OPTS.map(option => ({
+  id: option.value,
+  code: option.value,
+  label: option.label.replace(`${option.value} — `, ''),
+}))
+
+function ncmDisplay(value: string): string {
+  const option = NCM_SEARCH_OPTIONS.find(item => item.id === value)
+  return option ? `${option.code} — ${option.label}` : ''
+}
+
 const required = (value: unknown) => (!value && value !== 0 ? 'Campo obrigatório.' : undefined)
 
 function validateDescricao(value: string): string | undefined {
@@ -66,6 +78,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
 
   const [descricao, setDescricao] = useState(initialData?.descricao ?? '')
   const [ncm, setNcm] = useState(initialData?.ncm ?? '')
+  const [ncmQuery, setNcmQuery] = useState(() => ncmDisplay(initialData?.ncm ?? ''))
   const [tipo, setTipo] = useState<TipoProduto | ''>(initialData?.tipo ?? '')
   const [grupoId, setGrupoId] = useState<number | ''>(initialData?.grupoId ?? '')
   const [categoriaId, setCategoriaId] = useState<number | ''>(initialData?.categoriaId ?? '')
@@ -334,19 +347,32 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 disabled={submitting}
                 name="descricao"
               />
-              <FormSelect
+              <SearchSelect
                 label="NCM"
                 required
-                value={ncm}
-                onChange={event => {
-                  setNcm(event.target.value)
-                  setTouched(previous => ({ ...previous, ncm: true }))
+                name="ncm"
+                query={ncmQuery}
+                onQueryChange={value => {
+                  setNcmQuery(value)
+                  setNcm('')
                 }}
                 onBlur={() => setTouched(previous => ({ ...previous, ncm: true }))}
-                options={[{ value: '', label: 'Selecione o NCM...' }, ...NCM_OPTS]}
+                options={NCM_SEARCH_OPTIONS}
+                selectedId={ncm || null}
+                onSelect={option => {
+                  setNcm(option.id)
+                  setNcmQuery(`${option.code} — ${option.label}`)
+                  setTouched(previous => ({ ...previous, ncm: true }))
+                }}
+                onClear={() => {
+                  setNcm('')
+                  setNcmQuery('')
+                  setTouched(previous => ({ ...previous, ncm: true }))
+                }}
+                placeholder="Buscar NCM por código ou descrição..."
+                emptyText="Nenhum NCM encontrado."
                 error={errors.ncm}
                 disabled={submitting}
-                name="ncm"
               />
             </FormSection>
             <FormSection title="Classificação" columns={2} responsive divider={false}>

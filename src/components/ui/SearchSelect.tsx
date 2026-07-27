@@ -20,6 +20,7 @@ interface SearchSelectAction {
 
 interface SearchSelectProps {
   label?:        string
+  name?:         string
   required?:     boolean
   /** Dica exibida em tooltip ao lado do rótulo. */
   hint?:         string
@@ -29,6 +30,7 @@ interface SearchSelectProps {
   /** Texto de busca (controlado). */
   query:         string
   onQueryChange: (q: string) => void
+  onBlur?:       React.FocusEventHandler<HTMLInputElement>
   /** Lista completa de opções — a filtragem por `query` é interna. */
   options:       SearchSelectOption[]
   selectedId?:   string | null
@@ -52,12 +54,14 @@ interface SearchSelectProps {
  */
 export function SearchSelect({
   label,
+  name,
   required,
   hint,
   disabled,
   placeholder = 'Buscar...',
   query,
   onQueryChange,
+  onBlur,
   options,
   selectedId,
   onSelect,
@@ -71,6 +75,7 @@ export function SearchSelect({
   const { colors } = useTheme()
   const id = useId()
   const listboxId = `${id}-listbox`
+  const errorId = `${id}-error`
   const containerRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number>(-1)
@@ -93,7 +98,10 @@ export function SearchSelect({
 
   const q = query.trim().toLowerCase()
   const filtered = q
-    ? options.filter(o => o.label.toLowerCase().includes(q) || (o.code?.toLowerCase().includes(q) ?? false))
+    ? options.filter(o => {
+        const searchableText = o.code ? `${o.code} — ${o.label}` : o.label
+        return searchableText.toLowerCase().includes(q)
+      })
     : options
 
   const visibleOptions = filtered.slice(0, maxVisible)
@@ -165,17 +173,21 @@ export function SearchSelect({
           <Search size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} aria-hidden="true" />
           <input
             id={id}
+            name={name}
             type="text"
             role="combobox"
             aria-expanded={open}
             aria-controls={listboxId}
             aria-autocomplete="list"
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
             aria-activedescendant={activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
             placeholder={placeholder}
             value={query}
             disabled={disabled}
             onChange={e => { onQueryChange(e.target.value); setOpen(true); setActiveIndex(-1) }}
             onFocus={() => !disabled && setOpen(true)}
+            onBlur={onBlur}
             onKeyDown={handleKeyDown}
             autoComplete="off"
             data-1p-ignore="true"
@@ -248,7 +260,7 @@ export function SearchSelect({
       </div>
 
       {error && (
-        <span style={{ fontSize: t.font.size.xs, color: t.color.feedback.error.text, fontFamily: t.font.family.sans, marginTop: t.space[1], display: 'block' }}>
+        <span id={errorId} role="alert" style={{ fontSize: t.font.size.xs, color: t.color.feedback.error.text, fontFamily: t.font.family.sans, marginTop: t.space[1], display: 'block' }}>
           {error}
         </span>
       )}

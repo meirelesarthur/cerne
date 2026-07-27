@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, LogOut, UserCog } from 'lucide-react'
+import { Bell, Blocks, LogOut, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
@@ -20,9 +20,15 @@ interface TopbarProps {
   activeItemId: string | null
   /** Encerra a sessão do usuário (item "Sair" do menu de conta). */
   onLogout?: () => void
+  /**
+   * Abre uma tela de referência do design system (fora do menu de negócio).
+   * O gatilho só é renderizado em build de desenvolvimento (`import.meta.env.DEV`) —
+   * é uma ferramenta interna para devs/POs, não um papel de RBAC do produto.
+   */
+  onOpenDesignSystem?: (itemId: 'ds-estados-conta') => void
 }
 
-export default function Topbar({ expandedModule, activeItemId, onLogout }: TopbarProps) {
+export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenDesignSystem }: TopbarProps) {
   const { colors } = useTheme()
   const { navigateTo } = useNavigation()
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
@@ -69,6 +75,38 @@ export default function Topbar({ expandedModule, activeItemId, onLogout }: Topba
 
         {/* Farm Switcher */}
         <FarmSwitcher />
+
+        {/* Design System (dev/PO) — apenas em build de desenvolvimento; nunca
+           gated por papel de negócio (admin/manager/operator/viewer), pois esta
+           é uma audiência de ferramenta interna, não um papel de tenant do RBAC. */}
+        {import.meta.env.DEV && onOpenDesignSystem && (
+          <DropdownMenu
+            ariaLabel="Abrir referências do design system (uso interno)"
+            triggerIcon={
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 34,
+                  height: 34,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: activeItemId?.startsWith('ds-') ? colors.accent.default : colors.fg.muted,
+                }}
+              >
+                <Blocks size={16} />
+              </span>
+            }
+            items={[
+              {
+                id: 'ds-estados-conta',
+                label: 'Estados de Conta & RBAC',
+                icon: <UserCog size={15} />,
+                onClick: () => onOpenDesignSystem('ds-estados-conta'),
+              },
+            ]}
+          />
+        )}
 
         {/* Notifications */}
         <DropdownMenu

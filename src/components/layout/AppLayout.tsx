@@ -47,6 +47,7 @@ import DashEstoqueNutricao from '../../pages/dashboards/DashEstoqueNutricao'
 import DashConsumoRacao   from '../../pages/dashboards/DashConsumoRacao'
 import DashCustosConfinamento from '../../pages/dashboards/DashCustosConfinamento'
 import PlanosPage        from '../../pages/planos/PlanosPage'
+import EstadosContaPage  from '../../pages/design-system/EstadosContaPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
 import { NavigationContext } from '../../context/NavigationContext'
@@ -183,6 +184,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'dash-rac')  return <DashConsumoRacao />
   if (itemId === 'dash-cco')  return <DashCustosConfinamento />
   if (itemId === 'planos')    return <PlanosPage />
+  if (itemId === 'ds-estados-conta') return <EstadosContaPage />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 
@@ -273,6 +275,14 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
     updateBrowserPath('/planos')
   }
 
+  // Telas de referência do design system (fora do menu de negócio, uso interno
+  // de devs/POs) — mesmo padrão de "abrir por id direto" usado pelo Planos.
+  const handleOpenDesignSystem = (itemId: 'ds-estados-conta') => {
+    setExpandedModuleId(null)
+    setActiveItemId(itemId)
+    updateBrowserPath(itemId === 'ds-estados-conta' ? '/design-system/estados-conta' : undefined)
+  }
+
   const handleCloseSecondary = () => {
     setExpandedModuleId(null)
     // Keep activeItemId so current page stays visible after closing secondary nav
@@ -344,7 +354,12 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
           transition: 'background 0.2s ease',
         }}
       >
-        <Topbar expandedModule={expandedModule} activeItemId={activeItemId} onLogout={onLogout} />
+        <Topbar
+          expandedModule={expandedModule}
+          activeItemId={activeItemId}
+          onLogout={onLogout}
+          onOpenDesignSystem={handleOpenDesignSystem}
+        />
 
         <div style={{ flex: 1, display: 'flex', gap: t.space[2], overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -t.space[2] : 0 }}>
           {hasSecondaryNav && expandedModule && (

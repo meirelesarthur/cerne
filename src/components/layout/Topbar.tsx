@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Blocks, LogOut, UserCog } from 'lucide-react'
+import { BarChart3, Bell, Blocks, LogOut, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
@@ -25,7 +25,7 @@ interface TopbarProps {
    * O gatilho só é renderizado em build de desenvolvimento (`import.meta.env.DEV`) —
    * é uma ferramenta interna para devs/POs, não um papel de RBAC do produto.
    */
-  onOpenDesignSystem?: (itemId: 'ds-estados-conta') => void
+  onOpenDesignSystem?: (itemId: 'ds-estados-conta' | 'ds-cobertura') => void
 }
 
 export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenDesignSystem }: TopbarProps) {
@@ -98,6 +98,12 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
               </span>
             }
             items={[
+              {
+                id: 'ds-cobertura',
+                label: 'Cobertura do Design System',
+                icon: <BarChart3 size={15} />,
+                onClick: () => onOpenDesignSystem('ds-cobertura'),
+              },
               {
                 id: 'ds-estados-conta',
                 label: 'Estados de Conta & RBAC',

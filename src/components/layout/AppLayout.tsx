@@ -48,6 +48,7 @@ import DashConsumoRacao   from '../../pages/dashboards/DashConsumoRacao'
 import DashCustosConfinamento from '../../pages/dashboards/DashCustosConfinamento'
 import PlanosPage        from '../../pages/planos/PlanosPage'
 import EstadosContaPage  from '../../pages/design-system/EstadosContaPage'
+import CoberturaDesignSystemPage from '../../pages/design-system/CoberturaDesignSystemPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
 import { Construction } from 'lucide-react'
 import { NavigationContext } from '../../context/NavigationContext'
@@ -185,6 +186,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'dash-cco')  return <DashCustosConfinamento />
   if (itemId === 'planos')    return <PlanosPage />
   if (itemId === 'ds-estados-conta') return <EstadosContaPage />
+  if (itemId === 'ds-cobertura')     return <CoberturaDesignSystemPage />
   return <FuncionalidadePlaceholder itemId={itemId} module={module} />
 }
 
@@ -277,10 +279,14 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
 
   // Telas de referência do design system (fora do menu de negócio, uso interno
   // de devs/POs) — mesmo padrão de "abrir por id direto" usado pelo Planos.
-  const handleOpenDesignSystem = (itemId: 'ds-estados-conta') => {
+  const DESIGN_SYSTEM_PATHS: Record<'ds-estados-conta' | 'ds-cobertura', string> = {
+    'ds-estados-conta': '/design-system/estados-conta',
+    'ds-cobertura': '/design-system/cobertura',
+  }
+  const handleOpenDesignSystem = (itemId: 'ds-estados-conta' | 'ds-cobertura') => {
     setExpandedModuleId(null)
     setActiveItemId(itemId)
-    updateBrowserPath(itemId === 'ds-estados-conta' ? '/design-system/estados-conta' : undefined)
+    updateBrowserPath(DESIGN_SYSTEM_PATHS[itemId])
   }
 
   const handleCloseSecondary = () => {

@@ -5,6 +5,11 @@ import { useTheme } from '../../context/ThemeContext'
 interface PageCardProps {
   children: React.ReactNode
   /**
+   * Cabeçalho fixo no topo do card. Ideal para identidade da entidade +
+   * navegação de etapas; fica fora da região rolável do corpo.
+   */
+  header?: React.ReactNode
+  /**
    * Rodapé fixo na base do card (barra de ações de formulário, StepFooter…).
    * Quando ausente, todo o conteúdo rola junto (padrão de listagens).
    */
@@ -43,6 +48,7 @@ interface PageCardProps {
  */
 export function PageCard({
   children,
+  header,
   footer,
   footerBare = false,
   footerJustify = 'space-between',
@@ -62,6 +68,19 @@ export function PageCard({
         transition:    'background 0.2s',
       }}
     >
+      {header && (
+        <div
+          style={{
+            padding: `${t.space[4]}px ${t.space[6]}px ${t.space[3]}px`,
+            borderBottom: `${t.space[1] / 4}px solid ${colors.border.subtle}`,
+            flexShrink: 0,
+            background: colors.bg.surface,
+          }}
+        >
+          {header}
+        </div>
+      )}
+
       {/* Corpo com scroll interno */}
       <div
         style={{

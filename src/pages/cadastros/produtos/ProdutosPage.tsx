@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
 import ProdutosLista from './ProdutosLista'
 import ProdutoForm   from './ProdutoForm'
+import ProdutoDetalhe from './ProdutoDetalhe'
 import { mockProdutos }              from './produtos.mock'
 import { useToast, ToastContainer }  from '../../../components/ui/Toast'
 import type { Produto }              from './produtos.types'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'detail'
 
 export default function ProdutosPage() {
   const [view,       setView]       = useState<View>('list')
@@ -59,11 +60,22 @@ export default function ProdutosPage() {
     )
   }
 
+  if (view === 'detail' && selected) {
+    return (
+      <ProdutoDetalhe
+        produto={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <>
       <ProdutosLista
         produtos={produtos}
         onNew={() => { setSelectedId(null); setView('form') }}
+        onView={id => { setSelectedId(id); setView('detail') }}
         onEdit={id => { setSelectedId(id); setView('form') }}
         onDelete={handleDelete}
         onBulkActivate={handleBulkActivate}

@@ -60,14 +60,17 @@ export function ReadOnlyField({ label, value, copyValue, sensitive = false }: Re
 interface DetailGridProps {
   items: DetailItem[]
   columns?: 1 | 2 | 3
+  responsive?: boolean
 }
 
-export function DetailGrid({ items, columns = 2 }: DetailGridProps) {
+export function DetailGrid({ items, columns = 2, responsive = false }: DetailGridProps) {
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        gridTemplateColumns: responsive
+          ? `repeat(auto-fit, minmax(min(100%, ${columns === 2 ? t.size.drawer : t.size.stepBtn}px), 1fr))`
+          : `repeat(${columns}, minmax(0, 1fr))`,
         gap: t.space[3],
       }}
     >

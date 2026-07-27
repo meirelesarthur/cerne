@@ -13,6 +13,8 @@ interface FormPageHeaderProps {
   actions?:    ReactNode
   /** Espaçamento superior — alinha o título ao padrão das listagens (PageHeader). */
   paddingTop?: number
+  /** Remove a margem inferior quando o componente vive em um slot que controla o espaçamento. */
+  compact?: boolean
 }
 
 /**
@@ -21,7 +23,7 @@ interface FormPageHeaderProps {
  * não recriar headers inline nas páginas.
  */
 export function FormPageHeader({
-  title, subtitle, onBack, closeLabel = 'Fechar', actions, paddingTop,
+  title, subtitle, onBack, closeLabel = 'Fechar', actions, paddingTop, compact = false,
 }: FormPageHeaderProps) {
   const { colors } = useTheme()
   return (
@@ -31,7 +33,7 @@ export function FormPageHeader({
         alignItems:     'center',
         justifyContent: 'space-between',
         paddingTop:     paddingTop,
-        marginBottom:   t.space[6],
+        marginBottom:   compact ? t.space[2] : t.space[6],
         gap:            t.space[4],
       }}
     >

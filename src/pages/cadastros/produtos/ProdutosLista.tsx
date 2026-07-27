@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Package,
+  Plus, Pencil, Trash2, Package, Eye,
   Download,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -33,6 +33,7 @@ interface Props {
   produtos:         Produto[]
   isLoading?:       boolean
   onNew:            () => void
+  onView:           (id: number) => void
   onEdit:           (id: number) => void
   onDelete:         (id: number) => void
   onBulkActivate:   (ids: number[]) => void
@@ -52,10 +53,12 @@ const TIPO_COLORS: Record<TipoProduto, { bg: string; text: string }> = {
 type SortField = 'codigo' | 'descricao'
 type SortDir   = 'asc' | 'desc'
 
+const PRODUCT_GRID = `40px 100px 1fr 160px 110px 90px ${t.size.iconBtn.md * 3 + t.space[1] * 2}px`
+
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function ProdutosLista({
-  produtos, isLoading = false, onNew, onEdit, onDelete,
+  produtos, isLoading = false, onNew, onView, onEdit, onDelete,
   onBulkActivate, onBulkDeactivate, onBulkDelete,
 }: Props) {
   const { colors } = useTheme()
@@ -192,8 +195,6 @@ export default function ProdutosLista({
     textTransform: 'uppercase', letterSpacing: '0.05em',
   }
 
-  const GRID = '40px 100px 1fr 160px 110px 90px 96px'
-
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
 
@@ -272,7 +273,7 @@ export default function ProdutosLista({
            <div style={{ overflowX: 'auto' }}>
             <div style={{ minWidth: 820 }}>
             {/* Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: GRID, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
               {/* Checkbox all */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Checkbox
@@ -297,6 +298,7 @@ export default function ProdutosLista({
                 isLast={idx === paginated.length - 1}
                 isSelected={selected.has(prod.id)}
                 onToggle={() => toggleOne(prod.id)}
+                onView={() => onView(prod.id)}
                 onEdit={() => onEdit(prod.id)}
                 onDeleteReq={() => setDeleteTarget(prod)}
                 colors={colors}
@@ -399,19 +401,17 @@ export default function ProdutosLista({
 
 // ─── ProdutoRow ───────────────────────────────────────────────────────────────
 
-function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, colors, border }: {
+function ProdutoRow({ prod, isLast, isSelected, onToggle, onView, onEdit, onDeleteReq, colors, border }: {
   prod: Produto; isLast: boolean; isSelected: boolean
-  onToggle: () => void; onEdit: () => void; onDeleteReq: () => void
+  onToggle: () => void; onView: () => void; onEdit: () => void; onDeleteReq: () => void
   colors: ReturnType<typeof useTheme>['colors']; border: string
 }) {
   const [hovered, setHovered] = useState(false)
   const grupoNome = GRUPOS.find(g => g.id === prod.grupoId)?.nome ?? '—'
   const tipoCor = TIPO_COLORS[prod.tipo]
-  const GRID = '40px 100px 1fr 160px 110px 90px 96px'
-
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
+      style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -438,8 +438,9 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onEdit, onDeleteReq, c
         </span>
       </span>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-        <IconButton icon={<Pencil size={13} />} aria-label="Editar"  onClick={onEdit}      size="sm" variant="ghost" />
-        <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" onClick={onDeleteReq} size="sm" variant="ghost" danger />
+        <IconButton icon={<Eye size={t.icon.xs} />} aria-label="Visualizar" onClick={onView} size="sm" variant="ghost" />
+        <IconButton icon={<Pencil size={t.icon.xs} />} aria-label="Editar"  onClick={onEdit}      size="sm" variant="ghost" />
+        <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label="Excluir" onClick={onDeleteReq} size="sm" variant="ghost" danger />
       </div>
     </div>
   )

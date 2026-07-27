@@ -32,7 +32,7 @@ export function FormSelect({
   className,
   ...selectProps
 }: FormSelectProps) {
-  const { colors } = useTheme()
+  const { colors, isGbMode } = useTheme()
   const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
 
   const isError = !!error || status === 'err'
@@ -103,8 +103,12 @@ export function FormSelect({
             paddingRight: t.space[8],
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
-            color: selectProps.disabled ? t.color.state.disabled.text : colors.fg.default,
-            background: selectProps.disabled ? t.color.state.disabled.bg : colors.bg.input,
+            color: selectProps.disabled
+              ? isGbMode ? colors.fg.subtle : t.color.state.disabled.text
+              : colors.fg.default,
+            background: selectProps.disabled
+              ? isGbMode ? colors.bg.subtle : t.color.state.disabled.bg
+              : colors.bg.input,
             outline: 'none',
             boxSizing: 'border-box',
             appearance: 'none',

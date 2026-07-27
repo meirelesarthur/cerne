@@ -6,18 +6,20 @@ interface ToggleSwitchProps {
   onChange:   (v: boolean) => void
   label?:     string
   disabled?:  boolean
+  ariaLabel?: string
 }
 
-export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitchProps) {
+export function ToggleSwitch({ checked, onChange, label, disabled, ariaLabel }: ToggleSwitchProps) {
   const { colors } = useTheme()
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + t.space[1] / 2 }}>
       <button
         type="button"
         className="gb-focusable"
         role="switch"
         aria-checked={checked}
+        aria-label={ariaLabel ?? label}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         style={{
@@ -37,14 +39,15 @@ export function ToggleSwitch({ checked, onChange, label, disabled }: ToggleSwitc
         <span
           style={{
             position: 'absolute',
-            top: 2,
-            left: checked ? 20 : 2,
+            top: t.space[1] / 2,
+            left: t.space[1] / 2,
             width: t.size.toggle.thumb,
             height: t.size.toggle.thumb,
-            borderRadius: '50%',
-            background: 'white',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-            transition: `left ${t.transition.smooth}`,
+            borderRadius: t.radius.full,
+            background: t.color.neutral[0],
+            boxShadow: t.shadow.base,
+            transform: checked ? `translateX(${t.space[5]}px)` : 'translateX(0)',
+            transition: `transform ${t.transition.smooth}`,
           }}
         />
       </button>

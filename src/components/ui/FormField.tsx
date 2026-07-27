@@ -43,7 +43,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   style,
   ...inputProps
 }, ref) {
-  const { colors } = useTheme()
+  const { colors, isGbMode } = useTheme()
 
   const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
 
@@ -84,6 +84,12 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
     : isReadOnly
     ? t.color.state.readonly.border
     : colors.border.default
+  const stateText = isGbMode ? colors.fg.subtle : isDisabled
+    ? t.color.state.disabled.text
+    : t.color.state.readonly.text
+  const stateBackground = isGbMode ? colors.bg.subtle : isDisabled
+    ? t.color.state.disabled.bg
+    : t.color.state.readonly.bg
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
@@ -140,16 +146,16 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             fontSize: t.font.size.md,
             fontFamily: t.font.family.sans,
             color: isDisabled
-              ? t.color.state.disabled.text
+              ? stateText
               : isReadOnly
-              ? t.color.state.readonly.text
+              ? stateText
               : colors.fg.default,
             background: isError
               ? t.color.feedback.error.bg
               : isDisabled
-              ? t.color.state.disabled.bg
+              ? stateBackground
               : isReadOnly
-              ? t.color.state.readonly.bg
+              ? stateBackground
               : colors.bg.input,
             cursor: isDisabled ? 'not-allowed' : undefined,
             outline: 'none',

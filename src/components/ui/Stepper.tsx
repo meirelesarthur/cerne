@@ -29,15 +29,17 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
       {steps.map((step, index) => {
         const isCompleted = completed.includes(step.id)
         const isActive = step.id === current
-        const isClickable = isCompleted
-        const circleSize = isActive ? 14 : 10
+        const isClickable = isCompleted && !isActive
+        const circleSize = isActive ? t.space[4] : t.space[3]
 
         return (
           <React.Fragment key={step.id}>
             <button
               type="button"
-              disabled={!isClickable}
-              className={isClickable ? 'gb-focusable' : undefined}
+              disabled={!isClickable && !isActive}
+              aria-current={isActive ? 'step' : undefined}
+              aria-label={`${step.label}${isActive ? ', etapa atual' : isCompleted ? ', etapa disponível' : ', etapa pendente'}`}
+              className={isClickable || isActive ? 'gb-focusable' : undefined}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -64,8 +66,8 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   border: isCompleted
                     ? 'none'
                     : isActive
-                    ? `2px solid ${t.color.brand[600]}`
-                    : `1.5px solid ${colors.border.default}`,
+                    ? `${t.space[1] / 2}px solid ${t.color.brand[600]}`
+                    : `${t.space[1] / 2}px solid ${colors.border.default}`,
                   transition: `background ${t.transition.smooth}, border-color ${t.transition.smooth}`,
                   boxSizing: 'border-box',
                 }}
@@ -77,7 +79,6 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
                   fontFamily: t.font.family.sans,
                   color: isCompleted || isActive ? t.color.brand[600] : colors.fg.subtle,
                   whiteSpace: 'nowrap',
-                  letterSpacing: '0.1px',
                 }}
               >
                 {step.label}
@@ -88,8 +89,8 @@ export function Stepper({ steps, current, completed, onStepClick }: StepperProps
               <div
                 style={{
                   flex: 1,
-                  height: 1.5,
-                  marginBottom: 19,
+                  height: t.space[1] / 2,
+                  marginBottom: t.space[5],
                   background: isCompleted ? t.color.brand[600] : colors.border.default,
                   transition: `background ${t.transition.smooth}`,
                 }}

@@ -7,9 +7,11 @@ interface FormSectionProps {
   subtitle?: string
   columns?: 1 | 2 | 3
   children: React.ReactNode
+  /** Faz as colunas quebrarem automaticamente sem exigir media query na página. */
+  responsive?: boolean
 }
 
-export function FormSection({ title, subtitle, columns = 1, children }: FormSectionProps) {
+export function FormSection({ title, subtitle, columns = 1, children, responsive = false }: FormSectionProps) {
   const { colors } = useTheme()
 
   return (
@@ -42,7 +44,11 @@ export function FormSection({ title, subtitle, columns = 1, children }: FormSect
         style={{
           paddingTop: t.space[4],
           display: columns > 1 ? 'grid' : 'block',
-          gridTemplateColumns: columns === 2 ? '1fr 1fr' : columns === 3 ? '1fr 1fr 1fr' : undefined,
+          gridTemplateColumns: columns > 1
+            ? responsive
+              ? `repeat(auto-fit, minmax(min(100%, ${columns === 2 ? t.size.drawer : t.size.stepBtn}px), 1fr))`
+              : columns === 2 ? '1fr 1fr' : '1fr 1fr 1fr'
+            : undefined,
           gap: columns > 1 ? t.space[4] : undefined,
         }}
       >

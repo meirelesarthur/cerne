@@ -69,3 +69,25 @@ export const ComRodape: Story = {
     </div>
   ),
 }
+
+/** Fluxo longo — identidade e navegação permanecem fixas durante a rolagem. */
+export const ComCabecalhoFixo: Story = {
+  render: () => (
+    <div style={{ padding: t.space[6], height: '100vh', boxSizing: 'border-box' }}>
+      <PageCard
+        header={
+          <FormPageHeader
+            title="Editar registro"
+            subtitle="Código 00001"
+            onBack={() => {}}
+            compact
+          />
+        }
+        footer={<Button variant="primary">Salvar</Button>}
+        footerJustify="flex-end"
+      >
+        <Filler />
+      </PageCard>
+    </div>
+  ),
+}

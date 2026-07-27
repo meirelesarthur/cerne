@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
 import {
-  CloudRain, Droplets, CalendarDays, AlertTriangle,
+  CloudRain, Droplets,
   Filter, X, Sun, Cloud, CloudSun, TrendingUp,
   BarChart2, Activity,
 } from 'lucide-react'
+import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
 import { FormField } from '../../components/ui/FormField'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
 import { PageHeader } from '../../components/ui/PageHeader'
+import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { ChartCard } from '../../components/ui/ChartCard'
-import { KpiStatCard } from '../../components/ui/KpiStatCard'
+import { Trend } from '../../components/ui/Trend'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
 
@@ -172,6 +174,24 @@ export default function Pluviometria() {
     (dateEnd !== '25/05/2026' ? 1 : 0) +
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
+  const bc = colors.border.default as string
+
+  // KPIs em linha única dentro do card do dashboard, separados por linhas
+  // finas (HDivider/VDivider) — mesmo padrão do Financeiro/Pecuária, em vez
+  // de cartões individuais com sombra própria (que duplicava a moldura).
+  const kpis: {
+    label: string
+    value: string
+    trend?: string
+    up?: boolean
+    badge?: { label: string; variant: 'warning' | 'danger' }
+  }[] = [
+    { label: 'Acumulado (7 dias)', value: '19.2mm', trend: '+3.4mm vs mês ant.', up: true },
+    { label: 'Umidade do Solo', value: '17%', trend: '-5% vs mês ant.', up: false },
+    { label: 'Próxima Chuva (>15mm)', value: 'Sem prev.', badge: { label: 'Sem previsão', variant: 'warning' } },
+    { label: 'Alertas Ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
+  ]
+
   return (
     <div style={{
       margin: `${t.space[5]}px ${t.space[6]}px`,
@@ -297,45 +317,33 @@ export default function Pluviometria() {
         </div>
       </FilterDrawer>
 
-      {/* ── KPI Cards ───────────────────────────────────────────────── */}
+      {/* ── KPI row ─────────────────────────────────────────────────── */}
       {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3] }}>
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height={120} />)}
-        </div>
-      ) : null}
-      {!isLoading && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[3], alignItems: 'stretch' }}>
-        <KpiStatCard
-          icon={CloudRain}
-          label="Acumulado (7 dias)"
-          value="19.2mm"
-          sub="Open-Meteo · Prata (MG)"
-          trend="+3.4mm vs mês ant."
-          trendUp
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={Droplets}
-          label="Umidade do Solo"
-          value="17%"
-          sub="Open-Meteo · Prata (MG)"
-          trend="-5% vs mês ant."
-          trendUp={false}
-          accentColor={t.color.brand[600]}
-        />
-        <KpiStatCard
-          icon={CalendarDays}
-          label="Próxima Chuva (>15mm)"
-          value="Sem prev."
-          sub="Open-Meteo · Prata (MG)"
-          accentColor={t.color.feedback.warning.solid}
-        />
-        <KpiStatCard
-          icon={AlertTriangle}
-          label="Alertas Ativos"
-          value="Déficit Hídrico"
-          accentColor={t.color.feedback.error.solid}
-        />
-      </div>}
+        <Skeleton height={96} />
+      ) : (
+        <>
+          <HDivider color={bc} />
+          <div style={{ display: 'flex' }}>
+            {kpis.flatMap((kpi, i) => [
+              i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+              <div key={kpi.label} style={{ flex: 1, padding: `0 ${t.space[5]}px ${t.space[1]}px` }}>
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[1] }}>
+                  {kpi.label}
+                </div>
+                <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1.1, marginBottom: t.space[2] }}>
+                  {kpi.value}
+                </div>
+                {kpi.trend ? (
+                  <Trend value={kpi.trend} up={!!kpi.up} />
+                ) : kpi.badge ? (
+                  <Badge label={kpi.badge.label} variant={kpi.badge.variant} />
+                ) : null}
+              </div>,
+            ])}
+          </div>
+          <HDivider color={bc} />
+        </>
+      )}
 
       {/* ── Bar chart + Right panel ──────────────────────────────────── */}
       {isLoading ? (

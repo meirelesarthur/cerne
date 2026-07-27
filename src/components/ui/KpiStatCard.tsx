@@ -51,7 +51,9 @@ export function KpiStatCard({
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         borderRadius: t.radius.xl,
-        border: `1px solid ${hov ? `${ac}55` : colors.border.default}`,
+        borderRight: `1px solid ${hov ? `${ac}55` : colors.border.default}`,
+        borderBottom: `1px solid ${hov ? `${ac}55` : colors.border.default}`,
+        borderLeft: `1px solid ${hov ? `${ac}55` : colors.border.default}`,
         borderTop: `2px solid ${ac}`,
         boxShadow: hov
           ? (isGbMode ? t.shadow.cardDarkHover : t.shadow.cardHover)

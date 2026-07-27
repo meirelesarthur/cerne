@@ -9,6 +9,8 @@ interface PageCardProps {
    * navegação de etapas; fica fora da região rolável do corpo.
    */
   header?: React.ReactNode
+  /** Exibe a linha que separa o cabeçalho do conteúdo rolável. */
+  headerDivider?: boolean
   /**
    * Rodapé fixo na base do card (barra de ações de formulário, StepFooter…).
    * Quando ausente, todo o conteúdo rola junto (padrão de listagens).
@@ -49,6 +51,7 @@ interface PageCardProps {
 export function PageCard({
   children,
   header,
+  headerDivider = true,
   footer,
   footerBare = false,
   footerJustify = 'space-between',
@@ -72,7 +75,9 @@ export function PageCard({
         <div
           style={{
             padding: `${t.space[4]}px ${t.space[6]}px ${t.space[3]}px`,
-            borderBottom: `${t.space[1] / 4}px solid ${colors.border.subtle}`,
+            borderBottom: headerDivider
+              ? `${t.space[1] / 4}px solid ${colors.border.subtle}`
+              : 'none',
             flexShrink: 0,
             background: colors.bg.surface,
           }}

@@ -9,9 +9,18 @@ interface FormSectionProps {
   children: React.ReactNode
   /** Faz as colunas quebrarem automaticamente sem exigir media query na página. */
   responsive?: boolean
+  /** Controla a linha de separação abaixo do título. */
+  divider?: boolean
 }
 
-export function FormSection({ title, subtitle, columns = 1, children, responsive = false }: FormSectionProps) {
+export function FormSection({
+  title,
+  subtitle,
+  columns = 1,
+  children,
+  responsive = false,
+  divider = true,
+}: FormSectionProps) {
   const { colors } = useTheme()
 
   return (
@@ -22,8 +31,8 @@ export function FormSection({ title, subtitle, columns = 1, children, responsive
           fontWeight: t.font.weight.semibold,
           color: colors.fg.default,
           fontFamily: t.font.family.sans,
-          paddingBottom: t.space[2] + t.space[1] / 2,
-          borderBottom: `1px solid ${colors.border.default}`,
+          paddingBottom: divider ? t.space[2] + t.space[1] / 2 : 0,
+          borderBottom: divider ? `1px solid ${colors.border.default}` : 'none',
           marginBottom: subtitle ? t.space[1] : 0,
         }}
       >

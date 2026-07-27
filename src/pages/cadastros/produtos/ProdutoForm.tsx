@@ -253,6 +253,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
   return (
     <PageContainer style={{ paddingBottom: t.space[0] }}>
       <PageCard
+        headerDivider={false}
         header={
           <>
             <FormPageHeader
@@ -299,11 +300,8 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
       >
         {currentStep === 1 && (
           <>
-            <StepHeader
-              title="Identificação do produto"
-              subtitle="Defina os dados fiscais e a classificação do produto."
-            />
-            <FormSection title="Dados essenciais" subtitle="Informações usadas para localizar e reconhecer o produto." columns={2} responsive>
+            <StepHeader title="Identificação do produto" />
+            <FormSection title="Dados essenciais" columns={2} responsive divider={false}>
               <FormField
                 label="Código"
                 value={initialData?.codigo ?? 'Gerado ao salvar'}
@@ -351,7 +349,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 name="ncm"
               />
             </FormSection>
-            <FormSection title="Classificação" subtitle="A sequência grupo, categoria e classe organiza buscas e relatórios." columns={2} responsive>
+            <FormSection title="Classificação" columns={2} responsive divider={false}>
               <FormSelect
                 label="Grupo"
                 required
@@ -409,11 +407,8 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
 
         {currentStep === 2 && (
           <>
-            <StepHeader
-              title="Estoque e unidades"
-              subtitle="Configure como o produto é medido, convertido e controlado."
-            />
-            <FormSection title="Unidades de medida" subtitle="A unidade primária será usada em movimentações e saldos." columns={3} responsive>
+            <StepHeader title="Estoque e unidades" />
+            <FormSection title="Unidades de medida" columns={3} responsive divider={false}>
               <FormSelect
                 label="Unidade primária"
                 required
@@ -451,7 +446,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 name="fatorConversao"
               />
             </FormSection>
-            <FormSection title="Controle de estoque" subtitle="Ative somente os controles necessários para este produto." columns={2} responsive>
+            <FormSection title="Controle de estoque" columns={2} responsive divider={false}>
               <ToggleField
                 checked={controlaEstoque}
                 onChange={setControlaEstoque}
@@ -459,17 +454,18 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 description="Acompanha entradas, saídas e saldo disponível."
                 disabled={submitting}
                 icon={<Boxes size={t.icon.md} />}
-              />
-              <FormField
-                label="Estoque mínimo"
-                hint="Quantidade que dispara o alerta"
-                placeholder="0"
-                value={estoqueMinimo}
-                onChange={event => setEstoqueMinimo(event.target.value)}
-                disabled={submitting || !controlaEstoque}
-                inputMode="decimal"
-                name="estoqueMinimo"
-              />
+              >
+                <FormField
+                  label="Estoque mínimo"
+                  hint="Quantidade que dispara o alerta"
+                  placeholder="0"
+                  value={estoqueMinimo}
+                  onChange={event => setEstoqueMinimo(event.target.value)}
+                  disabled={submitting}
+                  inputMode="decimal"
+                  name="estoqueMinimo"
+                />
+              </ToggleField>
               <ToggleField
                 checked={controlaLote}
                 onChange={setControlaLote}
@@ -492,11 +488,8 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
 
         {currentStep === 3 && (
           <>
-            <StepHeader
-              title="Financeiro e operação"
-              subtitle="Conclua o cadastro com preços, integrações e regras de uso."
-            />
-            <FormSection title="Preços e financeiro" subtitle="Vincule o produto à classificação financeira utilizada nos lançamentos." columns={3} responsive>
+            <StepHeader title="Financeiro e operação" />
+            <FormSection title="Preços e financeiro" columns={3} responsive divider={false}>
               <FormField label="Preço médio" value={priceDisplay} readOnly name="precoMedio" />
               <FormField
                 label="Valor de referência"
@@ -523,7 +516,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 name="categoriaFinanceira"
               />
             </FormSection>
-            <FormSection title="Disponibilidade e integrações" subtitle="Defina onde o produto poderá ser utilizado no sistema." columns={2} responsive>
+            <FormSection title="Disponibilidade e integrações" columns={2} responsive divider={false}>
               <ToggleField
                 checked={ativo}
                 onChange={setAtivo}
@@ -557,7 +550,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 icon={<ReceiptText size={t.icon.md} />}
               />
             </FormSection>
-            <FormSection title="Informações adicionais" columns={2} responsive>
+            <FormSection title="Informações adicionais" columns={2} responsive divider={false}>
               <FormField
                 label="Princípio ativo"
                 hint="Aplicável a defensivos agrícolas"

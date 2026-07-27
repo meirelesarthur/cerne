@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { ToggleSwitch } from './ToggleSwitch'
@@ -10,6 +10,8 @@ interface ToggleFieldProps {
   description?: string
   disabled?: boolean
   icon?: ReactNode
+  /** Conteúdo condicional exibido abaixo do cabeçalho somente quando o switch está ativo. */
+  children?: ReactNode
 }
 
 /**
@@ -23,55 +25,83 @@ export function ToggleField({
   description,
   disabled = false,
   icon,
+  children,
 }: ToggleFieldProps) {
   const { colors } = useTheme()
+  const contentId = useId()
+  const hasContent = Boolean(children)
 
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: t.space[3],
-        minHeight: t.size.controlLg,
-        padding: `${t.space[3]}px ${t.space[4]}px`,
         border: `${t.space[1] / 4}px solid ${checked ? colors.accent.default : colors.border.default}`,
         borderRadius: t.radius.lg,
         background: checked ? colors.accent.subtle : colors.bg.subtle,
         opacity: disabled ? 0.7 : 1,
+        overflow: 'hidden',
         transition: `background ${t.transition.base}, border-color ${t.transition.base}, opacity ${t.transition.base}`,
       }}
     >
-      {icon && (
-        <span aria-hidden="true" style={{ display: 'flex', color: checked ? colors.accent.default : colors.fg.subtle }}>
-          {icon}
-        </span>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontFamily: t.font.family.sans,
-            fontSize: t.font.size.sm,
-            fontWeight: t.font.weight.semibold,
-            color: disabled ? colors.fg.subtle : colors.fg.default,
-          }}
-        >
-          {label}
-        </div>
-        {description && (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: t.space[3],
+          minHeight: t.size.controlLg,
+          padding: `${t.space[3]}px ${t.space[4]}px`,
+        }}
+      >
+        {icon && (
+          <span aria-hidden="true" style={{ display: 'flex', color: checked ? colors.accent.default : colors.fg.subtle }}>
+            {icon}
+          </span>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              marginTop: t.space[1],
               fontFamily: t.font.family.sans,
-              fontSize: t.font.size.xs,
-              lineHeight: t.font.lineHeight.snug,
-              color: colors.fg.subtle,
+              fontSize: t.font.size.sm,
+              fontWeight: t.font.weight.semibold,
+              color: disabled ? colors.fg.subtle : colors.fg.default,
             }}
           >
-            {description}
+            {label}
           </div>
-        )}
+          {description && (
+            <div
+              style={{
+                marginTop: t.space[1],
+                fontFamily: t.font.family.sans,
+                fontSize: t.font.size.xs,
+                lineHeight: t.font.lineHeight.snug,
+                color: colors.fg.subtle,
+              }}
+            >
+              {description}
+            </div>
+          )}
+        </div>
+        <ToggleSwitch
+          checked={checked}
+          onChange={onChange}
+          disabled={disabled}
+          ariaLabel={label}
+          ariaControls={hasContent ? contentId : undefined}
+        />
       </div>
-      <ToggleSwitch checked={checked} onChange={onChange} disabled={disabled} ariaLabel={label} />
+
+      {checked && hasContent && (
+        <div
+          id={contentId}
+          style={{
+            padding: `${t.space[4]}px`,
+            borderTop: `${t.space[1] / 4}px solid ${colors.border.default}`,
+            background: colors.bg.surface,
+          }}
+        >
+          {children}
+        </div>
+      )}
     </div>
   )
 }

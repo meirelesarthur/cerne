@@ -7,9 +7,10 @@ interface ToggleSwitchProps {
   label?:     string
   disabled?:  boolean
   ariaLabel?: string
+  ariaControls?: string
 }
 
-export function ToggleSwitch({ checked, onChange, label, disabled, ariaLabel }: ToggleSwitchProps) {
+export function ToggleSwitch({ checked, onChange, label, disabled, ariaLabel, ariaControls }: ToggleSwitchProps) {
   const { colors } = useTheme()
 
   return (
@@ -20,6 +21,7 @@ export function ToggleSwitch({ checked, onChange, label, disabled, ariaLabel }: 
         role="switch"
         aria-checked={checked}
         aria-label={ariaLabel ?? label}
+        aria-controls={ariaControls}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         style={{

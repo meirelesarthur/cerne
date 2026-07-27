@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 
 interface StepHeaderProps {
   title: string
-  subtitle: string
+  subtitle?: string
 }
 
 export function StepHeader({ title, subtitle }: StepHeaderProps) {
@@ -18,7 +18,7 @@ export function StepHeader({ title, subtitle }: StepHeaderProps) {
           fontWeight: t.font.weight.bold,
           color: colors.fg.default,
           fontFamily: t.font.family.sans,
-          margin: `0 0 ${t.space[2]}px`,
+          margin: subtitle ? `0 0 ${t.space[2]}px` : 0,
           letterSpacing: '-0.4px',
           lineHeight: t.font.lineHeight.tight,
           transition: 'color 0.2s',
@@ -26,18 +26,20 @@ export function StepHeader({ title, subtitle }: StepHeaderProps) {
       >
         {title}
       </h2>
-      <p
-        style={{
-          fontSize: t.font.size.base,
-          color: colors.fg.subtle,
-          fontFamily: t.font.family.sans,
-          margin: 0,
-          lineHeight: t.font.lineHeight.normal,
-          transition: 'color 0.2s',
-        }}
-      >
-        {subtitle}
-      </p>
+      {subtitle && (
+        <p
+          style={{
+            fontSize: t.font.size.base,
+            color: colors.fg.subtle,
+            fontFamily: t.font.family.sans,
+            margin: 0,
+            lineHeight: t.font.lineHeight.normal,
+            transition: 'color 0.2s',
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
     </div>
   )
 }

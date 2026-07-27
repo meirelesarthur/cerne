@@ -61,6 +61,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
   return (
     <PageContainer style={{ paddingBottom: t.space[0] }}>
       <PageCard
+        headerDivider={false}
         header={
           <>
             <FormPageHeader
@@ -100,11 +101,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
       >
         {currentStep === 1 && (
           <>
-            <StepHeader
-              title="Identificação do produto"
-              subtitle="Dados fiscais e classificação do produto."
-            />
-            <FormSection title="Dados essenciais">
+            <StepHeader title="Identificação do produto" />
+            <FormSection title="Dados essenciais" divider={false}>
               <DetailGrid
                 columns={3}
                 responsive
@@ -117,7 +115,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 ]}
               />
             </FormSection>
-            <FormSection title="Classificação">
+            <FormSection title="Classificação" divider={false}>
               <DetailGrid
                 columns={2}
                 responsive
@@ -134,11 +132,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
 
         {currentStep === 2 && (
           <>
-            <StepHeader
-              title="Estoque e unidades"
-              subtitle="Medição, conversão e controles operacionais."
-            />
-            <FormSection title="Unidades de medida">
+            <StepHeader title="Estoque e unidades" />
+            <FormSection title="Unidades de medida" divider={false}>
               <DetailGrid
                 columns={3}
                 responsive
@@ -149,7 +144,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 ]}
               />
             </FormSection>
-            <FormSection title="Controle de estoque">
+            <FormSection title="Controle de estoque" divider={false}>
               <DetailGrid
                 columns={2}
                 responsive
@@ -166,11 +161,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
 
         {currentStep === 3 && (
           <>
-            <StepHeader
-              title="Financeiro e operação"
-              subtitle="Preços, integrações e informações complementares."
-            />
-            <FormSection title="Preços e financeiro">
+            <StepHeader title="Financeiro e operação" />
+            <FormSection title="Preços e financeiro" divider={false}>
               <DetailGrid
                 columns={3}
                 responsive
@@ -181,7 +173,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 ]}
               />
             </FormSection>
-            <FormSection title="Disponibilidade e integrações">
+            <FormSection title="Disponibilidade e integrações" divider={false}>
               <DetailGrid
                 columns={2}
                 responsive
@@ -193,7 +185,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 ]}
               />
             </FormSection>
-            <FormSection title="Informações adicionais">
+            <FormSection title="Informações adicionais" divider={false}>
               <DetailGrid
                 columns={2}
                 responsive

@@ -1,17 +1,12 @@
 import { useState } from 'react'
 import { Download, Trash2, Upload } from 'lucide-react'
 import { Button } from '../../../components/ui/Button'
-import { CrudPattern, type CrudEntity } from '../../../components/ui/CrudPattern'
+import { CrudPattern } from '../../../components/ui/CrudPattern'
+import { FeedbackBanner } from '../../../components/ui/FeedbackBanner'
 import { ImportDialog } from '../../../components/ui/ImportDialog'
 import { ToastContainer, useToast } from '../../../components/ui/Toast'
 import { TypedConfirmDialog } from '../../../components/ui/TypedConfirmDialog'
-
-type Animal = CrudEntity & {
-  tag: string
-  category: string
-  batch: string
-  status: string
-}
+import { downloadAnimaisModelo, parseAnimaisCsv, type Animal } from './animais.io'
 
 const INITIAL_ANIMALS: Animal[] = [
   { id: 'animal-1', tag: 'BR-2048', category: 'Novilha', batch: 'Recria 2026', status: 'Ativo' },
@@ -58,17 +53,35 @@ export default function AnimaisPage() {
         open={importOpen}
         onClose={() => setImportOpen(false)}
         title="Importar animais"
-        accept=".xlsx,.xls"
-        onDownloadTemplate={() => show('Modelo de importação baixado.', 'info')}
-        onImport={async (file) => {
-          await new Promise((resolve) => window.setTimeout(resolve, 500))
-          if (!file.name.toLowerCase().endsWith('.xlsx') && !file.name.toLowerCase().endsWith('.xls')) {
-            return [{ message: 'Use uma planilha Excel no formato XLSX ou XLS.' }]
+        description="Baixe o modelo, preencha e envie a planilha para cadastrar ou atualizar o rebanho."
+        accept=".csv"
+        onDownloadTemplate={() => { downloadAnimaisModelo(animals); show('Modelo de importação baixado.', 'info') }}
+        onImport={(file) => new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            const result = parseAnimaisCsv(String(reader.result ?? ''), animals)
+            if (result.erros.length > 0) {
+              resolve(result.erros)
+              return
+            }
+            setAnimals(result.animais)
+            const partes = [
+              result.criados > 0 ? `${result.criados} animal${result.criados === 1 ? '' : 'is'} cadastrado${result.criados === 1 ? '' : 's'}` : null,
+              result.atualizados > 0 ? `${result.atualizados} atualizado${result.atualizados === 1 ? '' : 's'}` : null,
+            ].filter(Boolean)
+            show(partes.length > 0 ? `Importação concluída: ${partes.join(' e ')}.` : 'Importação concluída — nenhuma alteração.', 'success')
+            resolve([])
           }
-          setAnimals((current) => [{ id: crypto.randomUUID(), tag: 'IMPORTADO', category: 'A revisar', batch: 'Sem lote', status: 'Pendente' }, ...current])
-          return []
-        }}
-      />
+          reader.onerror = () => resolve([{ message: 'Não foi possível ler o arquivo — tente novamente.' }])
+          reader.readAsText(file, 'utf-8')
+        })}
+      >
+        <FeedbackBanner
+          variant="info"
+          title="Como funciona a importação"
+          description="Animais com identificação já cadastrada são atualizados; identificações novas são adicionadas. Nenhum animal existente é removido — use “Excluir tudo…” ou a exclusão individual para isso."
+        />
+      </ImportDialog>
 
       <TypedConfirmDialog
         open={deleteOpen}

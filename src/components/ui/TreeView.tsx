@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -17,6 +17,7 @@ interface TreeViewProps {
   selectedId?: string | null
   onSelect?: (node: TreeNode) => void
   onAddChild?: (node: TreeNode, depth: number) => void
+  onEdit?: (node: TreeNode) => void
   onDelete?: (node: TreeNode) => void
   maxDepth?: number
   ariaLabel?: string
@@ -27,6 +28,7 @@ export function TreeView({
   selectedId,
   onSelect,
   onAddChild,
+  onEdit,
   onDelete,
   maxDepth,
   ariaLabel = 'Hierarquia',
@@ -64,6 +66,7 @@ export function TreeView({
                 <span style={{ display: 'block', fontSize: t.font.size.base, fontWeight: t.font.weight.medium }}>{node.label}</span>
                 {node.description && <span style={{ display: 'block', marginTop: 2, fontSize: t.font.size.xs, color: colors.fg.subtle }}>{node.description}</span>}
               </button>
+              {onEdit && <IconButton icon={<Pencil size={t.icon.xs} />} aria-label={`Editar ${node.label}`} size="sm" variant="ghost" onClick={() => onEdit(node)} />}
               {canAdd && <IconButton icon={<Plus size={t.icon.xs} />} aria-label={`Criar descendente em ${node.label}`} size="sm" variant="ghost" onClick={() => onAddChild(node, depth)} />}
               {onDelete && <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label={hasChildren ? `${node.label} possui descendentes e não pode ser excluído` : `Excluir ${node.label}`} size="sm" variant="ghost" danger disabled={hasChildren} onClick={() => onDelete(node)} />}
             </div>

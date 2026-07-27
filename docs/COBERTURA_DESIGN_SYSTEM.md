@@ -67,8 +67,20 @@ O cabeçalho do painel tem dois links (abrem em nova aba): **Storybook** (build 
 Chromatic) e **Build Chromatic** (revisão visual). Ambos sobrescrevíveis sem novo deploy via
 env vars `VITE_STORYBOOK_URL` / `VITE_CHROMATIC_URL` (ex.: Cloudflare Pages → Settings →
 Environment Variables) — o padrão embutido no código é o último build publicado por
-`npm run chromatic` nesta sessão; atualize a env var a cada novo build relevante para não deixar
-o link apontando para uma revisão antiga.
+`npm run chromatic`; **atualize o fallback em `CoberturaDesignSystemPage.tsx` (ou a env var) a
+cada novo build relevante**, para não deixar o link apontando para uma revisão antiga.
+
+**Estado atual (Build 12, Chromatic CLI v18.1.0):** 90 componentes / 302 stories / 604
+snapshots. Esses números do Chromatic contam **todas** as `.stories.tsx` do repositório
+(inclui layout, dashboards, páginas soltas) — são uma contagem diferente e maior do que os
+"85/85 componentes de `ui/`" do resumo executivo acima (esse é escopado só a
+`src/components/ui/`). Não confundir os dois totais.
+
+**Automação (ainda manual, hoje):** não há CI publicando no Chromatic a cada push — o publish é
+manual via `npm run chromatic`. Se quiser automatizar, o próximo passo natural é um workflow de
+GitHub Actions que rode `npm run chromatic` a cada push/PR e, no Cloudflare Pages, atualize
+`VITE_CHROMATIC_URL`/`VITE_STORYBOOK_URL` automaticamente (via API do Chromatic ou um step de
+build) — hoje isso é feito manualmente, como nesta atualização.
 
 ## Visibilidade do painel (correção)
 

@@ -11,14 +11,73 @@ painel `src/pages/design-system/CoberturaDesignSystemPage.tsx` (dev/PO) — **ao
 cobertura real, atualize este arquivo primeiro; o painel deriva dele**, não duplique a
 informação em dois lugares.
 
+**Acesso ao painel:** menu "Design System" (ícone de blocos) no Topbar → "Cobertura do Design
+System". Visível em **qualquer build**, incluindo o deploy de produção/Cloudflare — não é
+dev-only; ver seção "Visibilidade do painel" abaixo.
+
 ## Resumo executivo
 
 | Métrica | Valor |
 |---|---:|
 | Componentes de `ui/` com tela-referência viva | **85 / 85** |
-| Padrões primários (fora dashboard/relatório) com referência Rica | **11 / 11** |
+| Padrões primários (fora dashboard/relatório) com referência Rica | **10 / 10** |
 | Sub-componentes de CRUD com referência Rica | 5 / 5 |
 | Lacunas de conteúdo (RBAC visível) | 0 (fechada) |
+| Telas catalogadas na Vitrine por tela | 22 |
+
+## Vitrine por tela — taxonomia para handoff
+
+O painel tem uma aba **"Vitrine por tela"** (a primeira, pensada para envio direto ao time):
+cada tela real do produto, classificada por **tipo de padrão** e com uma descrição curta do que
+ela demonstra e do que replicar. É o catálogo "esta tela é um CRUD simples", "esta é um CRUD
+complexo", "esta é a referência de tal componente" que substitui uma explicação verbal.
+
+Fonte de dados: `SCREEN_SHOWCASE` em `src/data/designSystemCoverage.ts`. Tipos usados
+(`ScreenKind`): `crud-simples`, `crud-complexo`, `crud-hierarquico`, `consulta`, `transacional`,
+`workflow`, `import-conciliacao`, `espacial`, `spa`, `integracao`, `fundacao`,
+`fora-de-escopo`, `referencia-interna`. Cada entrada tem um botão "Abrir tela" (quando a tela
+tem item de menu real) que navega direto para a referência dentro do próprio produto.
+
+| Tela | Tipo | Vitrine de |
+|---|---|---|
+| Bancos | CRUD simples | Base do `CrudPattern`, deliberadamente mínima |
+| Cidades | Consulta somente leitura | `CrudPattern` em modo `readOnly` |
+| Fazendas | CRUD complexo | Wizard + mapa editável — cadastro mais rico do catálogo |
+| Safras | CRUD complexo | Wizard + `WeekCanvas` (interação sob medida) |
+| Pessoas | CRUD complexo | Formulário multi-perfil com etapas condicionais |
+| Produtos (Catálogo) | CRUD complexo | Cascata real de 4 níveis + blocos condicionais |
+| Plano de Contas | CRUD hierárquico | Antecessor/anti-ciclo/código automático + import real |
+| Centros de Custo / Agrupadores Contábeis | CRUD hierárquico | Mesmo padrão de hierarquia acima |
+| Rebanho / Animais | CRUD complexo | Ação em massa + import real com validação por linha |
+| Usuários | CRUD complexo | Atribuição de papel/permissões, exportação |
+| Embalagens/Armazéns/Endereçamentos/Saldo Inicial/Contas Bancárias/Emissores | CRUD simples | Família de cadastros administrativos médios |
+| Baixa de Títulos | Editor transacional | Monetário, rateio, comprovante |
+| Importação OFX | Importação & conciliação | Upload + `ReconciliationWorkspace` |
+| Autorização de Compra | Workflow/aprovação | `WorkflowTimeline` + `StatusLegend` |
+| Planejamento Pecuário | Aplicação embutida (SPA) | Tabela hierárquica + cálculo recursivo |
+| Mapa de Confinamento | Espacial/drag-drop | `EntityBoard` + visualização geográfica |
+| Integração Domínio | Integração externa | `SecretField` + teste de conexão |
+| Login & Shell | Fundação | Layout público + shell — não replicar, estender via prop |
+| Relatórios / Dashboards | Fora de escopo | Tratados um a um, separadamente |
+| Estados de Conta & RBAC | Referência interna | Não é tela de produto — não copiar |
+
+## Links externos no painel
+
+O cabeçalho do painel tem dois links (abrem em nova aba): **Storybook** (build publicado via
+Chromatic) e **Build Chromatic** (revisão visual). Ambos sobrescrevíveis sem novo deploy via
+env vars `VITE_STORYBOOK_URL` / `VITE_CHROMATIC_URL` (ex.: Cloudflare Pages → Settings →
+Environment Variables) — o padrão embutido no código é o último build publicado por
+`npm run chromatic` nesta sessão; atualize a env var a cada novo build relevante para não deixar
+o link apontando para uma revisão antiga.
+
+## Visibilidade do painel (correção)
+
+O gatilho no Topbar **era** `import.meta.env.DEV` — o que o escondia em qualquer build de
+produção, inclusive o gerado pela Cloudflare. Corrigido para
+`import.meta.env.VITE_SHOW_DS_PANEL !== 'false'`: **visível por padrão em qualquer ambiente**,
+com uma env var de desligar (`VITE_SHOW_DS_PANEL=false`) reservada para um eventual deploy
+voltado a cliente final, que ainda não existe distinto deste. Não é gated por papel de negócio
+(admin/manager/operator/viewer) — é audiência de ferramenta interna, não RBAC de produto.
 
 ## Padrões primários — veredito
 

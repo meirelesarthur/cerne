@@ -36,6 +36,208 @@ export interface SubComponentCoverageEntry {
   note?: string
 }
 
+/**
+ * Taxonomia de telas — o "catálogo de vitrine" para handoff: cada tela real
+ * do produto, o tipo de padrão que ela demonstra e o que replicar dela.
+ * `moduleId`/`itemId` (quando presentes) apontam para os ids reais de
+ * `src/data/menuData.ts`, usados por `useNavigation().navigateTo()` para o
+ * botão "Abrir tela".
+ */
+export type ScreenKind =
+  | 'crud-simples'
+  | 'crud-complexo'
+  | 'crud-hierarquico'
+  | 'consulta'
+  | 'transacional'
+  | 'workflow'
+  | 'import-conciliacao'
+  | 'espacial'
+  | 'spa'
+  | 'integracao'
+  | 'fundacao'
+  | 'fora-de-escopo'
+  | 'referencia-interna'
+
+export interface ScreenShowcaseEntry {
+  screen: string
+  path: string
+  kind: ScreenKind
+  description: string
+  moduleId?: string
+  itemId?: string
+}
+
+export const SCREEN_KIND_LABELS: Record<ScreenKind, string> = {
+  'crud-simples': 'CRUD simples',
+  'crud-complexo': 'CRUD complexo',
+  'crud-hierarquico': 'CRUD hierárquico',
+  consulta: 'Consulta somente leitura',
+  transacional: 'Editor transacional',
+  workflow: 'Workflow / aprovação',
+  'import-conciliacao': 'Importação & conciliação',
+  espacial: 'Espacial / drag-drop',
+  spa: 'Aplicação embutida (SPA)',
+  integracao: 'Integração externa',
+  fundacao: 'Fundação do design system',
+  'fora-de-escopo': 'Fora de escopo (tratado à parte)',
+  'referencia-interna': 'Referência interna (não é tela de produto)',
+}
+
+export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
+  {
+    screen: 'Bancos',
+    path: 'cadastros/bancos',
+    kind: 'crud-simples',
+    description: 'Cadastro administrativo mínimo — listagem, busca, criar/editar/ver, excluir. Base do CrudPattern, simples por design; não copie os campos, copie a estrutura.',
+    moduleId: 'cadastros', itemId: 'cad-fin-ban',
+  },
+  {
+    screen: 'Cidades',
+    path: 'cadastros/cidades',
+    kind: 'consulta',
+    description: 'CrudPattern em modo readOnly — para cadastros que vêm de fonte oficial/integração, sem escrita do usuário.',
+    moduleId: 'cadastros', itemId: 'cad-ger-cid',
+  },
+  {
+    screen: 'Fazendas',
+    path: 'cadastros/fazendas',
+    kind: 'crud-complexo',
+    description: 'Wizard multi-etapa (Stepper) com mapa editável (Leaflet + desenho de polígono), documentos e detalhe com abas. A referência mais rica de cadastro do catálogo.',
+    moduleId: 'cadastros', itemId: 'cad-est-faz',
+  },
+  {
+    screen: 'Safras',
+    path: 'cadastros/safras',
+    kind: 'crud-complexo',
+    description: 'Cadastro multi-etapa + WeekCanvas (pintura semana a semana com arraste contínuo) — interação sob medida, sem componente equivalente ainda no catálogo.',
+    moduleId: 'cadastros', itemId: 'cad-est-saf',
+  },
+  {
+    screen: 'Pessoas',
+    path: 'cadastros/pessoas',
+    kind: 'crud-complexo',
+    description: 'Formulário com etapas condicionais por papel (cliente/fornecedor/funcionário/proprietário/usuário) — referência de RepeaterList, DatePicker e ToggleSection.',
+    moduleId: 'cadastros', itemId: 'cad-pes-uni',
+  },
+  {
+    screen: 'Produtos (Catálogo)',
+    path: 'cadastros/produtos/catalogo',
+    kind: 'crud-complexo',
+    description: 'Seções colapsáveis + cascata de seleção real de 4 níveis + campos condicionais fiscais. Referência de blocos condicionais e Select AJAX cascata.',
+    moduleId: 'cadastros', itemId: 'cad-est-pro-lista',
+  },
+  {
+    screen: 'Plano de Contas',
+    path: 'cadastros/plano-contas',
+    kind: 'crud-hierarquico',
+    description: 'Antecessor selecionável, prevenção de ciclo, código automático + import real de CSV com modelo pré-preenchido. Referência principal de hierarquia e de import em massa.',
+    moduleId: 'cadastros', itemId: 'cad-fis-pla',
+  },
+  {
+    screen: 'Centros de Custo',
+    path: 'cadastros/centros-custo',
+    kind: 'crud-hierarquico',
+    description: 'Mesmo padrão de hierarquia do Plano de Contas (antecessor, anti-ciclo, código automático).',
+    moduleId: 'cadastros', itemId: 'cad-est-cc',
+  },
+  {
+    screen: 'Agrupadores Contábeis',
+    path: 'cadastros/agrupadores-contabeis',
+    kind: 'crud-hierarquico',
+    description: 'Hierarquia via TreeView com o mesmo padrão de antecessor/anti-ciclo — variante do padrão acima sobre uma árvore visual.',
+    moduleId: 'cadastros', itemId: 'cad-fin-agr',
+  },
+  {
+    screen: 'Rebanho / Animais',
+    path: 'cadastros/rebanho',
+    kind: 'crud-complexo',
+    description: 'Seleção múltipla e ação em massa, importação real de CSV com validação por linha, exclusão com confirmação nomeada (TypedConfirmDialog).',
+    moduleId: 'cadastros', itemId: 'cad-pec-reb',
+  },
+  {
+    screen: 'Usuários',
+    path: 'cadastros/usuarios',
+    kind: 'crud-complexo',
+    description: 'CRUD administrativo com atribuição de papel/permissões, exportação e redefinição de senha (SecretField, MultiSelectField).',
+    moduleId: 'cadastros', itemId: 'cad-pes-usr',
+  },
+  {
+    screen: 'Embalagens / Armazéns / Endereçamentos / Saldo Inicial / Contas Bancárias / Emissores',
+    path: 'cadastros/*',
+    kind: 'crud-simples',
+    description: 'Família de cadastros administrativos médios — replicam o padrão-fábrica com pequenas variações de campo (upload de certificado, checklist, busca). Use qualquer uma como ponto de partida.',
+    moduleId: 'cadastros', itemId: 'cad-est-emb',
+  },
+  {
+    screen: 'Baixa de Títulos',
+    path: 'financeiro/baixa-titulos',
+    kind: 'transacional',
+    description: 'Campos monetários e percentuais, rateio (AllocationEditor), upload de comprovante, confirmação antes de efetivar.',
+    moduleId: 'financeiro', itemId: 'fin-bai',
+  },
+  {
+    screen: 'Importação OFX',
+    path: 'financeiro/ofx',
+    kind: 'import-conciliacao',
+    description: 'Upload de arquivo bancário, histórico de importações e ambiente de conciliação (ReconciliationWorkspace).',
+    moduleId: 'financeiro', itemId: 'fin-cnc-ofx',
+  },
+  {
+    screen: 'Autorização de Compra',
+    path: 'administrativo/autorizacao',
+    kind: 'workflow',
+    description: 'Timeline de status, cotação e ações condicionadas ao papel do usuário (WorkflowTimeline, StatusLegend).',
+    moduleId: 'administrativo', itemId: 'adm-sup-aut',
+  },
+  {
+    screen: 'Planejamento Pecuário',
+    path: 'operacional/planejamento-pecuario',
+    kind: 'spa',
+    description: 'Tabela hierárquica com cálculo recursivo e edição em modal — telas ricas que funcionam como uma pequena aplicação dentro do produto.',
+    moduleId: 'operacional', itemId: 'ope-pec-pla',
+  },
+  {
+    screen: 'Mapa de Confinamento',
+    path: 'operacional/mapa-confinamento',
+    kind: 'espacial',
+    description: 'Quadro (EntityBoard) com arrastar-e-soltar entre pátios/setores/currais, alternativa acessível por menu, e visualização geográfica com polígonos.',
+    moduleId: 'operacional', itemId: 'ope-pec-map',
+  },
+  {
+    screen: 'Integração Domínio',
+    path: 'integracoes/dominio',
+    kind: 'integracao',
+    description: 'Credencial protegida (SecretField), teste de conexão, busca assíncrona (AsyncSearchSelect) — referência de integrações externas.',
+    moduleId: 'integracoes', itemId: 'int-dom-soft',
+  },
+  {
+    screen: 'Login & Shell (AppLayout)',
+    path: '/ (raiz)',
+    kind: 'fundacao',
+    description: 'Layout público, autenticação e shell de navegação (sidebar/topbar/tema) — a moldura de toda tela interna. Não replicar; estender via prop.',
+  },
+  {
+    screen: 'Relatórios (11 hubs de menu / 92 telas no discovery)',
+    path: 'relatorios/*',
+    kind: 'fora-de-escopo',
+    description: 'ReportWorkspace (âncora: Estoque Consolidado) já é o padrão-fábrica de relatório. Os demais relatórios são endereçados um a um, separadamente — fora deste backlog.',
+    moduleId: 'relatorios', itemId: 'rel-est',
+  },
+  {
+    screen: 'Dashboards (14 telas)',
+    path: 'dashboards/*',
+    kind: 'fora-de-escopo',
+    description: 'Família de gráficos já 100% demonstrada (BarChart, LineChart, DonutChart, KpiStatCard, etc.). Endereçados um a um, separadamente — fora deste backlog.',
+    moduleId: 'dashboards', itemId: 'dash-overview',
+  },
+  {
+    screen: 'Estados de Conta & RBAC',
+    path: 'design-system/estados-conta',
+    kind: 'referencia-interna',
+    description: 'Vitrine de billing/feature-gating/RBAC visível para devs/POs. Não é uma funcionalidade de produto — não copiar como tela de negócio. Acesse pelo mesmo menu "Design System" do Topbar.',
+  },
+]
+
 // ─── Componentes de src/components/ui/ (85) ────────────────────────────────
 
 const AMPLO = 'Uso amplo — presente na maioria das telas de Cadastros/Financeiro/Administrativo (ver Storybook para exemplos isolados).'

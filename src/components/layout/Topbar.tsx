@@ -22,8 +22,8 @@ interface TopbarProps {
   onLogout?: () => void
   /**
    * Abre uma tela de referência do design system (fora do menu de negócio).
-   * O gatilho só é renderizado em build de desenvolvimento (`import.meta.env.DEV`) —
-   * é uma ferramenta interna para devs/POs, não um papel de RBAC do produto.
+   * Visível por padrão em qualquer build; desligável via `VITE_SHOW_DS_PANEL=false`
+   * no ambiente. É uma ferramenta interna para devs/POs, não um papel de RBAC do produto.
    */
   onOpenDesignSystem?: (itemId: 'ds-estados-conta' | 'ds-cobertura') => void
 }
@@ -76,10 +76,14 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
         {/* Farm Switcher */}
         <FarmSwitcher />
 
-        {/* Design System (dev/PO) — apenas em build de desenvolvimento; nunca
-           gated por papel de negócio (admin/manager/operator/viewer), pois esta
-           é uma audiência de ferramenta interna, não um papel de tenant do RBAC. */}
-        {import.meta.env.DEV && onOpenDesignSystem && (
+        {/* Design System (dev/PO) — visível em qualquer build (dev, staging ou
+           produção/Cloudflare) por padrão, já que este deploy É o material de
+           handoff para o time. Defina VITE_SHOW_DS_PANEL=false no ambiente
+           (ex.: Cloudflare Pages > Settings > Environment Variables) para
+           esconder num futuro deploy voltado a cliente final. Nunca gated por
+           papel de negócio (admin/manager/operator/viewer) — "dev/PO" é uma
+           audiência de ferramenta interna, não um papel de tenant do RBAC. */}
+        {import.meta.env.VITE_SHOW_DS_PANEL !== 'false' && onOpenDesignSystem && (
           <DropdownMenu
             ariaLabel="Abrir referências do design system (uso interno)"
             triggerIcon={

@@ -202,7 +202,7 @@ export default function ProdutosLista({
 
         {/* Header */}
         <PageHeader
-          title="Catálogo de Produtos"
+          title="Produtos"
           count={produtos.length}
           actions={
             <div style={{ display: 'flex', gap: 8 }}>
@@ -262,7 +262,7 @@ export default function ProdutosLista({
               <EmptyState
                 icon={<Package size={40} strokeWidth={1.5} />}
                 message={hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
-                description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece adicionando o primeiro produto ao catálogo.'}
+                description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece cadastrando o primeiro produto.'}
                 action={hasSearch ? undefined : { label: 'Adicionar Produto', onClick: onNew }}
               />
             )

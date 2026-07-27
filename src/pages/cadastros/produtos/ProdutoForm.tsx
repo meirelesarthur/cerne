@@ -301,7 +301,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
           <>
             <StepHeader
               title="Identificação do produto"
-              subtitle="Defina os dados fiscais e a posição do produto no catálogo."
+              subtitle="Defina os dados fiscais e a classificação do produto."
             />
             <FormSection title="Dados essenciais" subtitle="Informações usadas para localizar e reconhecer o produto." columns={2} responsive>
               <FormField

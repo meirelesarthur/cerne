@@ -133,7 +133,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     components: ['Stepper', 'StepHeader', 'StepFooter', 'RepeaterList', 'DatePicker', 'ToggleSection', 'SearchSelect'],
   },
   {
-    screen: 'Produtos (Catálogo)',
+    screen: 'Produtos',
     path: 'cadastros/produtos/catalogo',
     kind: 'crud-complexo',
     description: 'Seções colapsáveis + cascata de seleção real de 4 níveis + campos condicionais fiscais. Referência de blocos condicionais e Select AJAX cascata.',

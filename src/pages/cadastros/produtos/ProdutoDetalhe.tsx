@@ -67,7 +67,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
               title={produto.descricao}
               subtitle={`Produto ${produto.codigo} · ${textById(GRUPOS, produto.grupoId)}`}
               onBack={onBack}
-              closeLabel="Voltar ao catálogo"
+              closeLabel="Voltar aos produtos"
               compact
               actions={
                 <>
@@ -90,7 +90,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
         footer={
           <>
             <Button variant="secondary" icon={<ArrowLeft size={t.icon.xs} />} onClick={onBack}>
-              Voltar ao catálogo
+              Voltar aos produtos
             </Button>
             <Button variant="primary" icon={<Pencil size={t.icon.xs} />} onClick={onEdit}>
               Editar Produto
@@ -102,7 +102,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
           <>
             <StepHeader
               title="Identificação do produto"
-              subtitle="Dados fiscais e posição no catálogo."
+              subtitle="Dados fiscais e classificação do produto."
             />
             <FormSection title="Dados essenciais">
               <DetailGrid

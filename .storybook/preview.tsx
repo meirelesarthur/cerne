@@ -65,7 +65,7 @@ const preview: Preview = {
       theme: cerneTheme,
     },
     backgrounds: {
-      disable: true, // backgrounds handled by the decorator
+      disabled: true,
     },
     controls: {
       matchers: {

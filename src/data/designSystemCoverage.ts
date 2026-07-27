@@ -65,6 +65,14 @@ export interface ScreenShowcaseEntry {
   description: string
   moduleId?: string
   itemId?: string
+  /**
+   * Componentes DISTINTIVOS que esta tela demonstra — curado, não exaustivo.
+   * Primitivas de uso amplo (Button, FormField, PageHeader...) ficam de fora
+   * de propósito: listá-las em toda tela tornaria o filtro por componente
+   * inútil (bater em tudo). Use para os componentes de padrão/compostos que
+   * valem a pena navegar até essa tela para ver funcionando.
+   */
+  components?: string[]
 }
 
 export const SCREEN_KIND_LABELS: Record<ScreenKind, string> = {
@@ -90,6 +98,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-simples',
     description: 'Cadastro administrativo mínimo — listagem, busca, criar/editar/ver, excluir. Base do CrudPattern, simples por design; não copie os campos, copie a estrutura.',
     moduleId: 'cadastros', itemId: 'cad-fin-ban',
+    components: ['CrudPattern'],
   },
   {
     screen: 'Cidades',
@@ -97,6 +106,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'consulta',
     description: 'CrudPattern em modo readOnly — para cadastros que vêm de fonte oficial/integração, sem escrita do usuário.',
     moduleId: 'cadastros', itemId: 'cad-ger-cid',
+    components: ['CrudPattern'],
   },
   {
     screen: 'Fazendas',
@@ -104,6 +114,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'Wizard multi-etapa (Stepper) com mapa editável (Leaflet + desenho de polígono), documentos e detalhe com abas. A referência mais rica de cadastro do catálogo.',
     moduleId: 'cadastros', itemId: 'cad-est-faz',
+    components: ['Stepper', 'StepHeader', 'StepFooter', 'MapView', 'FilterDrawer', 'Tabs'],
   },
   {
     screen: 'Safras',
@@ -111,6 +122,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'Cadastro multi-etapa + WeekCanvas (pintura semana a semana com arraste contínuo) — interação sob medida, sem componente equivalente ainda no catálogo.',
     moduleId: 'cadastros', itemId: 'cad-est-saf',
+    components: ['Stepper', 'StepHeader', 'StepFooter'],
   },
   {
     screen: 'Pessoas',
@@ -118,6 +130,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'Formulário com etapas condicionais por papel (cliente/fornecedor/funcionário/proprietário/usuário) — referência de RepeaterList, DatePicker e ToggleSection.',
     moduleId: 'cadastros', itemId: 'cad-pes-uni',
+    components: ['Stepper', 'StepHeader', 'StepFooter', 'RepeaterList', 'DatePicker', 'ToggleSection', 'SearchSelect'],
   },
   {
     screen: 'Produtos (Catálogo)',
@@ -125,6 +138,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'Seções colapsáveis + cascata de seleção real de 4 níveis + campos condicionais fiscais. Referência de blocos condicionais e Select AJAX cascata.',
     moduleId: 'cadastros', itemId: 'cad-est-pro-lista',
+    components: ['CollapsibleSection', 'BulkActionBar', 'SortHeader'],
   },
   {
     screen: 'Plano de Contas',
@@ -132,6 +146,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-hierarquico',
     description: 'Antecessor selecionável, prevenção de ciclo, código automático + import real de CSV com modelo pré-preenchido. Referência principal de hierarquia e de import em massa.',
     moduleId: 'cadastros', itemId: 'cad-fis-pla',
+    components: ['CategoryTreeField', 'FileUpload'],
   },
   {
     screen: 'Centros de Custo',
@@ -139,6 +154,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-hierarquico',
     description: 'Mesmo padrão de hierarquia do Plano de Contas (antecessor, anti-ciclo, código automático).',
     moduleId: 'cadastros', itemId: 'cad-est-cc',
+    components: ['CategoryTreeField'],
   },
   {
     screen: 'Agrupadores Contábeis',
@@ -146,6 +162,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-hierarquico',
     description: 'Hierarquia via TreeView com o mesmo padrão de antecessor/anti-ciclo — variante do padrão acima sobre uma árvore visual.',
     moduleId: 'cadastros', itemId: 'cad-fin-agr',
+    components: ['TreeView'],
   },
   {
     screen: 'Rebanho / Animais',
@@ -153,6 +170,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'Seleção múltipla e ação em massa, importação real de CSV com validação por linha, exclusão com confirmação nomeada (TypedConfirmDialog).',
     moduleId: 'cadastros', itemId: 'cad-pec-reb',
+    components: ['CrudPattern', 'ImportDialog', 'TypedConfirmDialog'],
   },
   {
     screen: 'Usuários',
@@ -160,6 +178,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-complexo',
     description: 'CRUD administrativo com atribuição de papel/permissões, exportação e redefinição de senha (SecretField, MultiSelectField).',
     moduleId: 'cadastros', itemId: 'cad-pes-usr',
+    components: ['MultiSelectField', 'SecretField', 'ImportDialog', 'ResponsiveDataTable'],
   },
   {
     screen: 'Embalagens / Armazéns / Endereçamentos / Saldo Inicial / Contas Bancárias / Emissores',
@@ -167,6 +186,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'crud-simples',
     description: 'Família de cadastros administrativos médios — replicam o padrão-fábrica com pequenas variações de campo (upload de certificado, checklist, busca). Use qualquer uma como ponto de partida.',
     moduleId: 'cadastros', itemId: 'cad-est-emb',
+    components: ['CheckboxListField', 'FileUpload', 'SearchSelect'],
   },
   {
     screen: 'Baixa de Títulos',
@@ -174,6 +194,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'transacional',
     description: 'Campos monetários e percentuais, rateio (AllocationEditor), upload de comprovante, confirmação antes de efetivar.',
     moduleId: 'financeiro', itemId: 'fin-bai',
+    components: ['AllocationEditor', 'CurrencyField', 'AsyncSearchSelect', 'FileUpload'],
   },
   {
     screen: 'Importação OFX',
@@ -181,6 +202,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'import-conciliacao',
     description: 'Upload de arquivo bancário, histórico de importações e ambiente de conciliação (ReconciliationWorkspace).',
     moduleId: 'financeiro', itemId: 'fin-cnc-ofx',
+    components: ['ReconciliationWorkspace', 'ImportDialog', 'AllocationEditor'],
   },
   {
     screen: 'Autorização de Compra',
@@ -188,6 +210,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'workflow',
     description: 'Timeline de status, cotação e ações condicionadas ao papel do usuário (WorkflowTimeline, StatusLegend).',
     moduleId: 'administrativo', itemId: 'adm-sup-aut',
+    components: ['WorkflowTimeline', 'StatusLegend', 'ResponsiveDataTable', 'FilterSelect', 'CurrencyField'],
   },
   {
     screen: 'Planejamento Pecuário',
@@ -195,6 +218,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'spa',
     description: 'Tabela hierárquica com cálculo recursivo e edição em modal — telas ricas que funcionam como uma pequena aplicação dentro do produto.',
     moduleId: 'operacional', itemId: 'ope-pec-pla',
+    components: ['CurrencyField', 'DataTable'],
   },
   {
     screen: 'Mapa de Confinamento',
@@ -202,6 +226,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'espacial',
     description: 'Quadro (EntityBoard) com arrastar-e-soltar entre pátios/setores/currais, alternativa acessível por menu, e visualização geográfica com polígonos.',
     moduleId: 'operacional', itemId: 'ope-pec-map',
+    components: ['EntityBoard', 'MapView', 'FilterSelect'],
   },
   {
     screen: 'Integração Domínio',
@@ -209,12 +234,14 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'integracao',
     description: 'Credencial protegida (SecretField), teste de conexão, busca assíncrona (AsyncSearchSelect) — referência de integrações externas.',
     moduleId: 'integracoes', itemId: 'int-dom-soft',
+    components: ['SecretField', 'AsyncSearchSelect'],
   },
   {
     screen: 'Login & Shell (AppLayout)',
     path: '/ (raiz)',
     kind: 'fundacao',
     description: 'Layout público, autenticação e shell de navegação (sidebar/topbar/tema) — a moldura de toda tela interna. Não replicar; estender via prop.',
+    components: ['SSOButton', 'Divider', 'ProgressBar', 'Breadcrumb', 'FarmSwitcher', 'Tooltip'],
   },
   {
     screen: 'Relatórios (11 hubs de menu / 92 telas no discovery)',
@@ -222,6 +249,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'fora-de-escopo',
     description: 'ReportWorkspace (âncora: Estoque Consolidado) já é o padrão-fábrica de relatório. Os demais relatórios são endereçados um a um, separadamente — fora deste backlog.',
     moduleId: 'relatorios', itemId: 'rel-est',
+    components: ['ReportWorkspace', 'MultiSelectField'],
   },
   {
     screen: 'Dashboards (14 telas)',
@@ -229,14 +257,26 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'fora-de-escopo',
     description: 'Família de gráficos já 100% demonstrada (BarChart, LineChart, DonutChart, KpiStatCard, etc.). Endereçados um a um, separadamente — fora deste backlog.',
     moduleId: 'dashboards', itemId: 'dash-overview',
+    components: ['BarChart', 'LineChart', 'DonutChart', 'StackedBarChart', 'GroupedBarChart', 'GaugeChart', 'HeatmapChart', 'SparklineArea', 'SankeyFunnel', 'ChartCard', 'KpiStatCard', 'Trend', 'SectionDividers', 'InterpretationLetter'],
   },
   {
     screen: 'Estados de Conta & RBAC',
     path: 'design-system/estados-conta',
     kind: 'referencia-interna',
     description: 'Vitrine de billing/feature-gating/RBAC visível para devs/POs. Não é uma funcionalidade de produto — não copiar como tela de negócio. Acesse pelo mesmo menu "Design System" do Topbar.',
+    components: ['AccountStatusBanner', 'FeatureGate', 'UpgradePrompt', 'RadioGroup'],
   },
 ]
+
+/** Telas (com `components` preenchido) que demonstram o componente dado — para o filtro cruzado do painel. */
+export function getScreensForComponent(componentName: string): ScreenShowcaseEntry[] {
+  return SCREEN_SHOWCASE.filter((entry) => entry.components?.includes(componentName))
+}
+
+/** Nomes de componentes curados em `SCREEN_SHOWCASE`, ordenados — opções do filtro da Vitrine. */
+export const SHOWCASE_FILTERABLE_COMPONENTS: string[] = Array.from(
+  new Set(SCREEN_SHOWCASE.flatMap((entry) => entry.components ?? [])),
+).sort((a, b) => a.localeCompare(b))
 
 // ─── Componentes de src/components/ui/ (85) ────────────────────────────────
 
@@ -294,7 +334,6 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'ChartCard', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'Checkbox', status: 'coberto', screens: AMPLO },
   { name: 'ConfirmDialog', status: 'coberto', screens: AMPLO },
-  { name: 'CurrencyField', status: 'coberto', screens: 'ver acima' },
   { name: 'DataTable', status: 'coberto', screens: 'integracoes/dominio, planejamento-pecuario, ofx (+ via CrudPattern/ResponsiveDataTable)' },
   { name: 'Divider', status: 'coberto', screens: 'pages/Login, pages/planos' },
   { name: 'DonutChart', status: 'coberto', screens: 'pages/dashboards/*' },
@@ -328,6 +367,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'Spinner', status: 'coberto', screens: 'pages/Login, Button (prop loading)' },
   { name: 'SSOButton', status: 'coberto', screens: 'pages/Login' },
   { name: 'StackedBarChart', status: 'coberto', screens: 'pages/dashboards/*' },
+  { name: 'TableToolbar', status: 'coberto', screens: 'cadastros/fazendas, cadastros/enderecos (FilterButton)' },
   { name: 'Tabs', status: 'coberto', screens: 'financeiro/ofx, operacional/mapa-confinamento, pages/planos' },
   { name: 'Tag', status: 'coberto', screens: 'pages/planos' },
   { name: 'Toast', status: 'coberto', screens: 'AMPLO — ToastContainer/useToast em quase toda tela com mutação' },
@@ -357,7 +397,7 @@ export const PATTERN_COVERAGE: PatternCoverageEntry[] = [
 export const SUBCOMPONENT_COVERAGE: SubComponentCoverageEntry[] = [
   { name: 'Selects AJAX em cascata', screens: 'cadastros/produtos/ProdutoForm (4 níveis)', note: 'Referência mais rica que a âncora sugerida (Pessoas).' },
   { name: 'Import em massa', screens: 'cadastros/plano-contas/PlanoContasImportModal + cadastros/animais (parsing real)', note: 'Animais corrigido — antes era mock.' },
-  { name: 'Treeview / hierarquia', screens: 'cadastros/plano-contas/PlanoContaCadastro + centros-custo/CentroCustoCadastro (antecessor, anti-ciclo, código automático)', note: 'Agrupadores Contábeis recebendo o mesmo upgrade.' },
+  { name: 'Treeview / hierarquia', screens: 'cadastros/plano-contas/PlanoContaCadastro + centros-custo/CentroCustoCadastro (antecessor, anti-ciclo, código automático)', note: 'Agrupadores Contábeis recebeu o mesmo upgrade (via FormSelect de antecessor, não CategoryTreeField).' },
   { name: 'Blocos condicionais (fiscal/produto)', screens: 'cadastros/produtos/ProdutoForm' },
   { name: 'Exportação & RBAC', screens: 'cadastros/usuarios (atribuição de papel) + design-system/EstadosContaPage (RBAC visível em UI)' },
 ]

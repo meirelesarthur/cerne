@@ -92,7 +92,26 @@ Confirmado em `LINKS_NOVAS_FUNCIONALIDADES.md` — a simplicidade é intencional
 |---|---|---|
 | A1–A3 | `AccountStatusBanner`/`FeatureGate`/`UpgradePrompt`/`RadioGroup` órfãos + RBAC visível | ✅ Fechado — `pages/design-system/EstadosContaPage.tsx` |
 | B2 | Import real (parsing por linha) em `AnimaisPage` | ✅ Fechado |
-| B3 | Antecessor/anti-ciclo no treeview de `AgrupadoresContabeisPage` | Em andamento |
-| C1 | Stories para os 28 componentes sem story | Em andamento |
-| C3 | Auditoria de tokens vs. brand oficial + export DTCG | Pendente |
-| D1/D2 | Painel de cobertura + gatilho dev-only | Pendente |
+| B3 | Antecessor/anti-ciclo no treeview de `AgrupadoresContabeisPage` | ✅ Fechado |
+| C1 | Stories para os 28 componentes sem story | ✅ Fechado (28/28, build do Storybook validado) |
+| C3 | Auditoria de tokens vs. brand oficial + export DTCG | ✅ Verificado (achado abaixo — decisão de humano pendente) |
+| D1/D2 | Painel de cobertura + gatilho dev-only | ✅ Fechado — `pages/design-system/CoberturaDesignSystemPage.tsx` |
+
+## C3 — Auditoria de tokens (achado, sem alteração de cor)
+
+- `npm run tokens:export` regerado: **275 tokens em 5 sets** (core · semantic · light · gbMode ·
+  component) — `tokens/tokens.json` já estava sincronizado com `tokens.ts` (sem diff), Lei 5
+  cumprida.
+- **Divergência encontrada, não corrigida:** `tokens.ts` usa `brand[600] = #059669` (emerald do
+  Tailwind). O discovery (`05-specs/_DESIGN-CONTEXT.md`) cita `brand.600 = #178048` (light) /
+  `brand.400 = #38b76c` (gbMode) — mas o próprio discovery **declara essas cores como
+  reconstruídas de menções em um briefing, não oficiais**, e pede que sejam substituídas pelas
+  reais assim que disponíveis.
+- **Decisão tomada aqui:** não sobrescrever `tokens.ts` com um placeholder que o próprio
+  discovery admite não ser confiável — trocar a cor de marca retroativamente afetaria as ~26
+  telas-referência já validadas, sem uma fonte oficial real para justificar a mudança.
+  `tokens.ts` continua sendo a fonte única de fato (Lei 5) até que exista um `tokens.json`
+  oficial do GB.Cerne para comparar de verdade.
+- **Ação pendente (fora deste backlog, decisão de negócio):** confirmar com o time de marca/design
+  se `#059669` é a cor oficial ou se deve migrar para `#178048`/`#38b76c` — e só então propagar
+  via `tokens.ts` → `npm run tokens:export`.

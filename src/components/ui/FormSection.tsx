@@ -11,6 +11,8 @@ interface FormSectionProps {
   responsive?: boolean
   /** Controla a linha de separação abaixo do título. */
   divider?: boolean
+  /** Define se os itens da grade acompanham a altura da linha ou crescem individualmente. */
+  alignItems?: 'stretch' | 'start'
 }
 
 export function FormSection({
@@ -20,6 +22,7 @@ export function FormSection({
   children,
   responsive = false,
   divider = true,
+  alignItems = 'stretch',
 }: FormSectionProps) {
   const { colors } = useTheme()
 
@@ -58,6 +61,7 @@ export function FormSection({
               ? `repeat(auto-fit, minmax(min(100%, ${columns === 2 ? t.size.drawer : t.size.stepBtn}px), 1fr))`
               : columns === 2 ? '1fr 1fr' : '1fr 1fr 1fr'
             : undefined,
+          alignItems: columns > 1 ? alignItems : undefined,
           gap: columns > 1 ? t.space[4] : undefined,
         }}
       >

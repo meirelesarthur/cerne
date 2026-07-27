@@ -472,7 +472,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 name="fatorConversao"
               />
             </FormSection>
-            <FormSection title="Controle de estoque" columns={2} responsive divider={false}>
+            <FormSection title="Controle de estoque" columns={2} responsive divider={false} alignItems="start">
               <ToggleField
                 checked={controlaEstoque}
                 onChange={setControlaEstoque}

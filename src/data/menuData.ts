@@ -196,6 +196,7 @@ export const menuModules: NavModule[] = [
           { id: 'cad-pes-cli', label: 'Clientes',          path: '/cadastros/clientes',    icon: Handshake },
           { id: 'cad-pes-usr', label: 'Usuários',          path: '/cadastros/usuarios',    icon: UserCheck },
           { id: 'cad-pes-aut', label: 'Autorizadores',     path: '/cadastros/autorizadores', icon: ShieldCheck },
+          { id: 'cad-pes-rol', label: 'Perfis de Acesso',  path: '/cadastros/perfis-acesso', icon: Lock },
         ],
       },
       {

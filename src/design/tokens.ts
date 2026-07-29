@@ -401,6 +401,10 @@ export const size = {
   dropdownPanel: 280,
   /** Altura máxima do painel de opções do SearchSelect no modo `dense` (linhas com ícone, ex.: FarmSwitcher) — comporta ~10 linhas sem scroll */
   dropdownPanelDense: 540,
+  /** Largura da coluna de funcionalidade na matriz de permissões (PermissionMatrixField) */
+  permissionFeatureCol: 260,
+  /** Largura de cada coluna de ação (Visualizar/Criar/Editar/Deletar) na matriz de permissões */
+  permissionActionCol: 92,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

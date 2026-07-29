@@ -25,6 +25,7 @@ import BancosPage         from '../../pages/cadastros/bancos/BancosPage'
 import CidadesPage        from '../../pages/cadastros/cidades/CidadesPage'
 import AnimaisPage        from '../../pages/cadastros/animais/AnimaisPage'
 import UsuariosPage       from '../../pages/cadastros/usuarios/UsuariosPage'
+import PerfisAcessoPage   from '../../pages/cadastros/perfis-acesso/PerfisAcessoPage'
 import BaixaTitulosPage   from '../../pages/financeiro/baixa-titulos/BaixaTitulosPage'
 import AutorizacaoCompraPage from '../../pages/administrativo/autorizacao/AutorizacaoCompraPage'
 import OfxImportPage       from '../../pages/financeiro/ofx/OfxImportPage'
@@ -162,6 +163,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'cad-ger-cid')      return <CidadesPage />
   if (itemId === 'cad-pec-reb')      return <AnimaisPage />
   if (itemId === 'cad-pes-usr')      return <UsuariosPage />
+  if (itemId === 'cad-pes-rol')      return <PerfisAcessoPage />
   if (itemId === 'fin-bai')          return <BaixaTitulosPage />
   if (itemId === 'adm-sup-aut')      return <AutorizacaoCompraPage />
   if (itemId === 'fin-cnc-ofx')      return <OfxImportPage />

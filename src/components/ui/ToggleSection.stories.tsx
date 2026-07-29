@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { Briefcase } from 'lucide-react'
+import { Briefcase, Crown, Truck, ShoppingCart, KeyRound } from 'lucide-react'
 import { ToggleSection } from './ToggleSection'
 import { FormField } from './FormField'
 import { FormSelect } from './FormSelect'
@@ -62,6 +62,35 @@ export const SelectionCard: Story = {
         activeHint={'Etapa "Proprietário" adicionada — configure a seguir.'}
         inactiveHint="Ative para adicionar a etapa de configuração."
       />
+    )
+  },
+}
+
+export const CardGrid: Story = {
+  render: () => {
+    const roles = [
+      { key: 'proprietary', label: 'Proprietário', hint: 'Dono de fazenda — participação por propriedade e inscrições estaduais.', icon: <Crown size={16} /> },
+      { key: 'employee',    label: 'Funcionário',   hint: 'Colaborador — cargo, função, dados bancários e centro de custo.',      icon: <Briefcase size={16} /> },
+      { key: 'provider',    label: 'Fornecedor',    hint: 'Vende insumos — filiais, vendedores e dados bancários.',               icon: <Truck size={16} /> },
+      { key: 'client',      label: 'Cliente',       hint: 'Comprador — inscrições estaduais, contribuinte e dados fiscais.',      icon: <ShoppingCart size={16} /> },
+      { key: 'user',        label: 'Usuário',       hint: 'Acesso ao sistema — perfis, fazendas e encarregados.',                 icon: <KeyRound size={16} /> },
+    ]
+    const [active, setActive] = useState<Record<string, boolean>>({ proprietary: true, user: true })
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 12 }}>
+        {roles.map((r) => (
+          <ToggleSection
+            key={r.key}
+            variant="card"
+            title={r.label}
+            description={r.hint}
+            icon={r.icon}
+            active={!!active[r.key]}
+            onToggle={(v) => setActive((prev) => ({ ...prev, [r.key]: v }))}
+            activeHint={`Etapa "${r.label}" adicionada — configure a seguir.`}
+          />
+        ))}
+      </div>
     )
   },
 }

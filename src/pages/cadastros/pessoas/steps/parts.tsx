@@ -25,6 +25,30 @@ export const grid2:    React.CSSProperties = { display: 'grid', gridTemplateColu
 export const grid3:    React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: t.space[4] }
 export const colStack: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: t.space[4] }
 
+/**
+ * Grade responsiva para campos de tamanho variado, no máximo 4 colunas: a
+ * largura mínima de cada faixa é `max(t.size.fieldSm, 1/4 do espaço
+ * disponível)` — em telas largas isso trava em exatamente 4 colunas (nunca
+ * mais que isso); em containers estreitos, cai para 3, 2 ou 1 coluna antes de
+ * violar o piso `fieldSm`. Um campo que precisa de mais espaço usa
+ * `gridColumn: 'span 2'` (metade da grade, nunca a linha inteira). Substitui
+ * grids fixos (`grid2`/`grid3`) quando os campos de uma mesma etapa têm
+ * tamanhos de conteúdo bem diferentes entre si.
+ */
+export const gridFields: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: `repeat(auto-fill, minmax(max(${t.size.fieldSm}px, calc((100% - ${t.space[4] * 3}px) / 4)), 1fr))`,
+  gap: t.space[4],
+}
+export const spanHalf: React.CSSProperties = { gridColumn: 'span 2' }
+
+/** Grade de cartões de seleção (`ToggleSection` no modo `variant="card"`) — mesma lógica de `gridFields`, até 4 por linha. */
+export const gridCards: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: `repeat(auto-fill, minmax(max(${t.size.fieldSm}px, calc((100% - ${t.space[3] * 3}px) / 4)), 1fr))`,
+  gap: t.space[3],
+}
+
 export const SELECT_PLACEHOLDER: Opt = { value: '', label: 'Selecione...' }
 export const onlyDigits = (v: string) => v.replace(/\D/g, '')
 

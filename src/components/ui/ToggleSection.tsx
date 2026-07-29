@@ -28,6 +28,14 @@ interface ToggleSectionProps {
   headerExtra?: React.ReactNode
   /** Corpo revelado quando ativo. Opcional no modo cartão de seleção. */
   children?:    React.ReactNode
+  /**
+   * 'row' (padrão): cabeçalho de linha inteira com `ToggleSwitch` — para
+   * seções que revelam um corpo (`children`) ao ativar.
+   * 'card': cartão compacto com indicador de check, pensado para grades de
+   * seleção (ex.: papéis de uma pessoa) — várias unidades lado a lado.
+   * Não renderiza `children` nesse modo.
+   */
+  variant?: 'row' | 'card'
 }
 
 /**
@@ -42,8 +50,111 @@ interface ToggleSectionProps {
 export function ToggleSection({
   title, description, icon, active, onToggle, disabled = false,
   inactiveHint, activeHint, headerExtra, children,
+  variant = 'row',
 }: ToggleSectionProps) {
   const { colors } = useTheme()
+
+  if (variant === 'card') {
+    const hint = active ? activeHint : inactiveHint
+    const toggle = () => { if (!disabled) onToggle(!active) }
+    return (
+      <div
+        role="checkbox"
+        aria-checked={active}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : 0}
+        className="gb-focusable"
+        onClick={toggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() }
+        }}
+        style={{
+          display:      'flex',
+          flexDirection: 'column',
+          gap:          t.space[2],
+          padding:      t.space[3],
+          border:       `1.5px solid ${active ? colors.accent.default : colors.border.default}`,
+          borderRadius: t.radius.lg,
+          background:   active ? colors.accent.subtle : colors.bg.surface,
+          cursor:       disabled ? 'not-allowed' : 'pointer',
+          opacity:      disabled ? 0.6 : 1,
+          transition:   `border-color ${t.transition.smooth}, background ${t.transition.smooth}`,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: t.space[2] }}>
+          {icon && (
+            <span aria-hidden="true" style={{
+              display:        'flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              width:          t.space[7],
+              height:         t.space[7],
+              borderRadius:   t.radius.base,
+              background:     active ? colors.accent.subtle : colors.bg.subtle,
+              color:          active ? colors.accent.default : colors.fg.subtle,
+              flexShrink:     0,
+            }}>
+              {icon}
+            </span>
+          )}
+          <span aria-hidden="true" style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            width:          18,
+            height:         18,
+            flexShrink:     0,
+            borderRadius:   t.radius.sm,
+            border:         `1.5px solid ${active ? t.color.brand[600] : colors.border.default}`,
+            background:     active ? t.color.brand[600] : colors.bg.input,
+            transition:     `background ${t.transition.smooth}, border-color ${t.transition.smooth}`,
+          }}>
+            {active && (
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+        </div>
+
+        <div>
+          <div style={{
+            fontSize:   t.font.size.sm,
+            fontWeight: t.font.weight.semibold,
+            color:      disabled ? colors.fg.subtle : colors.fg.default,
+            fontFamily: t.font.family.sans,
+          }}>
+            {title}
+          </div>
+          {description && (
+            <div style={{
+              fontSize:   t.font.size.xs,
+              color:      colors.fg.subtle,
+              fontFamily: t.font.family.sans,
+              marginTop:  2,
+            }}>
+              {description}
+            </div>
+          )}
+        </div>
+
+        {hint && (
+          <div style={{
+            display:    'flex',
+            alignItems: 'center',
+            gap:        t.space[1] + 2,
+            fontSize:   t.font.size.xs,
+            fontWeight: t.font.weight.medium,
+            color:      active ? colors.accent.default : colors.fg.subtle,
+            fontFamily: t.font.family.sans,
+          }}>
+            {active && <Check size={12} aria-hidden="true" />}
+            {hint}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div style={{

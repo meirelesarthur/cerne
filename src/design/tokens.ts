@@ -391,6 +391,8 @@ export const size = {
   drawer:  330,
   /** Largura mínima dos botões do StepFooter (usar como minWidth — o rótulo cresce o botão) */
   stepBtn: 190,
+  /** Piso de largura de campo/cartão compacto em grades responsivas de até 4 colunas (ver `gridFields`/`gridCards` em pessoas/steps/parts.tsx) */
+  fieldSm: 150,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

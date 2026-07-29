@@ -403,8 +403,10 @@ export const size = {
   dropdownPanelDense: 540,
   /** Largura da coluna de funcionalidade na matriz de permissões (PermissionMatrixField) */
   permissionFeatureCol: 260,
-  /** Largura de cada coluna de ação (Visualizar/Criar/Editar/Deletar) na matriz de permissões */
-  permissionActionCol: 92,
+  /** Largura de cada coluna de ação (Visualizar/Criar/Editar/Deletar/Documentos) na matriz de permissões */
+  permissionActionCol: 108,
+  /** Largura da coluna QTD (contagem agregada) na matriz de permissões */
+  permissionQtyCol: 64,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

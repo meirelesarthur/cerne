@@ -10,7 +10,7 @@ const meta: Meta<typeof PermissionMatrixField> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div style={{ width: 640, fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ width: 820, fontFamily: "'Outfit', sans-serif" }}>
         <Story />
       </div>
     ),
@@ -20,10 +20,13 @@ const meta: Meta<typeof PermissionMatrixField> = {
 export default meta
 type Story = StoryObj<typeof PermissionMatrixField>
 
-// Amostra reduzida (2 módulos, incluindo um com sub-recurso aninhado) para manter a story legível.
+// Amostra reduzida (2 módulos, incluindo um com grupos e sub-recurso aninhado) para manter a story legível.
 const ADMINISTRATIVO = PERMISSION_CATALOG.find((m) => m.label === 'Administrativo')!
 const DASHBOARDS = PERMISSION_CATALOG.find((m) => m.label === 'Dashboards')!
 const AMOSTRA = [DASHBOARDS, ADMINISTRATIVO]
+
+const ESTOQUE_GROUP = ADMINISTRATIVO.children?.find((g) => g.label === 'Estoque')
+const FABRICA = ESTOQUE_GROUP?.children?.find((f) => f.label === 'Fábrica')
 
 // ─── Sem seleção ────────────────────────────────────────────────────────────────
 
@@ -35,16 +38,15 @@ export const SemSelecao: Story = {
   },
 }
 
-// ─── Com seleção parcial (demonstra tri-state e sub-recurso) ───────────────────
+// ─── Com seleção parcial (demonstra tri-state, grupo e coluna Documentos) ──────
 
 export const ComSelecaoParcial: Story = {
-  name: 'Com seleção parcial (inclui sub-recurso)',
+  name: 'Com seleção parcial (grupo + Documentos)',
   render: () => {
-    const fabrica = ADMINISTRATIVO.children?.find((f) => f.label === 'Fábrica')
-    const outraFuncionalidade = ADMINISTRATIVO.children?.[0]
+    const outraFuncionalidade = ESTOQUE_GROUP?.children?.[0]
     const initial = [
-      ...(fabrica?.children?.[0] ? LEAF_IDS_BY_NODE.get(fabrica.children[0].id) ?? [] : []), // seleciona toda a "Formulação"
-      ...(outraFuncionalidade ? [LEAF_IDS_BY_NODE.get(outraFuncionalidade.id)?.[0] ?? ''] : []), // seleciona só "Visualizar" da primeira funcionalidade
+      ...(FABRICA ? LEAF_IDS_BY_NODE.get(FABRICA.id) ?? [] : []), // seleciona toda a coluna Documentos de Fábrica
+      ...(outraFuncionalidade ? [LEAF_IDS_BY_NODE.get(outraFuncionalidade.id)?.[0] ?? ''] : []), // seleciona só "Visualizar" de outra funcionalidade
     ].filter(Boolean)
     const [selected, setSelected] = useState<string[]>(initial)
     return <PermissionMatrixField tree={AMOSTRA} selected={selected} onChange={setSelected} />

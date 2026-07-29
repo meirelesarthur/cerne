@@ -1,9 +1,9 @@
-import { menuModules, type NavModule, type NavSubItem } from './menuData'
+import { menuModules, type NavModule, type NavGroup, type NavSubItem } from './menuData'
 
 export interface PermissionNode {
   id: string
   label: string
-  /** Ausente = nó-folha (permissão selecionável). Presente = nó de agregação (módulo/funcionalidade/sub-recurso), nunca selecionável diretamente. */
+  /** Ausente = nó-folha (permissão selecionável). Presente = nó de agregação (módulo/grupo/funcionalidade), nunca selecionável diretamente. */
   children?: PermissionNode[]
 }
 
@@ -30,28 +30,44 @@ const SKIP_MODULE_IDS = new Set(['favoritos'])
 /** Itens de menu self-service, não atribuíveis como permissão de terceiros. */
 const SKIP_ITEM_IDS = new Set(['cad-pes-per'])
 
+/** Folhas de ação de sub-recurso (ex.: Formulação/Batida dentro de Fábrica) — alimentam a coluna agregada "Documentos" da matriz. Populado durante a construção do catálogo. */
+const documentLeafIds = new Set<string>()
+
 function buildActionLeaves(itemId: string, actions: ActionDef[]): PermissionNode[] {
   return actions.map((action) => ({ id: `${itemId}.${action.key}`, label: action.label }))
 }
 
 function buildFeatureNode(item: NavSubItem, actions: ActionDef[]): PermissionNode {
   if (item.children && item.children.length > 0) {
-    // Sub-recurso aninhado real (ex.: Fábrica > Formulação/Batida) — nível extra
-    // de árvore, cada sub-recurso com seu próprio conjunto de ações.
+    // Sub-recurso aninhado real (ex.: Fábrica > Formulação/Batida) — as ações
+    // desses filhos alimentam a coluna "Documentos" da funcionalidade-pai,
+    // agregadas num único indicador (não viram linhas próprias na matriz).
+    const subLeaves = item.children.flatMap((child) => {
+      const leaves = buildActionLeaves(child.id, ACTIONS_FULL)
+      leaves.forEach((leaf) => documentLeafIds.add(leaf.id))
+      return leaves
+    })
     return {
       id: `perm-feat-${item.id}`,
       label: item.label,
-      children: item.children.map((child) => ({
-        id: `perm-sub-${child.id}`,
-        label: child.label,
-        children: buildActionLeaves(child.id, ACTIONS_FULL),
-      })),
+      children: subLeaves,
     }
   }
   return {
     id: `perm-feat-${item.id}`,
     label: item.label,
     children: buildActionLeaves(item.id, actions),
+  }
+}
+
+function buildGroupNode(group: NavGroup, actions: ActionDef[]): PermissionNode {
+  const features = group.items
+    .filter((item) => !SKIP_ITEM_IDS.has(item.id))
+    .map((item) => buildFeatureNode(item, actions))
+  return {
+    id: `perm-group-${group.id}`,
+    label: group.label,
+    children: features,
   }
 }
 
@@ -73,8 +89,15 @@ function buildModuleNode(module: NavModule): PermissionNode {
     }
   }
 
-  const items: NavSubItem[] = module.flatItems ?? module.groups?.flatMap((group) => group.items) ?? []
+  if (module.groups) {
+    return {
+      id: `perm-mod-${module.id}`,
+      label: module.label,
+      children: module.groups.map((group) => buildGroupNode(group, actions)),
+    }
+  }
 
+  const items: NavSubItem[] = module.flatItems ?? []
   const features = items
     .filter((item) => !SKIP_ITEM_IDS.has(item.id))
     .map((item) => buildFeatureNode(item, actions))
@@ -88,15 +111,19 @@ function buildModuleNode(module: NavModule): PermissionNode {
 
 /**
  * Deriva o catálogo de permissões diretamente do menu real (`menuData.ts`) —
- * módulo > funcionalidade > ação (com um nível extra de sub-recurso quando o
- * item de menu já tem `children`). Fonte única (Lei 2): qualquer tela nova
- * adicionada ao menu real vira automaticamente uma permissão atribuível.
+ * módulo > grupo (quando existir) > funcionalidade > ação. Fonte única
+ * (Lei 2): qualquer tela nova adicionada ao menu real vira automaticamente
+ * uma permissão atribuível.
  */
 export function buildPermissionCatalog(): PermissionNode[] {
+  documentLeafIds.clear()
   return menuModules.filter((module) => !SKIP_MODULE_IDS.has(module.id)).map(buildModuleNode)
 }
 
 export const PERMISSION_CATALOG: PermissionNode[] = buildPermissionCatalog()
+
+/** Folhas que representam ações de sub-recurso (coluna "Documentos" da matriz) — congelado após a construção do catálogo. */
+export const DOCUMENT_LEAF_IDS: Set<string> = new Set(documentLeafIds)
 
 function buildLeafIndex(nodes: PermissionNode[]): Map<string, string[]> {
   const map = new Map<string, string[]>()

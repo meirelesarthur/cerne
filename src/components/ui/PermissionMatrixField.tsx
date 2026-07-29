@@ -358,13 +358,13 @@ function MatrixRow({
                 <span
                   aria-hidden="true"
                   style={{
-                    color: colors.fg.subtle,
-                    fontSize: t.font.size.sm,
-                    fontFamily: t.font.family.sans,
+                    display: 'block',
+                    width: t.space[3],
+                    height: t.space[1] / 2,
+                    borderRadius: t.radius.full,
+                    background: colors.fg.muted,
                   }}
-                >
-                  —
-                </span>
+                />
               </div>
             )
           }

@@ -23,6 +23,8 @@ interface IconButtonProps {
   'aria-label': string
   /** Estado pressionado/ativo (ex.: alternador mostrar/ocultar) — omitido por padrão. */
   'aria-pressed'?: boolean
+  /** Estado expandido/recolhido (ex.: toggle de árvore/accordion) — omitido por padrão. */
+  'aria-expanded'?: boolean
 }
 
 const sizeValues: Record<IconButtonSize, number> = {
@@ -61,6 +63,7 @@ export function IconButton({
   danger   = false,
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
+  'aria-expanded': ariaExpanded,
 }: IconButtonProps) {
   const { colors } = useTheme()
   const [hovered, setHovered] = useState(false)
@@ -89,6 +92,7 @@ export function IconButton({
       onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
       aria-pressed={ariaPressed}
+      aria-expanded={ariaExpanded}
       title={tooltip}
       disabled={disabled}
       onMouseEnter={() => !disabled && setHovered(true)}

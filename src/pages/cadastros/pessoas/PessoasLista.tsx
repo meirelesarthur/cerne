@@ -118,58 +118,6 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
           }
         />
 
-        {/* ── KPI Bar ─────────────────────────────────────────────────── */}
-        {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} variant="rect" width="100%" height={72} />
-            ))}
-          </div>
-        ) : (
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1,
-            border: `1px solid ${colors.border.default}`, borderRadius: t.radius.lg,
-            overflow: 'hidden', marginBottom: t.space[4],
-          }}>
-            {[
-              { label: 'Total de Pessoas', value: kpis.total, filterRole: null },
-              { label: 'Pessoas Físicas',  value: kpis.pf, filterRole: null },
-              { label: 'Pessoas Jurídicas', value: kpis.pj, filterRole: null },
-              { label: 'Com Acesso',        value: kpis.acesso, filterRole: 'user' as const },
-            ].map((item, idx, arr) => (
-              <div
-                key={item.label}
-                role={item.filterRole ? 'button' : undefined}
-                tabIndex={item.filterRole ? 0 : undefined}
-                className={item.filterRole ? 'gb-focusable' : undefined}
-                onClick={item.filterRole ? () => setRoleFilter((prev) => prev === item.filterRole ? '' : item.filterRole!) : undefined}
-                onKeyDown={item.filterRole ? (e) => { if (e.key === 'Enter') setRoleFilter((prev) => prev === item.filterRole ? '' : item.filterRole!) } : undefined}
-                style={{
-                  padding: `${t.space[4]}px ${t.space[5]}px`,
-                  background: item.filterRole && roleFilter === item.filterRole ? colors.accent.subtle : colors.bg.surface,
-                  borderRight: idx < arr.length - 1 ? `1px solid ${colors.border.default}` : undefined,
-                  display: 'flex', flexDirection: 'column', gap: 6,
-                  cursor: item.filterRole ? 'pointer' : undefined,
-                }}
-              >
-                <span style={{
-                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-                  color: colors.fg.subtle, fontFamily: t.font.family.sans,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
-                }}>
-                  {item.label}
-                </span>
-                <span style={{
-                  fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold,
-                  color: colors.fg.default, fontFamily: t.font.family.sans, lineHeight: 1,
-                }}>
-                  {item.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* ── Toolbar ─────────────────────────────────────────────────── */}
         <ListToolbar
           search={search}

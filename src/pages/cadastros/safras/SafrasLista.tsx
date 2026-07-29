@@ -140,53 +140,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           }
         />
 
-        {/* ── KPI cards ─────────────────────────────────────────────────────── */}
-        {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} variant="rect" width="100%" height={80} />
-            ))}
-          </div>
-        ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 1,
-            border: `1px solid ${border}`,
-            borderRadius: t.radius.lg,
-            overflow: 'hidden',
-            marginBottom: t.space[4],
-          }}>
-            <KpiCard label="Total de Safras" value={String(kpis.total)} sub="cadastradas" bg={cardBg} border={border} hasBorderRight />
-            <KpiCard
-              label="Ativas"
-              value={String(kpis.ativas)}
-              sub=""
-              bg={cardBg}
-              border={border}
-              accent={t.color.feedback.success.text}
-              hasBorderRight
-            />
-            <KpiCard
-              label="Safra Atual"
-              value={safrAtual?.desc ?? '—'}
-              sub={safrAtual ? `${fmtYMDtoDMY(safrAtual.ini)} — ${fmtYMDtoDMY(safrAtual.fim)}` : 'Nenhuma ativa'}
-              bg={cardBg}
-              border={border}
-              hasBorderRight
-              compact
-            />
-            <KpiCard
-              label="Encerradas"
-              value={String(kpis.encerradas)}
-              sub=""
-              bg={cardBg}
-              border={border}
-              accent={t.color.neutral[400]}
-            />
-          </div>
-        )}
-
         {/* ── Toolbar ───────────────────────────────────────────────────────── */}
         <ListToolbar
           search={search}

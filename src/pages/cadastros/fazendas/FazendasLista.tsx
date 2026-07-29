@@ -290,17 +290,6 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           }
         />
 
-        {/* ── KPI Bar ─────────────────────────────────────────────────────── */}
-        {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: t.space[4], marginBottom: t.space[4] }}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} variant="rect" width="100%" height={80} />
-            ))}
-          </div>
-        ) : (
-          <KpiBar kpis={kpis} colors={colors} isGbMode={isGbMode} />
-        )}
-
         {/* ── Toolbar: busca + filtro + toggle (linha 1) · chips (linha 2) ──── */}
         <ListToolbar
           search={search}

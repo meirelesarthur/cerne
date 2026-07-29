@@ -11,7 +11,9 @@ interface PermissionMatrixFieldProps {
   tree: PermissionNode[]
   /** Ids de FOLHA concedidas — nunca ids de módulo/grupo/funcionalidade (estado desses é sempre derivado). */
   selected: string[]
-  onChange: (ids: string[]) => void
+  onChange?: (ids: string[]) => void
+  /** Edição usa checkboxes interativos; visualização usa indicadores sem affordance de clique. */
+  mode?: 'edit' | 'view'
   searchPlaceholder?: string
 }
 
@@ -29,6 +31,77 @@ const ACTION_COLUMNS: ColumnDef[] = [
 ]
 
 const GRID_TEMPLATE = `minmax(220px, 1fr) repeat(${ACTION_COLUMNS.length}, ${t.size.permissionActionCol}px) ${t.size.permissionQtyCol}px`
+
+type SelectionState = 'none' | 'partial' | 'complete'
+
+function selectionState(selectedCount: number, total: number): SelectionState {
+  if (total > 0 && selectedCount === total) return 'complete'
+  if (selectedCount > 0) return 'partial'
+  return 'none'
+}
+
+/**
+ * Indicador exclusivamente de consulta. O traço isolado comunica uma
+ * permissão disponível, porém não concedida; o quadrado verde preserva os
+ * estados parcial e completo sem sugerir que o elemento seja clicável.
+ */
+function PermissionStateIndicator({ state, label }: { state: SelectionState; label: string }) {
+  const { colors } = useTheme()
+  const stateLabel = state === 'complete' ? 'concedida' : state === 'partial' ? 'parcialmente concedida' : 'não concedida'
+
+  return (
+    <span
+      role="img"
+      aria-label={`${label}: ${stateLabel}`}
+      title={stateLabel}
+      data-permission-state={state}
+      style={{
+        width: t.size.checkbox,
+        height: t.size.checkbox,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      {state === 'none' ? (
+        <span
+          aria-hidden="true"
+          style={{
+            display: 'block',
+            width: t.space[3],
+            height: t.space[1] / 2,
+            borderRadius: t.radius.full,
+            background: colors.fg.muted,
+          }}
+        />
+      ) : (
+        <span
+          aria-hidden="true"
+          style={{
+            width: t.size.checkbox,
+            height: t.size.checkbox,
+            borderRadius: t.radius.sm,
+            background: t.color.brand[600],
+            border: `1.5px solid ${t.color.brand[600]}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxSizing: 'border-box',
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            {state === 'complete' ? (
+              <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            ) : (
+              <path d="M2.5 5h5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            )}
+          </svg>
+        </span>
+      )}
+    </span>
+  )
+}
 
 // Faixa Unicode das marcas de combinação (acentos) — descartadas após
 // normalização NFD para permitir buscar "depreciacao" e achar "Depreciação".
@@ -109,6 +182,7 @@ export function PermissionMatrixField({
   tree,
   selected,
   onChange,
+  mode = 'edit',
   searchPlaceholder = 'Buscar...',
 }: PermissionMatrixFieldProps) {
   const { colors } = useTheme()
@@ -122,7 +196,7 @@ export function PermissionMatrixField({
   const toggleExpand = (id: string) => setExpandedManual((prev) => ({ ...prev, [id]: !prev[id] }))
 
   const toggleLeaves = (leafIds: string[]) => {
-    if (leafIds.length === 0) return
+    if (mode === 'view' || !onChange || leafIds.length === 0) return
     const allSelected = leafIds.every((id) => selectedSet.has(id))
     if (allSelected) {
       const toRemove = new Set(leafIds)
@@ -265,6 +339,7 @@ export function PermissionMatrixField({
               onToggleExpand={toggleExpand}
               selectedSet={selectedSet}
               onToggleLeaves={toggleLeaves}
+              mode={mode}
               colors={colors}
             />
           ))
@@ -282,6 +357,7 @@ function MatrixRow({
   onToggleExpand,
   selectedSet,
   onToggleLeaves,
+  mode,
   colors,
 }: {
   node: PermissionNode
@@ -291,6 +367,7 @@ function MatrixRow({
   onToggleExpand: (id: string) => void
   selectedSet: Set<string>
   onToggleLeaves: (leafIds: string[]) => void
+  mode: 'edit' | 'view'
   colors: ReturnType<typeof useTheme>['colors']
 }) {
   if (visibleIds && !visibleIds.has(node.id)) return null
@@ -301,6 +378,7 @@ function MatrixRow({
   const rowSelectedCount = allLeaves.filter((id) => selectedSet.has(id)).length
   const rowChecked = allLeaves.length > 0 && rowSelectedCount === allLeaves.length
   const rowIndeterminate = rowSelectedCount > 0 && rowSelectedCount < allLeaves.length
+  const rowState = selectionState(rowSelectedCount, allLeaves.length)
 
   return (
     <div>
@@ -333,7 +411,11 @@ function MatrixRow({
             <span style={{ width: t.size.iconBtn.sm, flexShrink: 0 }} aria-hidden="true" />
           )}
 
-          <Checkbox checked={rowChecked} indeterminate={rowIndeterminate} onChange={() => onToggleLeaves(allLeaves)} aria-label={node.label} />
+          {mode === 'edit' ? (
+            <Checkbox checked={rowChecked} indeterminate={rowIndeterminate} onChange={() => onToggleLeaves(allLeaves)} aria-label={node.label} />
+          ) : (
+            <PermissionStateIndicator state={rowState} label={node.label} />
+          )}
 
           <span
             style={{
@@ -354,18 +436,13 @@ function MatrixRow({
           const leaves = leavesForColumn(node, col.key)
           if (leaves.length === 0) {
             return (
-              <div key={col.key} style={{ display: 'flex', justifyContent: 'center' }}>
-                <span
-                  aria-hidden="true"
-                  style={{
-                    display: 'block',
-                    width: t.space[3],
-                    height: t.space[1] / 2,
-                    borderRadius: t.radius.full,
-                    background: colors.fg.muted,
-                  }}
-                />
-              </div>
+              <div
+                key={col.key}
+                role="img"
+                aria-label={`${col.label} indisponível para ${node.label}`}
+                data-permission-unavailable="true"
+                style={{ display: 'flex', justifyContent: 'center', minHeight: t.size.checkbox }}
+              />
             )
           }
           const count = leaves.filter((id) => selectedSet.has(id)).length
@@ -373,12 +450,19 @@ function MatrixRow({
           const indeterminate = count > 0 && count < leaves.length
           return (
             <div key={col.key} style={{ display: 'flex', justifyContent: 'center' }}>
-              <Checkbox
-                checked={checked}
-                indeterminate={indeterminate}
-                onChange={() => onToggleLeaves(leaves)}
-                aria-label={`${col.label} — ${node.label}`}
-              />
+              {mode === 'edit' ? (
+                <Checkbox
+                  checked={checked}
+                  indeterminate={indeterminate}
+                  onChange={() => onToggleLeaves(leaves)}
+                  aria-label={`${col.label} — ${node.label}`}
+                />
+              ) : (
+                <PermissionStateIndicator
+                  state={selectionState(count, leaves.length)}
+                  label={`${col.label} — ${node.label}`}
+                />
+              )}
             </div>
           )
         })}
@@ -398,6 +482,7 @@ function MatrixRow({
           onToggleExpand={onToggleExpand}
           selectedSet={selectedSet}
           onToggleLeaves={onToggleLeaves}
+          mode={mode}
           colors={colors}
         />
       ))}

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import PerfisAcessoLista from './PerfisAcessoLista'
 import PerfilAcessoCadastro from './PerfilAcessoCadastro'
+import PerfilAcessoVisualizacao from './PerfilAcessoVisualizacao'
 import { MOCK_PERFIS, type PerfilAcesso } from './perfisAcesso.types'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'detail'
 
 export default function PerfisAcessoPage() {
   const [view, setView] = useState<View>('list')
@@ -41,12 +42,26 @@ export default function PerfisAcessoPage() {
     )
   }
 
+  if (view === 'detail' && selected) {
+    return (
+      <PerfilAcessoVisualizacao
+        perfil={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <PerfisAcessoLista
       perfis={perfis}
       onNew={() => {
         setSelectedId(null)
         setView('form')
+      }}
+      onView={(id) => {
+        setSelectedId(id)
+        setView('detail')
       }}
       onEdit={(id) => {
         setSelectedId(id)

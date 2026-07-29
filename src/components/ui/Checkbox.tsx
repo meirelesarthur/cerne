@@ -71,6 +71,7 @@ export function Checkbox({
           type="checkbox"
           className="gb-focus-input"
           checked={checked}
+          aria-checked={indeterminate && !checked ? 'mixed' : checked}
           disabled={disabled}
           aria-label={!label ? ariaLabel : undefined}
           onChange={e => onChange(e.target.checked)}

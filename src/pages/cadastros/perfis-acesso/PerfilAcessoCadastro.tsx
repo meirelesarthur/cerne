@@ -163,7 +163,7 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
 
         <FormSection
           title="Permissões"
-          subtitle="Quadrados vazios podem ser selecionados. O traço verde indica seleção parcial; o traço simples indica uma ação indisponível."
+          subtitle="Selecione as permissões do perfil. Um quadrado verde com traço indica que apenas parte daquele módulo está selecionada."
           divider={false}
         >
           <PermissionMatrixField tree={PERMISSION_CATALOG} selected={form.permissoes} onChange={(perms) => set('permissoes', perms)} />

@@ -62,3 +62,28 @@ export const ArvoreCompleta: Story = {
     return <PermissionMatrixField tree={PERMISSION_CATALOG} selected={selected} onChange={setSelected} />
   },
 }
+
+// ─── Consulta — sem affordance de edição ─────────────────────────────────────
+
+export const VisualizacaoSemSelecao: Story = {
+  name: 'Visualização — sem seleção',
+  args: { tree: AMOSTRA, selected: [], mode: 'view' },
+}
+
+export const VisualizacaoParcial: Story = {
+  name: 'Visualização — seleção parcial',
+  args: {
+    tree: AMOSTRA,
+    selected: ESTOQUE_GROUP ? (LEAF_IDS_BY_NODE.get(ESTOQUE_GROUP.id) ?? []).slice(0, 2) : [],
+    mode: 'view',
+  },
+}
+
+export const VisualizacaoCompleta: Story = {
+  name: 'Visualização — seleção completa',
+  args: {
+    tree: AMOSTRA,
+    selected: AMOSTRA.flatMap((node) => LEAF_IDS_BY_NODE.get(node.id) ?? []),
+    mode: 'view',
+  },
+}

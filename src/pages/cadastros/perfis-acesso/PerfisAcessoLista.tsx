@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Pencil, Trash2, ShieldCheck, Shield } from 'lucide-react'
+import { Plus, Pencil, Trash2, ShieldCheck, Shield, Eye } from 'lucide-react'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard } from '../../../components/ui/PageCard'
@@ -20,13 +20,14 @@ import type { PerfilAcesso } from './perfisAcesso.types'
 interface PerfisAcessoListaProps {
   perfis: PerfilAcesso[]
   onNew: () => void
+  onView: (id: string) => void
   onEdit: (id: string) => void
   onDelete: (id: string) => void
 }
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
 
-export default function PerfisAcessoLista({ perfis, onNew, onEdit, onDelete }: PerfisAcessoListaProps) {
+export default function PerfisAcessoLista({ perfis, onNew, onView, onEdit, onDelete }: PerfisAcessoListaProps) {
   const { colors } = useTheme()
   const { can } = usePermission()
   const canDelete = can('config.manage')
@@ -97,6 +98,7 @@ export default function PerfisAcessoLista({ perfis, onNew, onEdit, onDelete }: P
             align="right"
             ariaLabel={`Ações do perfil ${p.nome}`}
             items={[
+              { id: 'view', label: 'Visualizar perfil', icon: <Eye size={13} />, onClick: () => onView(p.id) },
               { id: 'edit', label: 'Editar perfil', icon: <Pencil size={13} />, onClick: () => onEdit(p.id) },
               ...(canDelete
                 ? [
@@ -146,7 +148,7 @@ export default function PerfisAcessoLista({ perfis, onNew, onEdit, onDelete }: P
               columns={columns}
               data={paginated}
               keyField="id"
-              onRowClick={(row) => onEdit(row.id)}
+              onRowClick={(row) => onView(row.id)}
             />
 
             <div style={{ marginTop: t.space[4], paddingTop: t.space[4], borderTop: `1px solid ${colors.border.subtle}` }}>

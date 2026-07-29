@@ -5,8 +5,8 @@ import { PageCard } from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { Button } from '../../../components/ui/Button'
 import { FormField } from '../../../components/ui/FormField'
+import { FormSection } from '../../../components/ui/FormSection'
 import { ToggleSwitch } from '../../../components/ui/ToggleSwitch'
-import { Tabs } from '../../../components/ui/Tabs'
 import { PermissionMatrixField } from '../../../components/ui/PermissionMatrixField'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard'
@@ -30,8 +30,6 @@ interface FormData {
   permissoes: string[]
 }
 
-type TabId = 'geral' | 'permissoes'
-
 export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, onSave }: PerfilAcessoCadastroProps) {
   const isEdit = !!initialData
 
@@ -52,7 +50,6 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
         },
   )
 
-  const [activeTab, setActiveTab] = useState<TabId>('geral')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const { toasts, show, dismiss } = useToast()
@@ -95,7 +92,6 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
     const nomeError = validateNome(form.nome)
     if (nomeError) {
       setErrors({ nome: nomeError })
-      setActiveTab('geral')
       focusFirstError()
       show('Há campos pendentes — verifique os destaques em vermelho.', 'error')
       return
@@ -139,28 +135,7 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
           paddingTop={t.space[4]}
         />
 
-        <div style={{ marginBottom: t.space[4] }}>
-          <Tabs
-            items={[
-              { id: 'geral', label: 'Dados Gerais' },
-              { id: 'permissoes', label: 'Permissões' },
-            ]}
-            activeId={activeTab}
-            onChange={(id) => setActiveTab(id as TabId)}
-            variant="outline"
-            label="Seções do perfil"
-          />
-        </div>
-
-        <div
-          style={{
-            display: activeTab === 'geral' ? 'flex' : 'none',
-            flexDirection: 'column',
-            gap: 20,
-            paddingTop: t.space[4],
-            paddingBottom: t.space[6],
-          }}
-        >
+        <FormSection title="Dados do perfil" columns={2} responsive>
           <FormField
             label="Nome"
             required
@@ -173,8 +148,6 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
           />
           <FormField
             label="Descrição"
-            multiline
-            rows={3}
             placeholder="Ex.: Agricultura Advanced"
             value={form.descricao}
             onChange={(e) => set('descricao', e.target.value)}
@@ -186,11 +159,15 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
             label="Visível ao usuário"
             disabled={submitting}
           />
-        </div>
+        </FormSection>
 
-        <div style={{ display: activeTab === 'permissoes' ? 'block' : 'none', paddingTop: t.space[4], paddingBottom: t.space[6] }}>
+        <FormSection
+          title="Permissões"
+          subtitle="Marque as funcionalidades liberadas para este perfil. Um traço indica seleção parcial."
+          divider={false}
+        >
           <PermissionMatrixField tree={PERMISSION_CATALOG} selected={form.permissoes} onChange={(perms) => set('permissoes', perms)} />
-        </div>
+        </FormSection>
       </PageCard>
 
       <ConfirmDialog

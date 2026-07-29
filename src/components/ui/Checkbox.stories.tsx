@@ -35,6 +35,11 @@ export const Checked: Story = {
   args: { label: 'Manter conectado', checked: true, onChange: () => {} },
 }
 
+export const Indeterminate: Story = {
+  name: 'Seleção parcial',
+  args: { label: 'Algumas opções selecionadas', checked: false, indeterminate: true, onChange: () => {} },
+}
+
 export const Disabled: Story = {
   args: { label: 'Opção desativada', checked: false, disabled: true, onChange: () => {} },
 }

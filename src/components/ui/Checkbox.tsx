@@ -91,9 +91,9 @@ export function Checkbox({
             inset: 0,
             border: filled
               ? `1.5px solid ${t.color.brand[600]}`
-              : `1.5px solid ${colors.border.default}`,
+              : `1.5px solid ${colors.fg.subtle}`,
             borderRadius: t.radius.sm,
-            background: filled ? t.color.brand[600] : colors.bg.input,
+            background: filled ? t.color.brand[600] : colors.bg.surface,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

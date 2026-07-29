@@ -209,7 +209,7 @@ export function PermissionMatrixField({
           style={{
             fontSize: t.font.size.xs,
             fontWeight: t.font.weight.semibold,
-            color: colors.fg.subtle,
+            color: colors.fg.muted,
             fontFamily: t.font.family.sans,
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
@@ -224,7 +224,7 @@ export function PermissionMatrixField({
               textAlign: 'center',
               fontSize: t.font.size['2xs'],
               fontWeight: t.font.weight.semibold,
-              color: colors.fg.subtle,
+              color: colors.fg.muted,
               fontFamily: t.font.family.sans,
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
@@ -238,7 +238,7 @@ export function PermissionMatrixField({
             textAlign: 'center',
             fontSize: t.font.size['2xs'],
             fontWeight: t.font.weight.semibold,
-            color: colors.fg.subtle,
+            color: colors.fg.muted,
             fontFamily: t.font.family.sans,
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
@@ -358,13 +358,13 @@ function MatrixRow({
                 <span
                   aria-hidden="true"
                   style={{
-                    width: t.size.checkbox,
-                    height: t.size.checkbox,
-                    borderRadius: t.radius.sm,
-                    border: `1.5px solid ${colors.border.subtle}`,
-                    opacity: 0.5,
+                    color: colors.fg.subtle,
+                    fontSize: t.font.size.sm,
+                    fontFamily: t.font.family.sans,
                   }}
-                />
+                >
+                  —
+                </span>
               </div>
             )
           }

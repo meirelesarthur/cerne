@@ -57,7 +57,7 @@ npm run build      # Build de produção (TS check + Vite)
 ## Leis do Projeto
 
 Invioláveis, aplicam-se a toda geração de código neste projeto.
-Referência visual completa: `UI_WEB_GUIDE.html` na raiz do projeto.
+Referência visual completa: [`WEB_INTERFACE_GUIDELINES.md`](WEB_INTERFACE_GUIDELINES.md) na raiz do projeto.
 
 ### Lei 1 — Component-First
 
@@ -70,16 +70,9 @@ contexto — listagem, formulário, modal, dashboard — sem exceção.
 - Ao criar uma tela nova: apenas **importar e chamar** componentes existentes.
 - Componente necessário não existe no catálogo → criá-lo em `src/components/ui/`
   **antes** de usá-lo na tela.
-- Catálogo atual: `Avatar`, `Badge`, `Breadcrumb`, `BulkActionBar`, `Button`, `Card`,
-  `ChartCard`, `Checkbox`, `CollapsibleSection`, `ConfirmDialog`, `DataTable`, `Divider`,
-  `DropdownMenu`, `EmptyState`, `FilterDrawer`, `FormField`, `FormPageHeader`,
-  `FormSection`, `FormSelect`, `Heading`, `HeatmapChart`, `IconButton`, `KpiStatCard`,
-  `ListToolbar`, `MapView`, `Modal`, `PageCard`, `PageContainer`, `PageHeader`,
-  `Pagination`, `ProgressBar`, `SankeyFunnel`, `SearchSelect`, `SectionDividers`,
-  `Skeleton`, `SortHeader`, `SparklineArea`, `Spinner`, `SSOButton`, `StepFooter`,
-  `StepHeader`, `Stepper`, `TableToolbar` (exporta `TableSearchInput`, `FilterChip`,
-  `FilterButton`), `Tabs`, `Tag`, `Toast` (`useToast`/`ToastContainer`), `ToggleSwitch`,
-  `Tooltip`
+- Catálogo completo (categorizado, ~90 componentes) → ver
+  [`WEB_INTERFACE_GUIDELINES.md`](WEB_INTERFACE_GUIDELINES.md#4-catálogo-de-componentes) —
+  fonte única, não duplicar essa lista aqui para não divergir.
 
 ### Lei 2 — Fonte Única de Verdade (Propagação Global)
 
@@ -232,9 +225,9 @@ PageContainer (style={{ paddingBottom: 0 }})
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
 literal, procure o token:
 
-- **Tamanhos de controle:** `t.size.control` (42, = botão md), `controlSm` (32),
-  `controlLg` (46), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,thumb}`,
-  `pageBtn` (32), `tableRow` (42), `drawer` (320), `stepBtn` (180).
+- **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34),
+  `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`,
+  `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover`
   (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.

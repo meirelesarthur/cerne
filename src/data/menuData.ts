@@ -175,7 +175,7 @@ export const menuModules: NavModule[] = [
           { id: 'cad-est-cc',        label: 'Centros de Custo', path: '/cadastros/centros-custo',   icon: Layers },
           { id: 'cad-est-faz',       label: 'Fazendas',         path: '/cadastros/fazendas',         icon: Building2 },
           { id: 'cad-est-saf',       label: 'Safras',           path: '/cadastros/safras',           icon: Calendar },
-          { id: 'cad-est-pro-lista', label: 'Produtos',         path: '/cadastros/produtos/catalogo', icon: Package2 },
+          { id: 'cad-est-pro-lista', label: 'Produtos',         path: '/cadastros/produtos',         icon: Package2 },
           { id: 'cad-est-emb',       label: 'Embalagens',       path: '/cadastros/embalagens',       icon: Package },
           { id: 'cad-est-arm',       label: 'Armazéns',         path: '/cadastros/armazens',         icon: Warehouse },
           { id: 'cad-est-sal-ini',   label: 'Saldo Inicial',    path: '/cadastros/estoques-iniciais', icon: Wallet },
@@ -188,7 +188,7 @@ export const menuModules: NavModule[] = [
         label: 'Pessoas',
         icon: Users,
         items: [
-          { id: 'cad-pes-per', label: 'Perfil de Usuário', path: '/cadastros/perfil',      icon: UserCog },
+          { id: 'cad-pes-per', label: 'Meu perfil',        path: '/cadastros/perfil',      icon: UserCog },
           { id: 'cad-pes-uni', label: 'Pessoas',           path: '/cadastros/pessoas',     icon: Users },
           { id: 'cad-pes-pro', label: 'Proprietários',     path: '/cadastros/proprietarios', icon: Contact },
           { id: 'cad-pes-fun', label: 'Funcionários',      path: '/cadastros/funcionarios', icon: HardHat },

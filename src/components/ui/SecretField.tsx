@@ -50,6 +50,7 @@ export function SecretField({
         <IconButton
           icon={visible ? <EyeOff size={16} /> : <Eye size={16} />}
           aria-label={visible ? `Ocultar ${label}` : `Mostrar ${label}`}
+          aria-pressed={visible}
           size="xs"
           variant="ghost"
           onClick={() => setVisible((current) => !current)}

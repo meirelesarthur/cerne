@@ -3,10 +3,12 @@ import { BarChart3, Bell, Blocks, LogOut, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
+import { useUserProfile } from '../../context/UserProfileContext'
 import { t } from '../../design/tokens'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { FarmSwitcher } from '../ui/FarmSwitcher'
 import { DropdownMenu } from '../ui/DropdownMenu'
+import { Avatar } from '../ui/Avatar'
 import SearchBar from '../SearchBar'
 
 const INITIAL_NOTIFICATIONS = [
@@ -31,6 +33,7 @@ interface TopbarProps {
 export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenDesignSystem }: TopbarProps) {
   const { colors } = useTheme()
   const { navigateTo } = useNavigation()
+  const { profile } = useUserProfile()
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
   const dismissNotification = (id: string) =>
     setNotifications((prev) => prev.filter((n) => n.id !== id))
@@ -171,27 +174,8 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
 
         {/* Menu de conta — avatar como gatilho do DropdownMenu do kit */}
         <DropdownMenu
-          ariaLabel="Abrir menu da conta de Silvio Ventura"
-          triggerIcon={
-            <span
-              aria-hidden="true"
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: t.radius.full,
-                background: `linear-gradient(135deg, ${colors.accent.default}, ${t.color.brand[300]})`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: t.font.size.xs,
-                fontWeight: t.font.weight.semibold,
-                letterSpacing: '0.3px',
-              }}
-            >
-              SV
-            </span>
-          }
+          ariaLabel={`Abrir menu da conta de ${profile.name}`}
+          triggerIcon={<Avatar name={profile.name} src={profile.photoUrl ?? undefined} size="sm" />}
           items={[
             {
               id: 'perfil',

@@ -21,6 +21,8 @@ interface IconButtonProps {
   disabled?:  boolean
   danger?:    boolean
   'aria-label': string
+  /** Estado pressionado/ativo (ex.: alternador mostrar/ocultar) — omitido por padrão. */
+  'aria-pressed'?: boolean
 }
 
 const sizeValues: Record<IconButtonSize, number> = {
@@ -58,6 +60,7 @@ export function IconButton({
   disabled = false,
   danger   = false,
   'aria-label': ariaLabel,
+  'aria-pressed': ariaPressed,
 }: IconButtonProps) {
   const { colors } = useTheme()
   const [hovered, setHovered] = useState(false)
@@ -85,6 +88,7 @@ export function IconButton({
       className="gb-focusable"
       onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
       title={tooltip}
       disabled={disabled}
       onMouseEnter={() => !disabled && setHovered(true)}

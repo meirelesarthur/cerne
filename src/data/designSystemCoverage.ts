@@ -134,11 +134,11 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
   },
   {
     screen: 'Produtos',
-    path: 'cadastros/produtos/catalogo',
+    path: 'cadastros/produtos',
     kind: 'crud-complexo',
-    description: 'Seções colapsáveis + cascata de seleção real de 4 níveis + campos condicionais fiscais. Referência de blocos condicionais e Select AJAX cascata.',
+    description: 'Cadastro multi-etapa (Stepper) com cascata de seleção real de 4 níveis + campos condicionais fiscais. Referência de blocos condicionais e Select AJAX cascata.',
     moduleId: 'cadastros', itemId: 'cad-est-pro-lista',
-    components: ['CollapsibleSection', 'BulkActionBar', 'SortHeader'],
+    components: ['Stepper', 'StepHeader', 'StepFooter', 'BulkActionBar', 'SortHeader'],
   },
   {
     screen: 'Plano de Contas',

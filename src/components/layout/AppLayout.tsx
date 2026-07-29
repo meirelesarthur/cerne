@@ -5,6 +5,7 @@ import Topbar from './Topbar'
 import { useTheme } from '../../context/ThemeContext'
 import { FarmProvider } from '../../context/FarmContext'
 import { FavoritesProvider } from '../../context/FavoritesContext'
+import { UserProfileProvider } from '../../context/UserProfileContext'
 import { t } from '../../design/tokens'
 import Favoritos from '../../pages/Favoritos'
 import PerfilUsuario from '../../pages/PerfilUsuario'
@@ -319,6 +320,7 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
   return (
     <FarmProvider>
     <FavoritesProvider>
+    <UserProfileProvider>
     <NavigationContext.Provider value={{ navigateTo }}>
     <div
       style={{
@@ -389,6 +391,7 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
       </div>
     </div>
     </NavigationContext.Provider>
+    </UserProfileProvider>
     </FavoritesProvider>
     </FarmProvider>
   )

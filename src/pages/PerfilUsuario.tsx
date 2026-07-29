@@ -1,437 +1,440 @@
-import { useState } from 'react'
-import { Pencil } from 'lucide-react'
-import { FormField } from '../components/ui/FormField'
-import { FormSelect } from '../components/ui/FormSelect'
-import { Button } from '../components/ui/Button'
-import { Avatar } from '../components/ui/Avatar'
+import { useEffect, useRef, useState } from 'react'
+import { Camera } from 'lucide-react'
+import { PageHeader } from '../components/ui/PageHeader'
+import { Card } from '../components/ui/Card'
 import { Heading } from '../components/ui/Heading'
-import { ToggleSwitch } from '../components/ui/ToggleSwitch'
-import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { Badge } from '../components/ui/Badge'
+import { Avatar } from '../components/ui/Avatar'
+import { Button } from '../components/ui/Button'
+import { FormField } from '../components/ui/FormField'
+import { SearchSelect } from '../components/ui/SearchSelect'
+import { SecretField } from '../components/ui/SecretField'
 import { useToast, ToastContainer } from '../components/ui/Toast'
+import { useTheme } from '../context/ThemeContext'
+import { useFarm } from '../context/FarmContext'
+import { useUserProfile } from '../context/UserProfileContext'
+import { CIDADES, cidadeLabel, maskNif } from './cadastros/pessoas/pessoas.types'
+import { focusFirstError } from '../hooks/focusFirstError'
 import { t } from '../design/tokens'
 
-interface Device {
-  id: string
-  sistema: string
-  navegador: string
-  localizacao: string
-  atual: boolean
+// ─── Grade local (2 colunas responsivas) ───────────────────────────────────────
+// Escopo desta página apenas — o helper equivalente em pessoas/steps/parts.tsx
+// é privado daquela feature.
+const grid2: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+  gap: t.space[4],
 }
 
-// ─── primitives ──────────────────────────────────────────────────────────────
+const MAX_PHOTO_MB = 5
+const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <Heading level={2} size="lg" weight="normal" style={{ marginBottom: t.space[4] }}>
-      {children}
-    </Heading>
-  )
+// ─── Validações — Dados pessoais ───────────────────────────────────────────────
+
+function validateNome(value: string): string | undefined {
+  const v = value.trim()
+  if (!v) return 'Campo obrigatório.'
+  if (v.length < 3) return 'Mínimo 3 caracteres.'
+  if (v.length > 70) return 'Máximo 70 caracteres.'
 }
 
-function SubTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <Heading level={3} size="md" weight="medium" style={{ marginBottom: t.space[1] }}>
-      {children}
-    </Heading>
-  )
+function validateTelefone(value: string): string | undefined {
+  const digits = value.replace(/\D/g, '')
+  if (!digits) return 'Campo obrigatório.'
+  if (digits.length < 10 || digits.length > 11) return 'Informe DDD + número (10 ou 11 dígitos).'
 }
 
-function Muted({ children }: { children: React.ReactNode }) {
-  return (
-    <p style={{ fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
-      {children}
-    </p>
-  )
+function validateEndereco(value: string): string | undefined {
+  const v = value.trim()
+  if (!v) return 'Campo obrigatório.'
+  if (v.length > 255) return 'Máximo 255 caracteres.'
 }
 
-function Section({ children, last }: { children: React.ReactNode; last?: boolean }) {
-  return (
-    <div
-      style={{
-        borderBottom: last ? 'none' : '1px solid rgba(16,16,16,0.1)',
-        paddingBottom: last ? 32 : 28,
-        marginBottom: last ? 0 : 28,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}
-    >
-      {children}
-    </div>
-  )
+// ─── Validações — Segurança ─────────────────────────────────────────────────────
+
+function validateNovaSenha(nova: string, atual: string): string | undefined {
+  if (!nova) return 'Campo obrigatório.'
+  if (nova.length < 8) return 'Mínimo 8 caracteres.'
+  if (!/[A-Z]/.test(nova) || !/[a-z]/.test(nova) || !/\d/.test(nova)) {
+    return 'Use ao menos 1 maiúscula, 1 minúscula e 1 número.'
+  }
+  if (atual && nova === atual) return 'A nova senha deve ser diferente da atual.'
 }
 
-// ─── main component ───────────────────────────────────────────────────────────
+function validateConfirmacao(confirmacao: string, nova: string): string | undefined {
+  if (!confirmacao) return 'Campo obrigatório.'
+  if (confirmacao !== nova) return 'As senhas não coincidem.'
+}
+
+// ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PerfilUsuario() {
-  const [twoFactor, setTwoFactor] = useState(false)
-  const [newsletter, setNewsletter] = useState(true)
+  const { colors } = useTheme()
+  const { currentFarm } = useFarm()
+  const { profile, updateProfile } = useUserProfile()
   const { toasts, show, dismiss } = useToast()
 
-  // ── Dados pessoais ──
-  const [nome, setNome] = useState('Silvio Ventura Abreu')
-  const [usuario, setUsuario] = useState('silvioventura')
-  const [savingPerfil, setSavingPerfil] = useState(false)
+  // ── Foto ──────────────────────────────────────────────────────────────────
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [photoError, setPhotoError] = useState<string | undefined>()
 
-  const handleSalvarPerfil = () => {
-    setSavingPerfil(true)
+  // Libera a URL de objeto ao trocar de preview ou desmontar — evita vazamento de memória.
+  useEffect(() => () => { if (photoPreview) URL.revokeObjectURL(photoPreview) }, [photoPreview])
+
+  const handlePickPhoto = () => fileInputRef.current?.click()
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // permite reselecionar o mesmo arquivo depois de um erro
+    if (!file) return
+    if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+      setPhotoError('Envie um arquivo JPG, PNG ou WebP.')
+      show('Formato de imagem não suportado.', 'error')
+      return
+    }
+    if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
+      setPhotoError(`A imagem deve ter até ${MAX_PHOTO_MB} MB.`)
+      show('Imagem maior que o limite permitido.', 'error')
+      return
+    }
+    setPhotoError(undefined)
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
+  const handleRemovePhotoSelection = () => {
+    setPhotoFile(null)
+    setPhotoPreview(null)
+    setPhotoError(undefined)
+  }
+
+  const avatarSrc = photoPreview ?? profile.photoUrl ?? undefined
+  const avatarAriaLabel = avatarSrc ? `Foto de perfil de ${profile.name}` : 'Usuário sem foto de perfil'
+
+  // ── Dados pessoais (rascunho local, só vira canônico ao salvar) ────────────
+  const [nome, setNome]           = useState(profile.name)
+  const [telefone, setTelefone]   = useState(profile.phone)
+  const [cityId, setCityId]       = useState(profile.cityId)
+  const [cityQuery, setCityQuery] = useState(() => cidadeLabel(profile.cityId))
+  const [endereco, setEndereco]   = useState(profile.address)
+  const [touchedPessoal, setTouchedPessoal] = useState({ nome: false, telefone: false, cityId: false, endereco: false })
+  const [savingPessoal, setSavingPessoal]   = useState(false)
+
+  const pessoalDirty =
+    nome !== profile.name ||
+    telefone !== profile.phone ||
+    cityId !== profile.cityId ||
+    endereco !== profile.address ||
+    photoFile !== null
+
+  const pessoalErrors = {
+    nome:     touchedPessoal.nome     ? validateNome(nome)         : undefined,
+    telefone: touchedPessoal.telefone ? validateTelefone(telefone) : undefined,
+    cityId:   touchedPessoal.cityId && !cityId ? 'Selecione uma cidade.' : undefined,
+    endereco: touchedPessoal.endereco ? validateEndereco(endereco) : undefined,
+  }
+
+  const cityOptions = CIDADES.map((c) => ({ id: c.value, label: c.label }))
+
+  const handleDiscardPessoal = () => {
+    setNome(profile.name)
+    setTelefone(profile.phone)
+    setCityId(profile.cityId)
+    setCityQuery(cidadeLabel(profile.cityId))
+    setEndereco(profile.address)
+    handleRemovePhotoSelection()
+    setTouchedPessoal({ nome: false, telefone: false, cityId: false, endereco: false })
+  }
+
+  const handleSubmitPessoal = (e: React.FormEvent) => {
+    e.preventDefault()
+    setTouchedPessoal({ nome: true, telefone: true, cityId: true, endereco: true })
+    const errors = {
+      nome:     validateNome(nome),
+      telefone: validateTelefone(telefone),
+      cityId:   !cityId ? 'Selecione uma cidade.' : undefined,
+      endereco: validateEndereco(endereco),
+    }
+    if (Object.values(errors).some(Boolean)) {
+      focusFirstError()
+      show('Há campos pendentes — verifique os destaques em vermelho.', 'error')
+      return
+    }
+
+    setSavingPessoal(true)
+    // Simulação de persistência — substituir pela chamada real (PATCH /api/v1/me).
     setTimeout(() => {
-      setSavingPerfil(false)
+      updateProfile({
+        name:    nome.trim(),
+        phone:   telefone,
+        cityId,
+        address: endereco.trim(),
+        ...(photoFile ? { photoUrl: photoPreview } : {}),
+      })
+      setSavingPessoal(false)
+      setPhotoFile(null)
+      setPhotoPreview(null)
+      setTouchedPessoal({ nome: false, telefone: false, cityId: false, endereco: false })
       show('Perfil atualizado com sucesso.')
     }, 600)
   }
 
-  // ── Excluir conta ──
-  const hasActivePlan = true
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const [deletingAccount, setDeletingAccount] = useState(false)
+  // ── Segurança (senha) ──────────────────────────────────────────────────────
+  const [senhaAtual, setSenhaAtual]           = useState('')
+  const [novaSenha, setNovaSenha]             = useState('')
+  const [confirmarSenha, setConfirmarSenha]   = useState('')
+  const [touchedSenha, setTouchedSenha]       = useState({ atual: false, nova: false, confirmacao: false })
+  const [savingSenha, setSavingSenha]         = useState(false)
 
-  const handleConfirmDelete = () => {
-    setDeletingAccount(true)
+  const senhaDirty = !!(senhaAtual || novaSenha || confirmarSenha)
+
+  const senhaErrors = {
+    atual:       touchedSenha.atual ? (senhaAtual ? undefined : 'Campo obrigatório.') : undefined,
+    nova:        touchedSenha.nova ? validateNovaSenha(novaSenha, senhaAtual) : undefined,
+    confirmacao: touchedSenha.confirmacao ? validateConfirmacao(confirmarSenha, novaSenha) : undefined,
+  }
+
+  const handleSubmitSenha = (e: React.FormEvent) => {
+    e.preventDefault()
+    setTouchedSenha({ atual: true, nova: true, confirmacao: true })
+    const errors = {
+      atual:       senhaAtual ? undefined : 'Campo obrigatório.',
+      nova:        validateNovaSenha(novaSenha, senhaAtual),
+      confirmacao: validateConfirmacao(confirmarSenha, novaSenha),
+    }
+    if (Object.values(errors).some(Boolean)) {
+      focusFirstError()
+      show('Há campos pendentes — verifique os destaques em vermelho.', 'error')
+      return
+    }
+
+    setSavingSenha(true)
+    // Simulação de persistência — substituir pela chamada real (PUT /api/v1/me/password).
     setTimeout(() => {
-      setDeletingAccount(false)
-      setConfirmDeleteOpen(false)
-      show('Conta excluída com sucesso.')
+      setSavingSenha(false)
+      setSenhaAtual('')
+      setNovaSenha('')
+      setConfirmarSenha('')
+      setTouchedSenha({ atual: false, nova: false, confirmacao: false })
+      show('Senha alterada com sucesso.')
     }, 600)
   }
 
-  // ── Sessões e dispositivos ──
-  const [devices, setDevices] = useState<Device[]>([
-    { id: 'dev-1', sistema: 'Windows 11', navegador: 'Chrome 145', localizacao: '179.82.68.233', atual: true },
-  ])
-
-  const handleRevogarSessao = (id: string) => {
-    setDevices(prev => prev.filter(d => d.id !== id))
-    show('Sessão encerrada.')
-  }
+  // ── Alterações não salvas ao sair da página (fechar aba/recarregar) ────────
+  const hasUnsavedChanges = pessoalDirty || senhaDirty
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [hasUnsavedChanges])
 
   return (
     <div
       style={{
-        padding: '28px 32px',
-        maxWidth: 800,
-        fontFamily: t.font.family.sans,
+        padding: `${t.space[6]}px`,
+        maxWidth: 720,
+        margin: '0 auto',
+        width: '100%',
         boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: t.space[5],
       }}
     >
-      <Heading level={1} size="xl" weight="normal" style={{ marginBottom: t.space[7] }}>
-        Perfil
-      </Heading>
+      <PageHeader
+        title="Meu perfil"
+        description="Gerencie seus dados pessoais e a segurança da sua conta."
+      />
 
-      {/* ── Avatar ── */}
-      <Section>
-        <SectionTitle>Avatar</SectionTitle>
-        <button
-          type="button"
-          title="Alterar avatar"
-          onClick={() => show('Upload de avatar em breve.', 'info')}
-          className="gb-focusable"
-          style={{
-            cursor: 'pointer',
-            display: 'inline-flex',
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            borderRadius: t.radius.full,
-          }}
-        >
-          <Avatar name="Silvio Ventura" size="xl" />
-        </button>
-      </Section>
-
-      {/* ── Dados pessoais ── */}
-      <Section>
-        <SectionTitle>Dados pessoais</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ width: 320 }}>
-            <FormField
-              label="Nome completo"
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-              iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
-            />
-          </div>
-          <div style={{ width: 320 }}>
-            <FormField
-              label="Usuário"
-              value={usuario}
-              onChange={e => setUsuario(e.target.value)}
-              iconRight={<Pencil size={13} color={t.color.neutral[400]} />}
-            />
-          </div>
-          <div style={{ width: '100%' }}>
-            <FormField
-              label="E-mail"
-              defaultValue="ventura.silvio@greenbelt-ti.com"
-              readOnly
-            />
-          </div>
-          <div style={{ width: 'fit-content' }}>
-            <Button variant="primary" size="sm" loading={savingPerfil} onClick={handleSalvarPerfil}>
-              Salvar
-            </Button>
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Preferências do sistema ── */}
-      <Section>
-        <SectionTitle>Preferências do sistema</SectionTitle>
-        <div style={{ display: 'flex', gap: 16, maxWidth: 620 }}>
-          <div style={{ flex: 1 }}>
-            <FormSelect
-              label="Idioma"
-              defaultValue="Português (BR)"
-              options={[
-                { value: 'Português (BR)', label: 'Português (BR)' },
-                { value: 'English', label: 'English' },
-                { value: 'Español', label: 'Español' },
-              ]}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <FormSelect
-              label="Tema"
-              defaultValue="Claro"
-              options={[
-                { value: 'Claro', label: 'Claro' },
-                { value: 'Escuro', label: 'Escuro' },
-                { value: 'Sistema', label: 'Sistema' },
-              ]}
-            />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 16, maxWidth: 620 }}>
-          <div style={{ flex: 1 }}>
-            <FormSelect
-              label="Fazenda padrão"
-              defaultValue="Fazenda Santa Luzia"
-              options={[
-                { value: 'Fazenda Santa Luzia', label: 'Fazenda Santa Luzia' },
-                { value: 'Fazenda Bela Vista', label: 'Fazenda Bela Vista' },
-                { value: 'Fazenda Cerrado Verde', label: 'Fazenda Cerrado Verde' },
-              ]}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <FormSelect
-              label="Safra padrão"
-              defaultValue="Safra 2024/25"
-              options={[
-                { value: 'Safra 2024/25', label: 'Safra 2024/25' },
-                { value: 'Safra 2025/26', label: 'Safra 2025/26' },
-              ]}
-            />
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Segurança ── */}
-      <Section>
-        <SectionTitle>Segurança</SectionTitle>
-
-        {/* Senha */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <SubTitle>Senha</SubTitle>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <Muted>
-              <strong style={{ fontWeight: 600 }}>Atualize sua senha</strong> pelo botão abaixo. Você será redirecionado para uma nova página e deverá seguir as instruções.
-            </Muted>
-            <Button variant="secondary" size="sm">Alterar senha</Button>
-          </div>
-        </div>
-
-        {/* 2FA */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20 }}>
-            <div>
-              <SubTitle>Autenticação em dois fatores</SubTitle>
-              <Muted>
-                Ative a autenticação em dois fatores para adicionar uma camada extra de segurança ao seu acesso.
-                Ao entrar, enviaremos um código de 6 dígitos para o seu e-mail para verificar sua identidade.
-              </Muted>
+      {/* ── Resumo da conta ────────────────────────────────────────────────── */}
+      <Card shadow="sm">
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], flexWrap: 'wrap' }}>
+          <Avatar name={profile.name} src={avatarSrc} size="lg" ariaLabel={avatarAriaLabel} />
+          <div style={{ flex: 1, minWidth: 160 }}>
+            <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
+              {profile.name}
             </div>
-            <ToggleSwitch checked={twoFactor} onChange={setTwoFactor} />
+            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
+              {profile.email}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: t.space[2], flexWrap: 'wrap' }}>
+            {profile.roles.map((r) => <Badge key={r.id} label={r.label} variant="info" />)}
+            {currentFarm && <Badge label={currentFarm.name} variant="success" />}
           </div>
         </div>
-      </Section>
+      </Card>
 
-      {/* ── Contas conectadas ── */}
-      <Section>
-        <SectionTitle>Contas conectadas</SectionTitle>
-        <Muted>Gerencie as contas de terceiros conectadas ao seu perfil para login simplificado.</Muted>
+      {/* ── Card Dados pessoais ────────────────────────────────────────────── */}
+      <Card>
+        <form onSubmit={handleSubmitPessoal} noValidate style={{ display: 'flex', flexDirection: 'column', gap: t.space[5] }}>
+          <Heading level={2} size="lg" weight="semibold">Dados pessoais</Heading>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 0',
-            borderBottom: `1px solid ${t.color.neutral[200]}`,
-          }}
-        >
-          {/* Google G icon */}
-          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16.32 8.7c0-.567-.051-1.11-.146-1.633H8.5v3.09h4.395a3.754 3.754 0 0 1-1.628 2.465v2.05h2.635C15.453 13.327 16.32 11.187 16.32 8.7z" fill="#4285F4"/>
-            <path d="M8.5 16.5c2.205 0 4.053-.73 5.402-1.978l-2.635-2.05c-.73.49-1.664.78-2.767.78-2.128 0-3.93-1.437-4.574-3.368H1.198v2.117A8.003 8.003 0 0 0 8.5 16.5z" fill="#34A853"/>
-            <path d="M3.926 9.884A4.807 4.807 0 0 1 3.675 8.5c0-.48.082-.947.251-1.384V4.999H1.198A8.003 8.003 0 0 0 .5 8.5c0 1.29.31 2.51.698 3.501l2.728-2.117z" fill="#FBBC05"/>
-            <path d="M8.5 3.748c1.198 0 2.273.412 3.12 1.22l2.337-2.337C12.549 1.282 10.705.5 8.5.5A8.003 8.003 0 0 0 1.198 4.999L3.926 7.116C4.57 5.185 6.372 3.748 8.5 3.748z" fill="#EA4335"/>
-          </svg>
-          <span style={{ fontSize: t.font.size.lg, fontWeight: 700, color: t.color.neutral[800], fontFamily: t.font.family.sans, width: 60 }}>Google</span>
-          <span style={{ flex: 1, fontSize: t.font.size.md, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>Conectado</span>
-          <Button variant="secondary" size="sm">Desconectar</Button>
-        </div>
-      </Section>
-
-      {/* ── Notificações ── */}
-      <Section>
-        <SectionTitle>Notificações</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <SubTitle>Newsletter</SubTitle>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
-            <Muted>Receba newsletters, promoções e novidades do GB CERNE.</Muted>
-            <ToggleSwitch checked={newsletter} onChange={setNewsletter} />
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Sessões e dispositivos ── */}
-      <Section>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <SectionTitle>Sessões e dispositivos</SectionTitle>
-          <span
-            style={{
-              background: t.color.neutral[200],
-              borderRadius: t.radius.full,
-              padding: '2px 10px',
-              fontSize: t.font.size.sm,
-              fontWeight: 500,
-              color: t.color.neutral[800],
-              fontFamily: t.font.family.sans,
-              marginTop: -16,
-            }}
-          >
-            {devices.length}/3 dispositivos
-          </span>
-        </div>
-        <Muted>Por motivos de segurança, cada conta é limitada a três dispositivos conectados.</Muted>
-
-        <div style={{ width: '100%', borderRadius: t.radius.base, overflow: 'hidden', border: `1px solid ${t.color.neutral[200]}` }}>
-          {/* header */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto',
-              background: t.color.neutral[50],
-              borderBottom: `1px solid ${t.color.neutral[200]}`,
-            }}
-          >
-            {['Sistema', 'Navegador', 'Localização', 'Última sessão', ''].map((h) => (
-              <div
-                key={h}
+          {/* Foto */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4] }}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <Avatar name={profile.name} src={avatarSrc} size="xl" ariaLabel={avatarAriaLabel} />
+              <button
+                type="button"
+                onClick={handlePickPhoto}
+                className="gb-focusable"
+                aria-label="Alterar foto de perfil"
                 style={{
-                  padding: '11px 16px',
-                  fontSize: t.font.size.sm,
-                  fontWeight: 500,
-                  color: t.color.neutral[700],
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -2,
+                  width: 26,
+                  height: 26,
+                  borderRadius: t.radius.full,
+                  border: `2px solid ${colors.bg.surface}`,
+                  background: colors.accent.default,
+                  color: t.color.neutral[0],
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                <Camera size={12} />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ALLOWED_PHOTO_TYPES.join(',')}
+                onChange={handlePhotoChange}
+                style={{ display: 'none' }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
+              <div style={{ display: 'flex', gap: t.space[2] }}>
+                <Button type="button" variant="secondary" size="sm" onClick={handlePickPhoto} disabled={savingPessoal}>
+                  Alterar foto
+                </Button>
+                {photoFile && (
+                  <Button type="button" variant="ghost" size="sm" onClick={handleRemovePhotoSelection} disabled={savingPessoal}>
+                    Remover seleção
+                  </Button>
+                )}
+              </div>
+              <span
+                role={photoError ? 'alert' : undefined}
+                aria-live="polite"
+                style={{
+                  fontSize: t.font.size.xs,
+                  color: photoError ? t.color.feedback.error.text : colors.fg.subtle,
                   fontFamily: t.font.family.sans,
                 }}
               >
-                {h}
-              </div>
-            ))}
-          </div>
-          {/* rows */}
-          {devices.map((device, i) => (
-            <div
-              key={device.id}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.2fr 1fr 1fr 1.2fr auto',
-                alignItems: 'center',
-                borderTop: i === 0 ? 'none' : `1px solid ${t.color.neutral[200]}`,
-              }}
-            >
-              <div style={{ padding: '16px', fontSize: t.font.size.sm, fontWeight: 500, color: t.color.neutral[800], fontFamily: t.font.family.sans }}>
-                {device.sistema}
-              </div>
-              <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
-                {device.navegador}
-              </div>
-              <div style={{ padding: '16px', fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
-                {device.localizacao}
-              </div>
-              <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.color.brand[600], flexShrink: 0 }} />
-                <span style={{ fontSize: t.font.size.sm, color: t.color.neutral[600], fontFamily: t.font.family.sans }}>
-                  {device.atual ? 'Este dispositivo' : 'Ativo'}
-                </span>
-              </div>
-              <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <button
-                  type="button"
-                  aria-label="Encerrar sessão neste dispositivo"
-                  title="Encerrar sessão"
-                  onClick={() => handleRevogarSessao(device.id)}
-                  className="gb-focusable"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 24,
-                    height: 24,
-                    background: 'none',
-                    border: 'none',
-                    borderRadius: t.radius.md,
-                    color: t.color.neutral[600],
-                    cursor: 'pointer',
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-                  </svg>
-                </button>
-              </div>
+                {photoError ?? `JPG, PNG ou WebP — até ${MAX_PHOTO_MB} MB.`}
+              </span>
             </div>
-          ))}
-        </div>
-      </Section>
+          </div>
 
-      {/* ── Excluir conta ── */}
-      <Section last>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ width: 'fit-content' }}>
-            <Button
-              variant="destructive"
-              size="sm"
-              disabled={hasActivePlan}
-              title={hasActivePlan ? 'Cancele seu plano antes de excluir a conta' : undefined}
-              onClick={() => setConfirmDeleteOpen(true)}
-            >
-              Excluir conta
+          <div style={grid2}>
+            <FormField
+              label="Nome completo" required maxLength={70}
+              value={nome} onChange={(e) => setNome(e.target.value)}
+              onBlur={() => setTouchedPessoal((p) => ({ ...p, nome: true }))}
+              error={pessoalErrors.nome} disabled={savingPessoal}
+            />
+            <FormField
+              label="Telefone" required mask="phone" type="tel" placeholder="(00) 00000-0000"
+              value={telefone} autoComplete="tel"
+              onChange={(e) => setTelefone(e.target.value)}
+              onBlur={() => setTouchedPessoal((p) => ({ ...p, telefone: true }))}
+              error={pessoalErrors.telefone} disabled={savingPessoal}
+            />
+          </div>
+
+          <div style={grid2}>
+            <FormField
+              label="CPF / CNPJ" value={maskNif(profile.nif)} readOnly
+              hint="Alteração de documento é feita pelo administrador."
+            />
+            <FormField
+              label="E-mail" value={profile.email} readOnly type="email"
+              hint="Alteração de e-mail exige um fluxo próprio de verificação."
+            />
+          </div>
+
+          <SearchSelect
+            label="Cidade" required placeholder="Busque por nome ou UF…"
+            query={cityQuery}
+            onQueryChange={(v) => { setCityQuery(v); setCityId('') }}
+            onBlur={() => setTouchedPessoal((p) => ({ ...p, cityId: true }))}
+            options={cityOptions}
+            selectedId={cityId || null}
+            onSelect={(opt) => {
+              setCityId(opt.id)
+              setCityQuery(opt.label)
+              setTouchedPessoal((p) => ({ ...p, cityId: true }))
+            }}
+            onClear={() => {
+              setCityId('')
+              setCityQuery('')
+              setTouchedPessoal((p) => ({ ...p, cityId: true }))
+            }}
+            error={pessoalErrors.cityId}
+            disabled={savingPessoal}
+          />
+
+          <FormField
+            label="Endereço" required maxLength={255}
+            value={endereco} onChange={(e) => setEndereco(e.target.value)}
+            onBlur={() => setTouchedPessoal((p) => ({ ...p, endereco: true }))}
+            error={pessoalErrors.endereco} disabled={savingPessoal}
+          />
+
+          <div style={{ display: 'flex', gap: t.space[2], justifyContent: 'flex-end', paddingTop: t.space[3], borderTop: `1px solid ${colors.border.subtle}` }}>
+            <Button type="button" variant="ghost" onClick={handleDiscardPessoal} disabled={!pessoalDirty || savingPessoal}>
+              Descartar alterações
+            </Button>
+            <Button type="submit" variant="primary" loading={savingPessoal} disabled={!pessoalDirty}>
+              Salvar alterações
             </Button>
           </div>
-          {hasActivePlan && (
-            <p style={{ fontSize: t.font.size.sm, color: t.color.neutral[700], fontFamily: t.font.family.sans, margin: 0, lineHeight: 1.5 }}>
-              <strong>Nota:</strong> como você possui um plano ativo, não é possível excluir sua conta diretamente.
-              Entre em contato com{' '}
-              <span style={{ color: t.color.brand[600], fontWeight: 500 }}>suporte@greenbelt-ti.com</span>{' '}
-              para obter assistência.
-            </p>
-          )}
-        </div>
-      </Section>
+        </form>
+      </Card>
 
-      <ConfirmDialog
-        open={confirmDeleteOpen}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setConfirmDeleteOpen(false)}
-        title="Excluir conta…"
-        message="Esta ação é permanente e removerá todos os seus dados de acesso. Deseja continuar?"
-        tone="destructive"
-        confirmLabel="Excluir conta"
-        loading={deletingAccount}
-      />
+      {/* ── Card Segurança ─────────────────────────────────────────────────── */}
+      <Card>
+        <form onSubmit={handleSubmitSenha} noValidate style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+          <Heading level={2} size="lg" weight="semibold">Segurança</Heading>
+
+          <SecretField
+            label="Senha atual" required autoComplete="current-password"
+            value={senhaAtual}
+            onChange={(v) => setSenhaAtual(v)}
+            error={senhaErrors.atual}
+          />
+          <SecretField
+            label="Nova senha" required autoComplete="new-password"
+            hint="Mínimo 8 caracteres, com maiúscula, minúscula e número."
+            value={novaSenha}
+            onChange={(v) => setNovaSenha(v)}
+            error={senhaErrors.nova}
+          />
+          <SecretField
+            label="Confirmar nova senha" required autoComplete="new-password"
+            value={confirmarSenha}
+            onChange={(v) => setConfirmarSenha(v)}
+            error={senhaErrors.confirmacao}
+          />
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: t.space[3], borderTop: `1px solid ${colors.border.subtle}` }}>
+            <Button type="submit" variant="primary" loading={savingSenha} disabled={!senhaDirty}>
+              Alterar senha
+            </Button>
+          </div>
+        </form>
+      </Card>
 
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>

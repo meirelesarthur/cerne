@@ -188,7 +188,7 @@ export const menuModules: NavModule[] = [
         label: 'Pessoas',
         icon: Users,
         items: [
-          { id: 'cad-pes-per', label: 'Perfil de Usuário', path: '/cadastros/perfil',      icon: UserCog },
+          { id: 'cad-pes-per', label: 'Meu perfil',        path: '/cadastros/perfil',      icon: UserCog },
           { id: 'cad-pes-uni', label: 'Pessoas',           path: '/cadastros/pessoas',     icon: Users },
           { id: 'cad-pes-pro', label: 'Proprietários',     path: '/cadastros/proprietarios', icon: Contact },
           { id: 'cad-pes-fun', label: 'Funcionários',      path: '/cadastros/funcionarios', icon: HardHat },

@@ -7,6 +7,8 @@ interface AvatarProps {
   name:   string
   src?:   string
   size?:  AvatarSize
+  /** Sobrescreve o `aria-label` do avatar (default: o próprio `name`) — usar quando `name` só serve para gerar as iniciais e não é uma frase acessível válida por si só. */
+  ariaLabel?: string
 }
 
 const sizePx: Record<AvatarSize, number> = {
@@ -35,7 +37,7 @@ function initials(name: string): string {
  * `src` é fornecido (com fallback para iniciais se a imagem falhar).
  * Substitui os `<div>` de avatar recriados inline em Topbar e PerfilUsuario.
  */
-export function Avatar({ name, src, size = 'md' }: AvatarProps) {
+export function Avatar({ name, src, size = 'md', ariaLabel }: AvatarProps) {
   const [imgError, setImgError] = useState(false)
   const px = sizePx[size]
   const showImg = src && !imgError
@@ -43,7 +45,7 @@ export function Avatar({ name, src, size = 'md' }: AvatarProps) {
   return (
     <div
       role="img"
-      aria-label={name}
+      aria-label={ariaLabel ?? name}
       style={{
         width:          px,
         height:         px,

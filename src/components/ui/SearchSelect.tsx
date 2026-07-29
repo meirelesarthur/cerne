@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useId, useCallback } from 'react'
-import { Search, X, ChevronDown, HelpCircle } from 'lucide-react'
+import { Search, X, ChevronDown, HelpCircle, Check } from 'lucide-react'
 import { Tooltip } from './Tooltip'
 import { IconButton } from './IconButton'
 import { t } from '../../design/tokens'
@@ -10,6 +10,10 @@ export interface SearchSelectOption {
   label: string
   /** Código/identificador secundário exibido à esquerda do rótulo. */
   code?: string
+  /** Ícone exibido em um badge à esquerda (ex.: FarmSwitcher). Ativa o layout empilhado (rótulo + `subtitle`) e o check de selecionado no lugar do badge de `code`. */
+  icon?: React.ReactNode
+  /** Texto secundário exibido abaixo do rótulo — só tem efeito quando `icon` está presente. */
+  subtitle?: string
 }
 
 interface SearchSelectAction {
@@ -44,6 +48,8 @@ interface SearchSelectProps {
   /** Máximo de opções exibidas no dropdown (default 8). */
   maxVisible?:   number
   emptyText?:    string
+  /** Linhas mais compactas e painel mais alto — usar com opções que têm `icon`/`subtitle` (ex.: FarmSwitcher). */
+  dense?:        boolean
 }
 
 /**
@@ -71,6 +77,7 @@ export function SearchSelect({
   footerAction,
   maxVisible = 8,
   emptyText = 'Nenhum resultado encontrado.',
+  dense = false,
 }: SearchSelectProps) {
   const { colors } = useTheme()
   const id = useId()
@@ -218,7 +225,7 @@ export function SearchSelect({
               border: `1px solid ${colors.border.default}`,
               borderRadius: t.radius.lg,
               boxShadow: t.shadow.md,
-              maxHeight: 280,
+              maxHeight: dense ? t.size.dropdownPanelDense : t.size.dropdownPanel,
               overflowY: 'auto',
               marginTop: 2,
             }}>
@@ -241,6 +248,7 @@ export function SearchSelect({
                 isActive={activeIndex === idx}
                 onSelect={() => { onSelect(opt); setOpen(false) }}
                 colors={colors}
+                dense={dense}
               />
             ))}
 
@@ -268,13 +276,14 @@ export function SearchSelect({
   )
 }
 
-function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }: {
+function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors, dense }: {
   option:     SearchSelectOption
   optionId:   string
   isSelected: boolean
   isActive:   boolean
   onSelect:   () => void
   colors:     ReturnType<typeof useTheme>['colors']
+  dense?:     boolean
 }) {
   const [hov, setHov] = useState(false)
   const highlighted = isActive || hov
@@ -291,7 +300,7 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }:
       onMouseLeave={() => setHov(false)}
       style={{
         width: '100%',
-        padding: `${t.space[2]}px ${t.space[3]}px`,
+        padding: dense ? `${t.space[1] + 2}px ${t.space[3]}px` : `${t.space[2]}px ${t.space[3]}px`,
         background: isSelected ? colors.accent.subtle : highlighted ? colors.bg.subtle : 'transparent',
         border: 'none',
         cursor: 'pointer',
@@ -304,14 +313,45 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors }:
         outlineOffset: -2,
       }}
     >
-      {option.code && (
+      {option.icon && (
+        <span
+          aria-hidden="true"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: t.radius.md,
+            background: colors.bg.subtle,
+            color: colors.fg.muted,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {option.icon}
+        </span>
+      )}
+
+      {!option.icon && option.code && (
         <span style={{ fontSize: t.font.size.xs, color: colors.accent.default, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, minWidth: 52 }}>
           {option.code}
         </span>
       )}
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {option.label}
+
+      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
+        <span style={{ fontSize: t.font.size.sm, fontWeight: option.icon ? t.font.weight.semibold : t.font.weight.normal, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {option.label}
+        </span>
+        {option.icon && option.subtitle && (
+          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {option.subtitle}
+          </span>
+        )}
       </span>
+
+      {option.icon && isSelected && (
+        <Check size={15} color={colors.accent.default} style={{ flexShrink: 0 }} aria-hidden="true" />
+      )}
     </button>
   )
 }

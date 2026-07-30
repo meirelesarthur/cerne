@@ -157,8 +157,8 @@ export default function SafraCadastro({ initialData, onBack, onSave }: SafraCada
   const handleWeeksChange = useCallback((w: Week[]) => setWeeks(w), [])
 
   // ── Header dinâmico ───────────────────────────────────────────────────────
-  const pageTitle = isEdit ? `Editar — ${initialData!.desc}` : 'Nova Safra'
-  const pageDesc  = isEdit ? 'Atualize os dados da safra' : 'Preencha os dados da safra'
+  const pageTitle = isEdit ? 'Editar Safra' : 'Nova Safra'
+  const pageDesc  = isEdit ? initialData!.desc : 'Preencha os dados da safra'
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>

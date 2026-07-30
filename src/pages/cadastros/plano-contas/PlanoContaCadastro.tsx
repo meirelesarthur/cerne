@@ -203,8 +203,8 @@ export default function PlanoContaCadastro({
       >
 
           <FormPageHeader
-            title={isEdit ? `Editar — ${initialData!.descricao}` : 'Nova Conta'}
-            subtitle={isEdit ? 'Atualize os dados da conta contábil' : 'Preencha os dados para criar uma conta no plano'}
+            title={isEdit ? 'Editar Conta' : 'Nova Conta'}
+            subtitle={isEdit ? `${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os dados para criar uma conta no plano'}
             onBack={guard.guardedBack}
             paddingTop={t.space[4]}
           />

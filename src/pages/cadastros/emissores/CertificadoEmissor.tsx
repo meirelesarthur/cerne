@@ -77,8 +77,8 @@ export default function CertificadoEmissor({ emissor, today, onBack, onSave }: C
         }
       >
         <FormPageHeader
-          title={`Certificado — ${emissor.razaoSocial}`}
-          subtitle="Configure o certificado digital A1 (.pfx/.p12) usado para assinar os documentos fiscais"
+          title="Certificado Digital"
+          subtitle={emissor.razaoSocial}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

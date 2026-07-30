@@ -44,8 +44,8 @@ export default function PlanoContaDetalhe({ conta, contas, onBack, onEdit }: Pro
         }
       >
         <FormPageHeader
-          title={`Conta — ${conta.codigo}`}
-          subtitle="Consulte os dados da conta contábil."
+          title="Visualizar Conta"
+          subtitle={`${conta.codigo} — ${conta.descricao}`}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

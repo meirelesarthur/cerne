@@ -129,8 +129,8 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
         }
       >
         <FormPageHeader
-          title={isEdit ? `Editar Perfil — ${initialData!.nome}` : 'Novo Perfil'}
-          subtitle={isEdit ? 'Atualize os dados e permissões do perfil' : 'Defina os dados e as permissões do novo perfil'}
+          title={isEdit ? 'Editar Perfil' : 'Novo Perfil'}
+          subtitle={isEdit ? initialData!.nome : 'Defina os dados e as permissões do novo perfil'}
           onBack={guard.guardedBack}
           paddingTop={t.space[4]}
         />

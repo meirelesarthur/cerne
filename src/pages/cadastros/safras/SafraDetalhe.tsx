@@ -123,8 +123,8 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
 
           {/* ── Header ──────────────────────────────────────────────────────── */}
           <FormPageHeader
-            title={safra.desc}
-            subtitle={`${fmtYMDtoDMY(safra.ini)} — ${fmtYMDtoDMY(safra.fim)} · Rebanho: ${rebLabels[safra.reb]} · Evolução: ${evoLabels[safra.evo]}`}
+            title="Visualizar Safra"
+            subtitle={safra.desc}
             onBack={onBack}
             paddingTop={t.space[4]}
             actions={

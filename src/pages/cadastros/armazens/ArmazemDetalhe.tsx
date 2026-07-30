@@ -29,8 +29,8 @@ export default function ArmazemDetalhe({ armazem, onBack, onEdit }: Props) {
         }
       >
         <FormPageHeader
-          title={`Armazém — ${armazem.sigla}`}
-          subtitle="Consulte os dados do armazém."
+          title="Visualizar Armazém"
+          subtitle={`${armazem.sigla} — ${armazem.descricao}`}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

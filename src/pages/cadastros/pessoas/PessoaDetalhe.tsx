@@ -71,7 +71,7 @@ export default function PessoaDetalhe({ pessoa, onBack, onEdit }: Props) {
         }
       >
         <FormPageHeader
-          title="Detalhes da Pessoa"
+          title="Visualizar Pessoa"
           subtitle={`${pessoa.name} — ${pessoa.nickname}`}
           onBack={onBack}
           paddingTop={t.space[4]}

@@ -231,8 +231,8 @@ export default function EmissorCadastro({ initialData, onBack, onSave }: Emissor
       >
 
           <FormPageHeader
-            title={isEdit ? `Editar — ${initialData!.razaoSocial}` : 'Novo Emissor'}
-            subtitle={isEdit ? 'Atualize os dados do emissor' : 'Preencha os dados para criar um emissor de NFe/CTe/MDFe'}
+            title={isEdit ? 'Editar Emissor' : 'Novo Emissor'}
+            subtitle={isEdit ? `${initialData!.cpfCnpj} — ${initialData!.razaoSocial}` : 'Preencha os dados para criar um emissor de NFe/CTe/MDFe'}
             onBack={guard.guardedBack}
             paddingTop={t.space[4]}
           />

@@ -46,8 +46,8 @@ export default function CentroCustoDetalhe({ centro, centros, onBack, onEdit }: 
         }
       >
         <FormPageHeader
-          title={`Centro de Custo — ${centro.codigo}`}
-          subtitle="Consulte os dados do centro de custo."
+          title="Visualizar Centro de Custo"
+          subtitle={`${centro.codigo} — ${centro.descricao}`}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

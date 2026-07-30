@@ -369,8 +369,8 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda }: FazendaDetal
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Header */}
           <FormPageHeader
-            title={fazenda.nome}
-            subtitle={`${fazenda.tipoExploracao} · ${fazenda.cidade}, ${fazenda.uf}`}
+            title="Visualizar Fazenda"
+            subtitle={fazenda.nome}
             onBack={onBack}
             paddingTop={t.space[4]}
             actions={

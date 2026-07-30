@@ -35,8 +35,8 @@ export default function EmissorDetalhe({ emissor, onBack, onEdit }: Props) {
         }
       >
         <FormPageHeader
-          title={`Emissor — ${emissor.razaoSocial}`}
-          subtitle="Consulte os dados do emissor."
+          title="Visualizar Emissor"
+          subtitle={`${emissor.cpfCnpj} — ${emissor.razaoSocial}`}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

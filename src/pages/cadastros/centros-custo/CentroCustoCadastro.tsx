@@ -151,8 +151,8 @@ export default function CentroCustoCadastro({
 
           {/* Header */}
           <FormPageHeader
-            title={isEdit ? `Editar — ${initialData!.descricao}` : 'Novo Centro de Custo'}
-            subtitle={isEdit ? 'Atualize os dados do centro de custo' : 'Preencha os dados para criar um centro de custo'}
+            title={isEdit ? 'Editar Centro de Custo' : 'Novo Centro de Custo'}
+            subtitle={isEdit ? `${initialData!.codigo} — ${initialData!.descricao}` : 'Preencha os dados para criar um centro de custo'}
             onBack={guard.guardedBack}
             paddingTop={t.space[4]}
           />

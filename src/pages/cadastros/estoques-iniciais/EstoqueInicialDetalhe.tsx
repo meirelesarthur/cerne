@@ -32,8 +32,8 @@ export default function EstoqueInicialDetalhe({ registro, onBack, onEdit }: Prop
         }
       >
         <FormPageHeader
-          title={`Saldo Inicial — ${registro.produtoDescricao}`}
-          subtitle="Consulte os dados do saldo inicial de estoque."
+          title="Visualizar Saldo Inicial"
+          subtitle={`${registro.produtoCodigo} — ${registro.produtoDescricao}`}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

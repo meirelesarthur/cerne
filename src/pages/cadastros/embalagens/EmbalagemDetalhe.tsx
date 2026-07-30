@@ -28,8 +28,8 @@ export default function EmbalagemDetalhe({ embalagem, onBack, onEdit }: Props) {
         }
       >
         <FormPageHeader
-          title={`Embalagem — ${embalagem.descricao}`}
-          subtitle="Consulte os dados da embalagem."
+          title="Visualizar Embalagem"
+          subtitle={embalagem.descricao}
           onBack={onBack}
           paddingTop={t.space[4]}
         />

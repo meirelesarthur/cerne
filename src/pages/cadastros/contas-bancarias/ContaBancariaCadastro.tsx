@@ -181,11 +181,11 @@ export default function ContaBancariaCadastro({
   }
 
   const title = readOnly
-    ? `Visualizar — ${initialData!.descricao}`
-    : isEdit ? `Editar — ${initialData!.descricao}` : 'Nova Conta Bancária'
-  const subtitle = readOnly
-    ? 'Dados da conta bancária (somente leitura)'
-    : isEdit ? 'Atualize os dados da conta bancária' : 'Preencha os dados para criar uma conta bancária'
+    ? 'Visualizar Conta Bancária'
+    : isEdit ? 'Editar Conta Bancária' : 'Nova Conta Bancária'
+  const subtitle = readOnly || isEdit
+    ? `${initialData!.sigla} — ${initialData!.descricao}`
+    : 'Preencha os dados para criar uma conta bancária'
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>

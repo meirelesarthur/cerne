@@ -33,8 +33,8 @@ export default function PerfilAcessoVisualizacao({ perfil, onBack, onEdit }: Per
         }
       >
         <FormPageHeader
-          title={`Perfil — ${perfil.nome}`}
-          subtitle="Consulte os dados e as permissões deste perfil"
+          title="Visualizar Perfil"
+          subtitle={perfil.nome}
           onBack={onBack}
           paddingTop={t.space[4]}
           actions={

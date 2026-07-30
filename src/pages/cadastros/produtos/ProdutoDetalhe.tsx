@@ -64,8 +64,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
         header={
           <>
             <FormPageHeader
-              title={produto.descricao}
-              subtitle={`Produto ${produto.codigo} · ${textById(GRUPOS, produto.grupoId)}`}
+              title="Visualizar Produto"
+              subtitle={`${produto.codigo} — ${produto.descricao}`}
               onBack={onBack}
               closeLabel="Voltar aos produtos"
               compact

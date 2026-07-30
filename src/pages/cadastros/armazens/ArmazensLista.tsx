@@ -29,6 +29,7 @@ import {
 interface Props {
   armazens: Armazem[]
   onNew:    () => void
+  onView:   (id: number) => void
   onEdit:   (id: number) => void
   onDelete: (id: number) => void
 }
@@ -46,7 +47,7 @@ type SortDir   = 'asc' | 'desc'
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
-export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Props) {
+export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelete }: Props) {
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
@@ -183,6 +184,7 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
                   key={arm.id}
                   arm={arm}
                   isLast={idx === paginatedData.length - 1}
+                  onView={() => onView(arm.id)}
                   onEdit={() => onEdit(arm.id)}
                   onDeleteReq={() => setDeleteTarget(arm)}
                   colors={colors}
@@ -260,9 +262,9 @@ export default function ArmazensLista({ armazens, onNew, onEdit, onDelete }: Pro
 
 // ─── ArmazemRow ───────────────────────────────────────────────────────────────
 
-function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
+function ArmazemRow({ arm, isLast, onView, onEdit, onDeleteReq, colors, border }: {
   arm: Armazem; isLast: boolean
-  onEdit: () => void; onDeleteReq: () => void
+  onView: () => void; onEdit: () => void; onDeleteReq: () => void
   colors: ReturnType<typeof useTheme>['colors']; border: string
 }) {
   const [hovered, setHovered] = useState(false)
@@ -270,9 +272,15 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
 
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar armazém ${arm.descricao}`}
+      className="gb-focusable"
+      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center', cursor: 'pointer' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       <span title={arm.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.accent.default, fontFamily: t.font.family.sans, letterSpacing: '0.02em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {arm.sigla}
@@ -290,7 +298,7 @@ function ArmazemRow({ arm, isLast, onEdit, onDeleteReq, colors, border }: {
           {arm.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }} onClick={e => e.stopPropagation()}>
         <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={onEdit}      />
         <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={onDeleteReq} danger />
       </div>

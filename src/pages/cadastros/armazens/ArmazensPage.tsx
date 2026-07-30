@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
-import ArmazensLista from './ArmazensLista'
-import ArmazemForm   from './ArmazemForm'
+import ArmazensLista  from './ArmazensLista'
+import ArmazemForm    from './ArmazemForm'
+import ArmazemDetalhe from './ArmazemDetalhe'
 import { mockArmazens }              from './armazens.mock'
 import { useToast, ToastContainer }  from '../../../components/ui/Toast'
 import type { Armazem }              from './armazens.types'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'view'
 
 export default function ArmazensPage() {
   const [view,       setView]       = useState<View>('list')
@@ -43,11 +44,22 @@ export default function ArmazensPage() {
     )
   }
 
+  if (view === 'view' && selected) {
+    return (
+      <ArmazemDetalhe
+        armazem={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <>
       <ArmazensLista
         armazens={armazens}
         onNew={() => { setSelectedId(null); setView('form') }}
+        onView={id => { setSelectedId(id); setView('view') }}
         onEdit={id => { setSelectedId(id); setView('form') }}
         onDelete={handleDelete}
       />

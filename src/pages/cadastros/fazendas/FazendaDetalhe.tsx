@@ -9,6 +9,8 @@ import {
 import { Badge } from '../../../components/ui/Badge'
 import type { BadgeVariant } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
+import { DetailGrid } from '../../../components/ui/DetailGrid'
+import { FormField } from '../../../components/ui/FormField'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { MapView } from '../../../components/ui/MapView'
 import { EmptyState } from '../../../components/ui/EmptyState'
@@ -35,54 +37,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'financeiro',    label: 'Financeiro' },
   { id: 'centrosCusto',  label: 'Centros de Custo' },
 ]
-
-function InfoField({ label, value, full }: { label: string; value: React.ReactNode; full?: boolean }) {
-  const { colors } = useTheme()
-  return (
-    <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
-      <div
-        style={{
-          fontSize: t.font.size.xs,
-          fontWeight: 600,
-          color: colors.fg.subtle,
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          marginBottom: 4,
-          fontFamily: t.font.family.sans,
-          transition: `color ${t.transition.smooth}`,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: t.font.size.base,
-          color: colors.fg.default,
-          fontFamily: t.font.family.sans,
-          fontWeight: 400,
-          minHeight: 20,
-          transition: `color ${t.transition.smooth}`,
-        }}
-      >
-        {value || <span style={{ color: colors.border.default }}>—</span>}
-      </div>
-    </div>
-  )
-}
-
-function FieldGrid({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '20px 32px',
-      }}
-    >
-      {children}
-    </div>
-  )
-}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme()
@@ -132,12 +86,12 @@ function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
         transition: `background ${t.transition.smooth}`,
       }}
     >
-      <FieldGrid>
-        <InfoField label="Razão Social / Nome" value={f.nome} />
-        <InfoField label="CPF / CNPJ" value={f.cpfCnpj} />
-        <InfoField label="Inscrição Estadual" value={f.inscricaoEstadual} />
-        <InfoField label="Telefone" value={f.telefone} />
-      </FieldGrid>
+      <DetailGrid columns={2} items={[
+        { label: 'Razão Social / Nome', value: f.nome },
+        { label: 'CPF / CNPJ', value: f.cpfCnpj },
+        { label: 'Inscrição Estadual', value: f.inscricaoEstadual },
+        { label: 'Telefone', value: f.telefone },
+      ]} />
     </div>
   )
 }
@@ -145,21 +99,19 @@ function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
 function TabDocumentacao({ f }: { f: FazendaDetalheData }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <FieldGrid>
-        <InfoField label="Tipo de Exploração" value={f.tipoExploracao} />
-      </FieldGrid>
+      <DetailGrid columns={2} items={[
+        { label: 'Tipo de Exploração', value: f.tipoExploracao },
+      ]} />
 
       <div>
         <SectionTitle>Registros Ambientais e Fundiários</SectionTitle>
-        <FieldGrid>
-          <InfoField label="CAR — Cadastro Ambiental Rural" value={
-            <span style={{ fontSize: t.font.size.sm, fontFamily: 'monospace' }}>{f.car}</span>
-          } />
-          <InfoField label="NIRF — Imóvel Rural" value={f.nirf} />
-          <InfoField label="CCIR — Certificado de Cadastro" value={f.ccir} />
-          <InfoField label="CAFIR — Imóvel Rural" value={f.cafir} />
-          <InfoField label="CAE-PI — Produtor Integrado" value={f.caepi} />
-        </FieldGrid>
+        <DetailGrid columns={2} items={[
+          { label: 'CAR — Cadastro Ambiental Rural', value: f.car },
+          { label: 'NIRF — Imóvel Rural', value: f.nirf },
+          { label: 'CCIR — Certificado de Cadastro', value: f.ccir },
+          { label: 'CAFIR — Imóvel Rural', value: f.cafir },
+          { label: 'CAE-PI — Produtor Integrado', value: f.caepi },
+        ]} />
       </div>
     </div>
   )
@@ -186,25 +138,25 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
 
       <div>
         <SectionTitle>Endereço</SectionTitle>
-        <FieldGrid>
-          <InfoField label="País" value={f.pais} />
-          <InfoField label="CEP" value={f.cep} />
-          <InfoField label="Cidade" value={f.cidade} />
-          <InfoField label="UF" value={f.uf} />
-          <InfoField label="Endereço" value={f.endereco} />
-          <InfoField label="Número / Referência" value={f.numero} />
-          <InfoField label="Bairro / Distrito" value={f.bairro} />
-        </FieldGrid>
+        <DetailGrid columns={2} items={[
+          { label: 'País', value: f.pais },
+          { label: 'CEP', value: f.cep },
+          { label: 'Cidade', value: f.cidade },
+          { label: 'UF', value: f.uf },
+          { label: 'Endereço', value: f.endereco },
+          { label: 'Número / Referência', value: f.numero },
+          { label: 'Bairro / Distrito', value: f.bairro },
+        ]} />
       </div>
 
       <div>
         <SectionTitle>Geolocalização</SectionTitle>
-        <FieldGrid>
-          <InfoField label="Latitude" value={f.latitude} />
-          <InfoField label="Longitude" value={f.longitude} />
-          <InfoField
-            label="Mapa"
-            value={
+        <DetailGrid columns={2} items={[
+          { label: 'Latitude', value: f.latitude },
+          { label: 'Longitude', value: f.longitude },
+          {
+            label: 'Mapa',
+            value: (
               <a
                 href={googleMapsUrl}
                 target="_blank"
@@ -224,9 +176,9 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
                 Ver no Google Maps
                 <ExternalLink size={11} />
               </a>
-            }
-          />
-        </FieldGrid>
+            ),
+          },
+        ]} />
       </div>
     </div>
   )
@@ -243,32 +195,30 @@ function TabFinanceiro({ f }: { f: FazendaDetalheData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       <div>
         <SectionTitle>Área e Valores</SectionTitle>
-        <FieldGrid>
-          <InfoField label="Moeda" value={f.moeda === 'BRL' ? 'Real Brasileiro (BRL)' : f.moeda} />
-          <InfoField label="Área Total" value={`${f.areaTotal.toLocaleString('pt-BR')} ha`} />
-          <InfoField
-            label="Valor por Hectare"
-            value={f.valorHa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          />
-          <InfoField
-            label="Taxa de Remuneração"
-            value={`${f.taxaRemuneracao.toLocaleString('pt-BR', { minimumFractionDigits: 1 })} % a.a.`}
-          />
-          <InfoField
-            label="Valor Total Estimado"
-            value={
-              <span style={{ fontWeight: 600, color: t.color.brand[600] }}>{valorTotal}</span>
-            }
-          />
-        </FieldGrid>
+        <DetailGrid columns={2} items={[
+          { label: 'Moeda', value: f.moeda === 'BRL' ? 'Real Brasileiro (BRL)' : f.moeda },
+          { label: 'Área Total', value: `${f.areaTotal.toLocaleString('pt-BR')} ha` },
+          {
+            label: 'Valor por Hectare',
+            value: f.valorHa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          },
+          {
+            label: 'Taxa de Remuneração',
+            value: `${f.taxaRemuneracao.toLocaleString('pt-BR', { minimumFractionDigits: 1 })} % a.a.`,
+          },
+          {
+            label: 'Valor Total Estimado',
+            value: <span style={{ fontWeight: 600, color: t.color.brand[600] }}>{valorTotal}</span>,
+          },
+        ]} />
       </div>
 
       <div>
         <SectionTitle>Configurações Financeiras</SectionTitle>
-        <FieldGrid>
-          <InfoField label="Status" value={<BoolField value={f.ativo} trueLabel="Ativo" falseLabel="Inativo" />} />
-          <InfoField label="Uso de Livro Caixa" value={<BoolField value={f.usoLivroCaixa} />} />
-        </FieldGrid>
+        <DetailGrid columns={2} items={[
+          { label: 'Status', value: <BoolField value={f.ativo} trueLabel="Ativo" falseLabel="Inativo" /> },
+          { label: 'Uso de Livro Caixa', value: <BoolField value={f.usoLivroCaixa} /> },
+        ]} />
       </div>
     </div>
   )
@@ -329,21 +279,7 @@ function TabCentrosCusto({ f }: { f: FazendaDetalheData }) {
       {f.observacao && (
         <div>
           <SectionTitle>Observações</SectionTitle>
-          <p
-            style={{
-              fontSize: t.font.size.base,
-              color: colors.fg.muted,
-              lineHeight: 1.6,
-              fontFamily: t.font.family.sans,
-              background: colors.bg.subtle,
-              borderRadius: t.radius.base,
-              padding: '12px 14px',
-              margin: 0,
-              transition: `color ${t.transition.smooth}, background ${t.transition.smooth}`,
-            }}
-          >
-            {f.observacao}
-          </p>
+          <FormField variant="view" label="Observações" value={f.observacao} multiline />
         </div>
       )}
     </div>

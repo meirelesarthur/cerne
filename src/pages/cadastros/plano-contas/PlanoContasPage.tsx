@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import PlanoContasLista   from './PlanoContasLista'
 import PlanoContaCadastro from './PlanoContaCadastro'
+import PlanoContaDetalhe  from './PlanoContaDetalhe'
 import { mockPlanoContas } from './planoContas.mock'
 import type { Conta } from './planoContas.types'
 import type { ImportResult } from './planoContas.io'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'view'
 
 export default function PlanoContasPage() {
   const [view,       setView]       = useState<View>('list')
@@ -61,10 +62,22 @@ export default function PlanoContasPage() {
     )
   }
 
+  if (view === 'view' && selected) {
+    return (
+      <PlanoContaDetalhe
+        conta={selected}
+        contas={contas}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <PlanoContasLista
       contas={contas}
       onNew={() => { setSelectedId(null); setPresetAntecessorId(null); setView('form') }}
+      onView={(id) => { setSelectedId(id); setView('view') }}
       onEdit={(id) => { setSelectedId(id); setPresetAntecessorId(null); setView('form') }}
       onCreateDescendant={handleCreateDescendant}
       onDelete={handleDelete}

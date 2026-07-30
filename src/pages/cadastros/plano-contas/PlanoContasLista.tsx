@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, Printer, FileSpreadsheet,
+  Plus, Eye, Pencil, Trash2, Printer, FileSpreadsheet,
   HelpCircle, Power, GitBranchPlus,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -36,6 +36,7 @@ import { PlanoContasImportModal } from './PlanoContasImportModal'
 interface PlanoContasListaProps {
   contas:         Conta[]
   onNew:          () => void
+  onView:         (id: number) => void
   onEdit:         (id: number) => void
   onCreateDescendant: (parentId: number) => void
   onDelete:       (id: number) => void
@@ -50,7 +51,7 @@ const PAGE_SIZE = 10
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PlanoContasLista({
-  contas, onNew, onEdit, onCreateDescendant, onDelete, onToggleAtivo, onImport,
+  contas, onNew, onView, onEdit, onCreateDescendant, onDelete, onToggleAtivo, onImport,
 }: PlanoContasListaProps) {
   const { colors } = useTheme()
 
@@ -273,6 +274,7 @@ export default function PlanoContasLista({
                     key={conta.id}
                     conta={conta}
                     isLast={idx === paginated.length - 1}
+                    onView={() => onView(conta.id)}
                     onEdit={() => onEdit(conta.id)}
                     onCreateDescendant={() => onCreateDescendant(conta.id)}
                     onDelete={() => handleDeleteClick(conta.id)}
@@ -437,10 +439,11 @@ export default function PlanoContasLista({
 // ─── Linha da tabela ──────────────────────────────────────────────────────────
 
 function ContaRow({
-  conta, isLast, onEdit, onCreateDescendant, onDelete, onToggleAtivo, colors, border,
+  conta, isLast, onView, onEdit, onCreateDescendant, onDelete, onToggleAtivo, colors, border,
 }: {
   conta:         Conta
   isLast:        boolean
+  onView:        () => void
   onEdit:        () => void
   onCreateDescendant: () => void
   onDelete:      () => void
@@ -450,6 +453,10 @@ function ContaRow({
 }) {
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar conta ${conta.descricao}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: '90px 100px 90px 1fr 80px 80px 60px',
@@ -458,9 +465,12 @@ function ContaRow({
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         alignItems: 'center',
         transition: `background ${t.animation.duration.faster}`,
+        cursor: 'pointer',
       }}
       onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       {/* Código */}
       <span title={conta.codigo} style={{
@@ -517,11 +527,12 @@ function ContaRow({
       </div>
 
       {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
         <DropdownMenu
           align="right"
           ariaLabel="Ações da conta"
           items={[
+            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: onView },
             { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />,       onClick: onEdit },
             // "Criar Descendente" só se aplica a contas Sintéticas — Analíticas
             // são folhas e não podem ter contas-filhas.

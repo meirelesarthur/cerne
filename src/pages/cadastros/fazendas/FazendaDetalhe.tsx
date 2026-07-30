@@ -76,23 +76,13 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
 }
 
 function IdentificacaoHeader({ f }: { f: FazendaDetalheData }) {
-  const { colors } = useTheme()
   return (
-    <div
-      style={{
-        background: colors.bg.subtle,
-        borderRadius: t.radius.xl,
-        padding: `${t.space[5]}px ${t.space[6]}px`,
-        transition: `background ${t.transition.smooth}`,
-      }}
-    >
-      <DetailGrid columns={2} items={[
-        { label: 'Razão Social / Nome', value: f.nome },
-        { label: 'CPF / CNPJ', value: f.cpfCnpj },
-        { label: 'Inscrição Estadual', value: f.inscricaoEstadual },
-        { label: 'Telefone', value: f.telefone },
-      ]} />
-    </div>
+    <DetailGrid columns={2} items={[
+      { label: 'Razão Social / Nome', value: f.nome },
+      { label: 'CPF / CNPJ', value: f.cpfCnpj },
+      { label: 'Inscrição Estadual', value: f.inscricaoEstadual },
+      { label: 'Telefone', value: f.telefone },
+    ]} />
   )
 }
 

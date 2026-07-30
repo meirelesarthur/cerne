@@ -356,9 +356,10 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
           <span
             style={{
               fontFamily: t.font.family.sans,
-              fontSize: t.font.size.base,
-              fontWeight: t.font.weight.bold,
-              lineHeight: '20px',
+              fontSize: t.font.size.xs,
+              fontWeight: t.font.weight.semibold,
+              lineHeight: '16px',
+              letterSpacing: '0.04em',
               color: colors.fg.subtle,
               textTransform: 'uppercase',
             }}
@@ -374,9 +375,10 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
             lineHeight: '20px',
             color: colors.fg.default,
             // gap:0 no container + margin-top negativo: CSS `gap` não aceita valor
-            // negativo, e o Figma pede rótulo/valor 6px mais próximos que 20px de
-            // line-height permitiria.
-            marginTop: -6,
+            // negativo. Rótulo (16px lh) + valor (20px lh) - 4px de sobreposição =
+            // 32px, exatamente o espaço restante na caixa de 56px após os 12px de
+            // padding vertical (topo+base) — preenche a caixa sem sobra nem corte.
+            marginTop: -4,
             cursor: 'default',
             ...(multiline
               ? { whiteSpace: 'pre-wrap', wordBreak: 'break-word' }

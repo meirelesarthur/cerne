@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
 import EmbalagemLista    from './EmbalagemLista'
 import EmbalagemCadastro from './EmbalagemCadastro'
+import EmbalagemDetalhe  from './EmbalagemDetalhe'
 import { mockEmbalagens }            from './embalagens.mock'
 import { useToast, ToastContainer }  from '../../../components/ui/Toast'
 import type { Embalagem }            from './embalagens.types'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'view'
 
 export default function EmbalagensPage() {
   const [view,       setView]       = useState<View>('list')
@@ -42,11 +43,22 @@ export default function EmbalagensPage() {
     )
   }
 
+  if (view === 'view' && selected) {
+    return (
+      <EmbalagemDetalhe
+        embalagem={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <>
       <EmbalagemLista
         embalagens={embalagens}
         onNew={() => { setSelectedId(null); setView('form') }}
+        onView={id => { setSelectedId(id); setView('view') }}
         onEdit={id => { setSelectedId(id); setView('form') }}
         onDelete={handleDelete}
       />

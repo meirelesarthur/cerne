@@ -26,6 +26,7 @@ import { fmtQtd, UNIDADE_OPTS, type Embalagem } from './embalagens.types'
 interface Props {
   embalagens: Embalagem[]
   onNew:      () => void
+  onView:     (id: number) => void
   onEdit:     (id: number) => void
   onDelete:   (id: number) => void
 }
@@ -34,7 +35,7 @@ interface Props {
 
 type SortDir = 'asc' | 'desc'
 
-export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: Props) {
+export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDelete }: Props) {
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
@@ -181,6 +182,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
                   key={emb.id}
                   emb={emb}
                   isLast={idx === paginatedData.length - 1}
+                  onView={() => onView(emb.id)}
                   onEdit={() => onEdit(emb.id)}
                   onDeleteReq={() => setDeleteTarget(emb)}
                   colors={colors}
@@ -249,10 +251,11 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
 // ─── Linha da tabela ──────────────────────────────────────────────────────────
 
 function EmbalagemRow({
-  emb, isLast, onEdit, onDeleteReq, colors, border,
+  emb, isLast, onView, onEdit, onDeleteReq, colors, border,
 }: {
   emb:         Embalagem
   isLast:      boolean
+  onView:      () => void
   onEdit:      () => void
   onDeleteReq: () => void
   colors:      ReturnType<typeof useTheme>['colors']
@@ -263,6 +266,10 @@ function EmbalagemRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar embalagem ${emb.descricao}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: '1fr 140px 160px 96px',
@@ -272,9 +279,12 @@ function EmbalagemRow({
         background: hovered ? colors.bg.subtle : 'transparent',
         transition: `background ${t.animation.duration.faster}`,
         alignItems: 'center',
+        cursor: 'pointer',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       <span title={emb.descricao} style={{
         fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
@@ -297,7 +307,7 @@ function EmbalagemRow({
       </span>
 
       {/* Ações inline */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
         <IconButton icon={<Pencil size={13} />} aria-label="Editar"  size="xs" onClick={onEdit} />
         <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" size="xs" danger onClick={onDeleteReq} />
       </div>

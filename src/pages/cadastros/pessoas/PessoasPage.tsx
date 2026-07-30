@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import PessoasLista from './PessoasLista'
-import PessoaForm   from './PessoaForm'
+import PessoasLista   from './PessoasLista'
+import PessoaForm     from './PessoaForm'
+import PessoaDetalhe  from './PessoaDetalhe'
 import { mockPessoas } from './pessoas.mock'
 import type { Pessoa } from './pessoas.types'
 
@@ -31,13 +32,22 @@ export default function PessoasPage() {
     setPessoas((prev) => prev.filter((p) => p.id !== id))
   }
 
-  if (view === 'form' || view === 'view') {
+  if (view === 'form') {
     return (
       <PessoaForm
         initialData={selected ?? undefined}
-        readOnly={view === 'view'}
         onBack={() => setView('list')}
         onSave={handleSave}
+      />
+    )
+  }
+
+  if (view === 'view' && selected) {
+    return (
+      <PessoaDetalhe
+        pessoa={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
       />
     )
   }

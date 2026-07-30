@@ -102,17 +102,14 @@ function validateStep(key: StepKey, form: Pessoa, isEdit: boolean): Record<strin
 
 interface Props {
   initialData?: Pessoa
-  /** Modo somente-leitura (ação "Ver detalhes"). */
-  readOnly?:    boolean
   onBack:       () => void
   onSave:       (p: Pessoa) => void
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
-export default function PessoaForm({ initialData, readOnly = false, onBack, onSave }: Props) {
+export default function PessoaForm({ initialData, onBack, onSave }: Props) {
   const isEdit   = Boolean(initialData)
-  const disabled = readOnly
   const { toasts, show, dismiss } = useToast()
 
   const [form, setForm]       = useState<Pessoa>(() => initialData ?? emptyPessoa())
@@ -150,18 +147,15 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
   const goTo = (key: StepKey) => { setErrors({}); setCurrentKey(key) }
 
   const handleNext = () => {
-    if (!readOnly) {
-      const stepErrors = validateStep(currentKey, form, isEdit)
-      if (Object.keys(stepErrors).length > 0) {
-        setErrors(stepErrors)
-        focusFirstError()
-        show(Object.values(stepErrors)[0] ?? 'Há campos pendentes — verifique os destaques em vermelho.', 'error')
-        return
-      }
+    const stepErrors = validateStep(currentKey, form, isEdit)
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors)
+      focusFirstError()
+      show(Object.values(stepErrors)[0] ?? 'Há campos pendentes — verifique os destaques em vermelho.', 'error')
+      return
     }
     setCompleted((c) => (c.includes(currentKey) ? c : [...c, currentKey]))
     if (isLast) {
-      if (readOnly) { onBack(); return }
       onSave(form)
       show('Pessoa salva com sucesso.', 'success', 2500)
     } else {
@@ -177,7 +171,7 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
   }
 
   // ── Render do step ativo ─────────────────────────────────────────────────────
-  const stepProps = { form, errors, set, setRole, disabled }
+  const stepProps = { form, errors, set, setRole }
   const renderStep = () => {
     switch (currentKey) {
       case 'basico':      return <StepDadosBasicos {...stepProps} onToggleRole={onToggleRole} />
@@ -205,13 +199,13 @@ export default function PessoaForm({ initialData, readOnly = false, onBack, onSa
             totalSteps={steps.length}
             onBack={handleBack}
             onNext={handleNext}
-            nextLabel={isLast ? (readOnly ? 'Fechar' : 'Salvar Pessoa') : undefined}
+            nextLabel={isLast ? 'Salvar Pessoa' : undefined}
           />
         }
         footerBare
       >
         <FormPageHeader
-          title={readOnly ? 'Detalhes da Pessoa' : isEdit ? 'Editar Pessoa' : 'Nova Pessoa'}
+          title={isEdit ? 'Editar Pessoa' : 'Nova Pessoa'}
           subtitle={isEdit ? `${form.name} — ${form.nickname}` : 'Preencha as etapas para cadastrar a pessoa.'}
           onBack={guard.guardedBack}
           paddingTop={t.space[4]}

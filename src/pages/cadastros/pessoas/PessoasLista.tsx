@@ -286,14 +286,21 @@ function PessoaRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar pessoa ${pessoa.name}`}
+      className="gb-focusable"
       style={{
         display: 'grid', gridTemplateColumns: GRID,
         padding: '0 16px', minHeight: t.size.tableRow,
         borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
         alignItems: 'center', transition: `background ${t.transition.fast}`,
+        cursor: 'pointer',
       }}
       onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+      onClick={onView}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       {/* Nome + Avatar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + 2, minWidth: 0, paddingRight: t.space[3] }}>
@@ -339,7 +346,7 @@ function PessoaRow({
       </div>
 
       {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
         <DropdownMenu
           align="right"
           ariaLabel={`Ações de ${pessoa.name}`}

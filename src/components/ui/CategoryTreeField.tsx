@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { t } from '../../design/tokens'
@@ -84,60 +84,84 @@ export function CategoryTreeField({
         </div>
       </div>
 
-      <div style={{ padding: '12px 18px 16px', display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 420, overflowY: 'auto' }}>
-        {tree.map(cat => {
-          const groupIds      = [cat.id, ...cat.children.map(c => c.id)]
-          const groupSelected = groupIds.every(id => selected.includes(id))
-          const groupPartial  = !groupSelected && groupIds.some(id => selected.includes(id))
-          const isOpen        = expanded[cat.id] ?? false
+      <div style={{ padding: `0 ${t.space[2]}px`, maxHeight: 420, overflowY: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {tree.map(cat => {
+              const groupIds      = [cat.id, ...cat.children.map(c => c.id)]
+              const groupSelected = groupIds.every(id => selected.includes(id))
+              const groupPartial  = !groupSelected && groupIds.some(id => selected.includes(id))
+              const hasChildren   = cat.children.length > 0
+              const isOpen        = hasChildren && (expanded[cat.id] ?? false)
 
-          return (
-            <div key={cat.id}>
-              <div
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '7px 6px',
-                  borderRadius: t.radius.base,
-                  cursor: 'pointer',
-                  transition: `background ${t.animation.duration.faster}`,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-                onClick={() => setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] }))}
-              >
-                <Checkbox
-                  checked={groupSelected}
-                  indeterminate={groupPartial}
-                  onChange={() => toggleGroup(cat)}
-                  aria-label={cat.label}
-                />
-                <span style={{
-                  flex: 1, fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
-                  color: colors.fg.default, fontFamily: t.font.family.sans,
-                  letterSpacing: '0.01em',
-                }}>
-                  {cat.label}
-                </span>
-                <ChevronDown
-                  size={14}
-                  color={colors.fg.subtle}
-                  style={{
-                    transform: isOpen ? 'rotate(180deg)' : 'none',
-                    transition: `transform ${t.animation.duration.fast}`,
-                    flexShrink: 0,
-                  }}
-                />
-              </div>
+              return (
+                <Fragment key={cat.id}>
+                  <tr
+                    style={{
+                      height: t.size.tableRow,
+                      borderBottom: `1px solid ${colors.border.subtle}`,
+                      cursor: hasChildren ? 'pointer' : 'default',
+                      transition: `background ${t.animation.duration.faster}`,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                    onClick={hasChildren ? () => setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] })) : undefined}
+                  >
+                    <td style={{ width: t.size.iconBtn.sm, padding: 0 }}>
+                      {hasChildren ? (
+                        <button
+                          type="button"
+                          className="gb-focusable"
+                          aria-label={isOpen ? 'Recolher' : 'Expandir'}
+                          onClick={e => { e.stopPropagation(); setExpanded(prev => ({ ...prev, [cat.id]: !prev[cat.id] })) }}
+                          style={{
+                            width: t.size.iconBtn.sm,
+                            height: t.size.iconBtn.sm,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: colors.fg.subtle,
+                            flexShrink: 0,
+                            padding: 0,
+                            borderRadius: t.radius.sm,
+                            transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                            transition: `transform ${t.transition.fast}`,
+                          }}
+                        >
+                          <ChevronRight size={t.icon.xs} />
+                        </button>
+                      ) : (
+                        <span style={{ display: 'block', width: t.size.iconBtn.sm }} />
+                      )}
+                    </td>
+                    <td style={{ width: t.size.checkbox, padding: `0 ${t.space[1]}px 0 0` }} onClick={e => e.stopPropagation()}>
+                      <Checkbox
+                        checked={groupSelected}
+                        indeterminate={groupPartial}
+                        onChange={() => toggleGroup(cat)}
+                        aria-label={cat.label}
+                      />
+                    </td>
+                    <td style={{ padding: `0 ${t.space[2]}px 0 0` }}>
+                      <span style={{
+                        fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
+                        color: colors.fg.default, fontFamily: t.font.family.sans,
+                        letterSpacing: '0.01em',
+                      }}>
+                        {cat.label}
+                      </span>
+                    </td>
+                  </tr>
 
-              {isOpen && (
-                <div style={{ marginLeft: 28, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {cat.children.map(child => (
-                    <div
+                  {isOpen && cat.children.map(child => (
+                    <tr
                       key={child.id}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        padding: '5px 6px',
-                        borderRadius: t.radius.base,
+                        height: t.size.tableRow,
+                        borderBottom: `1px solid ${colors.border.subtle}`,
                         cursor: 'pointer',
                         transition: `background ${t.animation.duration.faster}`,
                       }}
@@ -145,21 +169,26 @@ export function CategoryTreeField({
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                       onClick={() => toggleItem(child.id)}
                     >
-                      <Checkbox
-                        checked={selected.includes(child.id)}
-                        onChange={() => toggleItem(child.id)}
-                        aria-label={child.label}
-                      />
-                      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
-                        {child.label}
-                      </span>
-                    </div>
+                      <td style={{ width: t.size.iconBtn.sm, padding: 0 }} />
+                      <td style={{ width: t.size.checkbox, padding: `0 ${t.space[1]}px 0 ${t.space[4]}px` }} onClick={e => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selected.includes(child.id)}
+                          onChange={() => toggleItem(child.id)}
+                          aria-label={child.label}
+                        />
+                      </td>
+                      <td style={{ padding: `0 ${t.space[2]}px 0 0` }}>
+                        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
+                          {child.label}
+                        </span>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
+                </Fragment>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )

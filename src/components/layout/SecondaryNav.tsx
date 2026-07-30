@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { ChevronRight, Star } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Star } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { IconButton } from '../ui/IconButton'
+import { Tooltip } from '../ui/Tooltip'
 import { t } from '../../design/tokens'
 
 // ─── sub-components ──────────────────────────────────────────────────────────
@@ -230,6 +231,48 @@ function NavFlatList({
   )
 }
 
+function collectAllItems(module: NavModule): NavSubItem[] {
+  return [
+    ...(module.flatItems ?? []),
+    ...(module.groups?.flatMap((g) => g.items) ?? []),
+  ]
+}
+
+function CollapsedIconList({
+  module,
+  activeItemId,
+  onItemClick,
+}: {
+  module: NavModule
+  activeItemId: string | null
+  onItemClick: (id: string) => void
+}) {
+  const items = collectAllItems(module)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      {items.map((item) => {
+        const Icon = item.icon
+        const hasActiveChild = item.children?.some((c) => c.id === activeItemId)
+        const isActive = activeItemId === item.id || hasActiveChild
+        const targetId = item.children?.length ? item.children[0].id : item.id
+
+        return (
+          <Tooltip key={item.id} label={item.label}>
+            <button
+              className={`nav-icon-btn ${isActive ? 'active' : ''}`}
+              onClick={() => onItemClick(targetId)}
+              aria-label={item.label}
+            >
+              <Icon size={16} aria-hidden="true" />
+            </button>
+          </Tooltip>
+        )
+      })}
+    </div>
+  )
+}
+
 // ─── main component ───────────────────────────────────────────────────────────
 
 function computeOpenGroup(module: NavModule, activeItemId: string | null): string | null {
@@ -251,6 +294,7 @@ export default function SecondaryNav({
   onItemClick,
 }: SecondaryNavProps) {
   const [openGroupId, setOpenGroupId] = useState<string | null>(() => computeOpenGroup(module, activeItemId))
+  const [collapsed, setCollapsed] = useState(false)
 
   // Recalcula apenas na troca de módulo — preserva o grupo aberto manualmente
   // quando o usuário apenas seleciona outro item dentro do mesmo módulo.
@@ -265,40 +309,88 @@ export default function SecondaryNav({
   }
 
   const { colors } = useTheme()
+  const w = collapsed ? 56 : 224
 
   return (
     <div
       style={{
-        width: 224,
-        minWidth: 224,
+        width: w,
+        minWidth: w,
         background: colors.bg.surface,
         borderRadius: t.radius.xl,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        transition: 'background 0.2s',
+        transition: 'width 0.2s ease, min-width 0.2s ease, background 0.2s',
       }}
     >
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 8px' }}>
-        {module.flatItems && <NavHeader module={module} />}
-        {module.flatItems ? (
-          <NavFlatList
-            items={module.flatItems}
-            activeItemId={activeItemId}
-            onItemClick={onItemClick}
-          />
+        {collapsed ? (
+          <CollapsedIconList module={module} activeItemId={activeItemId} onItemClick={onItemClick} />
         ) : (
-          module.groups?.map((group) => (
-            <NavGroupSection
-              key={group.id}
-              group={group}
-              open={openGroupId === group.id}
-              activeItemId={activeItemId}
-              onToggle={() => toggleGroup(group.id)}
-              onItemClick={onItemClick}
-            />
-          ))
+          <>
+            {module.flatItems && <NavHeader module={module} />}
+            {module.flatItems ? (
+              <NavFlatList
+                items={module.flatItems}
+                activeItemId={activeItemId}
+                onItemClick={onItemClick}
+              />
+            ) : (
+              module.groups?.map((group) => (
+                <NavGroupSection
+                  key={group.id}
+                  group={group}
+                  open={openGroupId === group.id}
+                  activeItemId={activeItemId}
+                  onToggle={() => toggleGroup(group.id)}
+                  onItemClick={onItemClick}
+                />
+              ))
+            )}
+          </>
         )}
+      </div>
+
+      {/* Recolher/expandir segundo nível */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: collapsed ? 'center' : 'flex-end',
+          padding: `${t.space[1]}px ${t.space[2]}px ${t.space[2]}px`,
+          flexShrink: 0,
+        }}
+      >
+        <Tooltip label={collapsed ? 'Expandir menu' : 'Recolher menu'}>
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? 'Expandir segundo nível do menu' : 'Recolher segundo nível do menu'}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: t.radius.full,
+              border: `1px solid ${colors.border.default}`,
+              background: colors.bg.surface,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: colors.fg.subtle,
+              flexShrink: 0,
+              transition: `background ${t.transition.fast}, color ${t.transition.fast}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = colors.nav.itemHover
+              e.currentTarget.style.color = colors.nav.textActive
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = colors.bg.surface
+              e.currentTarget.style.color = colors.fg.subtle
+            }}
+          >
+            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
+        </Tooltip>
       </div>
     </div>
   )

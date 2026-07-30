@@ -128,7 +128,7 @@ export function CrudPattern<T extends CrudEntity>({
     if (mode === 'create') {
       const record = { id: crypto.randomUUID(), ...draft } as T
       onRecordsChange([record, ...records])
-      show(`${singular} cadastrado com sucesso.`)
+      show(`${singular} cadastrado com sucesso.`, { type: 'success', action: { label: 'Visualizar', onClick: () => openRecord(record, 'show') } })
     } else if (mode === 'edit' && selected) {
       onRecordsChange(records.map((record) => record.id === selected.id ? { ...record, ...draft } : record))
       show(`${singular} atualizado com sucesso.`)

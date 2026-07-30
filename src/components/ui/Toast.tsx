@@ -161,18 +161,31 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
     >
       {/* Main row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], padding: `${t.space[2] + 2}px ${t.space[3]}px` }}>
-        <Icon size={t.icon.sm} style={{ flexShrink: 0 }} />
+        <div
+          style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            width:          t.size.iconBtn.sm,
+            height:         t.size.iconBtn.sm,
+            borderRadius:   t.radius.sm,
+            background:     'rgba(255,255,255,0.18)',
+            flexShrink:     0,
+          }}
+        >
+          <Icon size={t.icon.sm} />
+        </div>
         <span style={{ flex: 1, lineHeight: t.font.lineHeight.snug }}>{toast.message}</span>
         {toast.action && (
           <button
             onClick={handleAction}
             className="gb-focusable"
             style={{
-              background:   'rgba(255,255,255,0.18)',
-              border:       '1px solid rgba(255,255,255,0.3)',
-              borderRadius: t.radius.sm,
+              background:   'rgba(255,255,255,0.16)',
+              border:       '1px solid rgba(255,255,255,0.4)',
+              borderRadius: t.radius.full,
               cursor:       'pointer',
-              padding:      `${t.space[1]}px ${t.space[2]}px`,
+              padding:      `${t.space[1]}px ${t.space[3]}px`,
               color:        t.color.neutral[0],
               fontSize:     t.font.size.xs,
               fontWeight:   t.font.weight.semibold,
@@ -180,7 +193,10 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
               flexShrink:   0,
               lineHeight:   1,
               whiteSpace:   'nowrap',
+              transition:   `background ${t.transition.fast}`,
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.3)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.16)' }}
           >
             {toast.action.label}
           </button>
@@ -208,8 +224,8 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
         </button>
       </div>
 
-      {/* Progress bar — only when action is present */}
-      {toast.action && !reduced && autoCloses && (
+      {/* Barra de progresso — countdown do auto-close, sempre visível quando aplicável */}
+      {!reduced && autoCloses && (
         <div style={{ height: 3, background: 'rgba(255,255,255,0.2)', position: 'relative' }}>
           <div
             style={{
@@ -241,8 +257,8 @@ function ToastViewport({ toasts, onDismiss }: ToastContainerProps) {
       aria-label="Notificações"
       style={{
         position:      'fixed',
-        top:           72,          // below topbar (~56px) + 16px breathing room
-        right:         t.space[6],  // 24px
+        top:           t.space[4],  // 16px
+        right:         t.space[4],  // 16px
         display:       'flex',
         flexDirection: 'column',
         gap:           t.space[2],

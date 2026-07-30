@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Pencil } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -35,6 +35,8 @@ interface ContaBancariaCadastroProps {
   onBack:       () => void
   onSave:       (conta: ContaBancaria) => void
   readOnly?:    boolean
+  /** Chamado pelo botão Editar quando em modo somente-leitura. */
+  onEdit?:      () => void
 }
 
 interface FormData {
@@ -64,7 +66,7 @@ const emptyForm: FormData = {
 }
 
 export default function ContaBancariaCadastro({
-  initialData, allContas, onBack, onSave, readOnly = false,
+  initialData, allContas, onBack, onSave, readOnly = false, onEdit,
 }: ContaBancariaCadastroProps) {
   const { colors } = useTheme()
   const isEdit = !!initialData
@@ -191,7 +193,12 @@ export default function ContaBancariaCadastro({
       <PageCard
         footer={
           readOnly ? (
-            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>Voltar</Button>
+            <>
+              <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>Voltar</Button>
+              {onEdit && (
+                <Button variant="primary" onClick={onEdit} icon={<Pencil size={14} />}>Editar</Button>
+              )}
+            </>
           ) : (
             <>
               <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>

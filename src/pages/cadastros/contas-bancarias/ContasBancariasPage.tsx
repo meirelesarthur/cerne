@@ -39,6 +39,7 @@ export default function ContasBancariasPage() {
         onBack={() => setView('list')}
         onSave={handleSave}
         readOnly={view === 'view'}
+        onEdit={view === 'view' ? () => setView('form') : undefined}
       />
     )
   }

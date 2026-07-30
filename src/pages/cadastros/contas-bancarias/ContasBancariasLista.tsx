@@ -294,6 +294,10 @@ function ContaRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar conta bancária ${conta.descricao}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: '1.4fr 110px 90px 100px 1.2fr 100px 110px 70px 70px 60px',
@@ -302,9 +306,12 @@ function ContaRow({
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         alignItems: 'center',
         transition: `background ${t.animation.duration.faster}`,
+        cursor: 'pointer',
       }}
       onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       <span title={conta.descricao} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {conta.sigla} — {conta.descricao}
@@ -329,7 +336,7 @@ function ContaRow({
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Badge label={conta.emiteBoleto === 'sim' ? 'Sim' : 'Não'} variant={conta.emiteBoleto === 'sim' ? 'info' : 'neutral'} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
         <DropdownMenu
           align="right"
           ariaLabel="Ações da conta bancária"

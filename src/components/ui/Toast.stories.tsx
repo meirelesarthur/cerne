@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ToastContainer, useToast, type ToastItem } from './Toast'
+import { ToastContainer, ToastProvider, useToast, type ToastItem } from './Toast'
 import { Button } from './Button'
 import { t } from '../../design/tokens'
 
@@ -80,4 +80,32 @@ export const Interativo: Story = {
       </div>
     )
   },
+}
+
+function TrocaDeTelaDemo() {
+  const [editing, setEditing] = useState(true)
+  const { show } = useToast()
+
+  return editing ? (
+    <Button
+      onClick={() => {
+        show('Cadastro salvo e mantido após a troca de tela.')
+        setEditing(false)
+      }}
+    >
+      Salvar e voltar
+    </Button>
+  ) : (
+    <Button variant="secondary" onClick={() => setEditing(true)}>Abrir cadastro novamente</Button>
+  )
+}
+
+/** Reproduz o fluxo real: salvar desmonta o formulário, mas o toast global permanece visível. */
+export const PersistenciaEntreTelas: Story = {
+  name: 'Persistência após navegação',
+  render: () => (
+    <ToastProvider>
+      <TrocaDeTelaDemo />
+    </ToastProvider>
+  ),
 }

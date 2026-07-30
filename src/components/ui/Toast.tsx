@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { createContext, useState, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
 import { CheckCircle2, XCircle, Info, AlertTriangle, X } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { usePrefersReducedMotion } from './usePrefersReducedMotion'
@@ -19,6 +19,24 @@ export interface ToastItem {
   duration?: number
   action?:  ToastAction
 }
+
+export interface ShowToastOptions {
+  type?:     ToastType
+  duration?: number
+  action?:   ToastAction
+}
+
+interface ToastController {
+  toasts: ToastItem[]
+  show: (
+    message: string,
+    typeOrOptions?: ToastType | ShowToastOptions,
+    duration?: number,
+  ) => void
+  dismiss: (id: number) => void
+}
+
+const ToastContext = createContext<ToastController | null>(null)
 
 // ─── Design config ────────────────────────────────────────────────────────────
 
@@ -116,8 +134,8 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
 
   return (
     <div
-      role="status"
-      aria-live="polite"
+      role={toast.type === 'error' ? 'alert' : 'status'}
+      aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
       onMouseEnter={handlePause}
       onMouseLeave={handleResume}
       onFocus={handlePause}
@@ -216,10 +234,11 @@ export interface ToastContainerProps {
   onDismiss: (id: number) => void
 }
 
-export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
+function ToastViewport({ toasts, onDismiss }: ToastContainerProps) {
   if (toasts.length === 0) return null
   return (
     <div
+      aria-label="Notificações"
       style={{
         position:      'fixed',
         top:           72,          // below topbar (~56px) + 16px breathing room
@@ -238,16 +257,22 @@ export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
   )
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export interface ShowToastOptions {
-  type?:     ToastType
-  duration?: number
-  action?:   ToastAction
+/**
+ * Compatibilidade com telas e stories que ainda renderizam o container local.
+ * Dentro de `ToastProvider`, o viewport global já é a única saída visual e os
+ * containers locais não renderizam para impedir notificações duplicadas.
+ */
+export function ToastContainer(props: ToastContainerProps) {
+  const globalController = useContext(ToastContext)
+  if (globalController) return null
+  return <ToastViewport {...props} />
 }
 
-export function useToast() {
+// ─── Hook + provider global ───────────────────────────────────────────────────
+
+function useToastController(): ToastController {
   const [toasts, setToasts] = useState<ToastItem[]>([])
+  const nextId = useRef(0)
 
   /**
    * show(message)                          — success, default duration
@@ -260,7 +285,8 @@ export function useToast() {
     typeOrOptions: ToastType | ShowToastOptions = 'success',
     duration?: number,
   ) => {
-    const id = Date.now()
+    nextId.current += 1
+    const id = nextId.current
     if (typeof typeOrOptions === 'string') {
       setToasts(prev => [...prev, { id, message, type: typeOrOptions, duration }])
     } else {
@@ -274,4 +300,21 @@ export function useToast() {
   }, [])
 
   return { toasts, show, dismiss }
+}
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const controller = useToastController()
+
+  return (
+    <ToastContext.Provider value={controller}>
+      {children}
+      <ToastViewport toasts={controller.toasts} onDismiss={controller.dismiss} />
+    </ToastContext.Provider>
+  )
+}
+
+export function useToast(): ToastController {
+  const globalController = useContext(ToastContext)
+  const localController = useToastController()
+  return globalController ?? localController
 }

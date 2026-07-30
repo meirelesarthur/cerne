@@ -217,6 +217,9 @@ export function PermissionMatrixField({
         <div
           style={{
             flex: 1,
+            width: '100%',
+            maxWidth: 600,
+            minWidth: 0,
             display: 'flex',
             alignItems: 'center',
             gap: t.space[2] + 2,

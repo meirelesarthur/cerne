@@ -1,11 +1,12 @@
 import React from 'react'
-import { ArrowLeft, Pencil, Calendar, Users, TrendingUp, Clock } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 import { Button }     from '../../../components/ui/Button'
 import { Badge }      from '../../../components/ui/Badge'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { DetailGrid } from '../../../components/ui/DetailGrid'
+import { VDivider }   from '../../../components/ui/SectionDividers'
 import { t }          from '../../../design/tokens'
 import { useTheme }   from '../../../context/ThemeContext'
 import { WeekCanvas } from './WeekCanvas'
@@ -34,6 +35,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
   const { colors } = useTheme()
 
   const isAtiva = safra.ativo === 'sim'
+  const bc = colors.border.default as string
 
   const rebLabels: Record<string, string> = {
     individual: 'Individual',
@@ -45,25 +47,20 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
     desabilitado: 'Desabilitado',
   }
 
-  // Stats strip
+  // Stats strip — mesmo padrão visual dos dashboards (Financeiro/Pecuária):
+  // card único com divisórias finas (VDivider) em vez de cartões com ícone.
   const stats = [
     {
       label: 'Semanas',
       value: `${safra.weeks.length} semanas`,
-      icon: <Calendar size={16} color={t.color.brand[600]} />,
-      iconBg: '#d1fae5',
     },
     {
       label: 'Controle Rebanho',
       value: rebLabels[safra.reb],
-      icon: <Users size={16} color="#2563eb" />,
-      iconBg: '#dbeafe',
     },
     {
       label: 'Evolução Rebanho',
       value: evoLabels[safra.evo],
-      icon: <TrendingUp size={16} color="#7c3aed" />,
-      iconBg: '#ede9fe',
     },
     {
       label: 'Duração',
@@ -73,8 +70,6 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
         const months = Math.round((fim.getTime() - ini.getTime()) / (1000 * 60 * 60 * 24 * 30))
         return `~${months} meses`
       })(),
-      icon: <Clock size={16} color="#ea580c" />,
-      iconBg: '#ffedd5',
     },
   ]
 
@@ -111,38 +106,28 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
           />
 
           {/* ── Stats strip ───────────────────────────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-            {stats.map(s => (
-              <div
-                key={s.label}
-                style={{
-                  background: colors.bg.surface,
-                  borderRadius: t.radius.lg,
-                  padding: '12px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  transition: `background ${t.animation.duration.normal}`,
-                }}
-              >
-                <div style={{
-                  width: 34, height: 34, borderRadius: t.radius.base,
-                  background: s.iconBg,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  {s.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: t.font.size['2xs'], color: colors.fg.subtle, fontWeight: t.font.weight.semibold, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 }}>
+          <div
+            style={{
+              background: colors.bg.surface,
+              borderRadius: t.radius['2xl'],
+              border: `1px solid ${bc}`,
+              overflow: 'hidden',
+              transition: `background ${t.animation.duration.normal}`,
+            }}
+          >
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+              {stats.flatMap((s, i) => [
+                i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
+                <div key={s.label} style={{ flex: '1 1 180px', padding: `${t.space[4]}px ${t.space[5]}px` }}>
+                  <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[1] }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
+                  <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1.1 }}>
                     {s.value}
                   </div>
-                </div>
-              </div>
-            ))}
+                </div>,
+              ])}
+            </div>
           </div>
 
           {/* ── Dados gerais ─────────────────────────────────────────────────── */}

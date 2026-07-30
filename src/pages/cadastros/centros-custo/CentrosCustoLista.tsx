@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
-  Plus, Pencil, Trash2, HelpCircle,
+  Plus, Eye, Pencil, Trash2, HelpCircle,
 } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
@@ -31,6 +31,7 @@ import {
 interface CentrosCustoListaProps {
   centros:  CentroCusto[]
   onNew:    () => void
+  onView:   (id: number) => void
   onEdit:   (id: number) => void
   onDelete: (id: number) => void
 }
@@ -42,7 +43,7 @@ const PAGE_SIZE = 10
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function CentrosCustoLista({
-  centros, onNew, onEdit, onDelete,
+  centros, onNew, onView, onEdit, onDelete,
 }: CentrosCustoListaProps) {
   const { colors } = useTheme()
 
@@ -197,6 +198,7 @@ export default function CentrosCustoLista({
                     key={cc.id}
                     cc={cc}
                     isLast={idx === paginated.length - 1}
+                    onView={() => onView(cc.id)}
                     onEdit={() => onEdit(cc.id)}
                     onDelete={() => setDeleteId(cc.id)}
                     colors={colors}
@@ -209,11 +211,7 @@ export default function CentrosCustoLista({
 
               {/* ── Paginação ───────────────────────────────────────── */}
               {filtered.length > PAGE_SIZE && (
-                <div style={{
-                  marginTop: t.space[4],
-                  paddingTop: t.space[4],
-                  borderTop: `1px solid ${colors.border.subtle}`,
-                }}>
+                <div style={{ marginTop: t.space[3] }}>
                   <Pagination
                     page={page}
                     total={filtered.length}
@@ -334,10 +332,11 @@ export default function CentrosCustoLista({
 // ─── Linha da tabela ──────────────────────────────────────────────────────────
 
 function CCRow({
-  cc, isLast, onEdit, onDelete, colors, border,
+  cc, isLast, onView, onEdit, onDelete, colors, border,
 }: {
   cc:      CentroCusto
   isLast:  boolean
+  onView:  () => void
   onEdit:  () => void
   onDelete: () => void
   colors:  ReturnType<typeof useTheme>['colors']
@@ -347,6 +346,10 @@ function CCRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar centro de custo ${cc.descricao}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
@@ -355,9 +358,12 @@ function CCRow({
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         alignItems: 'center',
         transition: `background ${t.animation.duration.faster}`,
+        cursor: 'pointer',
       }}
       onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       {/* Código */}
       <span title={cc.codigo} style={{
@@ -423,11 +429,12 @@ function CCRow({
       </div>
 
       {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
         <DropdownMenu
           align="right"
           ariaLabel="Ações do centro de custo"
           items={[
+            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: onView },
             { id: 'edit',   label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
             { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
           ]}

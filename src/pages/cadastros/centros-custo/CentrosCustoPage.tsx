@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import CentrosCustoLista   from './CentrosCustoLista'
-import CentroCustoCadastro from './CentroCustoCadastro'
+import CentrosCustoLista    from './CentrosCustoLista'
+import CentroCustoCadastro  from './CentroCustoCadastro'
+import CentroCustoDetalhe   from './CentroCustoDetalhe'
 import { mockCentrosCusto } from './centrosCusto.mock'
 import { getAllDescendantCentroIds, type CentroCusto } from './centrosCusto.types'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'view'
 
 export default function CentrosCustoPage() {
   const [view,       setView]       = useState<View>('list')
@@ -45,10 +46,22 @@ export default function CentrosCustoPage() {
     )
   }
 
+  if (view === 'view' && selected) {
+    return (
+      <CentroCustoDetalhe
+        centro={selected}
+        centros={centros}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <CentrosCustoLista
       centros={centros}
       onNew={() => { setSelectedId(null); setView('form') }}
+      onView={(id) => { setSelectedId(id); setView('view') }}
       onEdit={(id) => { setSelectedId(id); setView('form') }}
       onDelete={handleDelete}
     />

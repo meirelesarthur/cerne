@@ -192,7 +192,7 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             </div>
 
             {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[4], paddingTop: t.space[4], borderTop: `1px solid ${colors.border.subtle}` }}>
+              <div style={{ marginTop: t.space[3] }}>
                 <Pagination page={safePage} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
               </div>
             )}

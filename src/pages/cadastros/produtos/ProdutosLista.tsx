@@ -312,7 +312,7 @@ export default function ProdutosLista({
 
         {/* Paginação */}
         {filtered.length > 0 && (
-          <div style={{ marginTop: 12 }}>
+          <div style={{ marginTop: t.space[3] }}>
             <Pagination
               page={page}
               total={filtered.length}

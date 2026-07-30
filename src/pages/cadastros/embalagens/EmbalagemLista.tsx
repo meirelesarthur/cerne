@@ -192,11 +192,7 @@ export default function EmbalagemLista({ embalagens, onNew, onEdit, onDelete }: 
             </div>
 
             {totalFiltered > PAGE_SIZE && (
-              <div style={{
-                marginTop: t.space[4],
-                paddingTop: t.space[4],
-                borderTop: `1px solid ${colors.border.subtle}`,
-              }}>
+              <div style={{ marginTop: t.space[3] }}>
                 <Pagination
                   page={page}
                   total={totalFiltered}

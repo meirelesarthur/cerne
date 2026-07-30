@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save, Pencil } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -34,9 +34,6 @@ interface ContaBancariaCadastroProps {
   allContas:    ContaBancaria[]
   onBack:       () => void
   onSave:       (conta: ContaBancaria) => void
-  readOnly?:    boolean
-  /** Chamado pelo botão Editar quando em modo somente-leitura. */
-  onEdit?:      () => void
 }
 
 interface FormData {
@@ -66,7 +63,7 @@ const emptyForm: FormData = {
 }
 
 export default function ContaBancariaCadastro({
-  initialData, allContas, onBack, onSave, readOnly = false, onEdit,
+  initialData, allContas, onBack, onSave,
 }: ContaBancariaCadastroProps) {
   const { colors } = useTheme()
   const isEdit = !!initialData
@@ -96,7 +93,7 @@ export default function ContaBancariaCadastro({
   const isFirstRender = useRef(true)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
-    if (!readOnly) guard.setIsDirty(true)
+    guard.setIsDirty(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
@@ -151,7 +148,7 @@ export default function ContaBancariaCadastro({
   }
 
   const handleSave = () => {
-    if (submitting || readOnly) return
+    if (submitting) return
     if (!validate()) return
 
     const conta: ContaBancaria = {
@@ -180,10 +177,8 @@ export default function ContaBancariaCadastro({
     }, 800)
   }
 
-  const title = readOnly
-    ? 'Visualizar Conta Bancária'
-    : isEdit ? 'Editar Conta Bancária' : 'Nova Conta Bancária'
-  const subtitle = readOnly || isEdit
+  const title = isEdit ? 'Editar Conta Bancária' : 'Nova Conta Bancária'
+  const subtitle = isEdit
     ? `${initialData!.sigla} — ${initialData!.descricao}`
     : 'Preencha os dados para criar uma conta bancária'
 
@@ -192,23 +187,14 @@ export default function ContaBancariaCadastro({
 
       <PageCard
         footer={
-          readOnly ? (
-            <>
-              <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>Voltar</Button>
-              {onEdit && (
-                <Button variant="primary" onClick={onEdit} icon={<Pencil size={14} />}>Editar</Button>
-              )}
-            </>
-          ) : (
-            <>
-              <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
-                Voltar
-              </Button>
-              <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
-                {isEdit ? 'Salvar alterações' : 'Salvar'}
-              </Button>
-            </>
-          )
+          <>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
+              Voltar
+            </Button>
+            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
+              {isEdit ? 'Salvar alterações' : 'Salvar'}
+            </Button>
+          </>
         }
       >
 
@@ -231,44 +217,37 @@ export default function ContaBancariaCadastro({
                     onClear={() => { set('banco', ''); setBancoQuery('') }}
                     placeholder="Buscar banco por nome ou código..."
                     error={errors.banco}
-                    disabled={readOnly}
                   />
-                  <FormField label="Agência" required value={form.agencia} error={errors.agencia} onChange={e => set('agencia', e.target.value)} disabled={readOnly} />
-                  <FormField label="Conta" required value={form.conta} error={errors.conta} onChange={e => set('conta', e.target.value)} disabled={readOnly} />
+                  <FormField label="Agência" required value={form.agencia} error={errors.agencia} onChange={e => set('agencia', e.target.value)} />
+                  <FormField label="Conta" required value={form.conta} error={errors.conta} onChange={e => set('conta', e.target.value)} />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 }}>
-                  <FormSelect label="Tipo" required options={TIPO_CONTA_OPTS} value={form.tipo} error={errors.tipo} onChange={e => set('tipo', e.target.value as TipoContaBancaria | '')} disabled={readOnly} />
-                  <FormField label="Sigla" required placeholder="Ex.: BB-CC" value={form.sigla} error={errors.sigla} onChange={e => set('sigla', e.target.value)} disabled={readOnly} />
-                  <FormSelect label="Usa no Livro Caixa" required options={SIM_NAO_OPTS} value={form.usaNoLivroCaixa} onChange={e => set('usaNoLivroCaixa', e.target.value as 'sim' | 'nao')} disabled={readOnly} />
-                  <FormSelect label="Ativo" required options={SIM_NAO_OPTS} value={form.ativo} onChange={e => set('ativo', e.target.value as 'sim' | 'nao')} disabled={readOnly} />
+                  <FormSelect label="Tipo" required options={TIPO_CONTA_OPTS} value={form.tipo} error={errors.tipo} onChange={e => set('tipo', e.target.value as TipoContaBancaria | '')} />
+                  <FormField label="Sigla" required placeholder="Ex.: BB-CC" value={form.sigla} error={errors.sigla} onChange={e => set('sigla', e.target.value)} />
+                  <FormSelect label="Usa no Livro Caixa" required options={SIM_NAO_OPTS} value={form.usaNoLivroCaixa} onChange={e => set('usaNoLivroCaixa', e.target.value as 'sim' | 'nao')} />
+                  <FormSelect label="Ativo" required options={SIM_NAO_OPTS} value={form.ativo} onChange={e => set('ativo', e.target.value as 'sim' | 'nao')} />
                 </div>
 
-                <FormField label="Descrição" required placeholder="Ex.: Banco do Brasil — Conta Movimento" value={form.descricao} error={errors.descricao} onChange={e => set('descricao', e.target.value)} disabled={readOnly} />
+                <FormField label="Descrição" required placeholder="Ex.: Banco do Brasil — Conta Movimento" value={form.descricao} error={errors.descricao} onChange={e => set('descricao', e.target.value)} />
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <FormField label="Limite" required hint="Limite de crédito/cheque especial associado à conta." mask="currency" value={form.limite} placeholder="R$ 0,00" error={errors.limite} onChange={e => set('limite', e.target.value)} disabled={readOnly} />
+                  <FormField label="Limite" required hint="Limite de crédito/cheque especial associado à conta." mask="currency" value={form.limite} placeholder="R$ 0,00" error={errors.limite} onChange={e => set('limite', e.target.value)} />
                   <FormSelect
                     label="Conta Investimento Vinculada"
                     hint="Associa esta conta a uma aplicação financeira ou caixa interno existente."
                     options={contaInvestimentoOpts}
                     value={form.contaInvestimentoVinculadaId}
                     onChange={e => set('contaInvestimentoVinculadaId', e.target.value)}
-                    disabled={readOnly}
                   />
                 </div>
 
-                {!readOnly && isEdit && (
+                {isEdit && (
                   <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
                     Saldo atual: {formatCurrencyBRL(initialData!.saldo)}
                     <span style={{ fontWeight: t.font.weight.normal, color: colors.fg.subtle, marginLeft: 8, fontSize: t.font.size.xs }}>
                       (calculado a partir do Saldo Inicial + lançamentos — não editável aqui)
                     </span>
-                  </div>
-                )}
-                {readOnly && (
-                  <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
-                    Saldo atual: {formatCurrencyBRL(initialData!.saldo)}
                   </div>
                 )}
               </div>
@@ -277,18 +256,18 @@ export default function ContaBancariaCadastro({
             {/* ── Seção: Emissão de Boleto ──────────────────────────────── */}
             <SectionBlock title="Emissão de Boleto" colors={colors}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <FormSelect label="Emite Boleto" required options={SIM_NAO_OPTS} value={form.emiteBoleto} onChange={e => set('emiteBoleto', e.target.value as 'sim' | 'nao')} disabled={readOnly} />
+                <FormSelect label="Emite Boleto" required options={SIM_NAO_OPTS} value={form.emiteBoleto} onChange={e => set('emiteBoleto', e.target.value as 'sim' | 'nao')} />
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-                  <FormField label="Carteira" required={form.emiteBoleto === 'sim'} disabled={readOnly || form.emiteBoleto === 'nao'} value={form.carteira} error={errors.carteira} onChange={e => set('carteira', e.target.value)} />
-                  <FormField label="Convênio / Cód. Beneficiário" required={form.emiteBoleto === 'sim'} disabled={readOnly || form.emiteBoleto === 'nao'} value={form.convenioCodBeneficiario} error={errors.convenioCodBeneficiario} onChange={e => set('convenioCodBeneficiario', e.target.value)} />
-                  <FormSelect label="Tipo do Boleto" required={form.emiteBoleto === 'sim'} disabled={readOnly || form.emiteBoleto === 'nao'} options={TIPO_BOLETO_OPTS} value={form.tipoBoleto} error={errors.tipoBoleto} onChange={e => set('tipoBoleto', e.target.value as 'cnab240' | 'cnab400' | '')} />
+                  <FormField label="Carteira" required={form.emiteBoleto === 'sim'} disabled={form.emiteBoleto === 'nao'} value={form.carteira} error={errors.carteira} onChange={e => set('carteira', e.target.value)} />
+                  <FormField label="Convênio / Cód. Beneficiário" required={form.emiteBoleto === 'sim'} disabled={form.emiteBoleto === 'nao'} value={form.convenioCodBeneficiario} error={errors.convenioCodBeneficiario} onChange={e => set('convenioCodBeneficiario', e.target.value)} />
+                  <FormSelect label="Tipo do Boleto" required={form.emiteBoleto === 'sim'} disabled={form.emiteBoleto === 'nao'} options={TIPO_BOLETO_OPTS} value={form.tipoBoleto} error={errors.tipoBoleto} onChange={e => set('tipoBoleto', e.target.value as 'cnab240' | 'cnab400' | '')} />
                 </div>
 
                 <CheckboxListField
                   label="Proprietários"
                   hint={form.emiteBoleto === 'sim' ? 'Obrigatório: identifica o(s) titular(es)/beneficiário(s) para geração do boleto.' : undefined}
-                  items={readOnly ? pessoasItems.filter(p => form.proprietarios.includes(p.id)) : pessoasItems}
+                  items={pessoasItems}
                   selectedIds={form.proprietarios}
                   onChange={ids => set('proprietarios', ids)}
                   searchPlaceholder="Buscar pessoa..."
@@ -305,7 +284,7 @@ export default function ContaBancariaCadastro({
             <SectionBlock title="Fazendas Vinculadas" colors={colors}>
               <CheckboxListField
                 label="Propriedades"
-                items={readOnly ? fazendasItems.filter(f => form.fazendasVinculadas.includes(f.id)) : fazendasItems}
+                items={fazendasItems}
                 selectedIds={form.fazendasVinculadas}
                 onChange={ids => set('fazendasVinculadas', ids)}
                 searchPlaceholder="Buscar fazenda..."

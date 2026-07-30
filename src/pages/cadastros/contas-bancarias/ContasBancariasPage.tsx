@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ContasBancariasLista   from './ContasBancariasLista'
 import ContaBancariaCadastro  from './ContaBancariaCadastro'
+import ContaBancariaDetalhe   from './ContaBancariaDetalhe'
 import { mockContasBancarias } from './contasBancarias.mock'
 import type { ContaBancaria } from './contasBancarias.types'
 
@@ -31,15 +32,24 @@ export default function ContasBancariasPage() {
     setContas(prev => prev.filter(c => c.id !== id))
   }
 
-  if (view === 'form' || view === 'view') {
+  if (view === 'view' && selected) {
+    return (
+      <ContaBancariaDetalhe
+        conta={selected}
+        allContas={contas}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
+  if (view === 'form') {
     return (
       <ContaBancariaCadastro
         initialData={selected ?? undefined}
         allContas={contas}
         onBack={() => setView('list')}
         onSave={handleSave}
-        readOnly={view === 'view'}
-        onEdit={view === 'view' ? () => setView('form') : undefined}
       />
     )
   }

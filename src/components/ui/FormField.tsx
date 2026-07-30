@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react'
-import { HelpCircle } from 'lucide-react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import { Check, Copy, HelpCircle } from 'lucide-react'
 import { Tooltip } from './Tooltip'
+import { IconButton } from './IconButton'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { applyMask, maskInputMode, type MaskType } from './masks'
@@ -25,6 +26,13 @@ interface FormFieldProps
    * funciona normalmente). Habilite em telas de login/credenciais.
    */
   allowPasswordManager?: boolean
+  /**
+   * 'view' troca o controle editável pela variação "Visualização" (Figma
+   * node 54220-2): rótulo + valor empilhados sobre fundo cinza, com ação de
+   * copiar revelada no hover/foco. Usar em todo campo somente-leitura de
+   * telas de detalhe — nunca estilizar um input/textarea `readOnly` à mão.
+   */
+  variant?: 'default' | 'view'
 }
 
 export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, FormFieldProps>(function FormField({
@@ -40,10 +48,17 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   rows = 4,
   mask,
   allowPasswordManager = false,
+  variant = 'default',
   style,
   ...inputProps
 }, ref) {
   const { colors, isGbMode } = useTheme()
+
+  if (variant === 'view') {
+    const rawValue = inputProps.value ?? inputProps.defaultValue
+    const value = rawValue == null ? '' : String(rawValue)
+    return <ViewField label={label} value={value} multiline={multiline} size={size} />
+  }
 
   const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
 
@@ -256,3 +271,122 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
     </div>
   )
 })
+
+interface ViewFieldProps {
+  label?: string
+  value: string
+  multiline: boolean
+  size: 'md' | 'lg'
+}
+
+// Variação "Visualização" do FormField (Figma node 54220-2): substitui o
+// <input>/<textarea> editável por um bloco somente-leitura — nunca deve
+// parecer editável (sem caret, sem foco de texto). O botão de copiar usa
+// apenas `opacity` (não `visibility`) para revelar no hover: `visibility:
+// hidden` remove o botão da ordem de tabulação do teclado, quebrando o
+// requisito de foco por teclado — ver `.gb-view-field-copy` em index.css.
+function ViewField({ label, value, multiline, size }: ViewFieldProps) {
+  const { colors } = useTheme()
+  const [copied, setCopied] = useState(false)
+  const timeoutRef = useRef<number | undefined>(undefined)
+  const hasValue = value.trim().length > 0
+
+  useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
+
+  const copy = async () => {
+    if (!hasValue) return
+    await navigator.clipboard.writeText(value)
+    setCopied(true)
+    window.clearTimeout(timeoutRef.current)
+    timeoutRef.current = window.setTimeout(() => setCopied(false), 1500)
+  }
+
+  return (
+    <div
+      className="gb-view-field"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: multiline ? undefined : t.space[14],
+        minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : undefined,
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: multiline ? 'flex-start' : 'center',
+        background: colors.bg.subtle,
+        border: `1px solid ${colors.border.subtle}`,
+        borderRadius: t.radius.base,
+        padding: `${t.space[3]}px ${t.space[4]}px`,
+        cursor: 'default',
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0,
+          paddingRight: hasValue ? 46 : 0,
+        }}
+      >
+        {label && (
+          <span
+            style={{
+              fontFamily: t.font.family.sans,
+              fontSize: t.font.size.base,
+              fontWeight: t.font.weight.bold,
+              lineHeight: '20px',
+              color: colors.fg.subtle,
+              textTransform: 'uppercase',
+            }}
+          >
+            {label}
+          </span>
+        )}
+        <span
+          style={{
+            fontFamily: t.font.family.sans,
+            fontSize: t.font.size.md,
+            fontWeight: t.font.weight.normal,
+            lineHeight: '20px',
+            color: colors.fg.default,
+            // gap:0 no container + margin-top negativo: CSS `gap` não aceita valor
+            // negativo, e o Figma pede rótulo/valor 6px mais próximos que 20px de
+            // line-height permitiria.
+            marginTop: -6,
+            cursor: 'default',
+            ...(multiline
+              ? { whiteSpace: 'pre-wrap', wordBreak: 'break-word' }
+              : { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }),
+          }}
+        >
+          {hasValue ? value : '—'}
+        </span>
+      </div>
+
+      {hasValue && (
+        <span
+          className="gb-view-field-copy"
+          style={{
+            position: 'absolute',
+            right: t.space[4],
+            top: multiline ? t.space[3] : '50%',
+            transform: multiline ? undefined : 'translateY(-50%)',
+          }}
+        >
+          <IconButton
+            size="xs"
+            variant="ghost"
+            icon={copied ? <Check size={t.icon.sm} /> : <Copy size={t.icon.sm} />}
+            aria-label={`Copiar ${label ? `${label.toLowerCase()} ` : ''}${value}`}
+            onClick={copy}
+          />
+        </span>
+      )}
+
+      <span aria-live="polite" className="sr-only">
+        {copied ? 'Valor copiado' : ''}
+      </span>
+    </div>
+  )
+}

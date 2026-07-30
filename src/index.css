@@ -69,6 +69,34 @@
   outline-offset: 2px;
 }
 
+/* ─── FormField variant="view" — botão de copiar revelado no hover/foco ──────
+   Usa `opacity` (não `visibility`) por padrão: `visibility: hidden` remove o
+   botão da ordem de tabulação do teclado, o que impediria alcançá-lo via Tab
+   antes mesmo de ele poder ficar visível. `pointer-events: none` evita clique
+   fantasma enquanto oculto. Duração 0.15s = t.transition.base. */
+.gb-view-field-copy {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.gb-view-field:hover .gb-view-field-copy,
+.gb-view-field:focus-within .gb-view-field-copy {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Telas sem hover (touch): botão sempre visível. */
+@media (hover: none) {
+  .gb-view-field-copy {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gb-view-field-copy {
+    transition-duration: 0.01ms;
+  }
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;

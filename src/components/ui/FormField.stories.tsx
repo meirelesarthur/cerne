@@ -58,3 +58,32 @@ export const Disabled: Story = {
     disabled: true,
   },
 }
+
+export const ViewInput: Story = {
+  name: 'Visualização (Input)',
+  args: {
+    label: 'Código',
+    value: '01102',
+    variant: 'view',
+  },
+}
+
+export const ViewInputEmpty: Story = {
+  name: 'Visualização (Input, sem valor)',
+  args: {
+    label: 'NCM',
+    value: '',
+    variant: 'view',
+  },
+}
+
+export const ViewTextarea: Story = {
+  name: 'Visualização (Textarea)',
+  args: {
+    label: 'Descrição',
+    value:
+      'Adubo formulado NPK 00-20-20, indicado para adubação de cobertura em culturas de soja e milho. Armazenar em local seco e arejado.',
+    variant: 'view',
+    multiline: true,
+  },
+}

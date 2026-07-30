@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { t } from '../../../design/tokens'
 import { useTheme } from '../../../context/ThemeContext'
+import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import {
@@ -70,6 +71,7 @@ export function WeekCanvas({
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, week: null })
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
+  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const up = () => { isPainting.current = false }
@@ -295,7 +297,11 @@ export function WeekCanvas({
           ? 'Grade de semanas — navegue com as setas e pinte com Enter ou Espaço'
           : 'Grade de semanas'}
         onTouchMove={handleGridTouchMove}
-        style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+        style={
+          grouped.length > 1
+            ? { display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'repeat(2, 1fr)', gap: 20 }
+            : { display: 'flex', flexDirection: 'column', gap: 4 }
+        }
       >
         {grouped.map(yg => (
           <div key={yg.year}>

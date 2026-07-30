@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Pencil, Trash2, FileKey, HelpCircle, Check, X as XIcon } from 'lucide-react'
+import { Plus, Eye, Pencil, Trash2, FileKey, HelpCircle, Check, X as XIcon } from 'lucide-react'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }        from '../../../components/ui/PageCard'
@@ -27,6 +27,7 @@ interface EmissoresListaProps {
   emissores: Emissor[]
   today:     string
   onNew:     () => void
+  onView:    (id: number) => void
   onEdit:    (id: number) => void
   onCertificado: (id: number) => void
   onDelete:  (id: number) => void
@@ -42,7 +43,7 @@ const CERT_BADGE: Record<CertificadoStatus, { label: (v: string) => string; vari
 }
 
 export default function EmissoresLista({
-  emissores, today, onNew, onEdit, onCertificado, onDelete,
+  emissores, today, onNew, onView, onEdit, onCertificado, onDelete,
 }: EmissoresListaProps) {
   const { colors } = useTheme()
 
@@ -162,6 +163,7 @@ export default function EmissoresLista({
                   emissor={emissor}
                   today={today}
                   isLast={idx === paginated.length - 1}
+                  onView={() => onView(emissor.id)}
                   onEdit={() => onEdit(emissor.id)}
                   onCertificado={() => onCertificado(emissor.id)}
                   onDelete={() => setDeleteId(emissor.id)}
@@ -253,11 +255,12 @@ export default function EmissoresLista({
 }
 
 function EmissorRow({
-  emissor, today, isLast, onEdit, onCertificado, onDelete, colors, border,
+  emissor, today, isLast, onView, onEdit, onCertificado, onDelete, colors, border,
 }: {
   emissor: Emissor
   today:   string
   isLast:  boolean
+  onView:  () => void
   onEdit:  () => void
   onCertificado: () => void
   onDelete: () => void
@@ -270,6 +273,10 @@ function EmissorRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar emissor ${emissor.razaoSocial}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: '1.6fr 130px 1fr 100px 90px 200px 70px 60px',
@@ -278,9 +285,12 @@ function EmissorRow({
         borderBottom: isLast ? 'none' : `1px solid ${border}`,
         alignItems: 'center',
         transition: `background ${t.animation.duration.faster}`,
+        cursor: 'pointer',
       }}
       onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       <span title={emissor.razaoSocial} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {emissor.razaoSocial}
@@ -305,11 +315,12 @@ function EmissorRow({
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Badge label={emissor.ativo === 'sim' ? 'Ativo' : 'Inativo'} variant={emissor.ativo === 'sim' ? 'success' : 'neutral'} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
         <DropdownMenu
           align="right"
           ariaLabel="Ações do emissor"
           items={[
+            { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: onView },
             { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
             { id: 'cert', label: 'Certificado', icon: <FileKey size={13} />, onClick: onCertificado },
             { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },

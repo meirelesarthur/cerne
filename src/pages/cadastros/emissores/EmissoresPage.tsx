@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import EmissoresLista      from './EmissoresLista'
 import EmissorCadastro     from './EmissorCadastro'
+import EmissorDetalhe      from './EmissorDetalhe'
 import CertificadoEmissor  from './CertificadoEmissor'
 import { mockEmissores, MOCK_TODAY } from './emissores.mock'
 import type { Emissor, CertificadoInfo } from './emissores.types'
 
-type View = 'list' | 'form' | 'certificado'
+type View = 'list' | 'form' | 'view' | 'certificado'
 
 export default function EmissoresPage() {
   const [view,       setView]       = useState<View>('list')
@@ -58,11 +59,22 @@ export default function EmissoresPage() {
     )
   }
 
+  if (view === 'view' && selected) {
+    return (
+      <EmissorDetalhe
+        emissor={selected}
+        onBack={() => setView('list')}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <EmissoresLista
       emissores={emissores}
       today={MOCK_TODAY}
       onNew={() => { setSelectedId(null); setView('form') }}
+      onView={(id) => { setSelectedId(id); setView('view') }}
       onEdit={(id) => { setSelectedId(id); setView('form') }}
       onCertificado={(id) => { setSelectedId(id); setView('certificado') }}
       onDelete={handleDelete}

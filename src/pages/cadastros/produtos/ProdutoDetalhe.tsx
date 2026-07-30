@@ -7,8 +7,7 @@ import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { FormSection } from '../../../components/ui/FormSection'
 import { PageCard } from '../../../components/ui/PageCard'
 import { PageContainer } from '../../../components/ui/PageContainer'
-import { StepHeader } from '../../../components/ui/StepHeader'
-import { Stepper } from '../../../components/ui/Stepper'
+import { Tabs } from '../../../components/ui/Tabs'
 import { t } from '../../../design/tokens'
 import {
   CAT_FINANCEIRA_OPTS,
@@ -28,12 +27,12 @@ interface Props {
   onEdit: () => void
 }
 
-type StepId = 1 | 2 | 3
+type Tab = 'identificacao' | 'estoque' | 'financeiro'
 
-const STEPS = [
-  { id: 1, label: 'Identificação' },
-  { id: 2, label: 'Estoque e unidades' },
-  { id: 3, label: 'Financeiro e operação' },
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'identificacao', label: 'Identificação' },
+  { id: 'estoque',       label: 'Estoque e unidades' },
+  { id: 'financeiro',    label: 'Financeiro e operação' },
 ]
 
 const textById = <T extends { id: number; nome: string }>(items: T[], id: number | '') =>
@@ -51,7 +50,7 @@ const currency = (value: number | '') => value === ''
   : value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
-  const [currentStep, setCurrentStep] = useState<StepId>(1)
+  const [activeTab, setActiveTab] = useState<Tab>('identificacao')
   const ncmLabel = optionLabel(NCM_OPTS, produto.ncm)
   const primaryUnit = optionLabel(UNIDADE_PRODUTO_OPTS, produto.unidadePrimaria)
   const secondaryUnit = produto.unidadeSecundaria
@@ -80,11 +79,12 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 </>
               }
             />
-            <Stepper
-              steps={STEPS}
-              current={currentStep}
-              completed={[1, 2, 3]}
-              onStepClick={step => setCurrentStep(step as StepId)}
+            <Tabs
+              items={TABS}
+              activeId={activeTab}
+              onChange={id => setActiveTab(id as Tab)}
+              label="Seções do produto"
+              variant="outline"
             />
           </>
         }
@@ -99,9 +99,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
           </>
         }
       >
-        {currentStep === 1 && (
+        {activeTab === 'identificacao' && (
           <>
-            <StepHeader title="Identificação do produto" />
             <FormSection title="Dados essenciais" divider={false}>
               <DetailGrid
                 columns={3}
@@ -130,9 +129,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
           </>
         )}
 
-        {currentStep === 2 && (
+        {activeTab === 'estoque' && (
           <>
-            <StepHeader title="Estoque e unidades" />
             <FormSection title="Unidades de medida" divider={false}>
               <DetailGrid
                 columns={3}
@@ -159,9 +157,8 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
           </>
         )}
 
-        {currentStep === 3 && (
+        {activeTab === 'financeiro' && (
           <>
-            <StepHeader title="Financeiro e operação" />
             <FormSection title="Preços e financeiro" divider={false}>
               <DetailGrid
                 columns={3}

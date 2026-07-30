@@ -411,11 +411,17 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onView, onEdit, onDele
   const tipoCor = TIPO_COLORS[prod.tipo]
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center' }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar produto ${prod.descricao}`}
+      className="gb-focusable"
+      style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center', cursor: 'pointer' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
         <Checkbox checked={isSelected} onChange={onToggle} aria-label={`Selecionar ${prod.descricao}`} />
       </div>
       <span title={prod.codigo} style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.fg.muted, fontFamily: t.font.family.sans, letterSpacing: '0.05em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -437,7 +443,7 @@ function ProdutoRow({ prod, isLast, isSelected, onToggle, onView, onEdit, onDele
           {prod.ativo ? 'Ativo' : 'Inativo'}
         </span>
       </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
         <IconButton icon={<Eye size={t.icon.xs} />} aria-label="Visualizar" onClick={onView} size="sm" variant="ghost" />
         <IconButton icon={<Pencil size={t.icon.xs} />} aria-label="Editar"  onClick={onEdit}      size="sm" variant="ghost" />
         <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label="Excluir" onClick={onDeleteReq} size="sm" variant="ghost" danger />

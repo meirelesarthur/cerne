@@ -272,11 +272,20 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   )
 })
 
-interface ViewFieldProps {
+export interface ViewFieldProps {
   label?: string
-  value: string
-  multiline: boolean
-  size: 'md' | 'lg'
+  /** Conteúdo exibido — string/number para o caso comum, ou um ReactNode (ex.: `<Badge>`) para status/booleanos. */
+  value: React.ReactNode
+  /**
+   * Texto copiado pelo botão de copiar. Default: o próprio `value` quando é
+   * string/number. Obrigatório quando `value` é um ReactNode (ex.: `<Badge>`)
+   * — sem ele, nenhum botão de copiar é exibido para esse campo.
+   */
+  copyValue?: string
+  /** Mascara o valor exibido (••••••••) sem afetar o que é copiado — dados sensíveis (ex.: chave de API). */
+  sensitive?: boolean
+  multiline?: boolean
+  size?: 'md' | 'lg'
 }
 
 // Variação "Visualização" do FormField (Figma node 54220-2): substitui o
@@ -285,20 +294,34 @@ interface ViewFieldProps {
 // apenas `opacity` (não `visibility`) para revelar no hover: `visibility:
 // hidden` remove o botão da ordem de tabulação do teclado, quebrando o
 // requisito de foco por teclado — ver `.gb-view-field-copy` em index.css.
-function ViewField({ label, value, multiline, size }: ViewFieldProps) {
+export function ViewField({ label, value, copyValue, sensitive = false, multiline = false, size = 'md' }: ViewFieldProps) {
   const { colors } = useTheme()
   const [copied, setCopied] = useState(false)
+  const [copyFailed, setCopyFailed] = useState(false)
   const timeoutRef = useRef<number | undefined>(undefined)
-  const hasValue = value.trim().length > 0
+  const hasValue = value !== undefined && value !== null && value !== ''
+  const resolvedCopyValue = copyValue ?? (typeof value === 'string' || typeof value === 'number' ? String(value) : undefined)
+  const displayValue = sensitive && hasValue ? '••••••••••••' : value
 
   useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
 
-  const copy = async () => {
-    if (!hasValue) return
-    await navigator.clipboard.writeText(value)
-    setCopied(true)
+  const announce = (ok: boolean) => {
+    setCopied(ok)
+    setCopyFailed(!ok)
     window.clearTimeout(timeoutRef.current)
-    timeoutRef.current = window.setTimeout(() => setCopied(false), 1500)
+    timeoutRef.current = window.setTimeout(() => { setCopied(false); setCopyFailed(false) }, 1500)
+  }
+
+  const copy = async () => {
+    if (!resolvedCopyValue) return
+    try {
+      await navigator.clipboard.writeText(resolvedCopyValue)
+      announce(true)
+    } catch {
+      // Permissão de clipboard negada (política do navegador/iframe) — sem
+      // isso o clique falha em silêncio e o usuário nunca sabe que não copiou.
+      announce(false)
+    }
   }
 
   return (
@@ -326,7 +349,7 @@ function ViewField({ label, value, multiline, size }: ViewFieldProps) {
           display: 'flex',
           flexDirection: 'column',
           gap: 0,
-          paddingRight: hasValue ? 46 : 0,
+          paddingRight: resolvedCopyValue ? 46 : 0,
         }}
       >
         {label && (
@@ -360,11 +383,11 @@ function ViewField({ label, value, multiline, size }: ViewFieldProps) {
               : { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }),
           }}
         >
-          {hasValue ? value : '—'}
+          {hasValue ? displayValue : '—'}
         </span>
       </div>
 
-      {hasValue && (
+      {resolvedCopyValue && (
         <span
           className="gb-view-field-copy"
           style={{
@@ -378,14 +401,14 @@ function ViewField({ label, value, multiline, size }: ViewFieldProps) {
             size="xs"
             variant="ghost"
             icon={copied ? <Check size={t.icon.sm} /> : <Copy size={t.icon.sm} />}
-            aria-label={`Copiar ${label ? `${label.toLowerCase()} ` : ''}${value}`}
+            aria-label={`Copiar ${label ? `${label.toLowerCase()} ` : ''}${resolvedCopyValue}`}
             onClick={copy}
           />
         </span>
       )}
 
       <span aria-live="polite" className="sr-only">
-        {copied ? 'Valor copiado' : ''}
+        {copied ? 'Valor copiado' : copyFailed ? 'Não foi possível copiar o valor' : ''}
       </span>
     </div>
   )

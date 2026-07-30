@@ -370,7 +370,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'TableToolbar', status: 'coberto', screens: 'cadastros/fazendas, cadastros/enderecos (FilterButton)' },
   { name: 'Tabs', status: 'coberto', screens: 'financeiro/ofx, operacional/mapa-confinamento, pages/planos' },
   { name: 'Tag', status: 'coberto', screens: 'pages/planos' },
-  { name: 'Toast', status: 'coberto', screens: 'AMPLO — ToastContainer/useToast em quase toda tela com mutação' },
+  { name: 'Toast', status: 'coberto', screens: 'GLOBAL — ToastProvider preserva feedback entre cadastro/lista; useToast cobre telas com mutação' },
   { name: 'ToggleSection', status: 'coberto', screens: 'cadastros/pessoas (steps)' },
   { name: 'ToggleField', status: 'coberto', screens: 'cadastros/produtos (estoque e operação)' },
   { name: 'ToggleSwitch', status: 'coberto', screens: 'AMPLO — flags booleanas em formulários' },

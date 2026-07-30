@@ -118,7 +118,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
       ref={containerRef}
       style={
         compact
-          ? { position: 'relative', width: 220 }
+          ? { position: 'relative', width: t.size.topbarSearch }
           : { position: 'relative', width: '100%', maxWidth: 560 }
       }
     >

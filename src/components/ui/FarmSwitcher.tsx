@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react'
+import { Building2 } from 'lucide-react'
 import { useFarm } from '../../context/FarmContext'
 import { SearchSelect, type SearchSelectOption } from './SearchSelect'
+import { t } from '../../design/tokens'
 
 export function FarmSwitcher() {
   const { currentFarm, farms, setCurrentFarm } = useFarm()
@@ -14,7 +16,8 @@ export function FarmSwitcher() {
     () => farms.map((farm) => ({
       id: farm.id,
       label: farm.name,
-      code: farm.code,
+      subtitle: farm.code,
+      icon: <Building2 size={15} />,
     })),
     [farms],
   )
@@ -25,7 +28,7 @@ export function FarmSwitcher() {
   }
 
   return (
-    <div style={{ width: 200 }}>
+    <div style={{ width: t.size.farmSwitcher }}>
       <SearchSelect
         placeholder="Selecionar fazenda..."
         query={query}
@@ -34,7 +37,8 @@ export function FarmSwitcher() {
         selectedId={currentFarm?.id ?? null}
         onSelect={handleSelect}
         onClear={() => setQuery(currentFarm?.name ?? '')}
-        maxVisible={6}
+        maxVisible={10}
+        dense
       />
     </div>
   )

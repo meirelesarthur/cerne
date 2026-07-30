@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import { SplashScreen } from './components/SplashScreen'
 import { ThemeProvider } from './context/ThemeContext'
 import { PermissionProvider, SessionProvider, SessionExpiredModal } from './auth'
+import { ToastProvider } from './components/ui/Toast'
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -20,14 +21,16 @@ export default function App() {
         // Área autenticada: papel padrão 'admin' (substituir pelo papel real do
         // usuário quando houver auth). SessionProvider expõe expire()/triggerSessionExpire
         // para a futura camada HTTP chamar em respostas 401.
-        <PermissionProvider>
-          <SessionProvider onRelogin={() => setLoggedIn(false)}>
-            <AppLayout onLogout={() => setLoggedIn(false)}>
-              <OverviewPanel />
-            </AppLayout>
-            <SessionExpiredModal />
-          </SessionProvider>
-        </PermissionProvider>
+        <ToastProvider>
+          <PermissionProvider>
+            <SessionProvider onRelogin={() => setLoggedIn(false)}>
+              <AppLayout onLogout={() => setLoggedIn(false)}>
+                <OverviewPanel />
+              </AppLayout>
+              <SessionExpiredModal />
+            </SessionProvider>
+          </PermissionProvider>
+        </ToastProvider>
       )}
     </ThemeProvider>
   )

@@ -393,6 +393,20 @@ export const size = {
   stepBtn: 190,
   /** Piso de largura de campo/cartão compacto em grades responsivas de até 4 colunas (ver `gridFields`/`gridCards` em pessoas/steps/parts.tsx) */
   fieldSm: 150,
+  /** Largura do campo de busca compacto do Topbar (SearchBar `compact`) */
+  topbarSearch: 220,
+  /** Largura do FarmSwitcher no Topbar — 1.5x t.size.topbarSearch (220 × 1.5) */
+  farmSwitcher: 330,
+  /** Altura máxima do painel de opções do SearchSelect (linha padrão) */
+  dropdownPanel: 280,
+  /** Altura máxima do painel de opções do SearchSelect no modo `dense` (linhas com ícone, ex.: FarmSwitcher) — comporta ~10 linhas sem scroll */
+  dropdownPanelDense: 540,
+  /** Largura da coluna de funcionalidade na matriz de permissões (PermissionMatrixField) */
+  permissionFeatureCol: 260,
+  /** Largura de cada coluna de ação (Visualizar/Criar/Editar/Deletar/Documentos) na matriz de permissões */
+  permissionActionCol: 108,
+  /** Largura da coluna QTD (contagem agregada) na matriz de permissões */
+  permissionQtyCol: 64,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { useId, useRef, useEffect } from 'react'
+import { useId, useRef, useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -24,6 +24,7 @@ export function Checkbox({
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const { colors } = useTheme()
+  const [hovered, setHovered] = useState(false)
 
   // `indeterminate` só existe no DOM, não como atributo JSX
   useEffect(() => {
@@ -42,6 +43,8 @@ export function Checkbox({
   return (
     <label
       htmlFor={id}
+      onMouseEnter={() => !disabled && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -68,6 +71,7 @@ export function Checkbox({
           type="checkbox"
           className="gb-focus-input"
           checked={checked}
+          aria-checked={indeterminate && !checked ? 'mixed' : checked}
           disabled={disabled}
           aria-label={!label ? ariaLabel : undefined}
           onChange={e => onChange(e.target.checked)}
@@ -91,9 +95,9 @@ export function Checkbox({
             inset: 0,
             border: filled
               ? `1.5px solid ${t.color.brand[600]}`
-              : `1.5px solid ${colors.border.default}`,
+              : `2px solid ${hovered ? colors.accent.default : colors.fg.muted}`,
             borderRadius: t.radius.sm,
-            background: filled ? t.color.brand[600] : colors.bg.input,
+            background: filled ? t.color.brand[600] : colors.bg.surface,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

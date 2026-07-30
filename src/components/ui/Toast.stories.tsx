@@ -48,6 +48,7 @@ export const ComAcao: Story = {
         id: 1,
         type: 'success',
         message: 'Fazenda excluída',
+        description: '"Fazenda São João" removida da listagem.',
         action: { label: 'Desfazer', onClick: () => {} },
       },
     ]

@@ -13,17 +13,19 @@ export interface ToastAction {
 }
 
 export interface ToastItem {
-  id:       number
-  message:  string
-  type:     ToastType
-  duration?: number
-  action?:  ToastAction
+  id:          number
+  message:     string
+  type:        ToastType
+  duration?:    number
+  description?: string
+  action?:     ToastAction
 }
 
 export interface ShowToastOptions {
-  type?:     ToastType
-  duration?: number
-  action?:   ToastAction
+  type?:        ToastType
+  duration?:    number
+  description?: string
+  action?:      ToastAction
 }
 
 interface ToastController {
@@ -173,20 +175,27 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             width:          t.size.iconBtn.sm,
             height:         t.size.iconBtn.sm,
             borderRadius:   t.radius.sm,
-            background:     highlight,
+            background:     t.color.neutral[800],
             flexShrink:     0,
           }}
         >
-          <Icon size={t.icon.sm} />
+          <Icon size={t.icon.sm} style={{ color: highlight }} />
         </div>
-        <span style={{ flex: 1, lineHeight: t.font.lineHeight.snug }}>{toast.message}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+          <span style={{ lineHeight: t.font.lineHeight.snug }}>{toast.message}</span>
+          {toast.description && (
+            <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.normal, color: t.color.neutral[400], lineHeight: t.font.lineHeight.snug }}>
+              {toast.description}
+            </span>
+          )}
+        </div>
         {toast.action && (
           <button
             onClick={handleAction}
             className="gb-focusable"
             style={{
-              background:   'rgba(255,255,255,0.16)',
-              border:       '1px solid rgba(255,255,255,0.4)',
+              background:   t.color.neutral[700],
+              border:       'none',
               borderRadius: t.radius.base,
               cursor:       'pointer',
               padding:      `${t.space[1]}px ${t.space[3]}px`,
@@ -199,8 +208,8 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
               whiteSpace:   'nowrap',
               transition:   `background ${t.transition.fast}`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.3)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.16)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = t.color.neutral[600] }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = t.color.neutral[700] }}
           >
             {toast.action.label}
           </button>
@@ -310,8 +319,8 @@ function useToastController(): ToastController {
     if (typeof typeOrOptions === 'string') {
       setToasts(prev => [...prev, { id, message, type: typeOrOptions, duration }])
     } else {
-      const { type = 'success', duration: dur, action } = typeOrOptions
-      setToasts(prev => [...prev, { id, message, type, duration: dur, action }])
+      const { type = 'success', duration: dur, description, action } = typeOrOptions
+      setToasts(prev => [...prev, { id, message, type, duration: dur, description, action }])
     }
   }, [])
 

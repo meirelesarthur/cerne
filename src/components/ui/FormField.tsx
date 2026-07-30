@@ -330,7 +330,12 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : t.space[14],
+        // Altura travada em 56px (nunca cresce): rótulo (12px lh) + gap (4px) +
+        // valor (16px lh) = 32px, exatamente o espaço livre após os 12px de
+        // padding vertical (topo+base). Rótulo é truncado com ellipsis abaixo
+        // para nunca quebrar em 2 linhas e estourar essa conta.
+        height: multiline ? undefined : t.space[14],
+        minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : undefined,
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: multiline ? 'flex-start' : 'center',
@@ -353,14 +358,18 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
       >
         {label && (
           <span
+            title={label}
             style={{
               fontFamily: t.font.family.sans,
               fontSize: t.font.size.xs,
               fontWeight: t.font.weight.semibold,
-              lineHeight: '16px',
+              lineHeight: '12px',
               letterSpacing: '0.04em',
               color: colors.fg.subtle,
               textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {label}

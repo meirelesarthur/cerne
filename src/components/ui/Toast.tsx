@@ -40,11 +40,15 @@ const ToastContext = createContext<ToastController | null>(null)
 
 // ─── Design config ────────────────────────────────────────────────────────────
 
-const TYPE_CONFIG: Record<ToastType, { bg: string; Icon: React.ElementType }> = {
-  success: { bg: t.color.feedback.success.solid, Icon: CheckCircle2 },
-  error:   { bg: t.color.feedback.error.solid,   Icon: XCircle      },
-  info:    { bg: t.color.feedback.info.solid,    Icon: Info          },
-  warning: { bg: t.color.feedback.warning.solid, Icon: AlertTriangle },
+/** Superfície da toast é sempre o mesmo tom escuro (light + GBMode); o tipo
+ *  aparece só como destaque de cor no quadrado do ícone. */
+const TOAST_SURFACE = t.color.neutral[950]
+
+const TYPE_CONFIG: Record<ToastType, { highlight: string; Icon: React.ElementType }> = {
+  success: { highlight: t.color.feedback.success.solid, Icon: CheckCircle2 },
+  error:   { highlight: t.color.feedback.error.solid,   Icon: XCircle      },
+  info:    { highlight: t.color.feedback.info.solid,    Icon: Info          },
+  warning: { highlight: t.color.feedback.warning.solid, Icon: AlertTriangle },
 }
 
 // ─── Keyframe injection (once) ────────────────────────────────────────────────
@@ -76,7 +80,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
   const [exiting, setExiting] = useState(false)
   const [paused, setPaused] = useState(false)
   const reduced = usePrefersReducedMotion()
-  const { bg, Icon } = TYPE_CONFIG[toast.type]
+  const { highlight, Icon } = TYPE_CONFIG[toast.type]
   const duration = toast.duration ?? 4000
   // Erros exigem dismiss manual — sem auto-close (WCAG 2.2.1/2.2.2).
   const autoCloses = toast.type !== 'error'
@@ -143,7 +147,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
       style={{
         display:      'flex',
         flexDirection:'column',
-        background:   bg,
+        background:   TOAST_SURFACE,
         color:        t.color.neutral[0],
         borderRadius: t.radius.lg,
         fontSize:     t.font.size.base,
@@ -169,7 +173,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             width:          t.size.iconBtn.sm,
             height:         t.size.iconBtn.sm,
             borderRadius:   t.radius.sm,
-            background:     'rgba(255,255,255,0.18)',
+            background:     highlight,
             flexShrink:     0,
           }}
         >
@@ -183,7 +187,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             style={{
               background:   'rgba(255,255,255,0.16)',
               border:       '1px solid rgba(255,255,255,0.4)',
-              borderRadius: t.radius.full,
+              borderRadius: t.radius.base,
               cursor:       'pointer',
               padding:      `${t.space[1]}px ${t.space[3]}px`,
               color:        t.color.neutral[0],

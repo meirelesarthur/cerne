@@ -20,7 +20,7 @@ export function ReadOnlyField({ label, value, copyValue, sensitive }: ReadOnlyFi
 
 interface DetailGridProps {
   items: DetailItem[]
-  columns?: 1 | 2 | 3
+  columns?: 1 | 2 | 3 | 4
   responsive?: boolean
 }
 

@@ -175,7 +175,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             width:          t.size.iconBtn.sm,
             height:         t.size.iconBtn.sm,
             borderRadius:   t.radius.sm,
-            background:     t.color.neutral[800],
+            background:     t.color.neutral[700],
             flexShrink:     0,
           }}
         >

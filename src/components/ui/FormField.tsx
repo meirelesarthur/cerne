@@ -330,8 +330,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
       style={{
         position: 'relative',
         width: '100%',
-        height: multiline ? undefined : t.space[14],
-        minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : undefined,
+        minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : t.space[14],
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: multiline ? 'flex-start' : 'center',
@@ -348,7 +347,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
           minWidth: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: 0,
+          gap: t.space[1],
           paddingRight: resolvedCopyValue ? 46 : 0,
         }}
       >
@@ -370,15 +369,10 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
         <span
           style={{
             fontFamily: t.font.family.sans,
-            fontSize: t.font.size.md,
+            fontSize: t.font.size.base,
             fontWeight: t.font.weight.normal,
-            lineHeight: '20px',
+            lineHeight: '16px',
             color: colors.fg.default,
-            // gap:0 no container + margin-top negativo: CSS `gap` não aceita valor
-            // negativo. Rótulo (16px lh) + valor (20px lh) - 4px de sobreposição =
-            // 32px, exatamente o espaço restante na caixa de 56px após os 12px de
-            // padding vertical (topo+base) — preenche a caixa sem sobra nem corte.
-            marginTop: -4,
             cursor: 'default',
             ...(multiline
               ? { whiteSpace: 'pre-wrap', wordBreak: 'break-word' }

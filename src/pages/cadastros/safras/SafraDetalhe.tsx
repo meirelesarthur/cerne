@@ -5,6 +5,7 @@ import { Badge }      from '../../../components/ui/Badge'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
+import { DetailGrid } from '../../../components/ui/DetailGrid'
 import { t }          from '../../../design/tokens'
 import { useTheme }   from '../../../context/ThemeContext'
 import { WeekCanvas } from './WeekCanvas'
@@ -21,35 +22,7 @@ interface SafraDetalheProps {
   onEdit: () => void
 }
 
-// ─── Helper: campo de leitura ─────────────────────────────────────────────────
-
-function InfoField({ label, value }: { label: string; value: React.ReactNode }) {
-  const { colors } = useTheme()
-  return (
-    <div>
-      <div style={{
-        fontSize: t.font.size['2xs'],
-        fontWeight: t.font.weight.semibold,
-        color: colors.fg.subtle,
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-        marginBottom: 4,
-        fontFamily: t.font.family.sans,
-      }}>
-        {label}
-      </div>
-      <div style={{
-        fontSize: t.font.size.base,
-        color: colors.fg.default,
-        fontFamily: t.font.family.sans,
-        fontWeight: t.font.weight.normal,
-        minHeight: 20,
-      }}>
-        {value || <span style={{ color: colors.border.default }}>—</span>}
-      </div>
-    </div>
-  )
-}
+// ─── Helper: rótulo de mês ────────────────────────────────────────────────────
 
 function mesLabel(mes: string): string {
   return MONTH_FULL[MES_OPTS.findIndex(m => m.value === mes)] ?? mes
@@ -187,12 +160,12 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
             }}>
               Dados Gerais
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px 28px' }}>
-              <InfoField label="Data de Início" value={fmtYMDtoDMY(safra.ini)} />
-              <InfoField label="Data de Fim"    value={fmtYMDtoDMY(safra.fim)} />
-              <InfoField label="1º Semestre"    value={mesLabel(safra.s1)} />
-              <InfoField label="2º Semestre"    value={mesLabel(safra.s2)} />
-            </div>
+            <DetailGrid columns={4} items={[
+              { label: 'Data de Início', value: fmtYMDtoDMY(safra.ini) },
+              { label: 'Data de Fim',    value: fmtYMDtoDMY(safra.fim) },
+              { label: '1º Semestre',    value: mesLabel(safra.s1) },
+              { label: '2º Semestre',    value: mesLabel(safra.s2) },
+            ]} />
           </div>
 
           {/* ── Canvas de semanas (read-only) ─────────────────────────────────── */}

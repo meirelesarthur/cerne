@@ -17,9 +17,15 @@ const ACTIONS_FULL: ActionDef[] = [
   { key: 'create', label: 'Criar' },
   { key: 'edit', label: 'Editar' },
   { key: 'delete', label: 'Deletar' },
+  { key: 'documents', label: 'Documentos' },
 ]
 
-const ACTIONS_VIEW_ONLY: ActionDef[] = [{ key: 'view', label: 'Visualizar' }]
+const ACTIONS_VIEW_ONLY: ActionDef[] = [
+  { key: 'view', label: 'Visualizar' },
+  { key: 'documents', label: 'Documentos' },
+]
+
+const ACTIONS_HOME: ActionDef[] = [{ key: 'view', label: 'Visualizar' }]
 
 /** Módulos cujas telas são só leitura (dashboards/relatórios/painel) — recebem apenas a ação Visualizar. */
 const VIEW_ONLY_MODULE_IDS = new Set(['dashboards', 'relatorios', 'painel'])
@@ -30,23 +36,23 @@ const SKIP_MODULE_IDS = new Set(['favoritos'])
 /** Itens de menu self-service, não atribuíveis como permissão de terceiros. */
 const SKIP_ITEM_IDS = new Set(['cad-pes-per'])
 
-/** Folhas de ação de sub-recurso (ex.: Formulação/Batida dentro de Fábrica) — alimentam a coluna agregada "Documentos" da matriz. Populado durante a construção do catálogo. */
+/** Folhas que autorizam exportar listagens, relatórios ou outros documentos. */
 const documentLeafIds = new Set<string>()
 
 function buildActionLeaves(itemId: string, actions: ActionDef[]): PermissionNode[] {
-  return actions.map((action) => ({ id: `${itemId}.${action.key}`, label: action.label }))
+  return actions.map((action) => {
+    const leaf = { id: `${itemId}.${action.key}`, label: action.label }
+    if (action.key === 'documents') documentLeafIds.add(leaf.id)
+    return leaf
+  })
 }
 
 function buildFeatureNode(item: NavSubItem, actions: ActionDef[]): PermissionNode {
   if (item.children && item.children.length > 0) {
-    // Sub-recurso aninhado real (ex.: Fábrica > Formulação/Batida) — as ações
-    // desses filhos alimentam a coluna "Documentos" da funcionalidade-pai,
-    // agregadas num único indicador (não viram linhas próprias na matriz).
-    const subLeaves = item.children.flatMap((child) => {
-      const leaves = buildActionLeaves(child.id, ACTIONS_FULL)
-      leaves.forEach((leaf) => documentLeafIds.add(leaf.id))
-      return leaves
-    })
+    // Sub-recursos aninhados (ex.: Fábrica > Formulação/Batida) permanecem
+    // agregados na linha da funcionalidade-pai. Cada coluna resume a mesma
+    // ação nos filhos, inclusive a permissão de exportar documentos.
+    const subLeaves = item.children.flatMap((child) => buildActionLeaves(child.id, actions))
     return {
       id: `perm-feat-${item.id}`,
       label: item.label,
@@ -83,7 +89,7 @@ function buildModuleNode(module: NavModule): PermissionNode {
         {
           id: 'perm-feat-painel-home',
           label: module.label,
-          children: buildActionLeaves('painel-home', ACTIONS_VIEW_ONLY),
+          children: buildActionLeaves('painel-home', ACTIONS_HOME),
         },
       ],
     }
@@ -122,7 +128,7 @@ export function buildPermissionCatalog(): PermissionNode[] {
 
 export const PERMISSION_CATALOG: PermissionNode[] = buildPermissionCatalog()
 
-/** Folhas que representam ações de sub-recurso (coluna "Documentos" da matriz) — congelado após a construção do catálogo. */
+/** Folhas da ação de exportação/geração exibida na coluna "Documentos". */
 export const DOCUMENT_LEAF_IDS: Set<string> = new Set(documentLeafIds)
 
 function buildLeafIndex(nodes: PermissionNode[]): Map<string, string[]> {

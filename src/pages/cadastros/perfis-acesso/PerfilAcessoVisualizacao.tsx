@@ -58,7 +58,7 @@ export default function PerfilAcessoVisualizacao({ perfil, onBack, onEdit }: Per
 
         <FormSection
           title="Permissões"
-          subtitle="Na consulta, o quadrado verde com V branco indica acesso completo; o quadrado verde com traço indica acesso parcial; o traço simples indica acesso não concedido. Células sem símbolo não se aplicam à funcionalidade."
+          subtitle="Documentos permite exportar listagens, relatórios e outros arquivos. Na consulta, o quadrado verde com V branco indica acesso completo; o quadrado verde com traço indica acesso parcial; o traço simples indica acesso não concedido."
           divider={false}
         >
           <PermissionMatrixField mode="view" tree={PERMISSION_CATALOG} selected={perfil.permissoes} />

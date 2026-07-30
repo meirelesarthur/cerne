@@ -163,7 +163,7 @@ export default function PerfilAcessoCadastro({ initialData, allPerfis, onBack, o
 
         <FormSection
           title="Permissões"
-          subtitle="Selecione as permissões do perfil. Um quadrado verde com traço indica que apenas parte daquele módulo está selecionada."
+          subtitle="Selecione as permissões do perfil. Documentos permite exportar listagens, relatórios e outros arquivos; um quadrado verde com traço indica seleção parcial."
           divider={false}
         >
           <PermissionMatrixField tree={PERMISSION_CATALOG} selected={form.permissoes} onChange={(perms) => set('permissoes', perms)} />

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PermissionMatrixField } from './PermissionMatrixField'
-import { PERMISSION_CATALOG, LEAF_IDS_BY_NODE } from '../../data/permissionsCatalog'
+import { DOCUMENT_LEAF_IDS, PERMISSION_CATALOG, LEAF_IDS_BY_NODE } from '../../data/permissionsCatalog'
 
 const meta: Meta<typeof PermissionMatrixField> = {
   title: 'GB CERNE/PermissionMatrixField',
@@ -45,7 +45,7 @@ export const ComSelecaoParcial: Story = {
   render: () => {
     const outraFuncionalidade = ESTOQUE_GROUP?.children?.[0]
     const initial = [
-      ...(FABRICA ? LEAF_IDS_BY_NODE.get(FABRICA.id) ?? [] : []), // seleciona toda a coluna Documentos de Fábrica
+      ...(FABRICA ? (LEAF_IDS_BY_NODE.get(FABRICA.id) ?? []).filter((id) => DOCUMENT_LEAF_IDS.has(id)) : []),
       ...(outraFuncionalidade ? [LEAF_IDS_BY_NODE.get(outraFuncionalidade.id)?.[0] ?? ''] : []), // seleciona só "Visualizar" de outra funcionalidade
     ].filter(Boolean)
     const [selected, setSelected] = useState<string[]>(initial)
@@ -53,7 +53,7 @@ export const ComSelecaoParcial: Story = {
   },
 }
 
-// ─── Árvore completa (catálogo real, ~622 permissões) ──────────────────────────
+// ─── Árvore completa (catálogo real, incluindo exportação de documentos) ─────
 
 export const ArvoreCompleta: Story = {
   name: 'Catálogo completo',

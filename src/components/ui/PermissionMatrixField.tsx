@@ -158,7 +158,7 @@ function computeVisibleIds(tree: PermissionNode[], query: string): Set<string> |
   return visible
 }
 
-/** Ids de folha de um nó filtrados por coluna: ação direta (view/create/edit/delete, excluindo sub-recurso) ou "documentos" (só sub-recurso, agregado). */
+/** Ids de folha de um nó filtrados por coluna de ação. */
 function leavesForColumn(node: PermissionNode, columnKey: string): string[] {
   const all = LEAF_IDS_BY_NODE.get(node.id) ?? []
   if (columnKey === 'documentos') return all.filter((id) => DOCUMENT_LEAF_IDS.has(id))
@@ -170,8 +170,8 @@ function leavesForColumn(node: PermissionNode, columnKey: string): string[] {
  * Deletar/Documentos/Qtd) alinhadas em todas as linhas. Módulo e grupo são
  * linhas agregadoras (fundo `bg.subtle`, expansíveis, com contador "X/Y" na
  * coluna Qtd); funcionalidade é linha final (fundo `bg.surface`, sem
- * expansão — suas ações e o agregado de sub-recurso já aparecem inline nas
- * colunas). Todo checkbox de coluna (inclusive nas linhas agregadoras)
+ * expansão — ações de eventuais sub-recursos aparecem agregadas inline nas
+ * respectivas colunas). Todo checkbox de coluna (inclusive nas linhas agregadoras)
  * seleciona/desmarca em massa só as folhas daquela coluna sob aquele nó.
  *
  * Reaproveita `Checkbox`/`IconButton`/`EmptyState` do kit (Lei 1 / Regra A).

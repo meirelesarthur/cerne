@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import EstoquesIniciaisLista from './EstoquesIniciaisLista'
-import EstoqueInicialForm   from './EstoqueInicialForm'
+import EstoquesIniciaisLista  from './EstoquesIniciaisLista'
+import EstoqueInicialForm     from './EstoqueInicialForm'
+import EstoqueInicialDetalhe  from './EstoqueInicialDetalhe'
 import { mockEstoquesIniciais } from './estoques-iniciais.mock'
 import type { EstoqueInicial } from './estoques-iniciais.types'
 import { useToast, ToastContainer } from '../../../components/ui/Toast'
 
-type View = 'list' | 'form'
+type View = 'list' | 'form' | 'view'
 
 export default function EstoquesIniciaisPage() {
   const [registros, setRegistros] = useState<EstoqueInicial[]>(mockEstoquesIniciais)
@@ -14,6 +15,7 @@ export default function EstoquesIniciaisPage() {
   const { toasts, show, dismiss } = useToast()
 
   const handleNew = () => { setEditId(null); setView('form') }
+  const handleView = (id: number) => { setEditId(id); setView('view') }
   const handleEdit = (id: number) => { setEditId(id); setView('form') }
   const handleDelete = (id: number) => {
     setRegistros(prev => prev.filter(r => r.id !== id))
@@ -49,11 +51,22 @@ export default function EstoquesIniciaisPage() {
     )
   }
 
+  if (view === 'view' && editData) {
+    return (
+      <EstoqueInicialDetalhe
+        registro={editData}
+        onBack={handleBack}
+        onEdit={() => setView('form')}
+      />
+    )
+  }
+
   return (
     <>
       <EstoquesIniciaisLista
         registros={registros}
         onNew={handleNew}
+        onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

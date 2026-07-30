@@ -27,6 +27,7 @@ import type { EstoqueInicial } from './estoques-iniciais.types'
 interface Props {
   registros: EstoqueInicial[]
   onNew:    () => void
+  onView:   (id: number) => void
   onEdit:   (id: number) => void
   onDelete: (id: number) => void
 }
@@ -55,7 +56,7 @@ function fmtTotal(v: number): string {
 
 const PAGE_SIZE = 10
 
-export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDelete }: Props) {
+export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit, onDelete }: Props) {
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
 
@@ -233,6 +234,7 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
                   key={r.id}
                   registro={r}
                   isLast={idx === pageSlice.length - 1}
+                  onView={() => onView(r.id)}
                   onEdit={() => onEdit(r.id)}
                   onDeleteReq={() => setDeleteId(r.id)}
                   colors={colors}
@@ -305,9 +307,10 @@ export default function EstoquesIniciaisLista({ registros, onNew, onEdit, onDele
 
 // ─── TableRow ─────────────────────────────────────────────────────────────────
 
-function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTemplate }: {
+function TableRow({ registro, isLast, onView, onEdit, onDeleteReq, colors, border, colTemplate }: {
   registro: EstoqueInicial
   isLast: boolean
+  onView: () => void
   onEdit: () => void
   onDeleteReq: () => void
   colors: ReturnType<typeof useTheme>['colors']
@@ -318,6 +321,10 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Visualizar saldo inicial ${registro.produtoDescricao}`}
+      className="gb-focusable"
       style={{
         display: 'grid',
         gridTemplateColumns: colTemplate,
@@ -328,9 +335,12 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
         transition: `background ${t.animation.duration.faster}`,
         alignItems: 'center',
         gap: 8,
+        cursor: 'pointer',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onView}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
     >
       {/* Produto */}
       <div title={`${registro.produtoCodigo} ${registro.produtoDescricao}`} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -378,7 +388,7 @@ function TableRow({ registro, isLast, onEdit, onDeleteReq, colors, border, colTe
       </span>
 
       {/* Ações */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
         <IconButton icon={<Pencil size={13} />} aria-label="Editar"  tooltip="Editar"  size="xs" onClick={onEdit} />
         <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" tooltip="Excluir" size="xs" danger onClick={onDeleteReq} />
       </div>

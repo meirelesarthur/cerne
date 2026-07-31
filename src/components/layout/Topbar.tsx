@@ -49,7 +49,7 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
   return (
     <div
       style={{
-        height: 48,
+        height: t.layout.topbarHeight,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

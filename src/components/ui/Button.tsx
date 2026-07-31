@@ -12,6 +12,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?:      React.ReactNode
   iconRight?: React.ReactNode
   block?:     boolean
+  /**
+   * Alinhamento do conteúdo quando `block`: 'start' (padrão — itens de menu e
+   * ações de lista) ou 'center' (pares de ação de largura igual, ex.: os dois
+   * botões da ErrorPage dentro de uma grade 1fr 1fr).
+   */
+  blockAlign?: 'start' | 'center'
   children:   React.ReactNode
 }
 
@@ -72,6 +78,7 @@ export function Button({
   size    = 'md',
   loading = false,
   block   = false,
+  blockAlign = 'start',
   icon,
   iconRight,
   children,
@@ -84,7 +91,11 @@ export function Button({
   const sz         = sizeStyle[size]
   const isDisabled = disabled || loading
 
-  const justify = block && iconRight ? 'space-between' : block ? 'flex-start' : 'center'
+  const justify = block && iconRight
+    ? 'space-between'
+    : block && blockAlign === 'start'
+    ? 'flex-start'
+    : 'center'
 
   return (
     <button

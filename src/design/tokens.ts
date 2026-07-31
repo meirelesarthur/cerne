@@ -314,6 +314,10 @@ export const font = {
     '2xl': 24,
     '3xl': 30,
     '4xl': 38,
+    /** Display — títulos de tela standalone (ErrorPage, splash). Não usar em UI de aplicação. */
+    '5xl': 48,
+    /** Display máximo — código de status da ErrorPage ("404", "500"). */
+    '6xl': 64,
   },
 
   weight: {
@@ -407,6 +411,8 @@ export const size = {
   permissionActionCol: 108,
   /** Largura da coluna QTD (contagem agregada) na matriz de permissões */
   permissionQtyCol: 64,
+  /** Altura máxima do bloco `FormField variant="view" multiline` antes de rolar internamente (≈6 linhas) */
+  viewFieldMax: 160,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────
@@ -548,8 +554,18 @@ export const layout = {
   contentTop: 72,
   /** Folga externa do chassi (root pad 8 + card pad 8 = 16). */
   gutter: 16,
+  /** Altura da barra superior (Topbar do chassi e cabeçalho de telas standalone). */
+  topbarHeight: 48,
   /** Largura máxima de cartões de autenticação e estados standalone. */
   formMaxWidth: 480,
+  /**
+   * Largura máxima da coluna de conteúdo da ErrorPage (texto, bloco de retorno e
+   * par de botões). Corresponde à regra "no máximo metade da área de conteúdo":
+   * a ilustração ocupa a outra metade e cada botão fica com (540 − gap) / 2.
+   */
+  errorMaxWidth: 540,
+  /** Largura máxima da ilustração da ErrorPage — impede que cresça sem limite em telas wide. */
+  errorIllustrationMax: 720,
 }
 
 // ─── Gráficos ──────────────────────────────────────────────────────────────────

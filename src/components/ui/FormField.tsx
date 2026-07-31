@@ -33,6 +33,12 @@ interface FormFieldProps
    * telas de detalhe — nunca estilizar um input/textarea `readOnly` à mão.
    */
   variant?: 'default' | 'view'
+  /**
+   * Só em `variant="view"` + `multiline`: altura máxima (px) do valor antes de
+   * rolar internamente — o rótulo e o botão de copiar ficam fixos. Use para
+   * corpos longos (JSON de retorno, stacktrace). Default: cresce sem limite.
+   */
+  viewMaxHeight?: number
 }
 
 export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, FormFieldProps>(function FormField({
@@ -49,6 +55,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   mask,
   allowPasswordManager = false,
   variant = 'default',
+  viewMaxHeight,
   style,
   ...inputProps
 }, ref) {
@@ -57,7 +64,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   if (variant === 'view') {
     const rawValue = inputProps.value ?? inputProps.defaultValue
     const value = rawValue == null ? '' : String(rawValue)
-    return <ViewField label={label} value={value} multiline={multiline} size={size} />
+    return <ViewField label={label} value={value} multiline={multiline} size={size} maxHeight={viewMaxHeight} />
   }
 
   const controlHeight = size === 'lg' ? t.size.controlLg : t.size.control
@@ -286,6 +293,11 @@ export interface ViewFieldProps {
   sensitive?: boolean
   multiline?: boolean
   size?: 'md' | 'lg'
+  /**
+   * Só com `multiline`: altura máxima (px) do valor antes de rolar internamente.
+   * Rótulo e botão de copiar permanecem fixos — só o conteúdo rola.
+   */
+  maxHeight?: number
 }
 
 // Variação "Visualização" do FormField (Figma node 54220-2): substitui o
@@ -294,7 +306,7 @@ export interface ViewFieldProps {
 // apenas `opacity` (não `visibility`) para revelar no hover: `visibility:
 // hidden` remove o botão da ordem de tabulação do teclado, quebrando o
 // requisito de foco por teclado — ver `.gb-view-field-copy` em index.css.
-export function ViewField({ label, value, copyValue, sensitive = false, multiline = false, size = 'md' }: ViewFieldProps) {
+export function ViewField({ label, value, copyValue, sensitive = false, multiline = false, size = 'md', maxHeight }: ViewFieldProps) {
   const { colors } = useTheme()
   const [copied, setCopied] = useState(false)
   const [copyFailed, setCopyFailed] = useState(false)
@@ -302,6 +314,17 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
   const hasValue = value !== undefined && value !== null && value !== ''
   const resolvedCopyValue = copyValue ?? (typeof value === 'string' || typeof value === 'number' ? String(value) : undefined)
   const displayValue = sensitive && hasValue ? '••••••••••••' : value
+
+  // O valor entra no rótulo do botão só quando é curto e de uma linha ("Copiar
+  // cpf 123.456.789-00"). Corpos longos (JSON de retorno, stacktrace) seriam
+  // lidos por inteiro pelo leitor de tela — nesses casos, só o rótulo do campo.
+  const isTerseValue =
+    !!resolvedCopyValue && resolvedCopyValue.length <= 40 && !resolvedCopyValue.includes('\n')
+  const copyButtonLabel = label
+    ? `Copiar ${label.toLowerCase()}${isTerseValue ? ` ${resolvedCopyValue}` : ''}`
+    : isTerseValue
+    ? `Copiar ${resolvedCopyValue}`
+    : 'Copiar valor'
 
   useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
 
@@ -384,7 +407,13 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
             color: colors.fg.default,
             cursor: 'default',
             ...(multiline
-              ? { whiteSpace: 'pre-wrap', wordBreak: 'break-word' }
+              ? {
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  ...(maxHeight
+                    ? { display: 'block', maxHeight, overflowY: 'auto', overscrollBehavior: 'contain' }
+                    : null),
+                }
               : { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }),
           }}
         >
@@ -406,7 +435,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
             size="xs"
             variant="ghost"
             icon={copied ? <Check size={t.icon.sm} /> : <Copy size={t.icon.sm} />}
-            aria-label={`Copiar ${label ? `${label.toLowerCase()} ` : ''}${resolvedCopyValue}`}
+            aria-label={copyButtonLabel}
             onClick={copy}
           />
         </span>

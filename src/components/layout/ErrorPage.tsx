@@ -27,6 +27,7 @@ export const errorDescriptions: Record<string, string> = {
   '502': 'Não conseguimos falar com o servidor.',
   '503': 'O serviço está temporariamente indisponível.',
   '504': 'O servidor demorou demais para responder.',
+  '505': 'O servidor não suporta a versão do protocolo usada na requisição.',
   offline: 'Você parece estar sem conexão com a internet.',
 }
 

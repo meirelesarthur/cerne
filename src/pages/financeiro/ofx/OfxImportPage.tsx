@@ -91,8 +91,13 @@ export default function OfxImportPage() {
         {tab === 'history' ? (
           <div style={{ marginTop: t.space[4] }}>
             <ListToolbar search={search} onSearch={setSearch} searchPlaceholder="Buscar arquivo ou conta…" />
-            <DataTable columns={columns} data={filteredImports} keyField="id" emptyMessage="Nenhuma importação encontrada." />
-            <div style={{ marginTop: t.space[4] }}><Pagination page={1} total={filteredImports.length} pageSize={10} onPageChange={() => undefined} /></div>
+            <DataTable
+              columns={columns}
+              data={filteredImports}
+              keyField="id"
+              emptyMessage="Nenhuma importação encontrada."
+              pagination={<Pagination page={1} total={filteredImports.length} pageSize={10} onPageChange={() => undefined} />}
+            />
           </div>
         ) : (
           <div style={{ marginTop: t.space[5] }}>

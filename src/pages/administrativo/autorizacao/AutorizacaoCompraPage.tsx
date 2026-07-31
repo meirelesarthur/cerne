@@ -131,8 +131,7 @@ export default function AutorizacaoCompraPage() {
           { label: 'Fornecedor', value: request.supplier },
           { label: 'Valor', value: formatCurrency(request.total) },
           { label: 'Status', value: <Badge label={STATUS_CONFIG[request.status].label} variant={STATUS_CONFIG[request.status].variant} /> },
-        ]} />} />
-        <div style={{ marginTop: t.space[4] }}><Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} /></div>
+        ]} />} pagination={<Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />} />
       </PageCard>
 
       <Modal

@@ -159,7 +159,7 @@ const state = {
     hoverGb:     'rgba(255,255,255,0.03)',          // GBMode
     selected:    primitive.brand[50],               // light
     selectedGb:  'rgba(16,185,129,0.06)',           // GBMode
-    striped:     primitive.neutral[50],             // light
+    striped:     'rgba(23,23,23,0.015)',            // light — mais claro que o header (neutral[50])
     stripedGb:   'rgba(255,255,255,0.015)',         // GBMode
   },
 }

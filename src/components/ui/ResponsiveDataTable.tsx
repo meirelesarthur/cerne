@@ -12,15 +12,17 @@ interface ResponsiveDataTableProps<T extends object> {
   renderCard: (row: T) => ReactNode
   emptyMessage?: string
   loading?: boolean
+  /** Paginação — colada como footer da tabela no desktop; abaixo dos cartões no mobile. */
+  pagination?: ReactNode
 }
 
 /** Tabela no desktop e cartões equivalentes abaixo de 768 px. */
-export function ResponsiveDataTable<T extends object>({ columns, data, keyField, renderCard, emptyMessage, loading }: ResponsiveDataTableProps<T>) {
+export function ResponsiveDataTable<T extends object>({ columns, data, keyField, renderCard, emptyMessage, loading, pagination }: ResponsiveDataTableProps<T>) {
   const { colors } = useTheme()
   return (
     <>
       <div className="hidden md:block">
-        <DataTable columns={columns} data={data} keyField={keyField} emptyMessage={emptyMessage} loading={loading} />
+        <DataTable columns={columns} data={data} keyField={keyField} emptyMessage={emptyMessage} loading={loading} pagination={pagination} />
       </div>
       <div className="md:hidden">
         {loading ? (
@@ -37,6 +39,9 @@ export function ResponsiveDataTable<T extends object>({ columns, data, keyField,
               </article>
             ))}
           </div>
+        )}
+        {pagination && !loading && data.length > 0 && (
+          <div style={{ marginTop: t.space[3] }}>{pagination}</div>
         )}
       </div>
     </>

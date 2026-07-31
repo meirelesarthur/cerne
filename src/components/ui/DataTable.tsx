@@ -25,6 +25,11 @@ interface DataTableProps<T> {
    * filhos permanecem inalteradas. Ex.: áreas internas de uma fazenda.
    */
   getChildren?: (row: T) => T[] | undefined
+  /**
+   * Paginação renderizada como footer colado à tabela (mesmo tom do header,
+   * zero espaço em relação às linhas). Omitir para não exibir footer.
+   */
+  pagination?: React.ReactNode
 }
 
 function SortIcon({ active, color }: { active?: boolean; color: string }) {
@@ -44,6 +49,7 @@ export function DataTable<T extends object>({
   loading,
   onRowClick,
   getChildren,
+  pagination,
 }: DataTableProps<T>) {
   const { colors, isGbMode } = useTheme()
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
@@ -86,6 +92,7 @@ export function DataTable<T extends object>({
   const borderSubtle  = colors.border.subtle
   const theadBg       = isGbMode ? t.color.state.row.hoverGb : t.color.neutral[50]
   const rowBg         = colors.bg.surface
+  const rowStripedBg  = isGbMode ? t.color.state.row.stripedGb : t.color.state.row.striped
   const rowHoverBg    = isGbMode ? t.color.state.row.selectedGb : t.color.neutral[50]
   const textHead      = colors.fg.muted
   const textCell      = colors.fg.default
@@ -147,13 +154,17 @@ export function DataTable<T extends object>({
                 </td>
               </tr>
             ) : (
-              flatRows.map(({ row, level }) => {
-                const rowKey = String(row[keyField])
-                const isHovered = hoveredRow === rowKey
-                const children = getChildren?.(row)
-                const hasChildren = !!children && children.length > 0
-                const isExpanded = expandedKeys.has(rowKey)
-                return (
+              (() => {
+                let topLevelIndex = -1
+                return flatRows.map(({ row, level }) => {
+                  const rowKey = String(row[keyField])
+                  const isHovered = hoveredRow === rowKey
+                  const children = getChildren?.(row)
+                  const hasChildren = !!children && children.length > 0
+                  const isExpanded = expandedKeys.has(rowKey)
+                  if (level === 0) topLevelIndex++
+                  const isStriped = level > 0 || topLevelIndex % 2 === 1
+                  return (
                   <tr
                     key={rowKey}
                     onMouseEnter={() => setHoveredRow(rowKey)}
@@ -162,8 +173,8 @@ export function DataTable<T extends object>({
                     style={{
                       background: isHovered
                         ? rowHoverBg
-                        : level > 0
-                          ? (isGbMode ? t.color.state.row.stripedGb : t.color.state.row.striped)
+                        : isStriped
+                          ? rowStripedBg
                           : rowBg,
                       borderBottom: `1px solid ${borderSubtle}`,
                       transition: `background ${t.transition.fast}`,
@@ -244,12 +255,24 @@ export function DataTable<T extends object>({
                       )
                     })}
                   </tr>
-                )
-              })
+                  )
+                })
+              })()
             )}
           </tbody>
         </table>
       </div>
+      {pagination && !loading && data.length > 0 && (
+        <div
+          style={{
+            background: theadBg,
+            borderTop: `1px solid ${borderColor}`,
+            padding: `${t.space[2] + 2}px ${t.space[4]}px`,
+          }}
+        >
+          {pagination}
+        </div>
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Pencil, Eye } from 'lucide-react'
 import { DataTable, type Column } from './DataTable'
 import { Badge } from './Badge'
+import { Pagination } from './Pagination'
 
 interface Fazenda {
   id: string
@@ -85,5 +86,16 @@ export const Empty: Story = {
     data: [],
     keyField: 'id',
     emptyMessage: 'Nenhuma fazenda encontrada.',
+  },
+}
+
+export const WithPagination: Story = {
+  args: {
+    columns,
+    data: mockData,
+    keyField: 'id',
+    pagination: (
+      <Pagination page={1} total={mockData.length} pageSize={10} onPageChange={() => {}} />
+    ),
   },
 }

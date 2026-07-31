@@ -149,19 +149,18 @@ export default function PerfisAcessoLista({ perfis, onNew, onView, onEdit, onDel
               data={paginated}
               keyField="id"
               onRowClick={(row) => onView(row.id)}
+              pagination={
+                <Pagination
+                  page={page}
+                  total={filtered.length}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={setPageSize}
+                  pageSizeOptions={PAGE_SIZE_OPTIONS}
+                  showPageSizeSelector
+                />
+              }
             />
-
-            <div style={{ marginTop: t.space[3] }}>
-              <Pagination
-                page={page}
-                total={filtered.length}
-                pageSize={pageSize}
-                onPageChange={setPage}
-                onPageSizeChange={setPageSize}
-                pageSizeOptions={PAGE_SIZE_OPTIONS}
-                showPageSizeSelector
-              />
-            </div>
           </>
         )}
       </PageCard>

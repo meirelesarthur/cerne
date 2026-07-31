@@ -155,8 +155,8 @@ export default function UsuariosPage() {
           keyField="id"
           emptyMessage="Nenhum usuário encontrado."
           renderCard={(user) => <DetailGrid items={detailItems(user)} columns={1} />}
+          pagination={<Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />}
         />
-        <div style={{ marginTop: t.space[4] }}><Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} /></div>
       </PageCard>
 
       <Modal open={editorOpen} onClose={() => setEditorOpen(false)} title={editing ? 'Editar Usuário' : 'Novo Usuário'} size="lg" footer={<><Button variant="secondary" onClick={() => setEditorOpen(false)}>Cancelar</Button><Button onClick={saveUser}>Salvar Usuário</Button></>}>

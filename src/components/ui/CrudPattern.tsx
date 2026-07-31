@@ -208,10 +208,8 @@ export function CrudPattern<T extends CrudEntity>({
                   {!readOnly && permissions.view && <Button variant="ghost" size="sm" icon={<Eye size={15} />} onClick={() => openRecord(record, 'show')}>Ver detalhes</Button>}
                 </div>
               )}
+              pagination={<Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />}
             />
-            <div style={{ marginTop: t.space[4] }}>
-              <Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />
-            </div>
           </>
         )}
       </PageCard>

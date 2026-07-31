@@ -294,8 +294,10 @@ export interface ViewFieldProps {
   multiline?: boolean
   size?: 'md' | 'lg'
   /**
-   * Só com `multiline`: altura máxima (px) do valor antes de rolar internamente.
-   * Rótulo e botão de copiar permanecem fixos — só o conteúdo rola.
+   * Só com `multiline`: altura máxima (px) do **bloco inteiro** — borda a borda,
+   * rótulo e paddings incluídos. Ao passar disso, quem rola é o valor; rótulo e
+   * botão de copiar continuam fixos. Conteúdo menor que o teto → o bloco encolhe
+   * para o tamanho do conteúdo.
    */
   maxHeight?: number
 }
@@ -330,11 +332,13 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
   // de copiar: padding do bloco + largura do IconButton `xs` + respiro.
   const copyClearance = t.space[4] + t.size.iconBtn.sm + t.space[1]
 
-  // Com `maxHeight`, quem rola é o próprio valor — e ele vai até a borda do
-  // conteúdo, para a barra nascer na extremidade direita do bloco, DEPOIS do
-  // ícone de copiar (que fica antes dela, no topo direito). Por isso a folga do
-  // ícone sai do contêiner e passa para cada filho: se ficasse no contêiner, a
-  // barra apareceria à esquerda do ícone.
+  // Com `maxHeight`, o teto vale para o bloco inteiro (borda a borda): o bloco
+  // para de crescer ali e quem rola é o valor, com a altura que sobra depois do
+  // rótulo e dos paddings. O valor vai até a borda do conteúdo, para a barra
+  // nascer na extremidade direita do bloco, DEPOIS do ícone de copiar (que fica
+  // antes dela, no topo direito). Por isso a folga do ícone sai do contêiner e
+  // passa para cada filho: se ficasse no contêiner, a barra apareceria à
+  // esquerda do ícone.
   const scrolls = multiline && !!maxHeight
 
   useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
@@ -370,9 +374,13 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
         // para nunca quebrar em 2 linhas e estourar essa conta.
         height: multiline ? undefined : t.space[14],
         minHeight: multiline ? (size === 'lg' ? t.size.controlLg : t.size.control) : undefined,
+        // Teto do bloco inteiro; `stretch` + `overflow: hidden` fazem a coluna
+        // interna herdar essa altura para o valor poder rolar dentro dela.
+        maxHeight: scrolls ? maxHeight : undefined,
+        overflow: scrolls ? 'hidden' : undefined,
         boxSizing: 'border-box',
         display: 'flex',
-        alignItems: multiline ? 'flex-start' : 'center',
+        alignItems: multiline ? (scrolls ? 'stretch' : 'flex-start') : 'center',
         background: colors.bg.subtle,
         border: `1px solid ${colors.border.subtle}`,
         borderRadius: t.radius.base,
@@ -384,6 +392,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
         style={{
           flex: 1,
           minWidth: 0,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
           gap: t.space[1],
@@ -429,8 +438,10 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
                   wordBreak: 'break-word',
                   ...(scrolls
                     ? {
-                        display: 'block',
-                        maxHeight,
+                        // Fica com a altura que sobra dentro do teto do bloco
+                        // (`minHeight: 0` é o que permite encolher e rolar).
+                        flex: 1,
+                        minHeight: 0,
                         overflowY: 'auto',
                         overscrollBehavior: 'contain',
                         paddingRight: resolvedCopyValue ? copyClearance : 0,

@@ -15,7 +15,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Alinhamento do conteúdo quando `block`: 'start' (padrão — itens de menu e
    * ações de lista) ou 'center' (pares de ação de largura igual, ex.: os dois
-   * botões da ErrorPage dentro de uma grade 1fr 1fr).
+   * botões da ErrorPage dentro da grade de colunas iguais).
    */
   blockAlign?: 'start' | 'center'
   children:   React.ReactNode

@@ -340,14 +340,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               emptyMessage="Nenhuma fazenda encontrada."
               onRowClick={(row) => onView(row.id)}
               getChildren={(row) => row.areas}
-              pagination={totalFiltered > PAGE_SIZE ? (
+              pagination={(
                 <Pagination
                   page={page}
                   total={totalFiltered}
                   pageSize={PAGE_SIZE}
                   onPageChange={setPage}
                 />
-              ) : undefined}
+              )}
             />
           </>
         ) : (
@@ -358,16 +358,14 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
               onEdit={onEdit}
               colors={colors}
             />
-            {totalFiltered > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination
-                  page={page}
-                  total={totalFiltered}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
+            <div style={{ marginTop: t.space[3] }}>
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </div>
           </>
         )}
 

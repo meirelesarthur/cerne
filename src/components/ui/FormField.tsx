@@ -326,6 +326,17 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
     ? `Copiar ${resolvedCopyValue}`
     : 'Copiar valor'
 
+  // Folga à direita que o texto precisa deixar livre para não passar sob o botão
+  // de copiar: padding do bloco + largura do IconButton `xs` + respiro.
+  const copyClearance = t.space[4] + t.size.iconBtn.sm + t.space[1]
+
+  // Com `maxHeight`, quem rola é o próprio valor — e ele vai até a borda do
+  // conteúdo, para a barra nascer na extremidade direita do bloco, DEPOIS do
+  // ícone de copiar (que fica antes dela, no topo direito). Por isso a folga do
+  // ícone sai do contêiner e passa para cada filho: se ficasse no contêiner, a
+  // barra apareceria à esquerda do ícone.
+  const scrolls = multiline && !!maxHeight
+
   useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
 
   const announce = (ok: boolean) => {
@@ -376,7 +387,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
           display: 'flex',
           flexDirection: 'column',
           gap: t.space[1],
-          paddingRight: resolvedCopyValue ? 46 : 0,
+          paddingRight: resolvedCopyValue && !scrolls ? copyClearance : 0,
         }}
       >
         {label && (
@@ -393,6 +404,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              paddingRight: resolvedCopyValue && scrolls ? copyClearance : 0,
             }}
           >
             {label}
@@ -403,15 +415,26 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
             fontFamily: t.font.family.sans,
             fontSize: t.font.size.base,
             fontWeight: t.font.weight.normal,
-            lineHeight: '16px',
+            // Uma linha: 16px travados — é essa conta que fecha a altura fixa de
+            // 56px do bloco. Multilinha: entrelinha de parágrafo, porque 16px em
+            // fonte de 14px comprime o texto E deixa a tinta da última linha
+            // vazar ~1px além da caixa, fazendo nascer barra de rolagem em
+            // conteúdo que cabe inteiro.
+            lineHeight: multiline ? t.font.lineHeight.normal : '16px',
             color: colors.fg.default,
             cursor: 'default',
             ...(multiline
               ? {
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
-                  ...(maxHeight
-                    ? { display: 'block', maxHeight, overflowY: 'auto', overscrollBehavior: 'contain' }
+                  ...(scrolls
+                    ? {
+                        display: 'block',
+                        maxHeight,
+                        overflowY: 'auto',
+                        overscrollBehavior: 'contain',
+                        paddingRight: resolvedCopyValue ? copyClearance : 0,
+                      }
                     : null),
                 }
               : { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }),
@@ -426,7 +449,9 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
           className="gb-view-field-copy"
           style={{
             position: 'absolute',
-            right: t.space[4],
+            // Quando o valor rola, o ícone recua a largura da barra para ficar
+            // imediatamente antes dela — nunca por cima.
+            right: scrolls ? t.space[4] + t.size.scrollbar : t.space[4],
             top: multiline ? t.space[3] : '50%',
             transform: multiline ? undefined : 'translateY(-50%)',
           }}

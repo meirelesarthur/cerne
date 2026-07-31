@@ -196,7 +196,7 @@ export function ErrorPage({
               multiline
               label={payloadLabel}
               value={payload}
-              viewMaxHeight={t.size.viewFieldMax}
+              viewMaxHeight={t.size.errorPayloadMax}
             />
           )}
 

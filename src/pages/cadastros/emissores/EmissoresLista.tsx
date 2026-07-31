@@ -10,6 +10,7 @@ import { Badge, type BadgeVariant } from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar }     from '../../../components/ui/ListToolbar'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
@@ -72,7 +73,6 @@ export default function EmissoresLista({
   useEffect(() => { setPage(1) }, [search, filters.ambiente, filters.ativo])
 
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-  const border = colors.border.default
 
   const handleConfirmDelete = () => {
     if (deleteId !== null) {
@@ -84,6 +84,105 @@ export default function EmissoresLista({
 
   const deleteTarget = emissores.find(e => e.id === deleteId)
   const deleteTemNotas = deleteTarget ? deleteTarget.emiteNfe === 'sim' && Number(deleteTarget.ultimoNumeroNfe) > 0 : false
+
+  const columns: Column<Emissor>[] = [
+    {
+      key: 'razaoSocial',
+      label: 'RAZÃO SOCIAL',
+      sortable: false,
+      render: (e) => (
+        <span title={e.razaoSocial} style={{ fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
+          {e.razaoSocial}
+        </span>
+      ),
+    },
+    {
+      key: 'cpfCnpj',
+      label: 'CPF/CNPJ',
+      width: 130,
+      sortable: false,
+      render: (e) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums', fontFamily: t.font.family.sans }}>{e.cpfCnpj}</span>
+      ),
+    },
+    {
+      key: 'cidade',
+      label: 'CIDADE',
+      sortable: false,
+      render: (e) => <span title={e.cidade}>{e.cidade}</span>,
+    },
+    {
+      key: 'ambiente',
+      label: 'AMBIENTE',
+      width: 100,
+      sortable: false,
+      render: (e) => <span>{e.ambiente ? AMBIENTE_LABEL[e.ambiente] : '—'}</span>,
+    },
+    {
+      key: 'emiteNfe',
+      label: 'EMITE NFE?',
+      width: 90,
+      align: 'center',
+      sortable: false,
+      render: (e) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }} title={e.emiteNfe === 'sim' ? 'Emite NFe' : 'Não emite NFe'}>
+          {e.emiteNfe === 'sim'
+            ? <Check size={16} color={t.color.feedback.success.text} aria-label="Emite NFe" />
+            : <XIcon size={16} color={colors.fg.subtle} aria-label="Não emite NFe" />}
+        </div>
+      ),
+    },
+    {
+      key: 'certificado',
+      label: 'CERTIFICADO',
+      width: 200,
+      align: 'center',
+      sortable: false,
+      render: (e) => {
+        const status = certificadoStatus(e.certificado, today)
+        const certBadge = CERT_BADGE[status]
+        const certDateLabel = e.certificado ? fmtISOtoDMY(e.certificado.validade) : ''
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Badge label={certBadge.label(certDateLabel)} variant={certBadge.variant} />
+          </div>
+        )
+      },
+    },
+    {
+      key: 'ativo',
+      label: 'ATIVO',
+      width: 70,
+      align: 'center',
+      sortable: false,
+      render: (e) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Badge label={e.ativo === 'sim' ? 'Ativo' : 'Inativo'} variant={e.ativo === 'sim' ? 'success' : 'neutral'} />
+        </div>
+      ),
+    },
+    {
+      key: 'acoes',
+      label: 'AÇÃO',
+      width: 60,
+      align: 'center',
+      sortable: false,
+      render: (e) => (
+        <div onClick={ev => ev.stopPropagation()} style={{ display: 'flex', justifyContent: 'center' }}>
+          <DropdownMenu
+            align="right"
+            ariaLabel={`Ações do emissor ${e.razaoSocial}`}
+            items={[
+              { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(e.id) },
+              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(e.id) },
+              { id: 'cert', label: 'Certificado', icon: <FileKey size={13} />, onClick: () => onCertificado(e.id) },
+              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(e.id), danger: true, divider: true },
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -135,52 +234,15 @@ export default function EmissoresLista({
             )
           })()
         ) : (
-          <>
-            <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 1240 }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1.6fr 130px 1fr 100px 90px 200px 70px 60px',
-                padding: '10px 16px',
-                borderBottom: `1px solid ${border}`,
-                background: colors.bg.subtle,
-              }}>
-                {['RAZÃO SOCIAL', 'CPF/CNPJ', 'CIDADE', 'AMBIENTE', 'EMITE NFE?', 'CERTIFICADO', 'ATIVO', 'AÇÃO'].map((h, i) => (
-                  <div key={h} style={{
-                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.subtle,
-                    fontFamily: t.font.family.sans, letterSpacing: '0.06em', textAlign: i >= 4 ? 'center' : 'left',
-                  }}>
-                    {h}
-                  </div>
-                ))}
-              </div>
-
-              {paginated.map((emissor, idx) => (
-                <EmissorRow
-                  key={emissor.id}
-                  emissor={emissor}
-                  today={today}
-                  isLast={idx === paginated.length - 1}
-                  onView={() => onView(emissor.id)}
-                  onEdit={() => onEdit(emissor.id)}
-                  onCertificado={() => onCertificado(emissor.id)}
-                  onDelete={() => setDeleteId(emissor.id)}
-                  colors={colors}
-                  border={border}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination page={page} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginated}
+            keyField="id"
+            onRowClick={row => onView(row.id)}
+            pagination={
+              <Pagination page={page} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            }
+          />
         )}
 
       </PageCard>
@@ -251,82 +313,5 @@ export default function EmissoresLista({
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-function EmissorRow({
-  emissor, today, isLast, onView, onEdit, onCertificado, onDelete, colors, border,
-}: {
-  emissor: Emissor
-  today:   string
-  isLast:  boolean
-  onView:  () => void
-  onEdit:  () => void
-  onCertificado: () => void
-  onDelete: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  border:  string
-}) {
-  const status = certificadoStatus(emissor.certificado, today)
-  const certBadge = CERT_BADGE[status]
-  const certDateLabel = emissor.certificado ? fmtISOtoDMY(emissor.certificado.validade) : ''
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar emissor ${emissor.razaoSocial}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1.6fr 130px 1fr 100px 90px 200px 70px 60px',
-        padding: '0 16px',
-        height: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        alignItems: 'center',
-        transition: `background ${t.animation.duration.faster}`,
-        cursor: 'pointer',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      <span title={emissor.razaoSocial} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {emissor.razaoSocial}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
-        {emissor.cpfCnpj}
-      </span>
-      <span title={emissor.cidade} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {emissor.cidade}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
-        {emissor.ambiente ? AMBIENTE_LABEL[emissor.ambiente] : '—'}
-      </span>
-      <div style={{ display: 'flex', justifyContent: 'center' }} title={emissor.emiteNfe === 'sim' ? 'Emite NFe' : 'Não emite NFe'}>
-        {emissor.emiteNfe === 'sim'
-          ? <Check size={16} color={t.color.feedback.success.text} aria-label="Emite NFe" />
-          : <XIcon size={16} color={colors.fg.subtle} aria-label="Não emite NFe" />}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Badge label={certBadge.label(certDateLabel)} variant={certBadge.variant} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Badge label={emissor.ativo === 'sim' ? 'Ativo' : 'Inativo'} variant={emissor.ativo === 'sim' ? 'success' : 'neutral'} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <DropdownMenu
-          align="right"
-          ariaLabel="Ações do emissor"
-          items={[
-            { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: onView },
-            { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
-            { id: 'cert', label: 'Certificado', icon: <FileKey size={13} />, onClick: onCertificado },
-            { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
-          ]}
-        />
-      </div>
-    </div>
   )
 }

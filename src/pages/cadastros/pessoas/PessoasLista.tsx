@@ -11,6 +11,7 @@ import { Avatar }          from '../../../components/ui/Avatar'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar }     from '../../../components/ui/ListToolbar'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -34,7 +35,6 @@ interface PessoasListaProps {
 }
 
 const PAGE_SIZE = 8
-const GRID = '2.2fr 150px 2fr 1.6fr 56px'
 
 export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete }: PessoasListaProps) {
   const { colors }   = useTheme()
@@ -98,6 +98,92 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
     }
   }
 
+  const columns: Column<Pessoa>[] = [
+    {
+      key: 'nome',
+      label: 'NOME',
+      sortable: false,
+      render: (p) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + 2, minWidth: 0 }}>
+          <Avatar name={p.name} size="sm" />
+          <div style={{ minWidth: 0 }}>
+            <div style={{
+              fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
+              color: colors.fg.default, fontFamily: t.font.family.sans,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {p.name}
+            </div>
+            <div style={{
+              fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {cidadeLabel(p.cityId)}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'nif',
+      label: 'CPF / CNPJ',
+      width: 150,
+      sortable: false,
+      render: (p) => (
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+          {maskNif(p.nif)}
+        </span>
+      ),
+    },
+    {
+      key: 'email',
+      label: 'E-MAIL',
+      sortable: false,
+      render: (p) => (
+        <span title={p.email} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
+          {p.email || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'entidades',
+      label: 'ENTIDADES',
+      sortable: false,
+      render: (p) => {
+        const roles = activeRoles(p)
+        return (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {roles.length === 0
+              ? <Badge label="Sem papel" variant="neutral" />
+              : roles.map((r) => <Badge key={r.key} label={r.label} variant={r.variant} />)}
+          </div>
+        )
+      },
+    },
+    {
+      key: 'acoes',
+      label: 'AÇÃO',
+      align: 'center',
+      width: 56,
+      sortable: false,
+      render: (p) => (
+        <div onClick={(e) => e.stopPropagation()} style={{ display: 'flex', justifyContent: 'center' }}>
+          <DropdownMenu
+            align="right"
+            ariaLabel={`Ações de ${p.name}`}
+            items={[
+              { id: 'view', label: 'Ver detalhes', icon: <Eye size={13} />, onClick: () => onView(p.id) },
+              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(p.id) },
+              ...(canDelete
+                ? [{ id: 'delete', label: 'Excluir…', icon: <Trash2 size={13} />, onClick: () => setDeleteId(p.id), danger: true, divider: true }]
+                : []),
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
       <PageCard>
@@ -149,54 +235,15 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             action={search || roleFilter ? undefined : { label: 'Nova Pessoa', onClick: onNew }}
           />
         ) : (
-          <>
-            <div style={{
-              background: colors.bg.surface, border: `1px solid ${colors.border.default}`,
-              borderRadius: t.radius.lg, overflow: 'hidden',
-            }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 900 }}>
-              {/* Cabeçalho */}
-              <div style={{
-                display: 'grid', gridTemplateColumns: GRID,
-                padding: '10px 16px', borderBottom: `1px solid ${colors.border.default}`,
-                background: colors.bg.subtle,
-              }}>
-                {['NOME', 'CPF / CNPJ', 'E-MAIL', 'ENTIDADES', 'AÇÃO'].map((h, i) => (
-                  <div key={h} style={{
-                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                    color: colors.fg.subtle, fontFamily: t.font.family.sans,
-                    letterSpacing: '0.06em', textAlign: i === 4 ? 'center' : 'left',
-                  }}>
-                    {h}
-                  </div>
-                ))}
-              </div>
-
-              {/* Linhas */}
-              {paginated.map((p, idx) => (
-                <PessoaRow
-                  key={p.id}
-                  pessoa={p}
-                  isLast={idx === paginated.length - 1}
-                  canDelete={canDelete}
-                  onView={() => onView(p.id)}
-                  onEdit={() => onEdit(p.id)}
-                  onDelete={() => setDeleteId(p.id)}
-                  colors={colors}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination page={safePage} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginated}
+            keyField="id"
+            onRowClick={(row) => onView(row.id)}
+            pagination={
+              <Pagination page={safePage} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            }
+          />
         )}
 
       </PageCard>
@@ -266,99 +313,5 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── Linha da tabela ──────────────────────────────────────────────────────────
-
-function PessoaRow({
-  pessoa, isLast, canDelete, onView, onEdit, onDelete, colors,
-}: {
-  pessoa:    Pessoa
-  isLast:    boolean
-  canDelete: boolean
-  onView:    () => void
-  onEdit:    () => void
-  onDelete:  () => void
-  colors:    ReturnType<typeof useTheme>['colors']
-}) {
-  const roles = activeRoles(pessoa)
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar pessoa ${pessoa.name}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid', gridTemplateColumns: GRID,
-        padding: '0 16px', minHeight: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
-        alignItems: 'center', transition: `background ${t.transition.fast}`,
-        cursor: 'pointer',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-      onClick={onView}
-      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      {/* Nome + Avatar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] + 2, minWidth: 0, paddingRight: t.space[3] }}>
-        <Avatar name={pessoa.name} size="sm" />
-        <div style={{ minWidth: 0 }}>
-          <div style={{
-            fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
-            color: colors.fg.default, fontFamily: t.font.family.sans,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {pessoa.name}
-          </div>
-          <div style={{
-            fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {cidadeLabel(pessoa.cityId)}
-          </div>
-        </div>
-      </div>
-
-      {/* CPF / CNPJ */}
-      <span style={{
-        fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans,
-        fontVariantNumeric: 'tabular-nums',
-      }}>
-        {maskNif(pessoa.nif)}
-      </span>
-
-      {/* E-mail */}
-      <span title={pessoa.email} style={{
-        fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans,
-        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: t.space[3],
-      }}>
-        {pessoa.email || '—'}
-      </span>
-
-      {/* Entidades (badges acessíveis: texto + cor) */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, paddingRight: t.space[2] }}>
-        {roles.length === 0
-          ? <Badge label="Sem papel" variant="neutral" />
-          : roles.map((r) => <Badge key={r.key} label={r.label} variant={r.variant} />)}
-      </div>
-
-      {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
-        <DropdownMenu
-          align="right"
-          ariaLabel={`Ações de ${pessoa.name}`}
-          items={[
-            { id: 'view', label: 'Ver detalhes', icon: <Eye size={13} />, onClick: onView },
-            { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
-            ...(canDelete
-              ? [{ id: 'delete', label: 'Excluir…', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true }]
-              : []),
-          ]}
-        />
-      </div>
-    </div>
   )
 }

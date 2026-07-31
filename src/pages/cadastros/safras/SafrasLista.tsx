@@ -14,6 +14,7 @@ import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -112,7 +113,82 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
   }
 
   const cardBg = isGbMode ? 'rgba(255,255,255,0.04)' : colors.bg.surface
-  const border  = colors.border.default
+
+  const columns: Column<Safra>[] = [
+    {
+      key: 'desc',
+      label: 'Descrição',
+      sortable: false,
+      render: (s) => (
+        <span style={{ fontWeight: t.font.weight.semibold, color: colors.accent.default, fontFamily: t.font.family.sans }}>
+          {s.desc}
+        </span>
+      ),
+    },
+    {
+      key: 'ini',
+      label: 'Dt. Início',
+      width: 120,
+      sortable: false,
+      render: (s) => (
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+          {fmtYMDtoDMY(s.ini)}
+        </span>
+      ),
+    },
+    {
+      key: 'fim',
+      label: 'Dt. Fim',
+      width: 120,
+      sortable: false,
+      render: (s) => (
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
+          {fmtYMDtoDMY(s.fim)}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      width: 100,
+      sortable: false,
+      render: (s) => (
+        <Badge label={s.ativo === 'sim' ? 'Ativa' : 'Inativa'} variant={s.ativo === 'sim' ? 'success' : 'neutral'} />
+      ),
+    },
+    {
+      key: 'weeks',
+      label: 'Semanas',
+      width: 80,
+      align: 'center',
+      sortable: false,
+      render: (s) => (
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
+          {s.weeks.length} sem.
+        </span>
+      ),
+    },
+    {
+      key: 'acoes',
+      label: '',
+      width: 52,
+      align: 'center',
+      sortable: false,
+      render: (s) => (
+        <div onClick={(e) => e.stopPropagation()} style={{ display: 'flex', justifyContent: 'center' }}>
+          <DropdownMenu
+            ariaLabel="Ações da safra"
+            align="right"
+            items={[
+              { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(s.id) },
+              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(s.id) },
+              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteTarget(s), danger: true, divider: true },
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -170,67 +246,20 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             action={{ label: 'Nova Safra', onClick: onNew }}
           />
         ) : (
-          <>
-            <div style={{
-              background:   colors.bg.surface,
-              border:       `1px solid ${border}`,
-              borderRadius: t.radius.lg,
-              overflow:     'hidden',
-            }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 700 }}>
-              {/* Cabeçalho */}
-              <div style={{
-                display:         'grid',
-                gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-                padding:         `${t.space[2] + 2}px ${t.space[4]}px`,
-                background:      colors.bg.subtle,
-                borderBottom:    `1px solid ${border}`,
-              }}>
-                {['Descrição', 'Dt. Início', 'Dt. Fim', 'Status', 'Semanas', ''].map((h, i) => (
-                  <span key={i} style={{
-                    fontSize:      t.font.size.xs,
-                    fontWeight:    t.font.weight.semibold,
-                    color:         colors.fg.subtle,
-                    fontFamily:    t.font.family.sans,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    textAlign:     i >= 4 ? 'center' : undefined,
-                  }}>
-                    {h}
-                  </span>
-                ))}
-              </div>
-
-              {/* Linhas */}
-              {paginatedData.map((safra, idx) => (
-                <SafraRow
-                  key={safra.id}
-                  safra={safra}
-                  isLast={idx === paginatedData.length - 1}
-                  onView={onView}
-                  onEdit={onEdit}
-                  onDeleteReq={setDeleteTarget}
-                  colors={colors}
-                  border={border}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {totalFiltered > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination
-                  page={page}
-                  total={totalFiltered}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginatedData}
+            keyField="id"
+            onRowClick={(row) => onView(row.id)}
+            pagination={
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            }
+          />
         )}
 
       </PageCard>
@@ -313,96 +342,6 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── SafraRow ─────────────────────────────────────────────────────────────────
-
-function SafraRow({
-  safra,
-  isLast,
-  onView,
-  onEdit,
-  onDeleteReq,
-  colors,
-  border,
-}: {
-  safra:        Safra
-  isLast:       boolean
-  onView:       (id: number) => void
-  onEdit:       (id: number) => void
-  onDeleteReq:  (s: Safra) => void
-  colors:       ReturnType<typeof useTheme>['colors']
-  border:       string
-}) {
-  const [hovered, setHovered] = useState(false)
-  const isAtiva = safra.ativo === 'sim'
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar safra ${safra.desc}`}
-      className="gb-focusable"
-      style={{
-        display:         'grid',
-        gridTemplateColumns: '1fr 120px 120px 100px 80px 52px',
-        padding:         `0 ${t.space[4]}px`,
-        height:          t.size.tableRow,
-        borderBottom:    isLast ? 'none' : `1px solid ${border}`,
-        background:      hovered ? colors.bg.subtle : 'transparent',
-        transition:      `background ${t.transition.fast}`,
-        cursor:          'pointer',
-        alignItems:      'center',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => onView(safra.id)}
-      onKeyDown={e => {
-        if (e.key === 'Enter') {
-          e.preventDefault()
-          onView(safra.id)
-        }
-      }}
-    >
-      {/* Descrição */}
-      <span title={safra.desc} style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.semibold, color: colors.accent.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {safra.desc}
-      </span>
-
-      {/* Dt. Início */}
-      <span title={fmtYMDtoDMY(safra.ini)} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtYMDtoDMY(safra.ini)}
-      </span>
-
-      {/* Dt. Fim */}
-      <span title={fmtYMDtoDMY(safra.fim)} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtYMDtoDMY(safra.fim)}
-      </span>
-
-      {/* Status badge — usa componente Badge */}
-      <div>
-        <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
-      </div>
-
-      {/* Semanas */}
-      <span title={`${safra.weeks.length} sem.`} style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, textAlign: 'center', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {safra.weeks.length} sem.
-      </span>
-
-      {/* Ações — DropdownMenu do kit */}
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <DropdownMenu
-          ariaLabel="Ações da safra"
-          align="right"
-          items={[
-            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />,    onClick: () => onView(safra.id) },
-            { id: 'edit',   label: 'Editar',     icon: <Pencil size={13} />, onClick: () => onEdit(safra.id) },
-            { id: 'delete', label: 'Excluir',    icon: <Trash2 size={13} />, onClick: () => onDeleteReq(safra), danger: true, divider: true },
-          ]}
-        />
-      </div>
-    </div>
   )
 }
 

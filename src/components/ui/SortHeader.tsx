@@ -20,9 +20,9 @@ interface SortHeaderProps {
 
 /**
  * Cabeçalho de coluna ordenável para tabelas montadas em grid (listas que não
- * usam `DataTable`). Substitui os `<button>` de ordenação reimplementados
- * inline em ProdutosLista, EmbalagemLista, EstoquesIniciaisLista e ArmazensLista
- * (Lei 1 / Regra A).
+ * usam `DataTable`). Nenhuma listagem do catálogo usa hoje — todas migraram
+ * para `DataTable` (que expõe ordenação controlada via `sortColumn`/
+ * `sortDirection`/`onSortChange`). Mantido para casos futuros de grid manual.
  */
 export function SortHeader({
   label,

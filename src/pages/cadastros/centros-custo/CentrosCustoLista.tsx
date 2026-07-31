@@ -12,6 +12,7 @@ import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -79,8 +80,6 @@ export default function CentrosCustoLista({
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const border = colors.border.default
-
   // ── Confirmar exclusão ────────────────────────────────────────────────────
   const handleConfirmDelete = () => {
     if (deleteId !== null) {
@@ -91,6 +90,110 @@ export default function CentrosCustoLista({
   }
 
   const deleteTarget = centros.find(c => c.id === deleteId)
+
+  // ── Colunas da tabela ─────────────────────────────────────────────────────
+  const columns: Column<CentroCusto>[] = [
+    {
+      key: 'codigo',
+      label: 'CÓDIGO',
+      width: 110,
+      sortable: false,
+      render: cc => (
+        <span style={{
+          fontSize: t.font.size.sm,
+          fontWeight: t.font.weight.semibold,
+          color: colors.fg.default,
+          fontFamily: t.font.family.sans,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {cc.codigo}
+        </span>
+      ),
+    },
+    {
+      key: 'classe',
+      label: 'CLASSE',
+      width: 110,
+      sortable: false,
+      render: cc => {
+        const classe = classeOf(cc.antecessorId)
+        return (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center',
+            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+            padding: '2px 8px', borderRadius: t.radius.full,
+            background: classe === 'sintetica' ? t.color.feedback.info.bg : t.color.brand[50],
+            color:      classe === 'sintetica' ? t.color.feedback.info.text : t.color.brand[600],
+            fontFamily: t.font.family.sans,
+            width: 'fit-content',
+          }}>
+            {CLASSE_LABEL[classe]}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'condicao',
+      label: 'CONDIÇÃO',
+      width: 110,
+      sortable: false,
+      render: cc => (
+        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
+          {CONDICAO_LABEL[cc.condicao]}
+        </span>
+      ),
+    },
+    {
+      key: 'descricao',
+      label: 'DESCRIÇÃO',
+      sortable: false,
+      render: cc => (
+        <span style={{
+          fontSize: t.font.size.base,
+          color: colors.fg.default,
+          fontFamily: t.font.family.sans,
+          paddingLeft: cc.antecessorId !== null ? 16 : 0,
+        }}>
+          {cc.descricao}
+        </span>
+      ),
+    },
+    {
+      key: 'ativo',
+      label: 'ATIVO',
+      width: 90,
+      align: 'center',
+      sortable: false,
+      render: cc => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Badge
+            label={cc.ativo === 'sim' ? 'Ativo' : 'Inativo'}
+            variant={cc.ativo === 'sim' ? 'success' : 'neutral'}
+          />
+        </div>
+      ),
+    },
+    {
+      key: 'acao',
+      label: 'AÇÃO',
+      width: 60,
+      align: 'center',
+      sortable: false,
+      render: cc => (
+        <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
+          <DropdownMenu
+            align="right"
+            ariaLabel="Ações do centro de custo"
+            items={[
+              { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(cc.id) },
+              { id: 'edit',   label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(cc.id) },
+              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(cc.id), danger: true, divider: true },
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -157,70 +260,20 @@ export default function CentrosCustoLista({
               )
             })()
           ) : (
-            <>
-              <div style={{
-                background: colors.bg.surface,
-                border: `1px solid ${border}`,
-                borderRadius: t.radius.lg,
-                overflow: 'hidden',
-              }}>
-               {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-               <div style={{ overflowX: 'auto' }}>
-                <div style={{ minWidth: 700 }}>
-                {/* Cabeçalho */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
-                  padding: '10px 16px',
-                  borderBottom: `1px solid ${border}`,
-                  background: colors.bg.subtle,
-                }}>
-                  {['CÓDIGO', 'CLASSE', 'CONDIÇÃO', 'DESCRIÇÃO', 'ATIVO', 'AÇÃO'].map((h, i) => (
-                    <div
-                      key={h}
-                      style={{
-                        fontSize: t.font.size.xs,
-                        fontWeight: t.font.weight.semibold,
-                        color: colors.fg.subtle,
-                        fontFamily: t.font.family.sans,
-                        letterSpacing: '0.06em',
-                        textAlign: i >= 4 ? 'center' : 'left',
-                      }}
-                    >
-                      {h}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Linhas */}
-                {paginated.map((cc, idx) => (
-                  <CCRow
-                    key={cc.id}
-                    cc={cc}
-                    isLast={idx === paginated.length - 1}
-                    onView={() => onView(cc.id)}
-                    onEdit={() => onEdit(cc.id)}
-                    onDelete={() => setDeleteId(cc.id)}
-                    colors={colors}
-                    border={border}
-                  />
-                ))}
-                </div>
-               </div>
-              </div>
-
-              {/* ── Paginação ───────────────────────────────────────── */}
-              {filtered.length > PAGE_SIZE && (
-                <div style={{ marginTop: t.space[3] }}>
-                  <Pagination
-                    page={page}
-                    total={filtered.length}
-                    pageSize={PAGE_SIZE}
-                    onPageChange={setPage}
-                  />
-                </div>
-              )}
-            </>
+            <DataTable
+              columns={columns}
+              data={paginated}
+              keyField="id"
+              onRowClick={row => onView(row.id)}
+              pagination={
+                <Pagination
+                  page={page}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              }
+            />
           )}
 
       </PageCard>
@@ -326,120 +379,5 @@ export default function CentrosCustoLista({
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── Linha da tabela ──────────────────────────────────────────────────────────
-
-function CCRow({
-  cc, isLast, onView, onEdit, onDelete, colors, border,
-}: {
-  cc:      CentroCusto
-  isLast:  boolean
-  onView:  () => void
-  onEdit:  () => void
-  onDelete: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  border:  string
-}) {
-  const classe = classeOf(cc.antecessorId)
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar centro de custo ${cc.descricao}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '110px 110px 110px 1fr 90px 60px',
-        padding: '0 16px',
-        height: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        alignItems: 'center',
-        transition: `background ${t.animation.duration.faster}`,
-        cursor: 'pointer',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      {/* Código */}
-      <span title={cc.codigo} style={{
-        fontSize: t.font.size.sm,
-        fontWeight: t.font.weight.semibold,
-        color: colors.fg.default,
-        fontFamily: t.font.family.sans,
-        fontVariantNumeric: 'tabular-nums',
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
-        {cc.codigo}
-      </span>
-
-      {/* Classe */}
-      <span style={{
-        display: 'inline-flex', alignItems: 'center',
-        fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
-        padding: '2px 8px', borderRadius: t.radius.full,
-        background: classe === 'sintetica' ? t.color.feedback.info.bg : t.color.brand[50],
-        color:      classe === 'sintetica' ? t.color.feedback.info.text : t.color.brand[600],
-        fontFamily: t.font.family.sans,
-        width: 'fit-content',
-      }}>
-        {CLASSE_LABEL[classe]}
-      </span>
-
-      {/* Condição */}
-      <span title={CONDICAO_LABEL[cc.condicao]} style={{
-        fontSize: t.font.size.sm,
-        color: colors.fg.muted,
-        fontFamily: t.font.family.sans,
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
-        {CONDICAO_LABEL[cc.condicao]}
-      </span>
-
-      {/* Descrição */}
-      <span title={cc.descricao} style={{
-        fontSize: t.font.size.base,
-        color: colors.fg.default,
-        fontFamily: t.font.family.sans,
-        paddingLeft: cc.antecessorId !== null ? 16 : 0,
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
-        {cc.descricao}
-      </span>
-
-      {/* Ativo */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Badge
-          label={cc.ativo === 'sim' ? 'Ativo' : 'Inativo'}
-          variant={cc.ativo === 'sim' ? 'success' : 'neutral'}
-        />
-      </div>
-
-      {/* Ação */}
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <DropdownMenu
-          align="right"
-          ariaLabel="Ações do centro de custo"
-          items={[
-            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: onView },
-            { id: 'edit',   label: 'Editar', icon: <Pencil size={13} />, onClick: onEdit },
-            { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
-          ]}
-        />
-      </div>
-    </div>
   )
 }

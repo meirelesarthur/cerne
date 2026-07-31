@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
   Download, Package,
@@ -10,7 +10,7 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
-import { SortHeader }  from '../../../components/ui/SortHeader'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState }      from '../../../components/ui/EmptyState'
@@ -116,18 +116,99 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
     return fmtDate(sorted[0].dtMovimento)
   }, [registros])
 
-  const border = colors.border.default
-
-  const colTemplate = '2fr 56px 1.6fr 110px 110px 110px 130px 110px 96px'
-
-  const colStyle: React.CSSProperties = {
-    fontSize: t.font.size.xs,
-    fontWeight: t.font.weight.semibold,
-    color: colors.fg.subtle,
-    fontFamily: t.font.family.sans,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  }
+  const columns: Column<EstoqueInicial>[] = [
+    {
+      key: 'produto',
+      label: 'PRODUTO',
+      sortable: false,
+      render: (r) => (
+        <div title={`${r.produtoCodigo} ${r.produtoDescricao}`} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
+            {r.produtoCodigo}
+          </span>
+          <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, marginLeft: 6 }}>
+            {r.produtoDescricao}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'unidade',
+      label: 'UN.',
+      width: 56,
+      sortable: false,
+      render: (r) => r.unidade,
+    },
+    {
+      key: 'armazem',
+      label: 'ARMAZÉM',
+      sortable: false,
+      render: (r) => r.armazemDescricao,
+    },
+    {
+      key: 'qtde',
+      label: 'QTDE.',
+      align: 'right',
+      width: 110,
+      sortable: false,
+      render: (r) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtQtde(r.qtdeTotal)}</span>
+      ),
+    },
+    {
+      key: 'vlUnitario',
+      label: 'VL. UNIT.',
+      align: 'right',
+      width: 110,
+      sortable: false,
+      render: (r) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtUnit(r.vlUnitario)}</span>
+      ),
+    },
+    {
+      key: 'valorTotal',
+      label: 'VALOR TOTAL',
+      align: 'right',
+      width: 110,
+      sortable: false,
+      render: (r) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
+          {fmtTotal(r.valorTotal)}
+        </span>
+      ),
+    },
+    {
+      key: 'dtMovimento',
+      label: 'DT. MOVIMENTO',
+      width: 130,
+      sortable: true,
+      render: (r) => fmtDate(r.dtMovimento),
+    },
+    {
+      key: 'lote',
+      label: 'LOTE',
+      width: 110,
+      sortable: false,
+      render: (r) => (
+        <span style={{ color: r.loteFornecedor ? colors.fg.default : colors.fg.subtle }}>
+          {r.loteFornecedor || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'acoes',
+      label: 'AÇÕES',
+      align: 'right',
+      width: 96,
+      sortable: false,
+      render: (r) => (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
+          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  tooltip="Editar"  size="xs" onClick={() => onEdit(r.id)} />
+          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" tooltip="Excluir" size="xs" danger onClick={() => setDeleteId(r.id)} />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -204,61 +285,23 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
             )
           })()
         ) : (
-          <>
-            <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 1520 }}>
-              {/* Header row */}
-              <div style={{ display: 'grid', gridTemplateColumns: colTemplate, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center', gap: 8 }}>
-                <span style={colStyle}>Produto</span>
-                <span style={colStyle}>Un.</span>
-                <span style={colStyle}>Armazém</span>
-                <span style={{ ...colStyle, textAlign: 'right' }}>Qtde.</span>
-                <span style={{ ...colStyle, textAlign: 'right' }}>Vl. Unit.</span>
-                <span style={{ ...colStyle, textAlign: 'right' }}>Valor Total</span>
-                <SortHeader
-                  label="Dt. Movimento"
-                  field="dtMovimento"
-                  activeField="dtMovimento"
-                  direction={sortDir}
-                  onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-                />
-                <span style={colStyle}>Lote</span>
-                <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-              </div>
-
-              {/* Rows */}
-              {pageSlice.map((r, idx) => (
-                <TableRow
-                  key={r.id}
-                  registro={r}
-                  isLast={idx === pageSlice.length - 1}
-                  onView={() => onView(r.id)}
-                  onEdit={() => onEdit(r.id)}
-                  onDeleteReq={() => setDeleteId(r.id)}
-                  colors={colors}
-                  border={border}
-                  colTemplate={colTemplate}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {/* Pagination */}
-            {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination
-                  page={safePage}
-                  total={filtered.length}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
-
-          </>
+          <DataTable
+            columns={columns}
+            data={pageSlice}
+            keyField="id"
+            onRowClick={(row) => onView(row.id)}
+            sortColumn="dtMovimento"
+            sortDirection={sortDir}
+            onSortChange={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+            pagination={
+              <Pagination
+                page={safePage}
+                total={filtered.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            }
+          />
         )}
 
       </PageCard>
@@ -302,97 +345,6 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── TableRow ─────────────────────────────────────────────────────────────────
-
-function TableRow({ registro, isLast, onView, onEdit, onDeleteReq, colors, border, colTemplate }: {
-  registro: EstoqueInicial
-  isLast: boolean
-  onView: () => void
-  onEdit: () => void
-  onDeleteReq: () => void
-  colors: ReturnType<typeof useTheme>['colors']
-  border: string
-  colTemplate: string
-}) {
-  const [hovered, setHovered] = useState(false)
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar saldo inicial ${registro.produtoDescricao}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: colTemplate,
-        padding: '0 16px',
-        height: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        background: hovered ? colors.bg.subtle : 'transparent',
-        transition: `background ${t.animation.duration.faster}`,
-        alignItems: 'center',
-        gap: 8,
-        cursor: 'pointer',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      {/* Produto */}
-      <div title={`${registro.produtoCodigo} ${registro.produtoDescricao}`} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        <span style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, fontWeight: t.font.weight.medium }}>
-          {registro.produtoCodigo}
-        </span>
-        <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, marginLeft: 6 }}>
-          {registro.produtoDescricao}
-        </span>
-      </div>
-
-      {/* Un. */}
-      <span title={registro.unidade} style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {registro.unidade}
-      </span>
-
-      {/* Armazém */}
-      <span title={registro.armazemDescricao} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {registro.armazemDescricao}
-      </span>
-
-      {/* Qtde. */}
-      <span title={fmtQtde(registro.qtdeTotal)} style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtQtde(registro.qtdeTotal)}
-      </span>
-
-      {/* Vl. Unit. */}
-      <span title={fmtUnit(registro.vlUnitario)} style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtUnit(registro.vlUnitario)}
-      </span>
-
-      {/* Valor Total */}
-      <span title={fmtTotal(registro.valorTotal)} style={{ fontSize: t.font.size.sm, color: colors.fg.default, fontFamily: t.font.family.sans, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: t.font.weight.semibold, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtTotal(registro.valorTotal)}
-      </span>
-
-      {/* Dt. Movimento */}
-      <span title={fmtDate(registro.dtMovimento)} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {fmtDate(registro.dtMovimento)}
-      </span>
-
-      {/* Lote */}
-      <span title={registro.loteFornecedor || '—'} style={{ fontSize: t.font.size.sm, color: registro.loteFornecedor ? colors.fg.default : colors.fg.subtle, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {registro.loteFornecedor || '—'}
-      </span>
-
-      {/* Ações */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
-        <IconButton icon={<Pencil size={13} />} aria-label="Editar"  tooltip="Editar"  size="xs" onClick={onEdit} />
-        <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" tooltip="Excluir" size="xs" danger onClick={onDeleteReq} />
-      </div>
-    </div>
   )
 }
 

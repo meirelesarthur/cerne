@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2, Package, Eye,
   Download,
@@ -9,7 +9,7 @@ import { PageCard }         from '../../../components/ui/PageCard'
 import { Button }          from '../../../components/ui/Button'
 import { IconButton }      from '../../../components/ui/IconButton'
 import { Checkbox }        from '../../../components/ui/Checkbox'
-import { SortHeader }      from '../../../components/ui/SortHeader'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { BulkActionBar }   from '../../../components/ui/BulkActionBar'
 import { EmptyState }      from '../../../components/ui/EmptyState'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
@@ -52,8 +52,6 @@ const TIPO_COLORS: Record<TipoProduto, { bg: string; text: string }> = {
 
 type SortField = 'codigo' | 'descricao'
 type SortDir   = 'asc' | 'desc'
-
-const PRODUCT_GRID = `40px 100px 1fr 160px 110px 90px ${t.size.iconBtn.md * 3 + t.space[1] * 2}px`
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
@@ -187,13 +185,96 @@ export default function ProdutosLista({
     setSelected(new Set())
   }
 
-  const border = colors.border.default
-
-  const colStyle: React.CSSProperties = {
-    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-    color: colors.fg.subtle, fontFamily: t.font.family.sans,
-    textTransform: 'uppercase', letterSpacing: '0.05em',
-  }
+  // ── Colunas da tabela ────────────────────────────────────────────────────────
+  const columns: Column<Produto>[] = [
+    {
+      key: 'select',
+      label: (
+        <Checkbox
+          checked={isAllSelected}
+          indeterminate={isPartialSelected}
+          onChange={toggleSelectAll}
+          aria-label="Selecionar todos os produtos"
+        />
+      ),
+      width: 40,
+      align: 'center',
+      sortable: false,
+      render: prod => (
+        <div onClick={e => e.stopPropagation()} style={{ display: 'flex', justifyContent: 'center' }}>
+          <Checkbox checked={selected.has(prod.id)} onChange={() => toggleOne(prod.id)} aria-label={`Selecionar ${prod.descricao}`} />
+        </div>
+      ),
+    },
+    {
+      key: 'codigo',
+      label: 'Código',
+      width: 100,
+      render: prod => (
+        <span title={prod.codigo} style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.fg.muted, fontFamily: t.font.family.sans, letterSpacing: '0.05em' }}>
+          {prod.codigo}
+        </span>
+      ),
+    },
+    {
+      key: 'descricao',
+      label: 'Descrição',
+      render: prod => prod.descricao,
+    },
+    {
+      key: 'grupo',
+      label: 'Grupo',
+      width: 160,
+      sortable: false,
+      render: prod => {
+        const grupoNome = GRUPOS.find(g => g.id === prod.grupoId)?.nome ?? '—'
+        return (
+          <span title={grupoNome} style={{ fontSize: t.font.size.xs, color: colors.fg.muted, fontFamily: t.font.family.sans }}>
+            {grupoNome}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'tipo',
+      label: 'Tipo',
+      width: 110,
+      sortable: false,
+      render: prod => {
+        const tipoCor = TIPO_COLORS[prod.tipo]
+        return (
+          <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: tipoCor.bg, color: tipoCor.text }}>
+            {TIPO_PRODUTO_LABEL[prod.tipo]}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      width: 90,
+      sortable: false,
+      render: prod => (
+        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: prod.ativo ? t.color.brand[50] : t.color.neutral[100], color: prod.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
+            {prod.ativo ? 'Ativo' : 'Inativo'}
+          </span>
+      ),
+    },
+    {
+      key: 'acoes',
+      label: 'Ações',
+      align: 'right',
+      width: t.size.iconBtn.md * 3 + t.space[1] * 2,
+      sortable: false,
+      render: prod => (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
+          <IconButton icon={<Eye size={t.icon.xs} />} aria-label="Visualizar" onClick={() => onView(prod.id)} size="sm" variant="ghost" />
+          <IconButton icon={<Pencil size={t.icon.xs} />} aria-label="Editar"  onClick={() => onEdit(prod.id)} size="sm" variant="ghost" />
+          <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label="Excluir" onClick={() => setDeleteTarget(prod)} size="sm" variant="ghost" danger />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -268,60 +349,25 @@ export default function ProdutosLista({
             )
           })()
         ) : (
-          <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-           {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-           <div style={{ overflowX: 'auto' }}>
-            <div style={{ minWidth: 820 }}>
-            {/* Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}`, alignItems: 'center' }}>
-              {/* Checkbox all */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Checkbox
-                  checked={isAllSelected}
-                  indeterminate={isPartialSelected}
-                  onChange={toggleSelectAll}
-                  aria-label="Selecionar todos os produtos"
-                />
-              </div>
-              <SortHeader label="Código"    field="codigo"    activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-              <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-              <span style={colStyle}>Grupo</span>
-              <span style={colStyle}>Tipo</span>
-              <span style={colStyle}>Status</span>
-              <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-            </div>
-
-            {paginated.map((prod, idx) => (
-              <ProdutoRow
-                key={prod.id}
-                prod={prod}
-                isLast={idx === paginated.length - 1}
-                isSelected={selected.has(prod.id)}
-                onToggle={() => toggleOne(prod.id)}
-                onView={() => onView(prod.id)}
-                onEdit={() => onEdit(prod.id)}
-                onDeleteReq={() => setDeleteTarget(prod)}
-                colors={colors}
-                border={border}
+          <DataTable
+            columns={columns}
+            data={paginated}
+            keyField="id"
+            onRowClick={prod => onView(prod.id)}
+            sortColumn={sortField}
+            sortDirection={sortDir}
+            onSortChange={key => handleSort(key as SortField)}
+            pagination={
+              <Pagination
+                page={page}
+                total={filtered.length}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={size => { setPageSize(size); setPage(1) }}
+                showPageSizeSelector
               />
-            ))}
-            </div>
-           </div>
-          </div>
-        )}
-
-        {/* Paginação */}
-        {filtered.length > 0 && (
-          <div style={{ marginTop: t.space[3] }}>
-            <Pagination
-              page={page}
-              total={filtered.length}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={size => { setPageSize(size); setPage(1) }}
-              showPageSizeSelector
-            />
-          </div>
+            }
+          />
         )}
 
       </PageCard>
@@ -396,59 +442,6 @@ export default function ProdutosLista({
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── ProdutoRow ───────────────────────────────────────────────────────────────
-
-function ProdutoRow({ prod, isLast, isSelected, onToggle, onView, onEdit, onDeleteReq, colors, border }: {
-  prod: Produto; isLast: boolean; isSelected: boolean
-  onToggle: () => void; onView: () => void; onEdit: () => void; onDeleteReq: () => void
-  colors: ReturnType<typeof useTheme>['colors']; border: string
-}) {
-  const [hovered, setHovered] = useState(false)
-  const grupoNome = GRUPOS.find(g => g.id === prod.grupoId)?.nome ?? '—'
-  const tipoCor = TIPO_COLORS[prod.tipo]
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar produto ${prod.descricao}`}
-      className="gb-focusable"
-      style={{ display: 'grid', gridTemplateColumns: PRODUCT_GRID, padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: isSelected ? `${t.color.brand[50]}99` : hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center', cursor: 'pointer' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <Checkbox checked={isSelected} onChange={onToggle} aria-label={`Selecionar ${prod.descricao}`} />
-      </div>
-      <span title={prod.codigo} style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: colors.fg.muted, fontFamily: t.font.family.sans, letterSpacing: '0.05em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {prod.codigo}
-      </span>
-      <span title={prod.descricao} style={{ fontSize: t.font.size.base, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {prod.descricao}
-      </span>
-      <span title={grupoNome} style={{ fontSize: t.font.size.xs, color: colors.fg.muted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {grupoNome}
-      </span>
-      <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: tipoCor.bg, color: tipoCor.text }}>
-          {TIPO_PRODUTO_LABEL[prod.tipo]}
-        </span>
-      </span>
-      <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 8px', borderRadius: t.radius.full, background: prod.ativo ? t.color.brand[50] : t.color.neutral[100], color: prod.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
-          {prod.ativo ? 'Ativo' : 'Inativo'}
-        </span>
-      </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
-        <IconButton icon={<Eye size={t.icon.xs} />} aria-label="Visualizar" onClick={onView} size="sm" variant="ghost" />
-        <IconButton icon={<Pencil size={t.icon.xs} />} aria-label="Editar"  onClick={onEdit}      size="sm" variant="ghost" />
-        <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label="Excluir" onClick={onDeleteReq} size="sm" variant="ghost" danger />
-      </div>
-    </div>
   )
 }
 

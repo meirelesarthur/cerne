@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
 } from 'lucide-react'
@@ -9,7 +9,7 @@ import { Button }          from '../../../components/ui/Button'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
-import { SortHeader }  from '../../../components/ui/SortHeader'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -33,8 +33,6 @@ interface Props {
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
-type SortDir = 'asc' | 'desc'
-
 export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDelete }: Props) {
   const { colors } = useTheme()
   const { toasts, show, dismiss } = useToast()
@@ -43,7 +41,6 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
   const search = useDebouncedValue(searchRaw, 300)
   const [filters,      setFilters]     = useState({ unidade: '' })
   const [drawerOpen,   setDrawerOpen]  = useState(false)
-  const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Embalagem | null>(null)
   // Mock síncrono — sem chamada real, não há motivo para simular loading.
   const [isLoading]   = useState(false)
@@ -54,7 +51,6 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filters.unidade])
 
-  const border  = colors.border.default
   const activeFilterCount = [filters.unidade].filter(Boolean).length
   const clearFilters = () => setFilters({ unidade: '' })
 
@@ -66,12 +62,9 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
       const matchUnidade = !filters.unidade || e.unidade === filters.unidade
       return matchSearch && matchUnidade
     })
-    base.sort((a, b) => {
-      const cmp = a.descricao.localeCompare(b.descricao, 'pt-BR')
-      return sortDir === 'asc' ? cmp : -cmp
-    })
+    base.sort((a, b) => a.descricao.localeCompare(b.descricao, 'pt-BR'))
     return base
-  }, [embalagens, search, filters, sortDir])
+  }, [embalagens, search, filters])
 
   const totalFiltered = filtered.length
   const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -83,8 +76,55 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
     setDeleteTarget(null)
   }
 
-  // expose show para o pai via callback
-  // (o pai não chama diretamente — toasts locais aqui)
+  const columns: Column<Embalagem>[] = [
+    {
+      key: 'descricao',
+      label: 'DESCRIÇÃO',
+      sortable: false,
+      render: (emb) => (
+        <span
+          title={emb.descricao}
+          style={{ fontWeight: t.font.weight.semibold, color: colors.accent.default, fontFamily: t.font.family.sans }}
+        >
+          {emb.descricao}
+        </span>
+      ),
+    },
+    {
+      key: 'quantidade',
+      label: 'QUANTIDADE',
+      width: 140,
+      sortable: false,
+      render: (emb) => (
+        <span title={fmtQtd(emb.quantidade)} style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {fmtQtd(emb.quantidade)}
+        </span>
+      ),
+    },
+    {
+      key: 'unidade',
+      label: 'UN. DE MEDIDA',
+      width: 160,
+      sortable: false,
+      render: (emb) => {
+        const label = UNIDADE_OPTS.find(o => o.value === emb.unidade)?.label.split(' — ')[0] ?? emb.unidade
+        return <span title={label}>{label}</span>
+      },
+    },
+    {
+      key: 'acoes',
+      label: 'AÇÕES',
+      align: 'right',
+      width: 96,
+      sortable: false,
+      render: (emb) => (
+        <div onClick={ev => ev.stopPropagation()} style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  size="xs" onClick={() => onEdit(emb.id)} />
+          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" size="xs" danger onClick={() => setDeleteTarget(emb)} />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -138,72 +178,20 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
             )
           })()
         ) : (
-          <>
-            <div style={{
-              background: colors.bg.surface,
-              border: `1px solid ${border}`,
-              borderRadius: t.radius.lg,
-              overflow: 'hidden',
-            }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 640 }}>
-              {/* Cabeçalho */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 140px 160px 96px',
-                padding: '10px 16px',
-                background: colors.bg.subtle,
-                borderBottom: `1px solid ${border}`,
-              }}>
-                {/* Descrição — ordenável */}
-                <SortHeader
-                  label="Descrição"
-                  field="descricao"
-                  activeField="descricao"
-                  direction={sortDir}
-                  onSort={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-                />
-                {['Quantidade', 'Un. de Medida', 'Ações'].map((h, i) => (
-                  <span key={h} style={{
-                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                    color: colors.fg.subtle, fontFamily: t.font.family.sans,
-                    textTransform: 'uppercase', letterSpacing: '0.05em',
-                    textAlign: i === 2 ? 'right' : 'left',
-                  }}>
-                    {h}
-                  </span>
-                ))}
-              </div>
-
-              {/* Linhas */}
-              {paginatedData.map((emb, idx) => (
-                <EmbalagemRow
-                  key={emb.id}
-                  emb={emb}
-                  isLast={idx === paginatedData.length - 1}
-                  onView={() => onView(emb.id)}
-                  onEdit={() => onEdit(emb.id)}
-                  onDeleteReq={() => setDeleteTarget(emb)}
-                  colors={colors}
-                  border={border}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {totalFiltered > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination
-                  page={page}
-                  total={totalFiltered}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginatedData}
+            keyField="id"
+            onRowClick={(row) => onView(row.id)}
+            pagination={
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            }
+          />
         )}
 
       </PageCard>
@@ -245,73 +233,6 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-// ─── Linha da tabela ──────────────────────────────────────────────────────────
-
-function EmbalagemRow({
-  emb, isLast, onView, onEdit, onDeleteReq, colors, border,
-}: {
-  emb:         Embalagem
-  isLast:      boolean
-  onView:      () => void
-  onEdit:      () => void
-  onDeleteReq: () => void
-  colors:      ReturnType<typeof useTheme>['colors']
-  border:      string
-}) {
-  const [hovered, setHovered] = useState(false)
-  const unidadeLabel = UNIDADE_OPTS.find(o => o.value === emb.unidade)?.label.split(' — ')[0] ?? emb.unidade
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar embalagem ${emb.descricao}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 140px 160px 96px',
-        padding: '0 16px',
-        height: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        background: hovered ? colors.bg.subtle : 'transparent',
-        transition: `background ${t.animation.duration.faster}`,
-        alignItems: 'center',
-        cursor: 'pointer',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      <span title={emb.descricao} style={{
-        fontSize: t.font.size.base, fontWeight: t.font.weight.semibold,
-        color: colors.accent.default, fontFamily: t.font.family.sans,
-        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      }}>
-        {emb.descricao}
-      </span>
-
-      <span title={fmtQtd(emb.quantidade)} style={{
-        fontSize: t.font.size.sm, color: colors.fg.muted,
-        fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums',
-        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      }}>
-        {fmtQtd(emb.quantidade)}
-      </span>
-
-      <span title={unidadeLabel} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {unidadeLabel}
-      </span>
-
-      {/* Ações inline */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
-        <IconButton icon={<Pencil size={13} />} aria-label="Editar"  size="xs" onClick={onEdit} />
-        <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" size="xs" danger onClick={onDeleteReq} />
-      </div>
-    </div>
   )
 }
 

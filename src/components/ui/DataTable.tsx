@@ -5,7 +5,10 @@ import { useTheme } from '../../context/ThemeContext'
 
 export interface Column<T> {
   key: string
-  label: string
+  /** Texto do cabeçalho. Aceita nó React para cabeçalhos ricos (ex.: checkbox de
+   * seleção, indicador de ordenação customizado) — strings continuam funcionando
+   * como antes. */
+  label: React.ReactNode
   width?: number | string
   align?: 'left' | 'center' | 'right'
   sortable?: boolean
@@ -30,13 +33,24 @@ interface DataTableProps<T> {
    * zero espaço em relação às linhas). Omitir para não exibir footer.
    */
   pagination?: React.ReactNode
+  /**
+   * Ordenação controlada pelo componente pai (ex.: quando a própria coluna
+   * dirige a ordem dos dados recebidos em `data`). Quando `onSortChange` é
+   * informado, o clique no cabeçalho chama esse callback em vez de alternar
+   * o estado interno — o ícone de sort passa a refletir `sortColumn`/
+   * `sortDirection`. Omitir preserva o comportamento padrão (sort interno,
+   * apenas visual).
+   */
+  sortColumn?: string
+  sortDirection?: 'asc' | 'desc'
+  onSortChange?: (key: string) => void
 }
 
-function SortIcon({ active, color }: { active?: boolean; color: string }) {
+function SortIcon({ active, direction, color }: { active?: boolean; direction?: 'asc' | 'desc'; color: string }) {
   return (
-    <svg width={t.icon.xs} height={t.icon.xs} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: active ? 1 : 0.35 }}>
-      <path d="M7 15l5 5 5-5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 9l5-5 5 5" stroke={active ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={t.icon.xs} height={t.icon.xs} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <path d="M7 15l5 5 5-5" stroke={active && direction === 'desc' ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={active && direction === 'desc' ? 1 : 0.35} />
+      <path d="M7 9l5-5 5 5" stroke={active && direction === 'asc' ? t.color.brand[600] : color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={active && direction === 'asc' ? 1 : 0.35} />
     </svg>
   )
 }
@@ -50,6 +64,9 @@ export function DataTable<T extends object>({
   onRowClick,
   getChildren,
   pagination,
+  sortColumn,
+  sortDirection,
+  onSortChange,
 }: DataTableProps<T>) {
   const { colors, isGbMode } = useTheme()
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
@@ -57,7 +74,11 @@ export function DataTable<T extends object>({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set())
 
+  const activeSortCol = onSortChange ? sortColumn ?? null : sortCol
+  const activeSortDir = onSortChange ? sortDirection ?? 'asc' : sortDir
+
   const handleSort = (colKey: string) => {
+    if (onSortChange) { onSortChange(colKey); return }
     if (sortCol === colKey) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else { setSortCol(colKey); setSortDir('asc') }
   }
@@ -134,7 +155,7 @@ export function DataTable<T extends object>({
                 >
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: t.space[1], justifyContent: col.align === 'right' ? 'flex-end' : col.align === 'center' ? 'center' : 'flex-start' }}>
                     {col.label}
-                    {col.sortable !== false && <SortIcon active={sortCol === col.key} color={textHead} />}
+                    {col.sortable !== false && <SortIcon active={activeSortCol === col.key} direction={activeSortDir} color={textHead} />}
                   </div>
                 </th>
               ))}

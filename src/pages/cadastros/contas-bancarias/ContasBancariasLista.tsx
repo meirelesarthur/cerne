@@ -10,6 +10,7 @@ import { Badge }           from '../../../components/ui/Badge'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar }     from '../../../components/ui/ListToolbar'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
 import { DropdownMenu }    from '../../../components/ui/DropdownMenu'
@@ -68,7 +69,6 @@ export default function ContasBancariasLista({
   useEffect(() => { setPage(1) }, [search, filters.tipo, filters.ativo])
 
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-  const border = colors.border.default
 
   const dependentesDe = (id: number) => contas.filter(c => c.contaInvestimentoVinculadaId === id)
 
@@ -94,6 +94,124 @@ export default function ContasBancariasLista({
   const deleteTarget  = contas.find(c => c.id === deleteId)
   const blockedTarget = contas.find(c => c.id === blockedDeleteId)
   const blockedVinculos = blockedTarget ? dependentesDe(blockedTarget.id) : []
+
+  const proprietariosLabel = (conta: ContaBancaria) =>
+    conta.proprietarios.length === 0
+      ? '—'
+      : conta.proprietarios
+          .map(id => mockPessoas.find(p => p.id === id)?.name)
+          .filter(Boolean)
+          .join(', ')
+
+  const columns: Column<ContaBancaria>[] = [
+    {
+      key: 'descricao',
+      label: 'DESCRIÇÃO',
+      width: '1.4fr',
+      sortable: false,
+      render: conta => (
+        <span style={{ fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
+          {conta.sigla} — {conta.descricao}
+        </span>
+      ),
+    },
+    {
+      key: 'banco',
+      label: 'BANCO',
+      width: 110,
+      sortable: false,
+      render: conta => bancoLabel(conta.banco),
+    },
+    {
+      key: 'agencia',
+      label: 'AGÊNCIA',
+      width: 90,
+      sortable: false,
+      render: conta => conta.agencia,
+    },
+    {
+      key: 'conta',
+      label: 'CONTA',
+      width: 100,
+      sortable: false,
+      render: conta => conta.conta,
+    },
+    {
+      key: 'proprietario',
+      label: 'PROPRIETÁRIO',
+      width: '1.2fr',
+      sortable: false,
+      render: conta => proprietariosLabel(conta),
+    },
+    {
+      key: 'limite',
+      label: 'LIMITE',
+      width: 100,
+      sortable: false,
+      render: conta => (
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrencyBRL(conta.limite)}</span>
+      ),
+    },
+    {
+      key: 'saldo',
+      label: 'SALDO',
+      width: 110,
+      sortable: false,
+      render: conta => (
+        <span style={{
+          fontWeight: t.font.weight.semibold,
+          color: conta.saldo < 0 ? t.color.feedback.error.text : colors.fg.default,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {formatCurrencyBRL(conta.saldo)}
+        </span>
+      ),
+    },
+    {
+      key: 'ativo',
+      label: 'ATIVO',
+      width: 70,
+      align: 'center',
+      sortable: false,
+      render: conta => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Badge label={conta.ativo === 'sim' ? 'Ativa' : 'Inativa'} variant={conta.ativo === 'sim' ? 'success' : 'neutral'} />
+        </div>
+      ),
+    },
+    {
+      key: 'boleto',
+      label: 'BOLETO',
+      width: 70,
+      align: 'center',
+      sortable: false,
+      render: conta => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Badge label={conta.emiteBoleto === 'sim' ? 'Sim' : 'Não'} variant={conta.emiteBoleto === 'sim' ? 'info' : 'neutral'} />
+        </div>
+      ),
+    },
+    {
+      key: 'acao',
+      label: 'AÇÃO',
+      width: 60,
+      align: 'center',
+      sortable: false,
+      render: conta => (
+        <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
+          <DropdownMenu
+            align="right"
+            ariaLabel="Ações da conta bancária"
+            items={[
+              { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />,    onClick: () => onView(conta.id) },
+              { id: 'edit',   label: 'Editar',      icon: <Pencil size={13} />, onClick: () => onEdit(conta.id) },
+              { id: 'delete', label: 'Excluir',     icon: <Trash2 size={13} />, onClick: () => handleDeleteClick(conta.id), danger: true, divider: true },
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -145,50 +263,15 @@ export default function ContasBancariasLista({
             )
           })()
         ) : (
-          <>
-            <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 1200 }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1.4fr 110px 90px 100px 1.2fr 100px 110px 70px 70px 60px',
-                padding: '10px 16px',
-                borderBottom: `1px solid ${border}`,
-                background: colors.bg.subtle,
-              }}>
-                {['DESCRIÇÃO', 'BANCO', 'AGÊNCIA', 'CONTA', 'PROPRIETÁRIO', 'LIMITE', 'SALDO', 'ATIVO', 'BOLETO', 'AÇÃO'].map((h, i) => (
-                  <div key={h} style={{
-                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.subtle,
-                    fontFamily: t.font.family.sans, letterSpacing: '0.06em', textAlign: i >= 7 ? 'center' : 'left',
-                  }}>
-                    {h}
-                  </div>
-                ))}
-              </div>
-
-              {paginated.map((conta, idx) => (
-                <ContaRow
-                  key={conta.id}
-                  conta={conta}
-                  isLast={idx === paginated.length - 1}
-                  onView={() => onView(conta.id)}
-                  onEdit={() => onEdit(conta.id)}
-                  onDelete={() => handleDeleteClick(conta.id)}
-                  colors={colors}
-                  border={border}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {filtered.length > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination page={page} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginated}
+            keyField="id"
+            onRowClick={conta => onView(conta.id)}
+            pagination={
+              <Pagination page={page} total={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            }
+          />
         )}
 
       </PageCard>
@@ -271,82 +354,5 @@ export default function ContasBancariasLista({
       </FilterDrawer>
 
     </PageContainer>
-  )
-}
-
-function ContaRow({
-  conta, isLast, onView, onEdit, onDelete, colors, border,
-}: {
-  conta:   ContaBancaria
-  isLast:  boolean
-  onView:  () => void
-  onEdit:  () => void
-  onDelete: () => void
-  colors:  ReturnType<typeof useTheme>['colors']
-  border:  string
-}) {
-  const proprietariosLabel = conta.proprietarios.length === 0
-    ? '—'
-    : conta.proprietarios
-        .map(id => mockPessoas.find(p => p.id === id)?.name)
-        .filter(Boolean)
-        .join(', ')
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar conta bancária ${conta.descricao}`}
-      className="gb-focusable"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1.4fr 110px 90px 100px 1.2fr 100px 110px 70px 70px 60px',
-        padding: '0 16px',
-        height: t.size.tableRow,
-        borderBottom: isLast ? 'none' : `1px solid ${border}`,
-        alignItems: 'center',
-        transition: `background ${t.animation.duration.faster}`,
-        cursor: 'pointer',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      <span title={conta.descricao} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {conta.sigla} — {conta.descricao}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {bancoLabel(conta.banco)}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>{conta.agencia}</span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans }}>{conta.conta}</span>
-      <span title={proprietariosLabel} style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {proprietariosLabel}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, color: colors.fg.muted, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
-        {formatCurrencyBRL(conta.limite)}
-      </span>
-      <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: conta.saldo < 0 ? t.color.feedback.error.text : colors.fg.default, fontFamily: t.font.family.sans, fontVariantNumeric: 'tabular-nums' }}>
-        {formatCurrencyBRL(conta.saldo)}
-      </span>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Badge label={conta.ativo === 'sim' ? 'Ativa' : 'Inativa'} variant={conta.ativo === 'sim' ? 'success' : 'neutral'} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Badge label={conta.emiteBoleto === 'sim' ? 'Sim' : 'Não'} variant={conta.emiteBoleto === 'sim' ? 'info' : 'neutral'} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
-        <DropdownMenu
-          align="right"
-          ariaLabel="Ações da conta bancária"
-          items={[
-            { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />,    onClick: onView },
-            { id: 'edit',   label: 'Editar',      icon: <Pencil size={13} />, onClick: onEdit },
-            { id: 'delete', label: 'Excluir',     icon: <Trash2 size={13} />, onClick: onDelete, danger: true, divider: true },
-          ]}
-        />
-      </div>
-    </div>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus, Pencil, Trash2,
 } from 'lucide-react'
@@ -11,7 +11,7 @@ import { IconButton }      from '../../../components/ui/IconButton'
 import { FilterDrawer }    from '../../../components/ui/FilterDrawer'
 import { FormSelect }      from '../../../components/ui/FormSelect'
 import { ListToolbar } from '../../../components/ui/ListToolbar'
-import { SortHeader }  from '../../../components/ui/SortHeader'
+import { DataTable, type Column } from '../../../components/ui/DataTable'
 import { Pagination }      from '../../../components/ui/Pagination'
 import { Skeleton }        from '../../../components/ui/Skeleton'
 import { EmptyState as EmptyStateUI } from '../../../components/ui/EmptyState'
@@ -42,9 +42,6 @@ const TIPO_COLORS: Record<TipoArmazem, { bg: string; text: string }> = {
   producao:   { bg: t.color.feedback.warning.bg,  text: t.color.feedback.warning.text },
 }
 
-type SortField = 'sigla' | 'descricao'
-type SortDir   = 'asc' | 'desc'
-
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelete }: Props) {
@@ -55,8 +52,6 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
   const search = useDebouncedValue(searchRaw, 300)
   const [filters,      setFilters]     = useState({ tipo: '', ativo: '' })
   const [drawerOpen,   setDrawerOpen]  = useState(false)
-  const [sortField,    setSortField]   = useState<SortField>('sigla')
-  const [sortDir,      setSortDir]     = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Armazem | null>(null)
   // Mock síncrono — sem chamada real, não há motivo para simular loading.
   const [isLoading]   = useState(false)
@@ -65,11 +60,6 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
 
   // Reset page quando filtros mudam
   useEffect(() => { setPage(1) }, [search, filters.tipo, filters.ativo])
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortField(field); setSortDir('asc') }
-  }
 
   const activeFilterCount = [filters.tipo, filters.ativo].filter(Boolean).length
   const clearFilters = () => setFilters({ tipo: '', ativo: '' })
@@ -84,12 +74,11 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
       const matchAtivo   = filters.ativo === '' || (filters.ativo === 'true' ? a.ativo : !a.ativo)
       return matchSearch && matchTipo && matchAtivo
     })
-    base.sort((a, b) => {
-      const cmp = a[sortField].localeCompare(b[sortField], 'pt-BR')
-      return sortDir === 'asc' ? cmp : -cmp
-    })
+    // DataTable ainda não expõe ordenação controlada externamente — mantém
+    // ordenação padrão por sigla (comportamento de repouso do grid anterior).
+    base.sort((a, b) => a.sigla.localeCompare(b.sigla, 'pt-BR'))
     return base
-  }, [armazens, search, filters, sortField, sortDir])
+  }, [armazens, search, filters])
 
   const totalFiltered = filtered.length
   const paginatedData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -101,13 +90,63 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
     setDeleteTarget(null)
   }
 
-  const border = colors.border.default
-
-  const colStyle: React.CSSProperties = {
-    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-    color: colors.fg.subtle, fontFamily: t.font.family.sans,
-    textTransform: 'uppercase', letterSpacing: '0.05em',
-  }
+  const columns: Column<Armazem>[] = [
+    {
+      key: 'sigla',
+      label: 'SIGLA',
+      width: 80,
+      sortable: false,
+      render: (a) => (
+        <span title={a.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.accent.default, fontFamily: t.font.family.sans, letterSpacing: '0.02em' }}>
+          {a.sigla}
+        </span>
+      ),
+    },
+    {
+      key: 'descricao',
+      label: 'DESCRIÇÃO',
+      sortable: false,
+      render: (a) => a.descricao,
+    },
+    {
+      key: 'tipo',
+      label: 'TIPO',
+      width: 140,
+      sortable: false,
+      render: (a) => {
+        const tipoCor = TIPO_COLORS[a.tipo]
+        return (
+          <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: tipoCor.bg, color: tipoCor.text }}>
+            {TIPO_ARMAZEM_LABEL[a.tipo]}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'ativo',
+      label: 'STATUS',
+      width: 100,
+      sortable: false,
+      render: (a) => (
+        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: a.ativo ? t.color.brand[50] : t.color.neutral[100], color: a.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
+          {a.ativo ? 'Ativo' : 'Inativo'}
+        </span>
+      ),
+    },
+    {
+      key: 'acoes',
+      label: 'AÇÕES',
+      align: 'right',
+      width: 96,
+      sortable: false,
+      render: (a) => (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }} onClick={e => e.stopPropagation()}>
+          <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={() => onEdit(a.id)} />
+          <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={() => setDeleteTarget(a)} danger />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
@@ -165,47 +204,20 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
             )
           })()
         ) : (
-          <>
-            <div style={{ background: colors.bg.surface, border: `1px solid ${border}`, borderRadius: t.radius.lg, overflow: 'hidden' }}>
-             {/* Rola horizontalmente em telas estreitas em vez de colapsar as colunas */}
-             <div style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: 680 }}>
-              {/* Cabeçalho */}
-              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '10px 16px', background: colors.bg.subtle, borderBottom: `1px solid ${border}` }}>
-                <SortHeader label="Sigla" field="sigla" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-                <SortHeader label="Descrição" field="descricao" activeField={sortField} direction={sortDir} onSort={f => handleSort(f as SortField)} />
-                <span style={colStyle}>Tipo</span>
-                <span style={colStyle}>Status</span>
-                <span style={{ ...colStyle, textAlign: 'right' }}>Ações</span>
-              </div>
-
-              {paginatedData.map((arm, idx) => (
-                <ArmazemRow
-                  key={arm.id}
-                  arm={arm}
-                  isLast={idx === paginatedData.length - 1}
-                  onView={() => onView(arm.id)}
-                  onEdit={() => onEdit(arm.id)}
-                  onDeleteReq={() => setDeleteTarget(arm)}
-                  colors={colors}
-                  border={border}
-                />
-              ))}
-              </div>
-             </div>
-            </div>
-
-            {totalFiltered > PAGE_SIZE && (
-              <div style={{ marginTop: t.space[3] }}>
-                <Pagination
-                  page={page}
-                  total={totalFiltered}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={paginatedData}
+            keyField="id"
+            onRowClick={(row) => onView(row.id)}
+            pagination={
+              <Pagination
+                page={page}
+                total={totalFiltered}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            }
+          />
         )}
 
       </PageCard>
@@ -259,53 +271,3 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
     </PageContainer>
   )
 }
-
-// ─── ArmazemRow ───────────────────────────────────────────────────────────────
-
-function ArmazemRow({ arm, isLast, onView, onEdit, onDeleteReq, colors, border }: {
-  arm: Armazem; isLast: boolean
-  onView: () => void; onEdit: () => void; onDeleteReq: () => void
-  colors: ReturnType<typeof useTheme>['colors']; border: string
-}) {
-  const [hovered, setHovered] = useState(false)
-  const tipoCor = TIPO_COLORS[arm.tipo]
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label={`Visualizar armazém ${arm.descricao}`}
-      className="gb-focusable"
-      style={{ display: 'grid', gridTemplateColumns: '80px 1fr 140px 100px 96px', padding: '0 16px', height: t.size.tableRow, borderBottom: isLast ? 'none' : `1px solid ${border}`, background: hovered ? colors.bg.subtle : 'transparent', transition: `background ${t.animation.duration.faster}`, alignItems: 'center', cursor: 'pointer' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onView}
-      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onView() } }}
-    >
-      <span title={arm.sigla} style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.accent.default, fontFamily: t.font.family.sans, letterSpacing: '0.02em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {arm.sigla}
-      </span>
-      <span title={arm.descricao} style={{ fontSize: t.font.size.base, color: colors.fg.default, fontFamily: t.font.family.sans, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {arm.descricao}
-      </span>
-      <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: tipoCor.bg, color: tipoCor.text }}>
-          {TIPO_ARMAZEM_LABEL[arm.tipo]}
-        </span>
-      </span>
-      <span style={{ display: 'inline-flex' }}>
-        <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, fontFamily: t.font.family.sans, padding: '3px 10px', borderRadius: t.radius.full, background: arm.ativo ? t.color.brand[50] : t.color.neutral[100], color: arm.ativo ? t.color.brand[600] : t.color.neutral[600] }}>
-          {arm.ativo ? 'Ativo' : 'Inativo'}
-        </span>
-      </span>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }} onClick={e => e.stopPropagation()}>
-        <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={onEdit}      />
-        <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={onDeleteReq} danger />
-      </div>
-    </div>
-  )
-}
-
-// ActionBtn foi substituído por IconButton de src/components/ui/IconButton
-
-// Modal local substituído por Modal de src/components/ui/Modal

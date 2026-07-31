@@ -38,13 +38,38 @@ const ERROR_ROUTES: Record<string, { status: string; payload?: string }> = {
   '/505': {
     status: '505',
     // Corpo de exemplo enquanto não há backend real — em produção vem da
-    // resposta HTTP que originou o erro.
+    // resposta HTTP que originou o erro. Comprido de propósito: passa dos
+    // `t.size.errorPayloadMax` (456px) e exercita a rolagem interna do bloco.
     payload: `{
   "timestamp": "2026-07-31T14:30:00Z",
   "status": 505,
   "error": "HTTP Version Not Supported",
   "message": "O servidor não suporta a versão do protocolo usada na requisição.",
-  "path": "/api/v1/safras"
+  "path": "/api/v1/safras",
+  "method": "GET",
+  "requestId": "8f3c1e7a-4b62-4d19-9f0a-2c7d5e1b4a03",
+  "protocol": {
+    "received": "HTTP/0.9",
+    "supported": ["HTTP/1.1", "HTTP/2"]
+  },
+  "headers": {
+    "host": "api.gbcerne.com.br",
+    "user-agent": "GBCerne-Web/0.1.0",
+    "accept": "application/json",
+    "x-fazenda-id": "42"
+  },
+  "details": [
+    "O proxy reverso recusou a negociação de protocolo antes de encaminhar a requisição ao serviço de safras.",
+    "Nenhuma leitura ou escrita chegou ao banco de dados.",
+    "A requisição não gerou efeito colateral — pode ser repetida com segurança."
+  ],
+  "trace": [
+    "org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:412)",
+    "org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)",
+    "org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740)",
+    "java.base/java.lang.Thread.run(Thread.java:1583)"
+  ],
+  "supportCode": "GBC-505-PROTO"
 }`,
   },
 }

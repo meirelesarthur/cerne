@@ -142,7 +142,9 @@ export default function Sidebar({
                   style={{
                     flexShrink: 0,
                     color: highlighted ? colors.accent.default : colors.fg.subtle,
-                    transform: isExpanded ? 'rotate(90deg)' : 'none',
+                    // Repouso: aponta pra baixo (indica "expansível"). Selecionado: aponta
+                    // pro lado — direção espacial de onde o segundo nível abre.
+                    transform: isExpanded ? 'none' : 'rotate(90deg)',
                     transition: 'transform 0.15s ease',
                   }}
                 />

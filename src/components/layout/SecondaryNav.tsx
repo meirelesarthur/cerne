@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type MouseEvent } from 'react'
 import { ChevronRight, ChevronLeft, Star } from 'lucide-react'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
@@ -56,7 +56,8 @@ function NavItem({
   const [expanded, setExpanded] = useState(hasActiveChild)
   const [hovered, setHovered] = useState(false)
 
-  const handleClick = () => {
+  const handleClick = (e: MouseEvent) => {
+    e.stopPropagation()
     if (hasChildren) {
       setExpanded(prev => !prev)
     } else {
@@ -97,7 +98,10 @@ function NavItem({
         )}
       </button>
       {showStar && (
-        <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}>
+        <span
+          onClick={(e) => e.stopPropagation()}
+          style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}
+        >
           <IconButton
             icon={
               <Star
@@ -121,7 +125,7 @@ function NavItem({
               <button
                 key={child.id}
                 className={`nav-sub-btn ${isChildActive ? 'active' : ''}`}
-                onClick={() => onChildClick(child.id)}
+                onClick={(e) => { e.stopPropagation(); onChildClick(child.id) }}
                 style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, paddingLeft: 22 }}
               >
                 <ChildIcon size={13} strokeWidth={2} style={{ flexShrink: 0, color: isChildActive ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
@@ -154,7 +158,7 @@ function NavGroupSection({
     <div style={{ marginBottom: 4 }}>
       {/* Divisão/contexto — apenas rótulo (sem ícone), permanece colapsável */}
       <button
-        onClick={onToggle}
+        onClick={(e) => { e.stopPropagation(); onToggle() }}
         style={{
           width: '100%',
           display: 'flex',
@@ -261,7 +265,7 @@ function CollapsedIconList({
           <Tooltip key={item.id} label={item.label}>
             <button
               className={`nav-icon-btn ${isActive ? 'active' : ''}`}
-              onClick={() => onItemClick(targetId)}
+              onClick={(e) => { e.stopPropagation(); onItemClick(targetId) }}
               aria-label={item.label}
             >
               <Icon size={16} aria-hidden="true" />
@@ -313,6 +317,7 @@ export default function SecondaryNav({
 
   return (
     <div
+      onClick={() => setCollapsed((c) => !c)}
       style={{
         width: w,
         minWidth: w,
@@ -322,6 +327,7 @@ export default function SecondaryNav({
         flexDirection: 'column',
         overflow: 'hidden',
         transition: 'width 0.2s ease, min-width 0.2s ease, background 0.2s',
+        cursor: 'default',
       }}
     >
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 8px' }}>
@@ -363,7 +369,7 @@ export default function SecondaryNav({
       >
         <Tooltip label={collapsed ? 'Expandir menu' : 'Recolher menu'}>
           <button
-            onClick={() => setCollapsed((c) => !c)}
+            onClick={(e) => { e.stopPropagation(); setCollapsed((c) => !c) }}
             aria-label={collapsed ? 'Expandir segundo nível do menu' : 'Recolher segundo nível do menu'}
             style={{
               width: 24,

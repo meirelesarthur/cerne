@@ -253,17 +253,14 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
       updateBrowserPath(module.path)
       return
     }
-    // Toggle secondary nav independently — sidebar width unaffected
-    if (expandedModuleId === module.id) {
-      setExpandedModuleId(null)
-      // Keep activeItemId so current page stays visible
-    } else {
-      setActiveModuleId(module.id)
-      setExpandedModuleId(module.id)
-      const firstItemId = getFirstItemId(module)
-      setActiveItemId(firstItemId)
-      updateBrowserPath(firstItemId ? findItem(module, firstItemId)?.path : undefined)
-    }
+    // Já expandido: clicar de novo no módulo mantém o segundo nível aberto —
+    // não existe mais ação de colapsar via reclique (só troca de módulo o fecha).
+    if (expandedModuleId === module.id) return
+    setActiveModuleId(module.id)
+    setExpandedModuleId(module.id)
+    const firstItemId = getFirstItemId(module)
+    setActiveItemId(firstItemId)
+    updateBrowserPath(firstItemId ? findItem(module, firstItemId)?.path : undefined)
   }
 
   const handleToggleSidebar = () => setSidebarCollapsed((c) => !c)
@@ -290,11 +287,6 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
     setExpandedModuleId(null)
     setActiveItemId(itemId)
     updateBrowserPath(DESIGN_SYSTEM_PATHS[itemId])
-  }
-
-  const handleCloseSecondary = () => {
-    setExpandedModuleId(null)
-    // Keep activeItemId so current page stays visible after closing secondary nav
   }
 
   const navigateTo = useCallback((moduleId: string, itemId?: string) => {

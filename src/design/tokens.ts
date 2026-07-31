@@ -412,7 +412,7 @@ export const size = {
   /** Largura da coluna QTD (contagem agregada) na matriz de permissões */
   permissionQtyCol: 64,
   /** Altura máxima do bloco de retorno da ErrorPage (`FormField variant="view" multiline`) antes de rolar internamente */
-  errorPayloadMax: 456,
+  errorPayloadMax: 156,
   /** Largura da barra de rolagem — espelha `::-webkit-scrollbar { width }` em index.css */
   scrollbar: 4,
 }

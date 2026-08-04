@@ -25,7 +25,7 @@ interface UpgradePromptProps {
 
 // ─── Labels dos planos ───────────────────────────────────────────────────────
 
-const PLAN_LABEL: Record<PlanTier, string> = {
+export const PLAN_LABEL: Record<PlanTier, string> = {
   trial:         'Avaliação',
   essencial:     'Essencial',
   profissional:  'Profissional',

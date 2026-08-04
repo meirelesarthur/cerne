@@ -25,6 +25,10 @@ interface DropdownMenuProps {
    * `Button size="md"` em barras de ação de cabeçalho.
    */
   size?: 'sm' | 'md'
+  /** Conteúdo customizado renderizado no topo do painel, antes dos itens — separado por divisor. */
+  header?: React.ReactNode
+  /** Largura mínima do painel. Default 150 (lista de ações curtas). */
+  minWidth?: number
 }
 
 const triggerSizeValues: Record<'sm' | 'md', number> = {
@@ -53,6 +57,8 @@ export function DropdownMenu({
   ariaLabel   = 'Abrir menu de ações',
   triggerIcon,
   size        = 'sm',
+  header,
+  minWidth    = 150,
 }: DropdownMenuProps) {
   const { colors, isGbMode } = useTheme()
   const [open, setOpen] = useState(false)
@@ -196,10 +202,16 @@ export function DropdownMenu({
             borderRadius: t.radius.lg,
             boxShadow:    isGbMode ? t.shadow.cardDarkHover : t.shadow.lg,
             zIndex:       t.zIndex.dropdown,
-            minWidth:     150,
+            minWidth,
             overflow:     'hidden',
           }}
         >
+          {header && (
+            <>
+              <div style={{ padding: t.space[3] }}>{header}</div>
+              <div style={{ height: 1, background: colors.border.subtle }} />
+            </>
+          )}
           {items.map((item, i) => (
             <React.Fragment key={item.id}>
               {item.divider && i > 0 && (

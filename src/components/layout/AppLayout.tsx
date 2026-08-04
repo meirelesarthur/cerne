@@ -337,8 +337,6 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
         expandedModuleId={expandedModuleId}
         onModuleClick={handleModuleClick}
         onToggle={handleToggleSidebar}
-        onOpenPlanos={handleOpenPlanos}
-        planosActive={activeItemId === 'planos'}
       />
 
       {/* Outer content card */}
@@ -361,6 +359,7 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
           activeItemId={activeItemId}
           onLogout={onLogout}
           onOpenDesignSystem={handleOpenDesignSystem}
+          onOpenPlanos={handleOpenPlanos}
         />
 
         <div style={{ flex: 1, display: 'flex', gap: t.space[2], overflow: 'hidden', marginLeft: hasSecondaryNav && expandedModule ? -t.space[2] : 0 }}>

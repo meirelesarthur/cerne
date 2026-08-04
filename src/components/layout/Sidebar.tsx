@@ -1,4 +1,4 @@
-import { ChevronRight, PanelLeftClose, Moon, Sun, Gem } from 'lucide-react'
+import { ChevronRight, PanelLeftClose } from 'lucide-react'
 import logoFull from '../../assets/Logo.svg'
 import logoFullWhite from '../../assets/Logo-white.svg'
 import logoMin from '../../assets/logo-min.svg'
@@ -15,8 +15,6 @@ interface SidebarProps {
   expandedModuleId: string | null
   onModuleClick: (module: NavModule) => void
   onToggle: () => void
-  onOpenPlanos?: () => void
-  planosActive?: boolean
 }
 
 export default function Sidebar({
@@ -26,10 +24,8 @@ export default function Sidebar({
   expandedModuleId,
   onModuleClick,
   onToggle,
-  onOpenPlanos,
-  planosActive,
 }: SidebarProps) {
-  const { colors, isGbMode, toggle } = useTheme()
+  const { colors, isGbMode } = useTheme()
   const isIconOnly = mode === 'icon-only'
   const w = isIconOnly ? 56 : 240
 
@@ -152,47 +148,6 @@ export default function Sidebar({
             </button>
           )
         })}
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: 1, background: colors.nav.divider, margin: `${t.space[2]}px 4px`, transition: 'background 0.2s' }} />
-
-      {/* Bottom actions — sempre param propagação */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: isIconOnly ? 'column' : 'row',
-          alignItems: 'center',
-          gap: 4,
-          justifyContent: isIconOnly ? 'center' : 'flex-start',
-          paddingLeft: isIconOnly ? 0 : 4,
-        }}
-      >
-        {/* Notificações já vivem no Bell do Topbar — evita duplicar/dessincronizar
-            a mesma badge em dois lugares da casca. */}
-
-        <Tooltip label={isGbMode ? 'Modo claro' : 'GB Mode'}>
-          <button
-            className="nav-icon-btn"
-            onClick={(e) => { e.stopPropagation(); toggle() }}
-            style={{ color: isGbMode ? colors.accent.default : undefined }}
-          >
-            {isGbMode ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
-        </Tooltip>
-
-        <Tooltip label="Planos">
-          <button
-            className={`nav-icon-btn ${planosActive ? 'active' : ''}`}
-            onClick={(e) => { e.stopPropagation(); onOpenPlanos?.() }}
-            style={{ color: planosActive ? colors.accent.default : undefined }}
-          >
-            <Gem size={15} />
-          </button>
-        </Tooltip>
-
-        {/* 'Configurações' removido: sem tela de destino ainda — reintroduzir
-            quando existir, em vez de deixar um ícone sem ação. */}
       </div>
     </div>
   )

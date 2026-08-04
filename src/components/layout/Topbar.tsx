@@ -1,15 +1,27 @@
 import { useState } from 'react'
-import { BarChart3, Bell, Blocks, LogOut, UserCog } from 'lucide-react'
+import { BarChart3, Bell, Blocks, Gem, Globe, LifeBuoy, LogOut, Moon, Settings, Sparkles, Sun, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
 import { useUserProfile } from '../../context/UserProfileContext'
+import { usePlan } from '../../auth/PlanContext'
+import type { PlanTier } from '../../auth/PlanContext'
 import { t } from '../../design/tokens'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { FarmSwitcher } from '../ui/FarmSwitcher'
 import { DropdownMenu } from '../ui/DropdownMenu'
 import { Avatar } from '../ui/Avatar'
+import { Badge, type BadgeVariant } from '../ui/Badge'
+import { Button } from '../ui/Button'
+import { PLAN_LABEL } from '../ui/UpgradePrompt'
 import SearchBar from '../SearchBar'
+
+const PLAN_BADGE_VARIANT: Record<PlanTier, BadgeVariant> = {
+  trial: 'neutral',
+  essencial: 'info',
+  profissional: 'purple',
+  enterprise: 'cyan',
+}
 
 const INITIAL_NOTIFICATIONS = [
   { id: 'n1', label: 'Safra 25/26 aguardando configuração de semanas' },
@@ -28,12 +40,15 @@ interface TopbarProps {
    * no ambiente. É uma ferramenta interna para devs/POs, não um papel de RBAC do produto.
    */
   onOpenDesignSystem?: (itemId: 'ds-estados-conta' | 'ds-cobertura') => void
+  /** Abre a tela de Planos (item "Planos" e botão "Fazer upgrade" do menu de conta). */
+  onOpenPlanos?: () => void
 }
 
-export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenDesignSystem }: TopbarProps) {
-  const { colors } = useTheme()
+export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenDesignSystem, onOpenPlanos }: TopbarProps) {
+  const { colors, isGbMode, toggle } = useTheme()
   const { navigateTo } = useNavigation()
   const { profile } = useUserProfile()
+  const { plan } = usePlan()
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
   const dismissNotification = (id: string) =>
     setNotifications((prev) => prev.filter((n) => n.id !== id))
@@ -172,16 +187,98 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
           }
         />
 
-        {/* Menu de conta — avatar como gatilho do DropdownMenu do kit */}
+        {/* Menu de conta — avatar como gatilho do DropdownMenu do kit. Concentra aqui
+           tudo que antes vivia solto no rodapé do Sidebar (tema, Planos) e no
+           próprio menu (perfil, sair), com o plano atual e upgrade em destaque. */}
         <DropdownMenu
           ariaLabel={`Abrir menu da conta de ${profile.name}`}
           triggerIcon={<Avatar name={profile.name} src={profile.photoUrl ?? undefined} size="sm" />}
+          minWidth={280}
+          header={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+                <Avatar name={profile.name} src={profile.photoUrl ?? undefined} size="md" />
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontSize: t.font.size.sm,
+                      fontWeight: t.font.weight.semibold,
+                      color: colors.fg.default,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {profile.name}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: t.font.size.xs,
+                      color: colors.fg.subtle,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {profile.email}
+                  </span>
+                </div>
+              </div>
+
+              <Button
+                variant="primary"
+                size="sm"
+                block
+                blockAlign="center"
+                icon={<Sparkles size={14} aria-hidden="true" />}
+                onClick={() => onOpenPlanos?.()}
+              >
+                Fazer upgrade
+              </Button>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Plano atual</span>
+                <Badge label={PLAN_LABEL[plan]} variant={PLAN_BADGE_VARIANT[plan]} />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], color: colors.fg.subtle }}>
+                <Globe size={13} aria-hidden="true" />
+                <span style={{ fontSize: t.font.size.xs }}>Português (BR)</span>
+              </div>
+            </div>
+          }
           items={[
             {
               id: 'perfil',
               label: 'Meu perfil',
               icon: <UserCog size={15} />,
               onClick: () => navigateTo('cadastros', 'cad-pes-per'),
+            },
+            {
+              id: 'configuracoes',
+              label: 'Configurações',
+              icon: <Settings size={15} />,
+              onClick: () => navigateTo('cadastros', 'cad-pes-per'),
+            },
+            {
+              id: 'tema',
+              label: isGbMode ? 'Ativar modo claro' : 'Ativar GB Mode',
+              icon: isGbMode ? <Sun size={15} /> : <Moon size={15} />,
+              divider: true,
+              onClick: () => toggle(),
+            },
+            {
+              id: 'planos',
+              label: 'Planos',
+              icon: <Gem size={15} />,
+              onClick: () => onOpenPlanos?.(),
+            },
+            {
+              id: 'ajuda',
+              label: 'Central de ajuda',
+              icon: <LifeBuoy size={15} />,
+              divider: true,
+              onClick: () => { window.location.href = 'mailto:suporte@greenbelt-ti.com' },
             },
             {
               id: 'sair',

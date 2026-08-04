@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { Map, Rows3 } from 'lucide-react'
-import { Badge } from '../../../components/ui/Badge'
-import { DetailGrid } from '../../../components/ui/DetailGrid'
 import { EntityBoard, type BoardEntity, type BoardGroup } from '../../../components/ui/EntityBoard'
 import { FeedbackBanner } from '../../../components/ui/FeedbackBanner'
 import { FilterSelect } from '../../../components/ui/FilterSelect'
 import { MapView } from '../../../components/ui/MapView'
-import { Modal } from '../../../components/ui/Modal'
 import { PageCard } from '../../../components/ui/PageCard'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Tabs } from '../../../components/ui/Tabs'
 import { ToastContainer, useToast } from '../../../components/ui/Toast'
 import { t } from '../../../design/tokens'
+import CurralDetalhe from './CurralDetalhe'
 
 const INITIAL_GROUPS: BoardGroup[] = [
   {
@@ -61,6 +59,8 @@ export default function MapaConfinamentoPage() {
   const totalOccupancy = groups.flatMap((group) => group.items).reduce((total, item) => total + (item.occupancy ?? 0), 0)
   const totalCapacity = groups.flatMap((group) => group.items).reduce((total, item) => total + (item.capacity ?? 0), 0)
 
+  if (selected) return <CurralDetalhe entity={selected} onBack={() => setSelected(null)} />
+
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
       <PageCard>
@@ -86,13 +86,6 @@ export default function MapaConfinamentoPage() {
         </div>
       </PageCard>
 
-      <Modal open={selected !== null} onClose={() => setSelected(null)} title={selected?.label} subtitle="Capacidade e lote atualmente alocado." size="sm" footer={<Badge label={selected && (selected.occupancy ?? 0) > (selected.capacity ?? 0) ? 'Acima da capacidade' : 'Capacidade regular'} variant={selected && (selected.occupancy ?? 0) > (selected.capacity ?? 0) ? 'danger' : 'success'} />}>
-        {selected && <DetailGrid columns={1} items={[
-          { label: 'Lote', value: selected.description },
-          { label: 'Ocupação', value: `${selected.occupancy ?? 0} animais` },
-          { label: 'Capacidade', value: `${selected.capacity ?? 0} animais` },
-        ]} />}
-      </Modal>
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </PageContainer>
   )

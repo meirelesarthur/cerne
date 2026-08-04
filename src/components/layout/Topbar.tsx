@@ -13,8 +13,9 @@ import { DropdownMenu } from '../ui/DropdownMenu'
 import { Avatar } from '../ui/Avatar'
 import { Badge, type BadgeVariant } from '../ui/Badge'
 import { Button } from '../ui/Button'
+import { FormSelect } from '../ui/FormSelect'
 import { PLAN_LABEL } from '../ui/UpgradePrompt'
-import { LanguageSwitcher, type SupportedLanguage } from './LanguageSwitcher'
+import type { SupportedLanguage } from './LanguageSwitcher'
 import SearchBar from '../SearchBar'
 
 const PLAN_BADGE_VARIANT: Record<PlanTier, BadgeVariant> = {
@@ -23,6 +24,12 @@ const PLAN_BADGE_VARIANT: Record<PlanTier, BadgeVariant> = {
   profissional: 'purple',
   enterprise: 'cyan',
 }
+
+const LANGUAGE_OPTIONS: { value: SupportedLanguage; label: string }[] = [
+  { value: 'pt-BR', label: 'Português (BR)' },
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español' },
+]
 
 const INITIAL_NOTIFICATIONS = [
   { id: 'n1', label: 'Safra 25/26 aguardando configuração de semanas' },
@@ -245,7 +252,13 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Idioma</span>
-                <LanguageSwitcher value={language} onChange={setLanguage} />
+                <FormSelect
+                  aria-label="Selecionar idioma"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
+                  options={LANGUAGE_OPTIONS}
+                  style={{ width: 148, height: t.size.controlSm, fontSize: t.font.size.xs }}
+                />
               </div>
             </div>
           }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BarChart3, Bell, Blocks, Gem, Globe, LifeBuoy, LogOut, Moon, Settings, Sparkles, Sun, UserCog } from 'lucide-react'
+import { BarChart3, Bell, Blocks, Gem, LifeBuoy, LogOut, Moon, Settings, Sparkles, Sun, UserCog } from 'lucide-react'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
@@ -14,6 +14,7 @@ import { Avatar } from '../ui/Avatar'
 import { Badge, type BadgeVariant } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { PLAN_LABEL } from '../ui/UpgradePrompt'
+import { LanguageSwitcher, type SupportedLanguage } from './LanguageSwitcher'
 import SearchBar from '../SearchBar'
 
 const PLAN_BADGE_VARIANT: Record<PlanTier, BadgeVariant> = {
@@ -49,6 +50,7 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
   const { navigateTo } = useNavigation()
   const { profile } = useUserProfile()
   const { plan } = usePlan()
+  const [language, setLanguage] = useState<SupportedLanguage>('pt-BR')
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
   const dismissNotification = (id: string) =>
     setNotifications((prev) => prev.filter((n) => n.id !== id))
@@ -241,9 +243,9 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
                 <Badge label={PLAN_LABEL[plan]} variant={PLAN_BADGE_VARIANT[plan]} />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1], color: colors.fg.subtle }}>
-                <Globe size={13} aria-hidden="true" />
-                <span style={{ fontSize: t.font.size.xs }}>Português (BR)</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Idioma</span>
+                <LanguageSwitcher value={language} onChange={setLanguage} />
               </div>
             </div>
           }

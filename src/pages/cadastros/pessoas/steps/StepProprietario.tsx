@@ -1,10 +1,11 @@
+import { EditableFieldTable } from '../../../../components/ui/EditableFieldTable'
 import { FormField }    from '../../../../components/ui/FormField'
 import { FormSelect }   from '../../../../components/ui/FormSelect'
 import { RepeaterList } from '../../../../components/ui/RepeaterList'
 import { StepHeader }   from '../../../../components/ui/StepHeader'
 import { t }            from '../../../../design/tokens'
-import { FAZENDAS }     from '../pessoas.types'
-import { grid2, colStack, onlyDigits, FieldGroupLabel, SELECT_PLACEHOLDER, type StepProps } from './parts'
+import { FAZENDAS, type FarmShare } from '../pessoas.types'
+import { colStack, onlyDigits, FieldGroupLabel, SELECT_PLACEHOLDER, type StepProps } from './parts'
 
 export function StepProprietario({ form, errors, setRole, disabled }: StepProps) {
   const { inscricoes, farms } = form.proprietary
@@ -42,29 +43,48 @@ export function StepProprietario({ form, errors, setRole, disabled }: StepProps)
         <div>
           <FieldGroupLabel>Fazendas e Participação</FieldGroupLabel>
           <div style={{ marginTop: t.space[2] }}>
-            <RepeaterList
+            <EditableFieldTable<FarmShare>
               items={farms}
               disabled={disabled}
-              align="start"
               addLabel="Adicionar fazenda"
               emptyText="Nenhuma fazenda vinculada."
               removeLabel="Remover fazenda"
-              onAdd={() => setRole('proprietary', { farms: [...farms, { farmId: '', percentage: '' }] })}
-              onRemove={(i) => setRole('proprietary', { farms: farms.filter((_, idx) => idx !== i) })}
-              renderRow={(fs, i) => (
-                <div style={{ ...grid2, gridTemplateColumns: '2fr 1fr' }}>
-                  <FormSelect
-                    label="Fazenda" options={[SELECT_PLACEHOLDER, ...FAZENDAS]} value={fs.farmId}
-                    onChange={(e) => setRole('proprietary', { farms: farms.map((x, idx) => idx === i ? { ...x, farmId: e.target.value } : x) })}
-                    error={errors[`prop_farm_${i}`]} disabled={disabled}
-                  />
-                  <FormField
-                    label="Participação (%)" inputMode="decimal" placeholder="0–100" value={fs.percentage}
-                    onChange={(e) => setRole('proprietary', { farms: farms.map((x, idx) => idx === i ? { ...x, percentage: e.target.value } : x) })}
-                    error={errors[`prop_pct_${i}`]} disabled={disabled}
-                  />
-                </div>
-              )}
+              emptyItem={() => ({ farmId: '', percentage: '' })}
+              onChange={(next) => setRole('proprietary', { farms: next })}
+              getError={(i, key) => key === 'farmId' ? errors[`prop_farm_${i}`] : errors[`prop_pct_${i}`]}
+              columns={[
+                {
+                  key: 'farmId',
+                  label: 'Fazenda',
+                  render: (fs) => FAZENDAS.find((option) => option.value === fs.farmId)?.label ?? '—',
+                  renderEdit: (fs, onChange, error) => (
+                    <FormSelect
+                      options={[SELECT_PLACEHOLDER, ...FAZENDAS]}
+                      value={fs.farmId}
+                      onChange={(e) => onChange({ farmId: e.target.value })}
+                      error={error}
+                      disabled={disabled}
+                    />
+                  ),
+                },
+                {
+                  key: 'percentage',
+                  label: 'Participação (%)',
+                  width: 180,
+                  align: 'right',
+                  render: (fs) => fs.percentage ? `${fs.percentage}%` : '—',
+                  renderEdit: (fs, onChange, error) => (
+                    <FormField
+                      inputMode="decimal"
+                      placeholder="0–100"
+                      value={fs.percentage}
+                      onChange={(e) => onChange({ percentage: e.target.value })}
+                      error={error}
+                      disabled={disabled}
+                    />
+                  ),
+                },
+              ]}
             />
           </div>
         </div>

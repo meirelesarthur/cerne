@@ -1,9 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Pencil, Trash2,
-  List, LayoutGrid, MapPin, Layers, Ruler, Eye,
-  TrendingUp, TrendingDown, ListPlus, X,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -254,16 +250,16 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
             items={
               row.isArea
                 ? [
-                    { id: 'view',   label: 'Visualizar', icon: <Eye size={14} />,    onClick: () => onView(row.id) },
-                    { id: 'edit',   label: 'Editar',      icon: <Pencil size={14} />, onClick: () => onEdit(row.id) },
-                    { id: 'delete', label: 'Excluir',     icon: <Trash2 size={14} />, danger: true, divider: true, onClick: () => setDeleteTarget(row) },
+                    { id: 'view',   label: 'Visualizar', icon: <Icon name="view" size={14} />,    onClick: () => onView(row.id) },
+                    { id: 'edit',   label: 'Editar',      icon: <Icon name="edit" size={14} />, onClick: () => onEdit(row.id) },
+                    { id: 'delete', label: 'Excluir',     icon: <Icon name="delete" size={14} />, danger: true, divider: true, onClick: () => setDeleteTarget(row) },
                   ]
                 : [
-                    { id: 'view',       label: 'Visualizar',                icon: <Eye size={14} />,     onClick: () => onView(row.id) },
-                    { id: 'add-area',   label: 'Adicionar Área',            icon: <Plus size={14} />,    onClick: () => setAreaTarget(row) },
-                    { id: 'add-multi',  label: 'Adicionar Múltiplas Áreas', icon: <ListPlus size={14} />, onClick: () => setMultiAreaTarget(row) },
-                    { id: 'edit',       label: 'Editar',                    icon: <Pencil size={14} />,   divider: true, onClick: () => onEdit(row.id) },
-                    { id: 'delete',     label: 'Excluir',                   icon: <Trash2 size={14} />,   danger: true, onClick: () => setDeleteTarget(row) },
+                    { id: 'view',       label: 'Visualizar',                icon: <Icon name="view" size={14} />,     onClick: () => onView(row.id) },
+                    { id: 'add-area',   label: 'Adicionar Área',            icon: <Icon name="add" size={14} />,    onClick: () => setAreaTarget(row) },
+                    { id: 'add-multi',  label: 'Adicionar Múltiplas Áreas', icon: <Icon name="list-add" size={14} />, onClick: () => setMultiAreaTarget(row) },
+                    { id: 'edit',       label: 'Editar',                    icon: <Icon name="edit" size={14} />,   divider: true, onClick: () => onEdit(row.id) },
+                    { id: 'delete',     label: 'Excluir',                   icon: <Icon name="delete" size={14} />,   danger: true, onClick: () => setDeleteTarget(row) },
                   ]
             }
           />
@@ -283,7 +279,7 @@ export default function FazendasLista({ onNew, onView, onEdit }: FazendasListaPr
           count={data.length}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Nova Fazenda
               </Button>
             </div>
@@ -590,7 +586,7 @@ function MultiAreaModal({ open, fazendaNome, onClose, onSave }: MultiAreaModalPr
               />
             </div>
             <IconButton
-              icon={<X size={14} />}
+              icon={<Icon name="close" size={14} />}
               aria-label="Remover linha"
               tooltip="Remover"
               size="sm"
@@ -610,7 +606,7 @@ function MultiAreaModal({ open, fazendaNome, onClose, onSave }: MultiAreaModalPr
         <Button
           variant="ghost"
           size="sm"
-          icon={<Plus size={13} />}
+          icon={<Icon name="add" size={13} />}
           onClick={addRow}
           style={{
             width: '100%',
@@ -745,8 +741,8 @@ function KpiBar({
                 padding: '2px 6px',
                 borderRadius: t.radius.full,
               }}>
-                {item.trend === 'up'   && <TrendingUp  size={10} />}
-                {item.trend === 'down' && <TrendingDown size={10} />}
+                {item.trend === 'up'   && <Icon name="trend-up"  size={10} />}
+                {item.trend === 'down' && <Icon name="trend-down" size={10} />}
                 {item.trendValue}
               </span>
             )}
@@ -779,8 +775,8 @@ function ViewToggle({
   colors: ReturnType<typeof useTheme>['colors']
 }) {
   const items: { mode: ViewMode; icon: React.ReactNode; label: string }[] = [
-    { mode: 'list',  icon: <List       size={14} />, label: 'Lista'  },
-    { mode: 'cards', icon: <LayoutGrid size={14} />, label: 'Cards'  },
+    { mode: 'list',  icon: <Icon name="list"       size={14} />, label: 'Lista'  },
+    { mode: 'cards', icon: <Icon name="grid" size={14} />, label: 'Cards'  },
   ]
 
   return (
@@ -901,13 +897,13 @@ function FazendaCard({
 
       {/* Infos */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] + 2 }}>
-        <InfoRow icon={<MapPin size={12} />} color={colors.fg.subtle}>
+        <InfoRow icon={<Icon name="location" size={12} />} color={colors.fg.subtle}>
           {row.cidade} — {row.uf}
         </InfoRow>
-        <InfoRow icon={<Layers size={12} />} color={colors.fg.subtle}>
+        <InfoRow icon={<Icon name="layers" size={12} />} color={colors.fg.subtle}>
           <Badge label={row.tipoExploracao} variant={tipoVariant} />
         </InfoRow>
-        <InfoRow icon={<Ruler size={12} />} color={colors.fg.subtle}>
+        <InfoRow icon={<Icon name="ruler" size={12} />} color={colors.fg.subtle}>
           <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.semibold }}>
             {row.areaTotal.toLocaleString('pt-BR')} ha
           </strong>
@@ -926,14 +922,14 @@ function FazendaCard({
           variant="ghost" size="sm"
           onClick={onEdit}
         >
-          <Pencil size={12} style={{ marginRight: 4 }} />
+          <Icon name="edit" size={12} style={{ marginRight: 4 }} />
           Editar
         </Button>
         <Button
           variant="secondary" size="sm"
           onClick={onView}
         >
-          <Eye size={12} style={{ marginRight: 4 }} />
+          <Icon name="view" size={12} style={{ marginRight: 4 }} />
           Ver detalhes
         </Button>
       </div>

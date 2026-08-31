@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { AllocationEditor, type AllocationItem } from '../../../components/ui/AllocationEditor'
 import { AsyncSearchSelect } from '../../../components/ui/AsyncSearchSelect'
 import { Badge } from '../../../components/ui/Badge'
@@ -77,8 +77,8 @@ export default function BaixaTitulosPage() {
       <PageCard
         footer={(
           <>
-            <Button variant="secondary" icon={<ArrowLeft size={16} />}>Voltar</Button>
-            <Button icon={<CheckCircle2 size={16} />} disabled={!canSubmit} onClick={() => setConfirmOpen(true)}>Efetivar Baixa</Button>
+            <Button variant="secondary" icon={<Icon name="arrow-left" size={16} />}>Voltar</Button>
+            <Button icon={<Icon name="success" size={16} />} disabled={!canSubmit} onClick={() => setConfirmOpen(true)}>Efetivar Baixa</Button>
           </>
         )}
       >

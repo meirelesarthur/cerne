@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Layers } from 'lucide-react'
+import { type IconName } from './Icon'
 import { StackedBarChart } from './StackedBarChart'
 import { ChartCard } from './ChartCard'
 
@@ -66,7 +66,7 @@ export const DentroDoChartCard: Story = {
   name: 'Dentro do ChartCard',
   render: () => (
     <div style={{ maxWidth: 600 }}>
-      <ChartCard icon={Layers} title="Composição de Custos — Safra 24/25">
+      <ChartCard icon={'layers'} title="Composição de Custos — Safra 24/25">
         <StackedBarChart
           labels={MESES}
           series={[

@@ -6,7 +6,7 @@
 // - Processar arquivos diferidos (Lei 8): importações de NF/XML de entrada de estoque em fila assíncrona; expor status via polling ou WebSocket
 
 import { useEffect, useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
+import { Icon } from '../../components/ui/Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
@@ -292,7 +292,7 @@ export default function DashEstoqueNutricao() {
             borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`,
             fontFamily: t.font.family.sans, whiteSpace: 'nowrap',
           }}>
-            <AlertTriangle size={t.font.size.xs} aria-hidden="true" />
+            <Icon name="warning" size={t.font.size.xs} />
             crítico abaixo de {CRITICO_THRESHOLD} dias
           </span>
         }

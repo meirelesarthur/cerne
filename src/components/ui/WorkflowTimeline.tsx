@@ -1,4 +1,4 @@
-import { Check, Circle, Clock3, X } from 'lucide-react'
+import { Icon, type IconName } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -16,11 +16,11 @@ interface WorkflowTimelineProps {
   ariaLabel?: string
 }
 
-const iconByStatus = {
-  completed: Check,
-  current: Clock3,
-  pending: Circle,
-  rejected: X,
+const iconByStatus: Record<WorkflowStepStatus, IconName> = {
+  completed: 'check',
+  current: 'clock-alt',
+  pending: 'circle',
+  rejected: 'close',
 }
 
 export function WorkflowTimeline({ steps, ariaLabel = 'Etapas do processo' }: WorkflowTimelineProps) {
@@ -28,7 +28,7 @@ export function WorkflowTimeline({ steps, ariaLabel = 'Etapas do processo' }: Wo
   return (
     <ol aria-label={ariaLabel} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>
       {steps.map((step, index) => {
-        const Icon = iconByStatus[step.status]
+        const icon = iconByStatus[step.status]
         const active = step.status === 'current' || step.status === 'completed'
         const rejected = step.status === 'rejected'
         const color = rejected ? t.color.feedback.error.text : active ? t.color.brand[600] : colors.fg.subtle
@@ -39,7 +39,7 @@ export function WorkflowTimeline({ steps, ariaLabel = 'Etapas do processo' }: Wo
             )}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: t.space[2] }}>
               <span style={{ width: t.size.iconBtn.md, height: t.size.iconBtn.md, flexShrink: 0, borderRadius: t.radius.full, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color, background: rejected ? t.color.feedback.error.bg : active ? t.color.feedback.success.bg : colors.bg.subtle, border: `1px solid ${color}` }}>
-                <Icon size={t.icon.xs} aria-hidden="true" />
+                <Icon name={icon} size={t.icon.xs} />
               </span>
               <span style={{ minWidth: 0, paddingTop: t.space[1] }}>
                 <span style={{ display: 'block', color: colors.fg.default, fontFamily: t.font.family.sans, fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold }}>{step.label}</span>

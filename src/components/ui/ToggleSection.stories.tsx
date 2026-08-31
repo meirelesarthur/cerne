@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { Briefcase, Crown, Truck, ShoppingCart, KeyRound } from 'lucide-react'
+import { Icon } from './Icon'
 import { ToggleSection } from './ToggleSection'
 import { FormField } from './FormField'
 import { FormSelect } from './FormSelect'
@@ -29,7 +29,7 @@ export const Default: Story = {
       <ToggleSection
         title="Funcionário"
         description="Ative para registrar dados de colaborador (cargo, salário, banco)."
-        icon={<Briefcase size={16} />}
+        icon={<Icon name="briefcase" size={16} />}
         active={active}
         onToggle={setActive}
         inactiveHint="Papel inativo — ative o toggle para preencher os dados."
@@ -56,7 +56,7 @@ export const SelectionCard: Story = {
       <ToggleSection
         title="Proprietário"
         description="Dono de fazenda — participação por propriedade e inscrições estaduais."
-        icon={<Briefcase size={16} />}
+        icon={<Icon name="briefcase" size={16} />}
         active={active}
         onToggle={setActive}
         activeHint={'Etapa "Proprietário" adicionada — configure a seguir.'}
@@ -69,11 +69,11 @@ export const SelectionCard: Story = {
 export const CardGrid: Story = {
   render: () => {
     const roles = [
-      { key: 'proprietary', label: 'Proprietário', hint: 'Dono de fazenda — participação por propriedade e inscrições estaduais.', icon: <Crown size={16} /> },
-      { key: 'employee',    label: 'Funcionário',   hint: 'Colaborador — cargo, função, dados bancários e centro de custo.',      icon: <Briefcase size={16} /> },
-      { key: 'provider',    label: 'Fornecedor',    hint: 'Vende insumos — filiais, vendedores e dados bancários.',               icon: <Truck size={16} /> },
-      { key: 'client',      label: 'Cliente',       hint: 'Comprador — inscrições estaduais, contribuinte e dados fiscais.',      icon: <ShoppingCart size={16} /> },
-      { key: 'user',        label: 'Usuário',       hint: 'Acesso ao sistema — perfis, fazendas e encarregados.',                 icon: <KeyRound size={16} /> },
+      { key: 'proprietary', label: 'Proprietário', hint: 'Dono de fazenda — participação por propriedade e inscrições estaduais.', icon: <Icon name="crown" size={16} /> },
+      { key: 'employee',    label: 'Funcionário',   hint: 'Colaborador — cargo, função, dados bancários e centro de custo.',      icon: <Icon name="briefcase" size={16} /> },
+      { key: 'provider',    label: 'Fornecedor',    hint: 'Vende insumos — filiais, vendedores e dados bancários.',               icon: <Icon name="truck" size={16} /> },
+      { key: 'client',      label: 'Cliente',       hint: 'Comprador — inscrições estaduais, contribuinte e dados fiscais.',      icon: <Icon name="cart" size={16} /> },
+      { key: 'user',        label: 'Usuário',       hint: 'Acesso ao sistema — perfis, fazendas e encarregados.',                 icon: <Icon name="key" size={16} /> },
     ]
     const [active, setActive] = useState<Record<string, boolean>>({ proprietary: true, user: true })
     return (

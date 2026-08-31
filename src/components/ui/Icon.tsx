@@ -14,6 +14,12 @@ export interface IconProps {
   /** Cor do traço. Default: herda do contexto via `currentColor`. */
   color?: string
   /**
+   * Preenche o desenho com a cor do traço. Para ícones que expressam um estado
+   * ligado/desligado com a mesma forma — favorito marcado, item selecionado.
+   * Não usar como variação estética.
+   */
+  filled?: boolean
+  /**
    * Rótulo para leitor de tela. Ausente, o ícone é decorativo
    * (`aria-hidden`) — o correto quando há texto ao lado.
    */
@@ -41,6 +47,7 @@ export function Icon({
   name,
   size = 'sm',
   color = 'currentColor',
+  filled = false,
   label,
   className,
   style,
@@ -53,6 +60,7 @@ export function Icon({
       size={px}
       color={color}
       strokeWidth={t.stroke.icon}
+      fill={filled ? color : 'none'}
       className={className}
       role={label ? 'img' : undefined}
       aria-label={label}

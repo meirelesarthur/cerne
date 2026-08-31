@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { DetailGrid } from '../../../components/ui/DetailGrid'
@@ -73,7 +73,7 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
                 <>
                   <Badge label={TIPO_PRODUTO_LABEL[produto.tipo]} variant="info" />
                   <Badge label={produto.ativo ? 'Ativo' : 'Inativo'} variant={produto.ativo ? 'success' : 'neutral'} />
-                  <Button variant="primary" size="sm" icon={<Pencil size={t.icon.xs} />} onClick={onEdit}>
+                  <Button variant="primary" size="sm" icon={<Icon name="edit" size={t.icon.xs} />} onClick={onEdit}>
                     Editar
                   </Button>
                 </>
@@ -90,10 +90,10 @@ export default function ProdutoDetalhe({ produto, onBack, onEdit }: Props) {
         }
         footer={
           <>
-            <Button variant="secondary" icon={<ArrowLeft size={t.icon.xs} />} onClick={onBack}>
+            <Button variant="secondary" icon={<Icon name="arrow-left" size={t.icon.xs} />} onClick={onBack}>
               Voltar aos produtos
             </Button>
-            <Button variant="primary" icon={<Pencil size={t.icon.xs} />} onClick={onEdit}>
+            <Button variant="primary" icon={<Icon name="edit" size={t.icon.xs} />} onClick={onEdit}>
               Editar Produto
             </Button>
           </>

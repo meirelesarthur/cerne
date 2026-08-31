@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react'
-import { Upload, MapPin } from 'lucide-react'
+import { Icon } from '../../../../components/ui/Icon'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw/dist/leaflet.draw.css'
@@ -267,7 +267,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
             fontFamily: t.font.family.sans,
           }}
         >
-          <MapPin size={13} color={colors.accent.default} />
+          <Icon name="location" size={13} color={colors.accent.default} />
           Use as ferramentas no mapa para desenhar o polígono da propriedade
         </div>
 
@@ -286,7 +286,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
           <Button
             variant="secondary"
             size="sm"
-            icon={<Upload size={12} />}
+            icon={<Icon name="upload" size={12} />}
             onClick={() => fileRef.current?.click()}
           >
             Importar KML

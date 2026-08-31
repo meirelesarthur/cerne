@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { Button } from './Button'
 import { ConfirmDialog } from './ConfirmDialog'
@@ -162,9 +162,9 @@ export function CrudPattern<T extends CrudEntity>({
         <DropdownMenu
           ariaLabel={`Ações de ${singular.toLowerCase()}`}
           items={[
-            ...(permissions.view ? [{ id: 'show', label: 'Ver detalhes', icon: <Eye size={15} />, onClick: () => openRecord(record, 'show' as const) }] : []),
-            ...(permissions.edit ? [{ id: 'edit', label: 'Editar', icon: <Pencil size={15} />, onClick: () => openRecord(record, 'edit' as const) }] : []),
-            ...(permissions.delete ? [{ id: 'delete', label: 'Excluir…', icon: <Trash2 size={15} />, danger: true, divider: true, onClick: () => setDeleteTarget(record) }] : []),
+            ...(permissions.view ? [{ id: 'show', label: 'Ver detalhes', icon: <Icon name="view" size={15} />, onClick: () => openRecord(record, 'show' as const) }] : []),
+            ...(permissions.edit ? [{ id: 'edit', label: 'Editar', icon: <Icon name="edit" size={15} />, onClick: () => openRecord(record, 'edit' as const) }] : []),
+            ...(permissions.delete ? [{ id: 'delete', label: 'Excluir…', icon: <Icon name="delete" size={15} />, danger: true, divider: true, onClick: () => setDeleteTarget(record) }] : []),
           ]}
         />
       ),
@@ -186,7 +186,7 @@ export function CrudPattern<T extends CrudEntity>({
           actions={(headerActions || (!readOnly && permissions.create)) ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap' }}>
               {headerActions}
-              {!readOnly && permissions.create && <Button icon={<Plus size={16} />} onClick={openCreate}>Novo {singular}</Button>}
+              {!readOnly && permissions.create && <Button icon={<Icon name="add" size={16} />} onClick={openCreate}>Novo {singular}</Button>}
             </div>
           ) : undefined}
         />
@@ -205,7 +205,7 @@ export function CrudPattern<T extends CrudEntity>({
               renderCard={(record) => (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3] }}>
                   <DetailGrid items={detailItems(record)} columns={1} />
-                  {!readOnly && permissions.view && <Button variant="ghost" size="sm" icon={<Eye size={15} />} onClick={() => openRecord(record, 'show')}>Ver detalhes</Button>}
+                  {!readOnly && permissions.view && <Button variant="ghost" size="sm" icon={<Icon name="view" size={15} />} onClick={() => openRecord(record, 'show')}>Ver detalhes</Button>}
                 </div>
               )}
               pagination={<Pagination page={page} total={filtered.length} pageSize={pageSize} onPageChange={setPage} />}

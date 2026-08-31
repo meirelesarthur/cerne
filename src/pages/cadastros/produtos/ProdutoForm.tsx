@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Boxes, ClipboardCheck, PackageCheck, ReceiptText, Save, ShieldCheck } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { FormField } from '../../../components/ui/FormField'
@@ -479,7 +479,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Controla estoque"
                 description="Acompanha entradas, saídas e saldo disponível."
                 disabled={submitting}
-                icon={<Boxes size={t.icon.md} />}
+                icon={<Icon name="stock" size={t.icon.md} />}
               >
                 <FormField
                   label="Estoque mínimo"
@@ -498,7 +498,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Controla lote"
                 description="Rastreia lotes nas entradas e saídas."
                 disabled={submitting}
-                icon={<PackageCheck size={t.icon.md} />}
+                icon={<Icon name="package-check" size={t.icon.md} />}
               />
               <ToggleField
                 checked={controlaQualidade}
@@ -506,7 +506,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Controla qualidade"
                 description="Exige análise antes de liberar o uso."
                 disabled={submitting}
-                icon={<ShieldCheck size={t.icon.md} />}
+                icon={<Icon name="shield-check" size={t.icon.md} />}
               />
             </FormSection>
           </>
@@ -549,7 +549,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Produto ativo"
                 description={ativo ? 'Disponível para uso no sistema.' : 'Indisponível para novos lançamentos.'}
                 disabled={submitting}
-                icon={<ClipboardCheck size={t.icon.md} />}
+                icon={<Icon name="clipboard-check" size={t.icon.md} />}
               />
               <ToggleField
                 checked={apontamento}
@@ -557,7 +557,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Apontamento agrícola"
                 description="Permite usar o produto em apontamentos."
                 disabled={submitting}
-                icon={<ReceiptText size={t.icon.md} />}
+                icon={<Icon name="receipt-detail" size={t.icon.md} />}
               />
               <ToggleField
                 checked={adicionaInventario}
@@ -565,7 +565,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Adicionar ao inventário"
                 description="Inclui o produto no inventário de ativos."
                 disabled={submitting}
-                icon={<Boxes size={t.icon.md} />}
+                icon={<Icon name="stock" size={t.icon.md} />}
               />
               <ToggleField
                 checked={emitirNFe}
@@ -573,7 +573,7 @@ export default function ProdutoForm({ initialData, onBack, onSave }: Props) {
                 label="Emitir NFe"
                 description="Habilita a emissão de nota fiscal na saída."
                 disabled={submitting}
-                icon={<ReceiptText size={t.icon.md} />}
+                icon={<Icon name="receipt-detail" size={t.icon.md} />}
               />
             </FormSection>
             <FormSection title="Informações adicionais" columns={2} responsive divider={false}>

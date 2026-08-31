@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { MapPinOff } from 'lucide-react'
+import { Icon } from './Icon'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { t } from '../../design/tokens'
@@ -116,7 +116,7 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
             pointerEvents: 'none',
           }}
         >
-          <MapPinOff size={24} color={colors.fg.subtle as string} aria-hidden="true" />
+          <Icon name="location-off" size={24} color={colors.fg.subtle as string} />
           <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
             Localização não definida para este registro.
           </span>

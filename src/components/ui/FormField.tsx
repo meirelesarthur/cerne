@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
-import { Check, Copy, HelpCircle } from 'lucide-react'
+import { Icon } from './Icon'
 import { Tooltip } from './Tooltip'
 import { IconButton } from './IconButton'
 import { t } from '../../design/tokens'
@@ -136,7 +136,7 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
           {hint && (
             <Tooltip label={hint}>
               <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-                <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
+                <Icon name="help" size={t.icon.xs} color={t.color.neutral[400]} />
               </span>
             </Tooltip>
           )}
@@ -470,7 +470,7 @@ export function ViewField({ label, value, copyValue, sensitive = false, multilin
           <IconButton
             size="xs"
             variant="ghost"
-            icon={copied ? <Check size={t.icon.sm} /> : <Copy size={t.icon.sm} />}
+            icon={copied ? <Icon name="check" size={t.icon.sm} /> : <Icon name="copy" size={t.icon.sm} />}
             aria-label={copyButtonLabel}
             onClick={copy}
           />

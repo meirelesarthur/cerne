@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { X, SlidersHorizontal } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -85,7 +85,7 @@ export function FilterDrawer({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-            <SlidersHorizontal size={15} color={t.color.brand[600]} />
+            <Icon name="filter-advanced" size={15} color={t.color.brand[600]} />
             <span
               style={{
                 fontSize: t.font.size.md,
@@ -130,7 +130,7 @@ export function FilterDrawer({
             onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
           >
-            <X size={16} />
+            <Icon name="close" size={16} />
           </button>
         </div>
 

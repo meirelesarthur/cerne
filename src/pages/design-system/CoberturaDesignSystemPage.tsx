@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookOpen, ExternalLink, GitCompare, LayoutGrid, Rows3 } from 'lucide-react'
+import { Icon } from '../../components/ui/Icon'
 import { Badge, type BadgeVariant } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
@@ -266,14 +266,14 @@ export default function CoberturaDesignSystemPage() {
       <IconButton
         aria-label="Ver como cards"
         tooltip="Ver como cards"
-        icon={<LayoutGrid />}
+        icon={<Icon name="grid" />}
         variant={viewMode === 'cards' ? 'subtle' : 'ghost'}
         onClick={() => setViewMode('cards')}
       />
       <IconButton
         aria-label="Ver como tabela"
         tooltip="Ver como tabela"
-        icon={<Rows3 />}
+        icon={<Icon name="rows" />}
         variant={viewMode === 'tabela' ? 'subtle' : 'ghost'}
         onClick={() => setViewMode('tabela')}
       />
@@ -289,13 +289,13 @@ export default function CoberturaDesignSystemPage() {
           actions={
             <div style={{ display: 'flex', gap: t.space[2] }}>
               <a href={STORYBOOK_URL} target="_blank" rel="noreferrer" style={externalLinkStyle}>
-                <BookOpen size={15} aria-hidden="true" />
+                <Icon name="book" size={15} />
                 Storybook
               </a>
               <a href={CHROMATIC_BUILD_URL} target="_blank" rel="noreferrer" style={externalLinkStyle}>
-                <GitCompare size={15} aria-hidden="true" />
+                <Icon name="git-compare" size={15} />
                 Build Chromatic
-                <ExternalLink size={12} aria-hidden="true" style={{ opacity: 0.6 }} />
+                <Icon name="external-link" size={12} style={{ opacity: 0.6 }} />
               </a>
             </div>
           }

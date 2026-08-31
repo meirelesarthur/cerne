@@ -1,5 +1,5 @@
 import React from 'react'
-import { Check } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { ToggleSwitch } from './ToggleSwitch'
@@ -148,7 +148,7 @@ export function ToggleSection({
             color:      active ? colors.accent.default : colors.fg.subtle,
             fontFamily: t.font.family.sans,
           }}>
-            {active && <Check size={12} aria-hidden="true" />}
+            {active && <Icon name="check" size={12} />}
             {hint}
           </div>
         )}
@@ -232,7 +232,7 @@ export function ToggleSection({
               color:      colors.accent.default,
               fontFamily: t.font.family.sans,
             }}>
-              <Check size={14} aria-hidden="true" />
+              <Icon name="check" size={14} />
               {activeHint}
             </div>
           )

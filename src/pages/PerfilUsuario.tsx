@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera } from 'lucide-react'
+import { Icon } from '../components/ui/Icon'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Card } from '../components/ui/Card'
 import { Heading } from '../components/ui/Heading'
@@ -302,7 +302,7 @@ export default function PerfilUsuario() {
                   padding: 0,
                 }}
               >
-                <Camera size={12} />
+                <Icon name="camera" size={12} />
               </button>
               <input
                 ref={fileInputRef}

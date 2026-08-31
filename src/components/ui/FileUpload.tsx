@@ -1,5 +1,5 @@
 import React, { useId, useRef, useState, useCallback } from 'react'
-import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { Icon, type IconName } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { IconButton } from './IconButton'
@@ -85,9 +85,9 @@ function InlineProgress({ value }: { value: number }) {
 function FileStatusIcon({ status }: { status?: UploadedFile['status'] }) {
   switch (status) {
     case 'done':
-      return <CheckCircle size={14} color={t.color.feedback.success.text} />
+      return <Icon name="check-circle" size={14} color={t.color.feedback.success.text} />
     case 'error':
-      return <AlertCircle size={14} color={t.color.feedback.error.text} />
+      return <Icon name="alert" size={14} color={t.color.feedback.error.text} />
     case 'uploading':
       return (
         <span
@@ -96,11 +96,11 @@ function FileStatusIcon({ status }: { status?: UploadedFile['status'] }) {
             animation: 'spin 1s linear infinite',
           }}
         >
-          <Loader2 size={14} color={t.color.brand[600]} />
+          <Icon name="loading" size={14} color={t.color.brand[600]} />
         </span>
       )
     default:
-      return <FileText size={14} color={t.color.neutral[400]} />
+      return <Icon name="document" size={14} color={t.color.neutral[400]} />
   }
 }
 
@@ -248,7 +248,7 @@ export function FileUpload({
         fontFamily: t.font.family.sans,
       }}
     >
-      {/* Keyframe para Loader2 — injetado via style tag inline */}
+      {/* Keyframe do spinner — injetado via style tag inline */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(0.01deg); } } }`}</style>
 
       {/* Label e hint ─────────────────────────────────────────────────────── */}
@@ -340,7 +340,7 @@ export function FileUpload({
           }}
           aria-hidden="true"
         >
-          <Upload size={18} color={iconColor} />
+          <Icon name="upload" size={18} color={iconColor} />
         </span>
 
         <div style={{ textAlign: 'center' }}>
@@ -478,7 +478,7 @@ export function FileUpload({
                 {/* Botão remover */}
                 {onRemove && (
                   <IconButton
-                    icon={<X size={14} />}
+                    icon={<Icon name="close" size={14} />}
                     aria-label={`Remover arquivo ${file.name}`}
                     onClick={() => onRemove(file.id)}
                     size="xs"

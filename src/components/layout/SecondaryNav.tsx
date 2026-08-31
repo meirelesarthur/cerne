@@ -1,5 +1,5 @@
 import { useState, useEffect, type MouseEvent } from 'react'
-import { ChevronRight, ChevronLeft, Star } from 'lucide-react'
+import { Icon } from '../ui/Icon'
 import type { NavModule, NavSubItem, NavGroup } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useFavorites } from '../../context/FavoritesContext'
@@ -50,7 +50,7 @@ function NavItem({
 }) {
   const { colors } = useTheme()
   const { isFavorite, toggleFavorite } = useFavorites()
-  const Icon = item.icon
+  const icon = item.icon
   const hasChildren = item.children && item.children.length > 0
   const hasActiveChild = hasChildren && item.children!.some(c => c.id === activeItemId)
   const [expanded, setExpanded] = useState(hasActiveChild)
@@ -80,13 +80,12 @@ function NavItem({
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[1] + 2, paddingRight: !hasChildren ? 28 : undefined }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, minWidth: 0 }}>
-          <Icon size={14} strokeWidth={2} style={{ flexShrink: 0, color: isActive && !hasChildren ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
+          <Icon name={icon} size={14} color={isActive && !hasChildren ? colors.accent.default : colors.fg.subtle} />
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
         </span>
         {hasChildren && (
-          <ChevronRight
+          <Icon name="chevron-right"
             size={10}
-            strokeWidth={2.2}
             style={{
               flexShrink: 0,
               transform: expanded ? 'rotate(90deg)' : 'none',
@@ -104,10 +103,11 @@ function NavItem({
         >
           <IconButton
             icon={
-              <Star
+              <Icon
+                name="star"
                 size={12}
                 color={favorited ? t.color.feedback.warning.solid : undefined}
-                fill={favorited ? t.color.feedback.warning.solid : 'none'}
+                filled={favorited}
               />
             }
             aria-label={favorited ? `Remover ${item.label} dos favoritos` : `Adicionar ${item.label} aos favoritos`}
@@ -119,7 +119,7 @@ function NavItem({
       {expanded && hasChildren && (
         <div style={{ paddingBottom: 2 }}>
           {item.children!.map(child => {
-            const ChildIcon = child.icon
+            const childIcon = child.icon
             const isChildActive = activeItemId === child.id
             return (
               <button
@@ -128,7 +128,7 @@ function NavItem({
                 onClick={(e) => { e.stopPropagation(); onChildClick(child.id) }}
                 style={{ display: 'flex', alignItems: 'center', gap: t.space[1] + 3, paddingLeft: 22 }}
               >
-                <ChildIcon size={13} strokeWidth={2} style={{ flexShrink: 0, color: isChildActive ? colors.accent.default : colors.fg.subtle }} aria-hidden="true" />
+                <Icon name={childIcon} size={13} color={isChildActive ? colors.accent.default : colors.fg.subtle} />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{child.label}</span>
               </button>
             )
@@ -181,9 +181,8 @@ function NavGroupSection({
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
       >
         <span style={{ flex: 1, textAlign: 'left' }}>{group.label}</span>
-        <ChevronRight
+        <Icon name="chevron-right"
           size={11}
-          strokeWidth={2.2}
           style={{
             flexShrink: 0,
             transform: open ? 'rotate(90deg)' : 'none',
@@ -256,7 +255,7 @@ function CollapsedIconList({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       {items.map((item) => {
-        const Icon = item.icon
+        const icon = item.icon
         const hasActiveChild = item.children?.some((c) => c.id === activeItemId)
         const isActive = activeItemId === item.id || hasActiveChild
         const targetId = item.children?.length ? item.children[0].id : item.id
@@ -268,7 +267,7 @@ function CollapsedIconList({
               onClick={(e) => { e.stopPropagation(); onItemClick(targetId) }}
               aria-label={item.label}
             >
-              <Icon size={16} aria-hidden="true" />
+              <Icon name={icon} size={16} />
             </button>
           </Tooltip>
         )
@@ -394,7 +393,7 @@ export default function SecondaryNav({
               e.currentTarget.style.color = colors.fg.subtle
             }}
           >
-            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            {collapsed ? <Icon name="chevron-right" size={14} /> : <Icon name="chevron-left" size={14} />}
           </button>
         </Tooltip>
       </div>

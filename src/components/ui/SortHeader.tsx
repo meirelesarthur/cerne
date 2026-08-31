@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -61,8 +61,8 @@ export function SortHeader({
     >
       {label}
       <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }} aria-hidden="true">
-        <ChevronUp   size={t.icon.xs} style={{ opacity: isActive && direction === 'asc'  ? 1 : 0.3 }} />
-        <ChevronDown size={t.icon.xs} style={{ opacity: isActive && direction === 'desc' ? 1 : 0.3 }} />
+        <Icon name="chevron-up"   size={t.icon.xs} style={{ opacity: isActive && direction === 'asc'  ? 1 : 0.3 }} />
+        <Icon name="chevron-down" size={t.icon.xs} style={{ opacity: isActive && direction === 'desc' ? 1 : 0.3 }} />
       </span>
     </button>
   )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Filter } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { Button } from './Button'
 import { FilterDrawer } from './FilterDrawer'
@@ -48,7 +48,7 @@ export function DashboardFilters({ fields, title = 'Filtros' }: DashboardFilters
   return (
     <>
       <Button
-        icon={<Filter size={t.icon.xs} />}
+        icon={<Icon name="filter" size={t.icon.xs} />}
         size="md"
         onClick={() => setOpen(true)}
       >

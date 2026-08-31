@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowUpRight } from 'lucide-react'
+import { Icon, type IconName } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { DashboardCard } from './DashboardGrid'
@@ -22,10 +22,10 @@ interface ChartCardProps {
    * Ícone opcional antes do título. Mantido por compatibilidade; nos dashboards
    * o rótulo de bloco é texto puro (ver Regra G).
    */
-  icon?: React.ElementType
+  icon?: IconName
 }
 
-export function ChartCard({ title, action, children, flex, icon: Icon }: ChartCardProps) {
+export function ChartCard({ title, action, children, flex, icon }: ChartCardProps) {
   const { colors } = useTheme()
   const [expanded, setExpanded] = useState(false)
 
@@ -33,9 +33,9 @@ export function ChartCard({ title, action, children, flex, icon: Icon }: ChartCa
     <DashboardCard
       flex={flex}
       title={
-        Icon ? (
+        icon ? (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: t.space[2] }}>
-            <Icon size={t.icon.xs} color={colors.fg.subtle as string} aria-hidden="true" />
+            <Icon name={icon} size={t.icon.xs} color={colors.fg.subtle as string} />
             {title}
           </span>
         ) : (
@@ -46,7 +46,7 @@ export function ChartCard({ title, action, children, flex, icon: Icon }: ChartCa
         <>
           {action}
           <IconButton
-            icon={<ArrowUpRight size={t.icon.xs} />}
+            icon={<Icon name="arrow-up-right" size={t.icon.xs} />}
             aria-label={`Expandir ${title}`}
             onClick={() => setExpanded(true)}
             size="sm"

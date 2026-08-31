@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckSquare, X } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -56,7 +56,7 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
         whiteSpace:   'nowrap',
       }}
     >
-      <CheckSquare size={t.icon.sm} color={accentColor} aria-hidden="true" />
+      <Icon name="check-square" size={t.icon.sm} color={accentColor} />
       <span style={{
         fontSize:   t.font.size.sm,
         fontWeight: t.font.weight.semibold,
@@ -87,7 +87,7 @@ export function BulkActionBar({ count, actions, onClose, noun = 'selecionado' }:
           flexShrink: 0,
         }}
       >
-        <X size={t.icon.xs} />
+        <Icon name="close" size={t.icon.xs} />
       </button>
     </div>
   )

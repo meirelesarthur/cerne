@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Building2 } from 'lucide-react'
+import { Icon } from './Icon'
 import { useFarm } from '../../context/FarmContext'
 import { SearchSelect, type SearchSelectOption } from './SearchSelect'
 import { t } from '../../design/tokens'
@@ -17,7 +17,7 @@ export function FarmSwitcher() {
       id: farm.id,
       label: farm.name,
       subtitle: farm.code,
-      icon: <Building2 size={15} />,
+      icon: <Icon name="building" size={15} />,
     })),
     [farms],
   )

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Eye, Pencil, Trash2, FileKey, HelpCircle, Check, X as XIcon } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }        from '../../../components/ui/PageCard'
@@ -127,8 +127,8 @@ export default function EmissoresLista({
       render: (e) => (
         <div style={{ display: 'flex', justifyContent: 'center' }} title={e.emiteNfe === 'sim' ? 'Emite NFe' : 'Não emite NFe'}>
           {e.emiteNfe === 'sim'
-            ? <Check size={16} color={t.color.feedback.success.text} aria-label="Emite NFe" />
-            : <XIcon size={16} color={colors.fg.subtle} aria-label="Não emite NFe" />}
+            ? <Icon name="check" size={16} color={t.color.feedback.success.text} aria-label="Emite NFe" />
+            : <Icon name="close" size={16} color={colors.fg.subtle} aria-label="Não emite NFe" />}
         </div>
       ),
     },
@@ -173,10 +173,10 @@ export default function EmissoresLista({
             align="right"
             ariaLabel={`Ações do emissor ${e.razaoSocial}`}
             items={[
-              { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(e.id) },
-              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(e.id) },
-              { id: 'cert', label: 'Certificado', icon: <FileKey size={13} />, onClick: () => onCertificado(e.id) },
-              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(e.id), danger: true, divider: true },
+              { id: 'view', label: 'Visualizar', icon: <Icon name="view" size={13} />, onClick: () => onView(e.id) },
+              { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={13} />, onClick: () => onEdit(e.id) },
+              { id: 'cert', label: 'Certificado', icon: <Icon name="document-key" size={13} />, onClick: () => onCertificado(e.id) },
+              { id: 'delete', label: 'Excluir', icon: <Icon name="delete" size={13} />, onClick: () => setDeleteId(e.id), danger: true, divider: true },
             ]}
           />
         </div>
@@ -193,10 +193,10 @@ export default function EmissoresLista({
           count={emissores.length}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+              <Button variant="ghost" size="sm" icon={<Icon name="help" size={14} />} onClick={() => setSaibaMais(true)}>
                 Saiba mais
               </Button>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Adicionar Novo
               </Button>
             </div>
@@ -270,7 +270,7 @@ export default function EmissoresLista({
         <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3] }}>
             <div style={{ width: t.space[10], height: t.space[10], borderRadius: t.radius.xl, background: colors.accent.subtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <HelpCircle size={22} color={colors.accent.default} />
+              <Icon name="help" size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">Emissor NFe</Heading>
           </div>

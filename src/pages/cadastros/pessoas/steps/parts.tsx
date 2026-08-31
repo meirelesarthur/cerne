@@ -1,5 +1,5 @@
 import React from 'react'
-import { Info } from 'lucide-react'
+import { Icon } from '../../../../components/ui/Icon'
 import { FormField }    from '../../../../components/ui/FormField'
 import { FormSelect }   from '../../../../components/ui/FormSelect'
 import { ToggleSwitch } from '../../../../components/ui/ToggleSwitch'
@@ -76,7 +76,7 @@ export function ToggleRow({ checked, onChange, label, hint, disabled }: {
         {label}
         {hint && (
           <Tooltip label={hint}>
-            <span style={{ display: 'flex' }}><Info size={12} color={colors.fg.subtle} /></span>
+            <span style={{ display: 'flex' }}><Icon name="info" size={12} color={colors.fg.subtle} /></span>
           </Tooltip>
         )}
       </div>

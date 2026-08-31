@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { CurrencyField } from '../../../components/ui/CurrencyField'
@@ -129,10 +129,10 @@ export default function PlanejamentoItemCadastro({
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />}>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<Icon name="arrow-left" size={14} />}>
               Cancelar
             </Button>
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />}>
+            <Button variant="primary" onClick={handleSave} icon={<Icon name="save" size={14} />}>
               {isEdit ? 'Salvar alterações' : 'Adicionar Item'}
             </Button>
           </>

@@ -4,8 +4,7 @@ import { FilterDrawer } from './FilterDrawer'
 import { FormField } from './FormField'
 import { FormSelect } from './FormSelect'
 import { Button } from './Button'
-import { SlidersHorizontal } from 'lucide-react'
-
+import { Icon } from './Icon'
 const meta: Meta<typeof FilterDrawer> = {
   title: 'GB CERNE/FilterDrawer',
   component: FilterDrawer,
@@ -30,7 +29,7 @@ export const Interactive: Story = {
       <div style={{ padding: 24 }}>
         <Button
           variant="secondary"
-          icon={<SlidersHorizontal size={14} />}
+          icon={<Icon name="filter-advanced" size={14} />}
           onClick={() => setOpen(true)}
         >
           Filtros {activeCount > 0 && `(${activeCount})`}

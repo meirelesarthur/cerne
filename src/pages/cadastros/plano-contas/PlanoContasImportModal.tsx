@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Upload, AlertTriangle } from 'lucide-react'
+import { Icon, type IconName } from '../../../components/ui/Icon'
 import { Modal }      from '../../../components/ui/Modal'
 import { Button }     from '../../../components/ui/Button'
 import { FileUpload, type UploadedFile } from '../../../components/ui/FileUpload'
@@ -96,7 +96,7 @@ export function PlanoContasImportModal({ open, contas, onClose, onImport }: Plan
           <Button
             variant="primary"
             size="md"
-            icon={<Upload size={14} />}
+            icon={<Icon name="upload" size={14} />}
             onClick={handleImportSubmit}
             loading={processing}
             disabled={!rawFile || processing}
@@ -115,8 +115,8 @@ export function PlanoContasImportModal({ open, contas, onClose, onImport }: Plan
               ? 'Baixe a planilha com as contas atualmente cadastradas para usar como base.'
               : 'Ainda não há contas cadastradas. Baixe a planilha modelo para começar.'}
           </p>
-          <Button variant="secondary" size="md" icon={<Download size={14} />} onClick={handleDownload} style={{ flexShrink: 0 }}>
-            Download
+          <Button variant="secondary" size="md" icon={<Icon name="download" size={14} />} onClick={handleDownload} style={{ flexShrink: 0 }}>
+            Baixar planilha
           </Button>
         </div>
         {downloaded && (
@@ -142,7 +142,7 @@ export function PlanoContasImportModal({ open, contas, onClose, onImport }: Plan
           alignItems:   'flex-start',
           gap:          t.space[3],
         }}>
-          <AlertTriangle size={18} color={t.color.feedback.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
+          <Icon name="warning" size={18} color={t.color.feedback.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
           <div>
             <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.feedback.warning.text, fontFamily: t.font.family.sans, marginBottom: 4 }}>
               Esta importação substitui todo o plano de contas.
@@ -175,7 +175,7 @@ export function PlanoContasImportModal({ open, contas, onClose, onImport }: Plan
             gap:          t.space[2],
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <AlertTriangle size={16} color={t.color.feedback.error.text} />
+              <Icon name="warning" size={16} color={t.color.feedback.error.text} />
               <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.feedback.error.text, fontFamily: t.font.family.sans }}>
                 Não foi possível importar — corrija e envie novamente
               </span>

@@ -1,8 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Eye, Pencil, Trash2, Printer, FileSpreadsheet,
-  HelpCircle, Power, GitBranchPlus,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }        from '../../../components/ui/PageCard'
@@ -234,13 +231,13 @@ export default function PlanoContasLista({
             align="right"
             ariaLabel="Ações da conta"
             items={[
-              { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(conta.id) },
-              { id: 'edit',   label: 'Editar',                                     icon: <Pencil size={13} />,       onClick: () => onEdit(conta.id) },
+              { id: 'view',   label: 'Visualizar', icon: <Icon name="view" size={13} />, onClick: () => onView(conta.id) },
+              { id: 'edit',   label: 'Editar',                                     icon: <Icon name="edit" size={13} />,       onClick: () => onEdit(conta.id) },
               // "Criar Descendente" só se aplica a contas Sintéticas — Analíticas
               // são folhas e não podem ter contas-filhas.
-              conta.classe === 'sintetica' && { id: 'desc', label: 'Criar Descendente', icon: <GitBranchPlus size={13} />, onClick: () => onCreateDescendant(conta.id) },
-              { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Power size={13} />,        onClick: () => handleToggleClick(conta.id) },
-              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => handleDeleteClick(conta.id), danger: true, divider: true },
+              conta.classe === 'sintetica' && { id: 'desc', label: 'Criar Descendente', icon: <Icon name="git-branch-add" size={13} />, onClick: () => onCreateDescendant(conta.id) },
+              { id: 'toggle', label: conta.ativo === 'sim' ? 'Inativar' : 'Ativar', icon: <Icon name="power" size={13} />,        onClick: () => handleToggleClick(conta.id) },
+              { id: 'delete', label: 'Excluir', icon: <Icon name="delete" size={13} />, onClick: () => handleDeleteClick(conta.id), danger: true, divider: true },
             ].filter(Boolean) as DropdownMenuItem[]}
           />
         </div>
@@ -259,11 +256,11 @@ export default function PlanoContasLista({
             count={contas.length}
             actions={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+                <Button variant="ghost" size="sm" icon={<Icon name="help" size={14} />} onClick={() => setSaibaMais(true)}>
                   Saiba mais
                 </Button>
                 <IconButton
-                  icon={<Printer size={15} />}
+                  icon={<Icon name="print" size={15} />}
                   aria-label="Imprimir relatório do plano de contas"
                   tooltip="Imprimir relatório"
                   variant="outline"
@@ -273,13 +270,13 @@ export default function PlanoContasLista({
                 <DropdownMenu
                   align="right"
                   ariaLabel="Importar ou exportar planilha do plano de contas"
-                  triggerIcon={<FileSpreadsheet size={15} />}
+                  triggerIcon={<Icon name="spreadsheet" size={15} />}
                   size="md"
                   items={[
-                    { id: 'importar', label: 'Importar', icon: <FileSpreadsheet size={13} />, onClick: () => setImportOpen(true) },
+                    { id: 'importar', label: 'Importar', icon: <Icon name="spreadsheet" size={13} />, onClick: () => setImportOpen(true) },
                   ]}
                 />
-                <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                   Adicionar Novo
                 </Button>
               </div>
@@ -407,7 +404,7 @@ export default function PlanoContasLista({
               background: colors.accent.subtle,
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <HelpCircle size={22} color={colors.accent.default} />
+              <Icon name="help" size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">
               Plano de Contas

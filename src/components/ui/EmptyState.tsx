@@ -1,5 +1,5 @@
 import React from 'react'
-import { FolderOpen, SearchX, AlertTriangle } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -27,9 +27,9 @@ interface EmptyStateProps {
 }
 
 const defaults: Record<EmptyStateVariant, { icon: React.ReactNode; message: string }> = {
-  empty:  { icon: <FolderOpen size={40} strokeWidth={1.5} />,    message: 'Nenhum registro encontrado.' },
-  search: { icon: <SearchX size={40} strokeWidth={1.5} />,       message: 'Nenhum resultado para sua busca.' },
-  error:  { icon: <AlertTriangle size={40} strokeWidth={1.5} />, message: 'Não foi possível carregar os dados.' },
+  empty:  { icon: <Icon name="folder" size={40} />,    message: 'Nenhum registro encontrado.' },
+  search: { icon: <Icon name="search-empty" size={40} />,       message: 'Nenhum resultado para sua busca.' },
+  error:  { icon: <Icon name="warning" size={40} />, message: 'Não foi possível carregar os dados.' },
 }
 
 export function EmptyState({

@@ -1,8 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Pencil, Trash2,
-  Download, Package,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -203,8 +200,8 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
       sortable: false,
       render: (r) => (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
-          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  tooltip="Editar"  size="xs" onClick={() => onEdit(r.id)} />
-          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" tooltip="Excluir" size="xs" danger onClick={() => setDeleteId(r.id)} />
+          <IconButton icon={<Icon name="edit" size={13} />} aria-label="Editar"  tooltip="Editar"  size="xs" onClick={() => onEdit(r.id)} />
+          <IconButton icon={<Icon name="delete" size={13} />} aria-label="Excluir" tooltip="Excluir" size="xs" danger onClick={() => setDeleteId(r.id)} />
         </div>
       ),
     },
@@ -220,10 +217,10 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
           count={registros.length}
           actions={
             <div style={{ display: 'flex', gap: 8 }}>
-              <Button variant="secondary" size="md" icon={<Download size={14} />} disabled title="Em breve">
+              <Button variant="secondary" size="md" icon={<Icon name="download" size={14} />} disabled title="Em breve">
                 Exportar
               </Button>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Adicionar
               </Button>
             </div>
@@ -243,7 +240,7 @@ export default function EstoquesIniciaisLista({ registros, onNew, onView, onEdit
           gap: 8,
           alignItems: 'center',
         }}>
-          <Package size={12} color={colors.accent.default} />
+          <Icon name="package" size={12} color={colors.accent.default} />
           <span>
             <strong style={{ color: colors.fg.default }}>{registros.length}</strong> registros · {' '}
             <strong style={{ color: colors.fg.default }}>{uniqueArmazens}</strong> armazéns · Última entrada: {' '}

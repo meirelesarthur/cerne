@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { PageCard } from '../../../components/ui/PageCard'
@@ -55,7 +55,7 @@ export default function AgrupadoresContabeisLista({
         <PageHeader
           title="Agrupadores Contábeis"
           description="Organize a estrutura contábil em níveis sintéticos e analíticos."
-          actions={<Button icon={<Plus size={16} />} onClick={() => onNew(null)}>Novo Agrupador</Button>}
+          actions={<Button icon={<Icon name="add" size={16} />} onClick={() => onNew(null)}>Novo Agrupador</Button>}
         />
         <TreeView
           nodes={nodes}

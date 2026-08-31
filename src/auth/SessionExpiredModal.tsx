@@ -1,5 +1,5 @@
 import React from 'react'
-import { LogIn } from 'lucide-react'
+import { Icon } from '../components/ui/Icon'
 import { t } from '../design/tokens'
 import { useTheme } from '../context/ThemeContext'
 import { Modal } from '../components/ui/Modal'
@@ -42,7 +42,7 @@ export function SessionExpiredModal() {
       footer={
         <Button
           variant="primary"
-          icon={<LogIn size={15} />}
+          icon={<Icon name="login" size={15} />}
           onClick={clear}
         >
           Entrar novamente

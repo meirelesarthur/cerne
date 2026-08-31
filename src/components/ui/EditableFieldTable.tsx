@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -142,13 +142,13 @@ export function EditableFieldTable<T>({
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }}>
                         {isEditingThis ? (
                           <>
-                            <IconButton icon={<Check size={14} />} onClick={confirmEdit} aria-label="Confirmar edição" variant="ghost" />
-                            <IconButton icon={<X size={14} />} onClick={cancelEdit} aria-label="Cancelar edição" variant="ghost" />
+                            <IconButton icon={<Icon name="check" size={14} />} onClick={confirmEdit} aria-label="Confirmar edição" variant="ghost" />
+                            <IconButton icon={<Icon name="close" size={14} />} onClick={cancelEdit} aria-label="Cancelar edição" variant="ghost" />
                           </>
                         ) : (
                           <>
-                            <IconButton icon={<Pencil size={14} />} onClick={() => startEdit(index)} aria-label={`Editar linha ${index + 1}`} variant="ghost" disabled={disabled || isBusy} />
-                            <IconButton icon={<Trash2 size={14} />} onClick={() => removeAt(index)} aria-label={removeLabel} variant="ghost" danger disabled={disabled || isBusy} />
+                            <IconButton icon={<Icon name="edit" size={14} />} onClick={() => startEdit(index)} aria-label={`Editar linha ${index + 1}`} variant="ghost" disabled={disabled || isBusy} />
+                            <IconButton icon={<Icon name="delete" size={14} />} onClick={() => removeAt(index)} aria-label={removeLabel} variant="ghost" danger disabled={disabled || isBusy} />
                           </>
                         )}
                       </div>
@@ -166,8 +166,8 @@ export function EditableFieldTable<T>({
                   ))}
                   <td style={cellStyle('right')}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }}>
-                      <IconButton icon={<Check size={14} />} onClick={confirmAdd} aria-label="Confirmar nova linha" variant="ghost" />
-                      <IconButton icon={<X size={14} />} onClick={cancelAdd} aria-label="Cancelar nova linha" variant="ghost" />
+                      <IconButton icon={<Icon name="check" size={14} />} onClick={confirmAdd} aria-label="Confirmar nova linha" variant="ghost" />
+                      <IconButton icon={<Icon name="close" size={14} />} onClick={cancelAdd} aria-label="Cancelar nova linha" variant="ghost" />
                     </div>
                   </td>
                 </tr>
@@ -181,7 +181,7 @@ export function EditableFieldTable<T>({
         <Button
           variant="ghost"
           size="sm"
-          icon={<Plus size={14} />}
+          icon={<Icon name="add" size={14} />}
           onClick={startAdd}
           disabled={disabled || isBusy}
           style={{ color: colors.accent.default }}

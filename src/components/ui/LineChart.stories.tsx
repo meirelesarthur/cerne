@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { TrendingUp } from 'lucide-react'
+import { type IconName } from './Icon'
 import { LineChart } from './LineChart'
 import { ChartCard } from './ChartCard'
 
@@ -73,7 +73,7 @@ export const DentroDoChartCard: Story = {
   name: 'Dentro do ChartCard',
   render: () => (
     <div style={{ maxWidth: 560 }}>
-      <ChartCard icon={TrendingUp} title="Evolução de Receita">
+      <ChartCard icon={'trend-up'} title="Evolução de Receita">
         <LineChart
           labels={MESES}
           series={[

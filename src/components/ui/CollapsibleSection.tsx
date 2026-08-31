@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -50,7 +50,7 @@ export function CollapsibleSection({
           if (!open) (e.currentTarget as HTMLButtonElement).style.background = colors.bg.surface
         }}
       >
-        <ChevronRight
+        <Icon name="chevron-right"
           size={13}
           color={colors.fg.subtle}
           style={{

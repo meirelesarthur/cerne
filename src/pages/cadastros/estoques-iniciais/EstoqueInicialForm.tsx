@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Lock, AlertTriangle, Plus, Save,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer }       from '../../../components/ui/PageContainer'
 import { PageCard }            from '../../../components/ui/PageCard'
 import { FormPageHeader }      from '../../../components/ui/FormPageHeader'
@@ -325,7 +323,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
         footer={
           <>
             <Button variant="secondary" onClick={handleBack} disabled={submitting}>Cancelar</Button>
-            <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
+            <Button variant="primary" icon={<Icon name="save" size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
               Salvar
             </Button>
           </>
@@ -362,8 +360,8 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             }}
             onClear={() => { setProductSearch(''); setField('produtoId', ''); setField('unidade', '') }}
             error={touched.produtoId && errors.produtoId ? errors.produtoId : undefined}
-            headerAction={{ label: 'Novo Produto', icon: <Plus size={11} />, onClick: () => setShowProductModal(true) }}
-            footerAction={{ label: 'Novo Produto', icon: <Plus size={13} />, onClick: () => setShowProductModal(true) }}
+            headerAction={{ label: 'Novo Produto', icon: <Icon name="add" size={11} />, onClick: () => setShowProductModal(true) }}
+            footerAction={{ label: 'Novo Produto', icon: <Icon name="add" size={13} />, onClick: () => setShowProductModal(true) }}
           />
         </div>
 
@@ -374,7 +372,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
               label="Unidade de Medida"
               value={form.unidade || '—'}
               readOnly
-              iconRight={<Lock size={12} color={colors.fg.subtle} />}
+              iconRight={<Icon name="lock" size={12} color={colors.fg.subtle} />}
               style={{ background: colors.bg.subtle, cursor: 'not-allowed' }}
             />
             <p style={hintText}>Preenchida automaticamente a partir do produto selecionado</p>
@@ -457,7 +455,7 @@ export default function EstoqueInicialForm({ initialData, registros, onBack, onS
             padding: `${t.space[4]}px`,
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: t.space[3], marginBottom: t.space[3] }}>
-              <AlertTriangle size={18} color={t.color.feedback.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
+              <Icon name="warning" size={18} color={t.color.feedback.warning.text} style={{ flexShrink: 0, marginTop: 1 }} />
               <div>
                 <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.feedback.warning.text, fontFamily: t.font.family.sans, marginBottom: 4 }}>
                   Já existe um saldo inicial para este produto neste armazém.

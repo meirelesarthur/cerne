@@ -1,4 +1,4 @@
-import { Eye, Pencil, Plus, RefreshCw } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { DataTable, type Column } from '../../../components/ui/DataTable'
@@ -28,9 +28,9 @@ export default function IntegracaoDominioLista({
     { key: 'sync', label: 'Última sincronização', width: 180, render: (record) => record.lastSync },
     { key: 'active', label: 'Situação', width: 110, render: (record) => <Badge label={record.enabled ? 'Ativa' : 'Inativa'} variant={record.enabled ? 'info' : 'neutral'} /> },
     { key: 'actions', label: 'Ações', width: 72, align: 'right', sortable: false, render: (record) => <DropdownMenu items={[
-      { id: 'show', label: 'Ver detalhes', icon: <Eye size={15} />, onClick: () => onView(record.id) },
-      { id: 'edit', label: 'Editar', icon: <Pencil size={15} />, onClick: () => onEdit(record.id) },
-      { id: 'sync', label: 'Sincronizar agora', icon: <RefreshCw size={15} />, divider: true, onClick: () => show('Sincronização enviada para processamento.', 'info') },
+      { id: 'show', label: 'Ver detalhes', icon: <Icon name="view" size={15} />, onClick: () => onView(record.id) },
+      { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={15} />, onClick: () => onEdit(record.id) },
+      { id: 'sync', label: 'Sincronizar agora', icon: <Icon name="refresh" size={15} />, divider: true, onClick: () => show('Sincronização enviada para processamento.', 'info') },
     ]} /> },
   ]
 
@@ -41,7 +41,7 @@ export default function IntegracaoDominioLista({
           title="Integração Domínio"
           description="Conecte emissores e contadores para a exportação contábil."
           count={records.length}
-          actions={<Button icon={<Plus size={16} />} onClick={onNew}>Nova Integração</Button>}
+          actions={<Button icon={<Icon name="add" size={16} />} onClick={onNew}>Nova Integração</Button>}
         />
         <DataTable columns={columns} data={records} keyField="id" emptyMessage="Nenhuma integração configurada." />
       </PageCard>

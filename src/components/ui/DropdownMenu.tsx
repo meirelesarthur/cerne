@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { MoreVertical } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -184,7 +184,7 @@ export function DropdownMenu({
           }
         }}
       >
-        {triggerIcon ?? <MoreVertical size={15} />}
+        {triggerIcon ?? <Icon name="more-vertical" size={15} />}
       </button>
 
       {open && menuPos && createPortal(

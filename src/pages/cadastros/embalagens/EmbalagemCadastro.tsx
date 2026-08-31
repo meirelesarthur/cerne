@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Save } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
@@ -103,7 +103,7 @@ export default function EmbalagemCadastro({ initialData, onBack, onSave }: Props
             </Button>
             <Button
               variant="primary"
-              icon={<Save size={13} />}
+              icon={<Icon name="save" size={13} />}
               onClick={handleSubmit}
               loading={submitting}
               disabled={!isValid || submitting}

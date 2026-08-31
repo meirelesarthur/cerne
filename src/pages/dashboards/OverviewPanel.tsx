@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import type { LatLngTuple } from 'leaflet'
-import {
-  Layers, ArrowRight, ChevronDown, TrendingUp, TrendingDown,
-  DollarSign, Wheat, BarChart2, MessageCircle, Settings2, Wallet,
-} from 'lucide-react'
+import { Icon } from '../../components/ui/Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
@@ -593,7 +590,7 @@ function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
         {/* Center icon + text */}
         <foreignObject x={cx - 56} y={cy - 42} width={112} height={84}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontFamily: t.font.family.sans }}>
-            <BarChart2 size={18} color={colors.fg.subtle as string} />
+            <Icon name="chart-bar" size={18} color={colors.fg.subtle as string} />
             <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
             <span style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.bold, color: colors.fg.default }}>{value}</span>
           </div>
@@ -944,7 +941,7 @@ export default function OverviewPanel() {
                   },
                 ]}
               />
-              <Button variant="secondary" size="sm" icon={<Settings2 size={12} />} disabled title="Personalização em breve">
+              <Button variant="secondary" size="sm" icon={<Icon name="settings-sliders" size={12} />} disabled title="Personalização em breve">
                 Personalizar
               </Button>
             </>
@@ -961,9 +958,9 @@ export default function OverviewPanel() {
               padding: `5px ${t.space[2]}px`, backdropFilter: 'blur(4px)',
               boxShadow: t.shadow.sm, cursor: 'pointer',
             }}>
-              <Layers size={11} color={t.color.neutral[500]} />
+              <Icon name="layers" size={11} color={t.color.neutral[500]} />
               <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[700], fontWeight: t.font.weight.medium }}>Talhões</span>
-              <ChevronDown size={11} color={t.color.neutral[400]} />
+              <Icon name="chevron-down" size={11} color={t.color.neutral[400]} />
             </div>
             <div style={{
               position: 'absolute', top: t.space[3], right: t.space[4], zIndex: 1000,
@@ -971,7 +968,7 @@ export default function OverviewPanel() {
               padding: `4px ${t.space[2]}px`, display: 'flex', alignItems: 'center', gap: t.space[1],
             }}>
               <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[0], fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
-              <ArrowRight size={10} color={t.color.neutral[0]} />
+              <Icon name="arrow-right" size={10} color={t.color.neutral[0]} />
             </div>
             <FarmAreasMap areas={MAP_AREAS} ariaLabel="Mapa dos talhões da fazenda" />
           </div>
@@ -1063,7 +1060,7 @@ export default function OverviewPanel() {
             <DashboardCard
               title="Insights"
               action={
-                <Button variant="ghost" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
+                <Button variant="ghost" size="sm" icon={<Icon name="message" size={11} />} onClick={() => setCartaOpen(true)}>
                   Ler a carta
                 </Button>
               }
@@ -1079,7 +1076,7 @@ export default function OverviewPanel() {
             <DashboardCard
               title="Resultado operacional (DRE)"
               action={
-                <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
+                <Button variant="ghost" size="sm" icon={<Icon name="grain" size={11} />}>
                   Detalhes
                 </Button>
               }
@@ -1181,7 +1178,7 @@ export default function OverviewPanel() {
                   colors={colors}
                   isGbMode={isGbMode}
                 />
-                <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[3] }}>
+                <Button variant="secondary" size="sm" block iconRight={<Icon name="arrow-right" size={11} />} style={{ marginTop: t.space[3] }}>
                   Ver detalhe
                 </Button>
               </div>
@@ -1241,7 +1238,7 @@ export default function OverviewPanel() {
                 ))}
               </div>
 
-              <Button variant="secondary" size="sm" block iconRight={<ArrowRight size={11} />} style={{ marginTop: t.space[3] }}>
+              <Button variant="secondary" size="sm" block iconRight={<Icon name="arrow-right" size={11} />} style={{ marginTop: t.space[3] }}>
                 Ver detalhes
               </Button>
             </DashboardCard>

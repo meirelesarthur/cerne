@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import {
-  Plus, Pencil, Trash2, ChevronRight, MapPin,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -106,7 +104,7 @@ export default function EnderecosList({
                 count={activeFilterCount}
                 onClick={() => setDrawerOpen(true)}
               />
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onAddRoot}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onAddRoot}>
                 Adicionar Setor
               </Button>
             </div>
@@ -130,13 +128,13 @@ export default function EnderecosList({
         {filteredTree.length === 0 ? (
           search.length > 0 ? (
             <EmptyState
-              icon={<MapPin size={40} strokeWidth={1.5} />}
+              icon={<Icon name="location" size={40} />}
               message="Nenhum endereçamento encontrado"
               description="Ajuste o filtro de busca."
             />
           ) : (
             <EmptyState
-              icon={<MapPin size={40} strokeWidth={1.5} />}
+              icon={<Icon name="location" size={40} />}
               message="Nenhum endereçamento cadastrado"
               description="Comece adicionando o primeiro setor."
               action={{ label: 'Adicionar Setor', onClick: onAddRoot }}
@@ -289,7 +287,7 @@ function TreeNode({
           {hasChildren ? (
             <IconButton
               icon={
-                <ChevronRight
+                <Icon name="chevron-right"
                   size={13}
                   style={{
                     transform: isExpanded ? 'rotate(90deg)' : 'none',
@@ -333,15 +331,15 @@ function TreeNode({
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 3 }}>
           {canHaveChild && (
             <IconButton
-              icon={<Plus size={13} />}
+              icon={<Icon name="add" size={13} />}
               aria-label={`Adicionar ${TIPO_LABEL[TIPO_CHILD[node.tipo]!]}`}
               onClick={() => onAddChild(node.id)}
               size="sm"
               variant="ghost"
             />
           )}
-          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  onClick={() => onEdit(node.id)}   size="sm" variant="ghost" />
-          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" onClick={() => onDeleteReq(node)} size="sm" variant="ghost" danger />
+          <IconButton icon={<Icon name="edit" size={13} />} aria-label="Editar"  onClick={() => onEdit(node.id)}   size="sm" variant="ghost" />
+          <IconButton icon={<Icon name="delete" size={13} />} aria-label="Excluir" onClick={() => onDeleteReq(node)} size="sm" variant="ghost" danger />
         </div>
       </div>
 

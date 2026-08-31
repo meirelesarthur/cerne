@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus, Download, Trash2, ArrowRight, Loader2 } from 'lucide-react'
+import { Icon } from './Icon'
 import { Button } from './Button'
 
 const meta: Meta<typeof Button> = {
@@ -59,10 +59,10 @@ export const Sizes: Story = {
 export const WithIcon: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-      <Button variant="primary" icon={<Plus size={15} />}>Nova Fazenda</Button>
-      <Button variant="secondary" icon={<Download size={15} />}>Exportar</Button>
-      <Button variant="destructive" icon={<Trash2 size={15} />}>Excluir</Button>
-      <Button variant="ghost" icon={<ArrowRight size={15} />}>Ver todos</Button>
+      <Button variant="primary" icon={<Icon name="add" size={15} />}>Nova Fazenda</Button>
+      <Button variant="secondary" icon={<Icon name="download" size={15} />}>Exportar</Button>
+      <Button variant="destructive" icon={<Icon name="delete" size={15} />}>Excluir</Button>
+      <Button variant="ghost" icon={<Icon name="arrow-right" size={15} />}>Ver todos</Button>
     </div>
   ),
 }
@@ -87,7 +87,7 @@ export const AllVariants: Story = {
           <Button variant={variant} size="sm">Sm</Button>
           <Button variant={variant} size="md">Md</Button>
           <Button variant={variant} size="lg">Lg</Button>
-          <Button variant={variant} icon={<Plus size={14} />}>Com ícone</Button>
+          <Button variant={variant} icon={<Icon name="add" size={14} />}>Com ícone</Button>
           <Button variant={variant} disabled>Disabled</Button>
         </div>
       ))}

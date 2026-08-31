@@ -1,8 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import {
-  LayoutDashboard, Star, TrendingUp, Layers,
-  Building2, Gauge, Wallet, Truck, Receipt, BarChart3, Network,
-} from 'lucide-react'
+import { type IconName } from './ui/Icon'
 import { ModuleCard, type ModuleCardConfig } from './ModuleCard'
 import type { NavModule } from '../data/menuData'
 
@@ -41,21 +38,21 @@ const configs: Record<string, ModuleCardConfig> = {
 
 export const Home: Story = {
   args: {
-    module: makeModule('painel', 'Home', LayoutDashboard),
+    module: makeModule('painel', 'Home', 'dashboard'),
     config: configs.painel,
   },
 }
 
 export const Financeiro: Story = {
   args: {
-    module: makeModule('financeiro', 'Financeiro', Wallet),
+    module: makeModule('financeiro', 'Financeiro', 'wallet'),
     config: configs.financeiro,
   },
 }
 
 export const Fiscal: Story = {
   args: {
-    module: makeModule('fiscal', 'Fiscal', Receipt),
+    module: makeModule('fiscal', 'Fiscal', 'receipt'),
     config: configs.fiscal,
   },
 }
@@ -63,17 +60,17 @@ export const Fiscal: Story = {
 export const AllModules: Story = {
   render: () => {
     const modules: Array<{ id: string; label: string; icon: NavModule['icon'] }> = [
-      { id: 'painel', label: 'Home', icon: LayoutDashboard },
-      { id: 'favoritos', label: 'Favoritos', icon: Star },
-      { id: 'dashboards', label: 'Dashboards', icon: TrendingUp },
-      { id: 'cadastros', label: 'Cadastros', icon: Layers },
-      { id: 'administrativo', label: 'Administrativo', icon: Building2 },
-      { id: 'operacional', label: 'Operacional', icon: Gauge },
-      { id: 'financeiro', label: 'Financeiro', icon: Wallet },
-      { id: 'frota', label: 'Frota', icon: Truck },
-      { id: 'fiscal', label: 'Fiscal', icon: Receipt },
-      { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
-      { id: 'integracoes', label: 'Integrações', icon: Network },
+      { id: 'painel', label: 'Home', icon: 'dashboard' },
+      { id: 'favoritos', label: 'Favoritos', icon: 'star' },
+      { id: 'dashboards', label: 'Dashboards', icon: 'trend-up' },
+      { id: 'cadastros', label: 'Cadastros', icon: 'layers' },
+      { id: 'administrativo', label: 'Administrativo', icon: 'building' },
+      { id: 'operacional', label: 'Operacional', icon: 'gauge' },
+      { id: 'financeiro', label: 'Financeiro', icon: 'wallet' },
+      { id: 'frota', label: 'Frota', icon: 'truck' },
+      { id: 'fiscal', label: 'Fiscal', icon: 'receipt' },
+      { id: 'relatorios', label: 'Relatórios', icon: 'chart-column' },
+      { id: 'integracoes', label: 'Integrações', icon: 'network' },
     ]
 
     return (

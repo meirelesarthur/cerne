@@ -1,11 +1,5 @@
 import { useState } from 'react'
-import {
-  Pencil,
-  MapPin,
-  CheckCircle2,
-  XCircle,
-  ExternalLink,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import type { BadgeVariant } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
@@ -65,8 +59,8 @@ function BoolField({ value, trueLabel = 'Sim', falseLabel = 'Não' }: { value: b
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       {value
-        ? <CheckCircle2 size={14} color={colors.accent.default} />
-        : <XCircle size={14} color={colors.fg.subtle} />
+        ? <Icon name="success" size={14} color={colors.accent.default} />
+        : <Icon name="error" size={14} color={colors.fg.subtle} />
       }
       <span style={{ fontSize: t.font.size.base, color: value ? colors.accent.default : colors.fg.subtle, fontFamily: t.font.family.sans }}>
         {value ? trueLabel : falseLabel}
@@ -119,7 +113,7 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
           <MapView geoJSON={f.perimetroGeoJSON} lat={f.latitude} lng={f.longitude} height={340} />
         ) : (
           <EmptyState
-            icon={<MapPin size={28} />}
+            icon={<Icon name="location" size={28} />}
             message="Sem demarcação cadastrada"
             description="Edite a fazenda para desenhar o perímetro no mapa ou importar um arquivo KML."
           />
@@ -162,9 +156,9 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
                   fontFamily: t.font.family.sans,
                 }}
               >
-                <MapPin size={12} />
+                <Icon name="location" size={12} />
                 Ver no Google Maps
-                <ExternalLink size={11} />
+                <Icon name="external-link" size={11} />
               </a>
             ),
           },
@@ -302,7 +296,7 @@ export default function FazendaDetalhe({ onBack, onEdit, fazenda }: FazendaDetal
             actions={
               <>
                 <Badge label={fazenda.ativo ? 'Ativo' : 'Inativo'} variant={fazenda.ativo ? 'success' : 'neutral'} />
-                <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+                <Button variant="primary" size="sm" icon={<Icon name="edit" size={13} />} onClick={onEdit}>
                   Editar
                 </Button>
               </>

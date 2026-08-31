@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { LayoutDashboard } from 'lucide-react'
+import { type IconName } from './Icon'
 import { GroupedBarChart } from './GroupedBarChart'
 import { ChartCard } from './ChartCard'
 
@@ -62,7 +62,7 @@ export const DentroDoChartCard: Story = {
   name: 'Dentro do ChartCard',
   render: () => (
     <div style={{ maxWidth: 640 }}>
-      <ChartCard icon={LayoutDashboard} title="Produção — Safra 23/24 vs 24/25">
+      <ChartCard icon={'dashboard'} title="Produção — Safra 23/24 vs 24/25">
         <GroupedBarChart
           labels={SAFRAS}
           series={[

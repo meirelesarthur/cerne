@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Icon } from './Icon'
 import { FormField } from './FormField'
 import { IconButton } from './IconButton'
 
@@ -48,7 +48,7 @@ export function SecretField({
       spellCheck={false}
       iconRight={(
         <IconButton
-          icon={visible ? <EyeOff size={16} /> : <Eye size={16} />}
+          icon={visible ? <Icon name="view-off" size={16} /> : <Icon name="view" size={16} />}
           aria-label={visible ? `Ocultar ${label}` : `Mostrar ${label}`}
           aria-pressed={visible}
           size="xs"

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Map, Rows3 } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { EntityBoard, type BoardEntity, type BoardGroup } from '../../../components/ui/EntityBoard'
 import { FeedbackBanner } from '../../../components/ui/FeedbackBanner'
 import { FilterSelect } from '../../../components/ui/FilterSelect'
@@ -69,7 +69,7 @@ export default function MapaConfinamentoPage() {
           description="Pátios, setores, currais e capacidade operacional."
           actions={<FilterSelect ariaLabel="Selecionar pátio" prefix="Pátio:" value={yard} onChange={setYard} options={[{ value: 'north', label: 'Norte' }, { value: 'south', label: 'Sul' }]} />}
         />
-        <Tabs items={[{ id: 'board', label: 'Estrutura', icon: <Rows3 size={15} /> }, { id: 'map', label: 'Mapa e polígonos', icon: <Map size={15} /> }]} activeId={view} onChange={setView} syncParam="feedlotView" />
+        <Tabs items={[{ id: 'board', label: 'Estrutura', icon: <Icon name="rows" size={15} /> }, { id: 'map', label: 'Mapa e polígonos', icon: <Icon name="map" size={15} /> }]} activeId={view} onChange={setView} syncParam="feedlotView" />
         <div style={{ marginTop: t.space[4] }}>
           <FeedbackBanner
             variant={totalOccupancy > totalCapacity ? 'warning' : 'info'}

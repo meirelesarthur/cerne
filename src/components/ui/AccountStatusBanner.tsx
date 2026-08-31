@@ -1,5 +1,5 @@
 import React from 'react'
-import { AlertTriangle, AlertCircle, Clock, Info } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -40,7 +40,7 @@ const ICON_SIZE = 16
 
 const CONFIG: Partial<Record<AccountStatus, BannerConfig>> = {
   trial: {
-    icon:         <Clock size={ICON_SIZE} aria-hidden="true" />,
+    icon:         <Icon name="clock" size={ICON_SIZE} />,
     bg:           t.color.feedback.warning.bg,
     bgGb:         'rgba(217,119,6,0.12)',
     border:       t.color.feedback.warning.border,
@@ -54,7 +54,7 @@ const CONFIG: Partial<Record<AccountStatus, BannerConfig>> = {
     defaultAction: 'Fazer upgrade',
   },
   past_due: {
-    icon:         <AlertCircle size={ICON_SIZE} aria-hidden="true" />,
+    icon:         <Icon name="alert" size={ICON_SIZE} />,
     bg:           t.color.feedback.warning.bg,
     bgGb:         'rgba(217,119,6,0.12)',
     border:       t.color.feedback.warning.border,
@@ -65,7 +65,7 @@ const CONFIG: Partial<Record<AccountStatus, BannerConfig>> = {
     defaultAction: 'Regularizar pagamento',
   },
   suspended: {
-    icon:         <AlertTriangle size={ICON_SIZE} aria-hidden="true" />,
+    icon:         <Icon name="warning" size={ICON_SIZE} />,
     bg:           t.color.feedback.error.bg,
     bgGb:         'rgba(220,38,38,0.12)',
     border:       t.color.feedback.error.border,
@@ -76,7 +76,7 @@ const CONFIG: Partial<Record<AccountStatus, BannerConfig>> = {
     defaultAction: 'Regularizar conta',
   },
   expired: {
-    icon:         <Info size={ICON_SIZE} aria-hidden="true" />,
+    icon:         <Icon name="info" size={ICON_SIZE} />,
     bg:           t.color.feedback.error.bg,
     bgGb:         'rgba(220,38,38,0.12)',
     border:       t.color.feedback.error.border,

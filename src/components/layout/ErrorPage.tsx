@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ChevronLeft, Home, RotateCw } from 'lucide-react'
+import { Icon } from '../ui/Icon'
 import logoLight from '../../assets/Logo.svg'
 import logoDark from '../../assets/Logo-white.svg'
 import cowIllustration from '../../assets/404-cow.png'
@@ -132,7 +132,7 @@ export function ErrorPage({
           style={{ display: 'block', height: t.space[7], width: 'auto' }}
         />
         {onBack && (
-          <Button variant="ghost" icon={<ChevronLeft size={t.icon.sm} />} onClick={onBack}>
+          <Button variant="ghost" icon={<Icon name="chevron-left" size={t.icon.sm} />} onClick={onBack}>
             {backLabel}
           </Button>
         )}
@@ -214,12 +214,12 @@ export function ErrorPage({
               }}
             >
               {onHome && (
-                <Button variant="secondary" block blockAlign="center" icon={<Home size={t.icon.sm} />} onClick={onHome}>
+                <Button variant="secondary" block blockAlign="center" icon={<Icon name="home" size={t.icon.sm} />} onClick={onHome}>
                   {homeLabel}
                 </Button>
               )}
               {onRetry && (
-                <Button block blockAlign="center" icon={<RotateCw size={t.icon.sm} />} onClick={onRetry}>
+                <Button block blockAlign="center" icon={<Icon name="rotate" size={t.icon.sm} />} onClick={onRetry}>
                   {retryLabel}
                 </Button>
               )}

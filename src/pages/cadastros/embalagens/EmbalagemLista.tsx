@@ -1,7 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Pencil, Trash2,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -119,8 +117,8 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
       sortable: false,
       render: (emb) => (
         <div onClick={ev => ev.stopPropagation()} style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-          <IconButton icon={<Pencil size={13} />} aria-label="Editar"  size="xs" onClick={() => onEdit(emb.id)} />
-          <IconButton icon={<Trash2 size={13} />} aria-label="Excluir" size="xs" danger onClick={() => setDeleteTarget(emb)} />
+          <IconButton icon={<Icon name="edit" size={13} />} aria-label="Editar"  size="xs" onClick={() => onEdit(emb.id)} />
+          <IconButton icon={<Icon name="delete" size={13} />} aria-label="Excluir" size="xs" danger onClick={() => setDeleteTarget(emb)} />
         </div>
       ),
     },
@@ -137,7 +135,7 @@ export default function EmbalagemLista({ embalagens, onNew, onView, onEdit, onDe
           count={embalagens.length}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Adicionar Embalagem
               </Button>
             </div>

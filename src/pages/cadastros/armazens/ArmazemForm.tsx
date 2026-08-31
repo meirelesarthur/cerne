@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Save } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
@@ -101,7 +101,7 @@ export default function ArmazemForm({ initialData, existingArmazens, onBack, onS
         footer={
           <>
             <Button variant="secondary" onClick={guard.guardedBack} disabled={submitting}>Cancelar</Button>
-            <Button variant="primary" icon={<Save size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
+            <Button variant="primary" icon={<Icon name="save" size={13} />} onClick={handleSubmit} loading={submitting} disabled={!isValid || submitting}>
               Salvar Armazém
             </Button>
           </>

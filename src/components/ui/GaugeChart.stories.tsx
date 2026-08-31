@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GaugeChart } from './GaugeChart'
 import { ChartCard } from './ChartCard'
-import { Target } from 'lucide-react'
+import { type IconName } from './Icon'
 import { t } from '../../design/tokens'
 
 const meta: Meta<typeof GaugeChart> = {
@@ -41,7 +41,7 @@ export const OrcamentoExecutado: Story = {
 export const NoChartCard: Story = {
   render: () => (
     <div style={{ maxWidth: 360 }}>
-      <ChartCard icon={Target} title="Execução Orçamentária">
+      <ChartCard icon={'target'} title="Execução Orçamentária">
         <GaugeChart value={82} centerValue="82%" centerLabel="executado no período" />
       </ChartCard>
     </div>

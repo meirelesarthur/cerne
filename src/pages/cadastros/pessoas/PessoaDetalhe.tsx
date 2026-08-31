@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button }         from '../../../components/ui/Button'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
@@ -367,7 +367,7 @@ export default function PessoaDetalhe({ pessoa, onBack, onEdit }: Props) {
         footer={
           <>
             <Button variant="secondary" onClick={onBack}>Voltar</Button>
-            <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>Editar</Button>
+            <Button variant="primary" icon={<Icon name="edit" size={14} />} onClick={onEdit}>Editar</Button>
           </>
         }
       >

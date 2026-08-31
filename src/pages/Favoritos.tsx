@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react'
+import { Icon } from '../components/ui/Icon'
 import t from '../design/tokens'
 import { findNavItemById } from '../data/menuData'
 import { useNavigation } from '../context/NavigationContext'
@@ -28,7 +28,7 @@ export default function Favoritos() {
 
       {favoriteEntries.length === 0 ? (
         <EmptyState
-          icon={<Star size={40} strokeWidth={1.5} />}
+          icon={<Icon name="star" size={40} />}
           message="Você ainda não tem favoritos."
           description="Passe o mouse sobre um item do menu e clique na estrela para adicioná-lo aqui."
           action={{ label: 'Explorar Dashboards', onClick: () => navigateTo('dashboards') }}
@@ -42,7 +42,7 @@ export default function Favoritos() {
           }}
         >
           {favoriteEntries.map(({ item, module }) => {
-            const Icon = item.icon
+            const icon = item.icon
             return (
               <Card
                 key={item.id}
@@ -54,7 +54,7 @@ export default function Favoritos() {
                   onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id) }}
                 >
                   <IconButton
-                    icon={<Star size={13} color={t.color.feedback.warning.solid} fill={t.color.feedback.warning.solid} />}
+                    icon={<Icon name="star" size={13} color={t.color.feedback.warning.solid} filled />}
                     aria-label={`Remover ${item.label} dos favoritos`}
                     size="xs"
                   />
@@ -71,7 +71,7 @@ export default function Favoritos() {
                     marginBottom: 12,
                   }}
                 >
-                  <Icon size={19} color={t.color.brand[600]} strokeWidth={1.6} />
+                  <Icon name={icon} size={19} color={t.color.brand[600]} />
                 </div>
                 <div style={{ fontSize: t.font.size.base, fontWeight: 600, color: colors.fg.default, marginBottom: 3, fontFamily: t.font.family.sans, paddingRight: t.space[5] }}>
                   {item.label}

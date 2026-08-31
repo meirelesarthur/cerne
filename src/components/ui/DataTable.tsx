@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -247,7 +247,7 @@ export function DataTable<T extends object>({
                                     transition: `transform ${t.transition.fast}`,
                                   }}
                                 >
-                                  <ChevronRight size={t.icon.xs} />
+                                  <Icon name="chevron-right" size={t.icon.xs} />
                                 </button>
                               ) : (
                                 <span style={{ width: t.size.iconBtn.sm, flexShrink: 0 }} />

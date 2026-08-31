@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Minus, PackageCheck, Plus } from 'lucide-react'
+import { Icon } from '../../components/ui/Icon'
 import { Breadcrumb } from '../../components/ui/Breadcrumb'
 import { PageContainer } from '../../components/ui/PageContainer'
 import { PageHeader } from '../../components/ui/PageHeader'
@@ -357,7 +357,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             Usuários
           </span>
           <IconButton
-            icon={<Minus size={13} />}
+            icon={<Icon name="remove" size={13} />}
             variant="outline"
             size="sm"
             aria-label="Diminuir número de usuários"
@@ -378,7 +378,7 @@ function BarraControles({ nUsuarios, setNUsuarios, anual, setAnual, colors }: Ba
             {nUsuarios}
           </div>
           <IconButton
-            icon={<Plus size={13} />}
+            icon={<Icon name="add" size={13} />}
             variant="outline"
             size="sm"
             aria-label="Aumentar número de usuários"
@@ -605,7 +605,7 @@ function PlanoCard({
               block
               size="lg"
               loading={comprando}
-              iconRight={<ArrowRight size={16} />}
+              iconRight={<Icon name="arrow-right" size={16} />}
               onClick={onComprar}
             >
               Comprar agora
@@ -647,12 +647,10 @@ function PlanoCard({
               fontFamily: t.font.family.sans,
             }}
           >
-            <Check
+            <Icon name="check"
               size={14}
               color={t.color.brand[600]}
-              strokeWidth={2.5}
               style={{ flexShrink: 0, marginTop: 1 }}
-              aria-hidden="true"
             />
             {feature.label}
           </li>
@@ -668,7 +666,7 @@ function PlanoCard({
           justifyContent: 'center',
         }}
       >
-        <Button variant="ghost" size="md" onClick={onVerDetalhes} icon={<ChevronRight size={14} />}>
+        <Button variant="ghost" size="md" onClick={onVerDetalhes} icon={<Icon name="chevron-right" size={14} />}>
           Ver detalhes e comparar
         </Button>
       </div>
@@ -791,7 +789,7 @@ function PlanoDetalhe({
                     block
                     size="lg"
                     loading={comprando}
-                    iconRight={<ArrowRight size={16} />}
+                    iconRight={<Icon name="arrow-right" size={16} />}
                     onClick={onComprar}
                   >
                     Comprar agora
@@ -836,7 +834,7 @@ function PlanoDetalhe({
             border: `1px solid ${t.color.brand[200]}`,
           }}
         >
-          <ArrowUpRight size={18} color={t.color.brand[600]} aria-hidden="true" style={{ flexShrink: 0 }} />
+          <Icon name="arrow-up-right" size={18} color={t.color.brand[600]} style={{ flexShrink: 0 }} />
           <span
             style={{
               fontSize: t.font.size.base,
@@ -927,7 +925,7 @@ function AbaPrecos({ plano, nUsuarios, anual, colors }: AbaPrecosProps) {
       {sobConsulta ? (
         <Card radius="xl" shadow="md" padding={0} style={{ overflow: 'hidden' }}>
           <EmptyState
-            icon={<PackageCheck size={40} strokeWidth={1.5} />}
+            icon={<Icon name="package-check" size={40} />}
             message="Preço sob consulta"
             description="O plano Enterprise é dimensionado conforme o número de operações, usuários e integrações. Fale com nossa equipe para um orçamento personalizado."
           />
@@ -1092,12 +1090,10 @@ function AbaPreRequisitos({ plano, colors }: { plano: Plano; colors: ReturnType<
                 lineHeight: t.font.lineHeight.snug,
               }}
             >
-              <CheckCircle2
+              <Icon name="success"
                 size={16}
                 color={t.color.brand[600]}
-                strokeWidth={2}
                 style={{ flexShrink: 0, marginTop: 1 }}
-                aria-hidden="true"
               />
               {req}
             </li>
@@ -1129,7 +1125,7 @@ function AbaComplementos({
       {compativeis.length === 0 ? (
         <Card radius="xl" shadow="md" padding={0} style={{ overflow: 'hidden' }}>
           <EmptyState
-            icon={<PackageCheck size={40} strokeWidth={1.5} />}
+            icon={<Icon name="package-check" size={40} />}
             message="Todos os módulos já estão inclusos"
             description={`O plano ${plano.nome} já inclui todos os módulos do AGRO365 — não há complementos adicionais a contratar.`}
           />
@@ -1262,7 +1258,7 @@ function AddOnCard({ addon, nUsuarios, colors, mostrarCompatibilidade }: AddOnCa
             variant={adicionado ? 'primary' : 'secondary'}
             block
             size="sm"
-            icon={adicionado ? <Check size={13} /> : undefined}
+            icon={adicionado ? <Icon name="check" size={13} /> : undefined}
             aria-pressed={adicionado}
             onClick={() => setAdicionado((v) => !v)}
           >
@@ -1296,7 +1292,7 @@ function CelulaComparacao({
   colors: ReturnType<typeof useTheme>['colors']
 }) {
   if (value === true) {
-    return <Check size={14} color={t.color.brand[600]} strokeWidth={2.5} aria-label="Incluído" />
+    return <Icon name="check" size={14} color={t.color.brand[600]} aria-label="Incluído" />
   }
   if (value === false) {
     return (

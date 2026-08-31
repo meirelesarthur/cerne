@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { BarChart2 } from 'lucide-react'
+import { type IconName } from './Icon'
 import { BarChart } from './BarChart'
 import { ChartCard } from './ChartCard'
 import { t } from '../../design/tokens'
@@ -66,7 +66,7 @@ export const DentroDoChartCard: Story = {
   name: 'Dentro do ChartCard',
   render: () => (
     <div style={{ maxWidth: 560 }}>
-      <ChartCard icon={BarChart2} title="Custos Operacionais por Categoria">
+      <ChartCard icon={'chart-bar'} title="Custos Operacionais por Categoria">
         <BarChart
           data={[
             { label: 'Semente', value: 28500 },

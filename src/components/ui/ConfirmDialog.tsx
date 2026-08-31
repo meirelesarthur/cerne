@@ -1,4 +1,4 @@
-import { AlertTriangle, Info } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Modal } from './Modal'
@@ -37,7 +37,7 @@ export function ConfirmDialog({
   const { colors } = useTheme()
   const isDestructive = tone === 'destructive'
   const accent = isDestructive ? t.color.feedback.error : t.color.feedback.info
-  const Icon = isDestructive ? AlertTriangle : Info
+  const icon = isDestructive ? 'warning' : 'info'
 
   return (
     <Modal
@@ -75,7 +75,7 @@ export function ConfirmDialog({
             justifyContent: 'center',
           }}
         >
-          <Icon size={20} />
+          <Icon name={icon} size={20} />
         </div>
         <div style={{ flex: 1 }}>
           <h2

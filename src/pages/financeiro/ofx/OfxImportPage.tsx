@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { GitMerge, Plus, Upload } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { AllocationEditor, type AllocationItem } from '../../../components/ui/AllocationEditor'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
@@ -79,13 +79,13 @@ export default function OfxImportPage() {
     { key: 'period', label: 'Período', render: (item) => item.period },
     { key: 'movements', label: 'Movimentos', align: 'right', render: (item) => String(item.movements) },
     { key: 'status', label: 'Conciliação', width: 140, render: (item) => <Badge label={item.pending ? `${item.pending} pendentes` : 'Concluída'} variant={item.pending ? 'warning' : 'success'} /> },
-    { key: 'actions', label: 'Ações', width: 72, align: 'right', sortable: false, render: () => <DropdownMenu items={[{ id: 'reconcile', label: 'Conciliar', icon: <GitMerge size={15} />, onClick: () => setTab('reconciliation') }]} /> },
+    { key: 'actions', label: 'Ações', width: 72, align: 'right', sortable: false, render: () => <DropdownMenu items={[{ id: 'reconcile', label: 'Conciliar', icon: <Icon name="git-merge" size={15} />, onClick: () => setTab('reconciliation') }]} /> },
   ]
 
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
       <PageCard>
-        <PageHeader title="Importação OFX" description="Importe extratos e concilie movimentos do banco com o financeiro." actions={<Button icon={<Upload size={16} />} onClick={() => setImportOpen(true)}>Importar OFX</Button>} />
+        <PageHeader title="Importação OFX" description="Importe extratos e concilie movimentos do banco com o financeiro." actions={<Button icon={<Icon name="upload" size={16} />} onClick={() => setImportOpen(true)}>Importar OFX</Button>} />
         <Tabs items={[{ id: 'history', label: 'Histórico de importações' }, { id: 'reconciliation', label: `Conciliação (${bankItems.filter((item) => item.status === 'pending').length})` }]} activeId={tab} onChange={setTab} syncParam="ofxTab" />
 
         {tab === 'history' ? (
@@ -140,7 +140,7 @@ export default function OfxImportPage() {
         </FormSection>
       </Modal>
 
-      <Modal open={movementItem !== null} onClose={() => setMovementItem(null)} title="Criar movimento" subtitle="Classifique o movimento antes de conciliá-lo." size="lg" footer={<><Button variant="secondary" onClick={() => setMovementItem(null)}>Cancelar</Button><Button icon={<Plus size={15} />} disabled={!movementItem} onClick={() => movementItem && markReconciled(movementItem, 'created')}>Criar e Conciliar</Button></>}>
+      <Modal open={movementItem !== null} onClose={() => setMovementItem(null)} title="Criar movimento" subtitle="Classifique o movimento antes de conciliá-lo." size="lg" footer={<><Button variant="secondary" onClick={() => setMovementItem(null)}>Cancelar</Button><Button icon={<Icon name="add" size={15} />} disabled={!movementItem} onClick={() => movementItem && markReconciled(movementItem, 'created')}>Criar e Conciliar</Button></>}>
         {movementItem && (
           <>
             <FeedbackBanner variant="info" title={movementItem.description} description={`Movimento de ${Math.abs(movementItem.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}.`} />

@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge }          from '../../../components/ui/Badge'
 import { Button }         from '../../../components/ui/Button'
 import { DetailGrid }     from '../../../components/ui/DetailGrid'
@@ -39,7 +39,7 @@ export default function PlanoContaDetalhe({ conta, contas, onBack, onEdit }: Pro
         footer={
           <>
             <Button variant="secondary" onClick={onBack}>Voltar</Button>
-            <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>Editar</Button>
+            <Button variant="primary" icon={<Icon name="edit" size={14} />} onClick={onEdit}>Editar</Button>
           </>
         }
       >

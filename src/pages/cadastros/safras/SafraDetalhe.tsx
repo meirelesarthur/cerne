@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button }     from '../../../components/ui/Button'
 import { Badge }      from '../../../components/ui/Badge'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -78,10 +78,10 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
       <PageCard
         footer={
           <>
-            <Button variant="secondary" icon={<ArrowLeft size={14} />} onClick={onBack}>
+            <Button variant="secondary" icon={<Icon name="arrow-left" size={14} />} onClick={onBack}>
               Voltar
             </Button>
-            <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>
+            <Button variant="primary" icon={<Icon name="edit" size={14} />} onClick={onEdit}>
               Editar
             </Button>
           </>
@@ -98,7 +98,7 @@ export default function SafraDetalhe({ safra, onBack, onEdit }: SafraDetalheProp
             actions={
               <>
                 <Badge label={isAtiva ? 'Ativa' : 'Inativa'} variant={isAtiva ? 'success' : 'neutral'} />
-                <Button variant="primary" size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
+                <Button variant="primary" size="sm" icon={<Icon name="edit" size={13} />} onClick={onEdit}>
                   Editar
                 </Button>
               </>

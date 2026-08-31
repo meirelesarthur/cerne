@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Save, ShieldAlert, ShieldCheck } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -67,10 +67,10 @@ export default function CertificadoEmissor({ emissor, today, onBack, onSave }: C
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
+            <Button variant="secondary" onClick={onBack} icon={<Icon name="arrow-left" size={14} />} disabled={submitting}>
               Voltar
             </Button>
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting || !preview}>
+            <Button variant="primary" onClick={handleSave} icon={<Icon name="save" size={14} />} loading={submitting} disabled={submitting || !preview}>
               Salvar Certificado
             </Button>
           </>
@@ -93,8 +93,8 @@ export default function CertificadoEmissor({ emissor, today, onBack, onSave }: C
               border: `1px solid ${naoPodeLer ? t.color.feedback.error.border : t.color.feedback.success.border}`,
             }}>
               {naoPodeLer
-                ? <ShieldAlert size={18} color={t.color.feedback.error.text} style={{ flexShrink: 0, marginTop: 2 }} />
-                : <ShieldCheck size={18} color={t.color.feedback.success.text} style={{ flexShrink: 0, marginTop: 2 }} />}
+                ? <Icon name="shield-alert" size={18} color={t.color.feedback.error.text} style={{ flexShrink: 0, marginTop: 2 }} />
+                : <Icon name="shield-check" size={18} color={t.color.feedback.success.text} style={{ flexShrink: 0, marginTop: 2 }} />}
               <div>
                 <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: naoPodeLer ? t.color.feedback.error.text : t.color.feedback.success.text, fontFamily: t.font.family.sans }}>
                   {naoPodeLer ? 'Certificado atual não pode ser validado' : 'Certificado atual válido'}
@@ -139,7 +139,7 @@ export default function CertificadoEmissor({ emissor, today, onBack, onSave }: C
               background: t.color.feedback.info.bg, border: `1px solid ${t.color.feedback.info.border}`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <ShieldCheck size={16} color={t.color.feedback.info.text} />
+                <Icon name="shield-check" size={16} color={t.color.feedback.info.text} />
                 <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: t.color.feedback.info.text, fontFamily: t.font.family.sans }}>
                   Confirme os dados antes de salvar
                 </span>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Icon, type IconName } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -6,7 +7,7 @@ import { useTheme } from '../../context/ThemeContext'
 // Cartão de métrica estilo efferd: número grande + label + chip de tendência.
 
 interface KpiStatCardProps {
-  icon: React.ElementType
+  icon: IconName
   label: string
   value: string
   sub?: string
@@ -28,7 +29,7 @@ function defaultValueSize(value: string): keyof typeof t.font.size {
 }
 
 export function KpiStatCard({
-  icon: Icon,
+  icon,
   label,
   value,
   sub,
@@ -113,7 +114,7 @@ export function KpiStatCard({
             flexShrink: 0,
           }}
         >
-          <Icon size={t.icon.md} color={ac} />
+          <Icon name={icon} size={t.icon.md} color={ac} />
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { X } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 
 type TagVariant = 'neutral' | 'brand' | 'success' | 'danger' | 'warning' | 'info' | 'purple' | 'cyan'
@@ -73,7 +73,7 @@ export function Tag({ label, variant = 'neutral', icon, onRemove }: TagProps) {
           onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
           onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
         >
-          <X size={t.icon.xs} />
+          <Icon name="close" size={t.icon.xs} />
         </button>
       )}
     </span>

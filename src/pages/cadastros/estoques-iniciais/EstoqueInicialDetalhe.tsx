@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button }         from '../../../components/ui/Button'
 import { DetailGrid }     from '../../../components/ui/DetailGrid'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -27,7 +27,7 @@ export default function EstoqueInicialDetalhe({ registro, onBack, onEdit }: Prop
         footer={
           <>
             <Button variant="secondary" onClick={onBack}>Voltar</Button>
-            <Button variant="primary" icon={<Pencil size={14} />} onClick={onEdit}>Editar</Button>
+            <Button variant="primary" icon={<Icon name="edit" size={14} />} onClick={onEdit}>Editar</Button>
           </>
         }
       >

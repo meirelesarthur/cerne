@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Download, Eye, KeyRound, Pencil, Plus, Upload } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { type Column } from '../../../components/ui/DataTable'
@@ -67,9 +67,9 @@ export default function UsuariosLista({ users, onNew, onView, onEdit }: Usuarios
     { key: 'status', label: 'Status', width: 120, render: (user) => <Badge label={user.online ? 'Online' : 'Offline'} variant={user.online ? 'success' : 'neutral'} /> },
     { key: 'actions', label: 'Ações', width: 72, align: 'right', sortable: false, render: (user) => (
       <DropdownMenu items={[
-        { id: 'show', label: 'Ver detalhes', icon: <Eye size={15} />, onClick: () => onView(user.id) },
-        { id: 'edit', label: 'Editar', icon: <Pencil size={15} />, onClick: () => onEdit(user.id) },
-        { id: 'password', label: 'Redefinir senha…', icon: <KeyRound size={15} />, divider: true, onClick: () => openPassword(user) },
+        { id: 'show', label: 'Ver detalhes', icon: <Icon name="view" size={15} />, onClick: () => onView(user.id) },
+        { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={15} />, onClick: () => onEdit(user.id) },
+        { id: 'password', label: 'Redefinir senha…', icon: <Icon name="key" size={15} />, divider: true, onClick: () => openPassword(user) },
       ]} />
     ) },
   ]
@@ -83,9 +83,9 @@ export default function UsuariosLista({ users, onNew, onView, onEdit }: Usuarios
           count={filtered.length}
           actions={(
             <div style={{ display: 'flex', gap: t.space[2], flexWrap: 'wrap' }}>
-              <Button variant="ghost" icon={<Upload size={16} />} onClick={() => setImportOpen(true)}>Importar</Button>
-              <Button variant="secondary" icon={<Download size={16} />} onClick={() => show('Exportação XLS preparada com sucesso.')}>Exportar</Button>
-              <Button icon={<Plus size={16} />} onClick={onNew}>Novo Usuário</Button>
+              <Button variant="ghost" icon={<Icon name="upload" size={16} />} onClick={() => setImportOpen(true)}>Importar</Button>
+              <Button variant="secondary" icon={<Icon name="download" size={16} />} onClick={() => show('Exportação XLS preparada com sucesso.')}>Exportar</Button>
+              <Button icon={<Icon name="add" size={16} />} onClick={onNew}>Novo Usuário</Button>
             </div>
           )}
         />

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Wallet, TrendingUp, Sprout, AlertTriangle } from 'lucide-react'
+import { type IconName } from './Icon'
 import { KpiStatCard } from './KpiStatCard'
 import { t } from '../../design/tokens'
 
@@ -24,7 +24,7 @@ type Story = StoryObj<typeof KpiStatCard>
 
 export const Default: Story = {
   args: {
-    icon: Wallet,
+    icon: 'wallet',
     label: 'Saldo Total',
     value: 'R$ 482,3K',
     sub: 'Período completo',
@@ -38,7 +38,7 @@ export const Default: Story = {
 export const TendenciaNegativa: Story = {
   name: 'Tendência negativa',
   args: {
-    icon: AlertTriangle,
+    icon: 'warning',
     label: 'Contas a Pagar Vencidas',
     value: 'R$ 38,1K',
     sub: '+30 dias',
@@ -53,7 +53,7 @@ export const TendenciaNegativa: Story = {
 export const SemTendencia: Story = {
   name: 'Sem tendência',
   args: {
-    icon: Sprout,
+    icon: 'sprout',
     label: 'Área Plantada',
     value: '1.240 ha',
     sub: 'Safra 2024/25',
@@ -65,7 +65,7 @@ export const SemTendencia: Story = {
 export const ValorLongo: Story = {
   name: 'Valor longo (degrau de fonte automático)',
   args: {
-    icon: TrendingUp,
+    icon: 'trend-up',
     label: 'Margem por Hectare',
     value: 'R$ 1.847,90/ha',
     trend: '5,1%',
@@ -79,10 +79,10 @@ export const GradeDeKpis: Story = {
   name: 'Grade de KPIs (uso real em dashboard)',
   render: () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, width: 560 }}>
-      <KpiStatCard icon={Wallet} label="Saldo Total" value="R$ 482,3K" trend="12,4%" trendUp />
-      <KpiStatCard icon={TrendingUp} label="A Receber" value="R$ 210,0K" trend="4,8%" trendUp />
-      <KpiStatCard icon={AlertTriangle} label="A Pagar" value="R$ 96,5K" trend="3,1%" trendUp={false} accentColor={t.color.feedback.error.solid} />
-      <KpiStatCard icon={Sprout} label="Área Plantada" value="1.240 ha" sub="Safra 2024/25" />
+      <KpiStatCard icon={'wallet'} label="Saldo Total" value="R$ 482,3K" trend="12,4%" trendUp />
+      <KpiStatCard icon={'trend-up'} label="A Receber" value="R$ 210,0K" trend="4,8%" trendUp />
+      <KpiStatCard icon={'warning'} label="A Pagar" value="R$ 96,5K" trend="3,1%" trendUp={false} accentColor={t.color.feedback.error.solid} />
+      <KpiStatCard icon={'sprout'} label="Área Plantada" value="1.240 ha" sub="Safra 2024/25" />
     </div>
   ),
 }

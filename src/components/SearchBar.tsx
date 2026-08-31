@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Search, ArrowRight, Hash, type LucideIcon } from 'lucide-react'
+import { Icon, type IconName } from './ui/Icon'
 import { menuModules } from '../data/menuData'
 import { useTheme } from '../context/ThemeContext'
 import { useNavigation } from '../context/NavigationContext'
@@ -10,7 +10,7 @@ interface SearchItem {
   label: string
   moduleId: string
   moduleLabel: string
-  moduleIcon: LucideIcon
+  moduleIcon: IconName
   groupLabel?: string
   path: string
 }
@@ -139,7 +139,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
         }}
         onClick={() => inputRef.current?.focus()}
       >
-        <Search size={compact ? 13 : 16} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
+        <Icon name="search" size={compact ? 13 : 16} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
         <input
           ref={inputRef}
           value={query}
@@ -195,7 +195,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
           }}
         >
           {results.map((item, i) => {
-            const Icon = item.moduleIcon
+            const icon = item.moduleIcon
             const isActive = i === activeIdx
             return (
               <div
@@ -228,7 +228,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                     transition: 'background 0.1s',
                   }}
                 >
-                  <Icon size={13} color={isActive ? colors.accent.default : colors.fg.muted} strokeWidth={1.8} />
+                  <Icon name={icon} size={13} color={isActive ? colors.accent.default : colors.fg.muted} />
                 </div>
 
                 {/* Text — single line with separator */}
@@ -273,7 +273,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                       flexShrink: 0,
                     }}
                   >
-                    <Hash size={9} strokeWidth={2} />
+                    <Icon name="hash" size={9} />
                     {item.moduleLabel}
                     {item.groupLabel && (
                       <>
@@ -285,7 +285,7 @@ export default function SearchBar({ onNavigate, compact = false }: SearchBarProp
                 </div>
 
                 {/* Arrow */}
-                <ArrowRight
+                <Icon name="arrow-right"
                   size={13}
                   color={isActive ? colors.accent.default : colors.border.default}
                   style={{ flexShrink: 0, transition: 'color 0.1s' }}

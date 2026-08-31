@@ -1,4 +1,5 @@
 import type { NavModule } from '../data/menuData'
+import { Icon } from './ui/Icon'
 import { useTheme } from '../context/ThemeContext'
 import t from '../design/tokens'
 
@@ -13,7 +14,7 @@ interface ModuleCardProps {
 }
 
 export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
-  const Icon = module.icon
+  const icon = module.icon
   const { colors } = useTheme()
 
   return (
@@ -34,7 +35,7 @@ export function ModuleCard({ module, config, onClick }: ModuleCardProps) {
           marginBottom: 12,
         }}
       >
-        <Icon size={19} color={t.color.brand[600]} strokeWidth={1.6} />
+        <Icon name={icon} size={19} color={t.color.brand[600]} />
       </div>
       <div
         style={{

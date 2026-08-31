@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
-import { CheckCircle2, XCircle, Info, AlertTriangle, X } from 'lucide-react'
+import { Icon, type IconName } from './Icon'
 import { t } from '../../design/tokens'
 import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
@@ -46,11 +46,11 @@ const ToastContext = createContext<ToastController | null>(null)
  *  aparece só como destaque de cor no quadrado do ícone. */
 const TOAST_SURFACE = t.color.neutral[950]
 
-const TYPE_CONFIG: Record<ToastType, { highlight: string; Icon: React.ElementType }> = {
-  success: { highlight: t.color.feedback.success.solid, Icon: CheckCircle2 },
-  error:   { highlight: t.color.feedback.error.solid,   Icon: XCircle      },
-  info:    { highlight: t.color.feedback.info.solid,    Icon: Info          },
-  warning: { highlight: t.color.feedback.warning.solid, Icon: AlertTriangle },
+const TYPE_CONFIG: Record<ToastType, { highlight: string; icon: IconName }> = {
+  success: { highlight: t.color.feedback.success.solid, icon: 'success' },
+  error:   { highlight: t.color.feedback.error.solid,   icon: 'error'   },
+  info:    { highlight: t.color.feedback.info.solid,    icon: 'info'    },
+  warning: { highlight: t.color.feedback.warning.solid, icon: 'warning' },
 }
 
 // ─── Keyframe injection (once) ────────────────────────────────────────────────
@@ -82,7 +82,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
   const [exiting, setExiting] = useState(false)
   const [paused, setPaused] = useState(false)
   const reduced = usePrefersReducedMotion()
-  const { highlight, Icon } = TYPE_CONFIG[toast.type]
+  const { highlight, icon } = TYPE_CONFIG[toast.type]
   const duration = toast.duration ?? 4000
   // Erros exigem dismiss manual — sem auto-close (WCAG 2.2.1/2.2.2).
   const autoCloses = toast.type !== 'error'
@@ -179,7 +179,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             flexShrink:     0,
           }}
         >
-          <Icon size={t.icon.sm} style={{ color: highlight }} />
+          <Icon name={icon} size={t.icon.sm} color={highlight} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
           <span style={{ lineHeight: t.font.lineHeight.snug }}>{toast.message}</span>
@@ -233,7 +233,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: numb
             lineHeight:     1,
           }}
         >
-          <X size={t.icon.xs} />
+          <Icon name="close" size={t.icon.xs} />
         </button>
       </div>
 

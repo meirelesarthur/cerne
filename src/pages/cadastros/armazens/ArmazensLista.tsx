@@ -1,7 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Pencil, Trash2,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -141,8 +139,8 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
       sortable: false,
       render: (a) => (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space[1] }} onClick={e => e.stopPropagation()}>
-          <IconButton icon={<Pencil size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={() => onEdit(a.id)} />
-          <IconButton icon={<Trash2 size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={() => setDeleteTarget(a)} danger />
+          <IconButton icon={<Icon name="edit" size={13} />} size="sm" variant="ghost" aria-label="Editar"  onClick={() => onEdit(a.id)} />
+          <IconButton icon={<Icon name="delete" size={13} />} size="sm" variant="ghost" aria-label="Excluir" onClick={() => setDeleteTarget(a)} danger />
         </div>
       ),
     },
@@ -158,7 +156,7 @@ export default function ArmazensLista({ armazens, onNew, onView, onEdit, onDelet
           count={armazens.length}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Adicionar Armazém
               </Button>
             </div>

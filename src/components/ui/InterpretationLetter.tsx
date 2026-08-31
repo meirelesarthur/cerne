@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Modal } from './Modal'
@@ -132,7 +132,7 @@ export function InterpretationLetter({ open, onClose, carta, fonte, filterAware 
           fontSize: t.font.size.sm, fontWeight: t.font.weight.bold, color: colors.fg.default,
           paddingBottom: t.space[1], borderBottom: `1px solid ${colors.border.subtle}`, marginBottom: t.space[2],
         }}>
-          <Sparkles size={13} color={colors.accent.default as string} aria-hidden="true" />
+          <Icon name="sparkles" size={13} color={colors.accent.default as string} />
           Conceitos e definições
         </div>
         {carta.glossary.map(g => (

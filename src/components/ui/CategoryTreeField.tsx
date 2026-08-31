@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { Icon } from './Icon'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { t } from '../../design/tokens'
@@ -131,7 +131,7 @@ export function CategoryTreeField({
                             transition: `transform ${t.transition.fast}`,
                           }}
                         >
-                          <ChevronRight size={t.icon.xs} />
+                          <Icon name="chevron-right" size={t.icon.xs} />
                         </button>
                       ) : (
                         <span style={{ display: 'block', width: t.size.iconBtn.sm }} />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BarChart3, Bell, Blocks, Gem, LifeBuoy, LogOut, Moon, Settings, Sparkles, Sun, UserCog } from 'lucide-react'
+import { Icon, type IconName } from '../ui/Icon'
 import type { NavModule } from '../../data/menuData'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigation } from '../../context/NavigationContext'
@@ -125,20 +125,20 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
                   color: activeItemId?.startsWith('ds-') ? colors.accent.default : colors.fg.muted,
                 }}
               >
-                <Blocks size={16} />
+                <Icon name="blocks" size={16} />
               </span>
             }
             items={[
               {
                 id: 'ds-cobertura',
                 label: 'Cobertura do Design System',
-                icon: <BarChart3 size={15} />,
+                icon: <Icon name="chart-column" size={15} />,
                 onClick: () => onOpenDesignSystem('ds-cobertura'),
               },
               {
                 id: 'ds-estados-conta',
                 label: 'Estados de Conta & RBAC',
-                icon: <UserCog size={15} />,
+                icon: <Icon name="user-settings" size={15} />,
                 onClick: () => onOpenDesignSystem('ds-estados-conta'),
               },
             ]}
@@ -161,7 +161,7 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
                 color: colors.fg.muted,
               }}
             >
-              <Bell size={16} />
+              <Icon name="bell" size={16} />
               {notifications.length > 0 && (
                 <span
                   style={{
@@ -239,7 +239,7 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
                 size="sm"
                 block
                 blockAlign="center"
-                icon={<Sparkles size={14} aria-hidden="true" />}
+                icon={<Icon name="sparkles" size={14} />}
                 onClick={() => onOpenPlanos?.()}
               >
                 Fazer upgrade
@@ -266,39 +266,39 @@ export default function Topbar({ expandedModule, activeItemId, onLogout, onOpenD
             {
               id: 'perfil',
               label: 'Meu perfil',
-              icon: <UserCog size={15} />,
+              icon: <Icon name="user-settings" size={15} />,
               onClick: () => navigateTo('cadastros', 'cad-pes-per'),
             },
             {
               id: 'configuracoes',
               label: 'Configurações',
-              icon: <Settings size={15} />,
+              icon: <Icon name="settings" size={15} />,
               onClick: () => navigateTo('cadastros', 'cad-pes-per'),
             },
             {
               id: 'tema',
               label: isGbMode ? 'Ativar modo claro' : 'Ativar GB Mode',
-              icon: isGbMode ? <Sun size={15} /> : <Moon size={15} />,
+              icon: isGbMode ? <Icon name="sun" size={15} /> : <Icon name="moon" size={15} />,
               divider: true,
               onClick: () => toggle(),
             },
             {
               id: 'planos',
               label: 'Planos',
-              icon: <Gem size={15} />,
+              icon: <Icon name="gem" size={15} />,
               onClick: () => onOpenPlanos?.(),
             },
             {
               id: 'ajuda',
               label: 'Central de ajuda',
-              icon: <LifeBuoy size={15} />,
+              icon: <Icon name="support" size={15} />,
               divider: true,
               onClick: () => { window.location.href = 'mailto:suporte@greenbelt-ti.com' },
             },
             {
               id: 'sair',
               label: 'Sair',
-              icon: <LogOut size={15} />,
+              icon: <Icon name="logout" size={15} />,
               danger: true,
               divider: true,
               onClick: () => onLogout?.(),

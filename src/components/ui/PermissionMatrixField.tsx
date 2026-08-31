@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Search, ChevronRight } from 'lucide-react'
+import { Icon } from './Icon'
 import { Checkbox } from './Checkbox'
 import { IconButton } from './IconButton'
 import { EmptyState } from './EmptyState'
@@ -230,7 +230,7 @@ export function PermissionMatrixField({
             background: colors.bg.input,
           }}
         >
-          <Search size={16} color={colors.fg.subtle} aria-hidden="true" style={{ flexShrink: 0 }} />
+          <Icon name="search" size={16} color={colors.fg.subtle} style={{ flexShrink: 0 }} />
           <input
             type="text"
             value={query}
@@ -399,7 +399,7 @@ function MatrixRow({
           {isAggregator ? (
             <IconButton
               icon={
-                <ChevronRight
+                <Icon name="chevron-right"
                   size={14}
                   style={{ transform: open ? 'rotate(90deg)' : 'none', transition: `transform ${t.animation.duration.fast}` }}
                 />

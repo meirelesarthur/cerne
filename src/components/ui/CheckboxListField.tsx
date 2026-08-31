@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Icon } from './Icon'
 import { Checkbox } from './Checkbox'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -95,7 +95,7 @@ export function CheckboxListField({
             border: `1px solid ${colors.border.default}`, borderRadius: t.radius.base,
             padding: '0 10px', height: t.size.controlSm,
           }}>
-            <Search size={13} color={colors.fg.subtle} aria-hidden="true" />
+            <Icon name="search" size={13} color={colors.fg.subtle} />
             <input
               type="text"
               value={query}

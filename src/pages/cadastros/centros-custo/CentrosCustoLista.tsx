@@ -1,7 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Eye, Pencil, Trash2, HelpCircle,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -185,9 +183,9 @@ export default function CentrosCustoLista({
             align="right"
             ariaLabel="Ações do centro de custo"
             items={[
-              { id: 'view',   label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(cc.id) },
-              { id: 'edit',   label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(cc.id) },
-              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteId(cc.id), danger: true, divider: true },
+              { id: 'view',   label: 'Visualizar', icon: <Icon name="view" size={13} />, onClick: () => onView(cc.id) },
+              { id: 'edit',   label: 'Editar', icon: <Icon name="edit" size={13} />, onClick: () => onEdit(cc.id) },
+              { id: 'delete', label: 'Excluir', icon: <Icon name="delete" size={13} />, onClick: () => setDeleteId(cc.id), danger: true, divider: true },
             ]}
           />
         </div>
@@ -207,10 +205,10 @@ export default function CentrosCustoLista({
             count={centros.length}
             actions={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+                <Button variant="ghost" size="sm" icon={<Icon name="help" size={14} />} onClick={() => setSaibaMais(true)}>
                   Saiba mais
                 </Button>
-                <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+                <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                   Novo Centro
                 </Button>
               </div>
@@ -314,7 +312,7 @@ export default function CentrosCustoLista({
               background: colors.accent.subtle,
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <HelpCircle size={22} color={colors.accent.default} />
+              <Icon name="help" size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">
               Centros de Custo

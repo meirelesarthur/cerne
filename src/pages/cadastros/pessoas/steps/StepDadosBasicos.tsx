@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Crown, Briefcase, Truck, ShoppingCart, KeyRound } from 'lucide-react'
+import { Icon } from '../../../../components/ui/Icon'
 import { FormField }     from '../../../../components/ui/FormField'
 import { StepHeader }    from '../../../../components/ui/StepHeader'
 import { ToggleSection } from '../../../../components/ui/ToggleSection'
@@ -9,11 +9,11 @@ import { ROLES, isPJ, type RoleKey } from '../pessoas.types'
 import { gridFields, spanHalf, gridCards, colStack, FieldGroupLabel, type StepProps } from './parts'
 
 const ROLE_ICON: Record<RoleKey, ReactNode> = {
-  proprietary: <Crown size={16} />,
-  employee:    <Briefcase size={16} />,
-  provider:    <Truck size={16} />,
-  client:      <ShoppingCart size={16} />,
-  user:        <KeyRound size={16} />,
+  proprietary: <Icon name="crown" size={16} />,
+  employee:    <Icon name="briefcase" size={16} />,
+  provider:    <Icon name="truck" size={16} />,
+  client:      <Icon name="cart" size={16} />,
+  user:        <Icon name="key" size={16} />,
 }
 
 interface Props extends StepProps {

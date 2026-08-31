@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus } from 'lucide-react'
+import { Icon } from './Icon'
 import { SearchSelect, type SearchSelectOption } from './SearchSelect'
 
 const meta: Meta<typeof SearchSelect> = {
@@ -65,7 +65,7 @@ export const ComAcaoDeRodape: Story = {
           selectedId={selectedId}
           onSelect={(o) => { setSelectedId(o.id); setQuery(o.label) }}
           onClear={() => { setSelectedId(null); setQuery('') }}
-          footerAction={{ label: 'Novo Produto', icon: <Plus size={12} />, onClick: () => {} }}
+          footerAction={{ label: 'Novo Produto', icon: <Icon name="add" size={12} />, onClick: () => {} }}
         />
       </div>
     )
@@ -84,7 +84,7 @@ export const ComAcaoNoCabecalho: Story = {
           onQueryChange={setQuery}
           options={PRODUTOS}
           onSelect={() => {}}
-          headerAction={{ label: 'Novo Produto', icon: <Plus size={12} />, onClick: () => {} }}
+          headerAction={{ label: 'Novo Produto', icon: <Icon name="add" size={12} />, onClick: () => {} }}
         />
       </div>
     )

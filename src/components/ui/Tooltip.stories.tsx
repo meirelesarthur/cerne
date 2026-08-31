@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { HelpCircle, Info, AlertCircle } from 'lucide-react'
+import { Icon } from './Icon'
 import { Tooltip } from './Tooltip'
 
 const meta: Meta<typeof Tooltip> = {
@@ -19,7 +19,7 @@ export const Default: Story = {
   render: (args) => (
     <Tooltip {...args}>
       <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-        <HelpCircle size={16} color="#9ca3af" />
+        <Icon name="help" size={16} color="#9ca3af" />
       </span>
     </Tooltip>
   ),
@@ -32,7 +32,7 @@ export const WithInfoIcon: Story = {
   render: (args) => (
     <Tooltip {...args}>
       <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-        <Info size={16} color="#2563eb" />
+        <Icon name="info" size={16} color="#2563eb" />
       </span>
     </Tooltip>
   ),
@@ -45,7 +45,7 @@ export const WithAlertIcon: Story = {
   render: (args) => (
     <Tooltip {...args}>
       <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-        <AlertCircle size={16} color="#d97706" />
+        <Icon name="alert" size={16} color="#d97706" />
       </span>
     </Tooltip>
   ),

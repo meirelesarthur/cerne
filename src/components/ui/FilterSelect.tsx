@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { Check, ChevronDown } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -98,7 +98,7 @@ export function FilterSelect({ options, value, onChange, ariaLabel, prefix }: Fi
       >
         {prefix && <span style={{ color: colors.fg.subtle }}>{prefix}</span>}
         {selected?.label ?? value}
-        <ChevronDown size={11} aria-hidden="true" />
+        <Icon name="chevron-down" size={11} />
       </button>
 
       {open && pos && createPortal(
@@ -175,7 +175,7 @@ function FilterOptionRow({
       }}
     >
       {label}
-      {active && <Check size={13} aria-hidden="true" />}
+      {active && <Icon name="check" size={13} />}
     </button>
   )
 }

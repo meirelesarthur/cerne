@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save, GitBranchPlus } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -187,15 +187,15 @@ export default function PlanoContaCadastro({
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<Icon name="arrow-left" size={14} />} disabled={submitting}>
               Voltar
             </Button>
             {onCreateDescendant && (
-              <Button variant="secondary" onClick={onCreateDescendant} icon={<GitBranchPlus size={14} />} disabled={submitting}>
+              <Button variant="secondary" onClick={onCreateDescendant} icon={<Icon name="git-branch-add" size={14} />} disabled={submitting}>
                 Criar Descendente
               </Button>
             )}
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
+            <Button variant="primary" onClick={handleSave} icon={<Icon name="save" size={14} />} loading={submitting} disabled={submitting}>
               {isEdit ? 'Salvar alterações' : 'Salvar'}
             </Button>
           </>

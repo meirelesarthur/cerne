@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react'
-import { Download, Upload } from 'lucide-react'
+import { Icon } from './Icon'
 import { Button } from './Button'
 import { FeedbackBanner } from './FeedbackBanner'
 import { FileUpload, type UploadedFile } from './FileUpload'
@@ -78,13 +78,13 @@ export function ImportDialog({
       footer={(
         <>
           <Button variant="secondary" onClick={onClose}>Fechar</Button>
-          <Button icon={<Upload size={16} />} loading={loading} disabled={!file || done} onClick={submit}>Importar arquivo</Button>
+          <Button icon={<Icon name="upload" size={16} />} loading={loading} disabled={!file || done} onClick={submit}>Importar arquivo</Button>
         </>
       )}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
         {onDownloadTemplate && (
-          <div><Button variant="ghost" icon={<Download size={16} />} onClick={onDownloadTemplate}>{templateLabel}</Button></div>
+          <div><Button variant="ghost" icon={<Icon name="download" size={16} />} onClick={onDownloadTemplate}>{templateLabel}</Button></div>
         )}
         {children}
         <FileUpload

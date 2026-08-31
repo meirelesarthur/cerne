@@ -1,8 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Eye, Pencil, Trash2,
-  Info, Calendar, CheckCircle2,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -180,9 +177,9 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             ariaLabel="Ações da safra"
             align="right"
             items={[
-              { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: () => onView(s.id) },
-              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(s.id) },
-              { id: 'delete', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => setDeleteTarget(s), danger: true, divider: true },
+              { id: 'view', label: 'Visualizar', icon: <Icon name="view" size={13} />, onClick: () => onView(s.id) },
+              { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={13} />, onClick: () => onEdit(s.id) },
+              { id: 'delete', label: 'Excluir', icon: <Icon name="delete" size={13} />, onClick: () => setDeleteTarget(s), danger: true, divider: true },
             ]}
           />
         </div>
@@ -204,12 +201,12 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
               <Button
                 variant="secondary"
                 size="sm"
-                icon={<Info size={13} />}
+                icon={<Icon name="info" size={13} />}
                 onClick={() => setShowInfo(true)}
               >
                 Saiba Mais
               </Button>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Nova Safra
               </Button>
             </div>
@@ -242,7 +239,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
           <EmptyState
             message="Nenhuma safra encontrada."
             description="Tente ajustar os filtros ou cadastre uma nova safra."
-            icon={<Calendar size={40} strokeWidth={1.5} />}
+            icon={<Icon name="calendar" size={40} />}
             action={{ label: 'Nova Safra', onClick: onNew }}
           />
         ) : (
@@ -287,7 +284,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
         size="sm"
         footer={
           <Button variant="primary" onClick={() => setShowInfo(false)}>
-            <CheckCircle2 size={14} />
+            <Icon name="success" size={14} />
             Entendido
           </Button>
         }
@@ -303,7 +300,7 @@ export default function SafrasLista({ safras, onNew, onView, onEdit, onDelete }:
             justifyContent: 'center',
             margin:         '0 auto',
           }}>
-            <Info size={22} color={t.color.feedback.info.text} />
+            <Icon name="info" size={22} color={t.color.feedback.info.text} />
           </div>
           <div style={{ fontSize: t.font.size.base, color: colors.fg.muted, lineHeight: t.font.lineHeight.relaxed, fontFamily: t.font.family.sans, display: 'flex', flexDirection: 'column', gap: t.space[2] + 2 }}>
             <p style={{ margin: 0 }}>

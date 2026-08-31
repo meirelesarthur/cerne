@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { X } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { useFocusTrap } from './useFocusTrap'
@@ -170,7 +170,7 @@ export function Modal({
                 onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'none' }}
               >
-                <X size={16} />
+                <Icon name="close" size={16} />
               </button>
             </div>
           )}

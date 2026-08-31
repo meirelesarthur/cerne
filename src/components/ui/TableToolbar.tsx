@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Search, X, SlidersHorizontal } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { IconButton } from './IconButton'
@@ -31,7 +31,7 @@ export function TableSearchInput({
         minWidth: 220,
       }}
     >
-      <Search
+      <Icon name="search"
         size={13}
         color={focused ? t.color.brand[600] : colors.fg.subtle}
         style={{ flexShrink: 0, transition: `color ${t.transition.base}` }}
@@ -51,7 +51,7 @@ export function TableSearchInput({
       />
       {value && (
         <IconButton
-          icon={<X size={11} />}
+          icon={<Icon name="close" size={11} />}
           onClick={() => onChange('')}
           aria-label="Limpar busca"
           size="xs"
@@ -90,7 +90,7 @@ export function FilterChip({ label, onRemove }: { label: string; onRemove: () =>
           color: colors.accent.default, display: 'flex', alignItems: 'center', padding: 0,
         }}
       >
-        <X size={11} />
+        <Icon name="close" size={11} />
       </button>
     </div>
   )
@@ -135,7 +135,7 @@ export function FilterButton({
         transition: `background ${t.transition.base}, border-color ${t.transition.base}, color ${t.transition.base}`,
       }}
     >
-      <SlidersHorizontal size={13} />
+      <Icon name="filter-advanced" size={13} />
       {label}
       {active && (
         <span

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Pencil, Trash2, ShieldCheck, Shield, Eye } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard } from '../../../components/ui/PageCard'
@@ -70,9 +70,9 @@ export default function PerfisAcessoLista({ perfis, onNew, onView, onEdit, onDel
       render: (p) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
           {p.visivelAoUsuario ? (
-            <ShieldCheck size={15} color={colors.accent.default} aria-hidden="true" style={{ flexShrink: 0 }} />
+            <Icon name="shield-check" size={15} color={colors.accent.default} style={{ flexShrink: 0 }} />
           ) : (
-            <Shield size={15} color={colors.fg.subtle} aria-hidden="true" style={{ flexShrink: 0 }} />
+            <Icon name="shield" size={15} color={colors.fg.subtle} style={{ flexShrink: 0 }} />
           )}
           <span style={{ fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
             {p.nome}
@@ -98,14 +98,14 @@ export default function PerfisAcessoLista({ perfis, onNew, onView, onEdit, onDel
             align="right"
             ariaLabel={`Ações do perfil ${p.nome}`}
             items={[
-              { id: 'view', label: 'Visualizar perfil', icon: <Eye size={13} />, onClick: () => onView(p.id) },
-              { id: 'edit', label: 'Editar perfil', icon: <Pencil size={13} />, onClick: () => onEdit(p.id) },
+              { id: 'view', label: 'Visualizar perfil', icon: <Icon name="view" size={13} />, onClick: () => onView(p.id) },
+              { id: 'edit', label: 'Editar perfil', icon: <Icon name="edit" size={13} />, onClick: () => onEdit(p.id) },
               ...(canDelete
                 ? [
                     {
                       id: 'delete',
                       label: 'Excluir perfil',
-                      icon: <Trash2 size={13} />,
+                      icon: <Icon name="delete" size={13} />,
                       onClick: () => setDeleteId(p.id),
                       danger: true,
                       divider: true,
@@ -128,7 +128,7 @@ export default function PerfisAcessoLista({ perfis, onNew, onView, onEdit, onDel
           title="Perfis de Acesso"
           count={perfis.length}
           actions={
-            <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+            <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
               Novo(a)
             </Button>
           }

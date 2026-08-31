@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRightLeft, GripVertical, MoreVertical } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Badge } from './Badge'
@@ -72,7 +72,7 @@ export function EntityBoard({ groups, onMove, onSelect, emptyText = 'Nenhuma est
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: t.space[2] }}>
                     <Tooltip label="Arraste para outro setor ou use o menu de ações.">
-                      <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center', minHeight: t.size.iconBtn.sm, color: colors.fg.subtle, cursor: 'grab' }}><GripVertical size={t.icon.xs} /></span>
+                      <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center', minHeight: t.size.iconBtn.sm, color: colors.fg.subtle, cursor: 'grab' }}><Icon name="drag-handle" size={t.icon.xs} /></span>
                     </Tooltip>
                     <button type="button" className="gb-focusable" onClick={() => onSelect?.(entity)} style={{ flex: 1, minWidth: 0, border: 0, padding: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
                       <span style={{ display: 'block', color: colors.fg.default, fontFamily: t.font.family.sans, fontSize: t.font.size.base, fontWeight: t.font.weight.semibold }}>{entity.label}</span>
@@ -80,8 +80,8 @@ export function EntityBoard({ groups, onMove, onSelect, emptyText = 'Nenhuma est
                     </button>
                     <DropdownMenu
                       ariaLabel={`Ações de ${entity.label}`}
-                      triggerIcon={<MoreVertical size={t.icon.xs} />}
-                      items={groups.filter((candidate) => candidate.id !== group.id).map((candidate) => ({ id: candidate.id, label: `Mover para ${candidate.label}`, icon: <ArrowRightLeft size={14} />, onClick: () => onMove(entity.id, group.id, candidate.id) }))}
+                      triggerIcon={<Icon name="more-vertical" size={t.icon.xs} />}
+                      items={groups.filter((candidate) => candidate.id !== group.id).map((candidate) => ({ id: candidate.id, label: `Mover para ${candidate.label}`, icon: <Icon name="transfer" size={14} />, onClick: () => onMove(entity.id, group.id, candidate.id) }))}
                     />
                   </div>
                   {capacityLabel && (

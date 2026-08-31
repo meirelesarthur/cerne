@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react'
-import { RotateCcw } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { t } from '../../../design/tokens'
 import { useTheme } from '../../../context/ThemeContext'
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
@@ -178,7 +178,7 @@ export function WeekCanvas({
           )}
         </div>
         {editable && (
-          <Button variant="secondary" size="sm" icon={<RotateCcw size={12} />} onClick={() => setResetConfirmOpen(true)}>
+          <Button variant="secondary" size="sm" icon={<Icon name="rotate-back" size={12} />} onClick={() => setResetConfirmOpen(true)}>
             Reiniciar ciclo
           </Button>
         )}

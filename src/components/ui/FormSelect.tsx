@@ -1,5 +1,5 @@
 import React from 'react'
-import { HelpCircle, ChevronDown } from 'lucide-react'
+import { Icon } from './Icon'
 import { Tooltip } from './Tooltip'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
@@ -66,7 +66,7 @@ export function FormSelect({
           {hint && (
             <Tooltip label={hint}>
               <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-                <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
+                <Icon name="help" size={t.icon.xs} color={t.color.neutral[400]} />
               </span>
             </Tooltip>
           )}
@@ -134,7 +134,7 @@ export function FormSelect({
             </option>
           ))}
         </select>
-        <ChevronDown
+        <Icon name="chevron-down"
           size={t.icon.sm}
           color={t.color.neutral[400]}
           style={{

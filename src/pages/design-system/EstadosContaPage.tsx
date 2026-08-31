@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Eye, Lock, Plus, Trash2 } from 'lucide-react'
+import { Icon } from '../../components/ui/Icon'
 import { PermissionGuard, PermissionProvider, type Role } from '../../auth'
 import { PlanProvider, type AccountStatus } from '../../auth/PlanContext'
 import { AccountStatusBanner } from '../../components/ui/AccountStatusBanner'
@@ -175,7 +175,7 @@ export default function EstadosContaPage() {
                     >
                       <Button
                         variant="secondary"
-                        icon={<Download size={16} aria-hidden="true" />}
+                        icon={<Icon name="download" size={16} />}
                         onClick={() => show('Exportação simulada iniciada.', 'success')}
                       >
                         Exportar CSV
@@ -222,7 +222,7 @@ export default function EstadosContaPage() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: t.space[2] }}>
                     {/* Oculta por completo quando não permitido — sem fallback */}
                     <PermissionGuard need="fazenda.view">
-                      <Button variant="secondary" icon={<Eye size={16} aria-hidden="true" />}>
+                      <Button variant="secondary" icon={<Icon name="view" size={16} />}>
                         Ver Fazenda
                       </Button>
                     </PermissionGuard>
@@ -231,12 +231,12 @@ export default function EstadosContaPage() {
                     <PermissionGuard
                       need="fazenda.create"
                       fallback={
-                        <Button variant="secondary" disabled icon={<Lock size={16} aria-hidden="true" />}>
+                        <Button variant="secondary" disabled icon={<Icon name="lock" size={16} />}>
                           Criar Fazenda
                         </Button>
                       }
                     >
-                      <Button variant="secondary" icon={<Plus size={16} aria-hidden="true" />}>
+                      <Button variant="secondary" icon={<Icon name="add" size={16} />}>
                         Criar Fazenda
                       </Button>
                     </PermissionGuard>
@@ -244,12 +244,12 @@ export default function EstadosContaPage() {
                     <PermissionGuard
                       need="fazenda.delete"
                       fallback={
-                        <Button variant="destructive" disabled icon={<Lock size={16} aria-hidden="true" />}>
+                        <Button variant="destructive" disabled icon={<Icon name="lock" size={16} />}>
                           Excluir Fazenda…
                         </Button>
                       }
                     >
-                      <Button variant="destructive" icon={<Trash2 size={16} aria-hidden="true" />}>
+                      <Button variant="destructive" icon={<Icon name="delete" size={16} />}>
                         Excluir Fazenda…
                       </Button>
                     </PermissionGuard>
@@ -257,12 +257,12 @@ export default function EstadosContaPage() {
                     <PermissionGuard
                       need="financeiro.export"
                       fallback={
-                        <Button variant="secondary" disabled icon={<Lock size={16} aria-hidden="true" />}>
+                        <Button variant="secondary" disabled icon={<Icon name="lock" size={16} />}>
                           Exportar Financeiro
                         </Button>
                       }
                     >
-                      <Button variant="secondary" icon={<Download size={16} aria-hidden="true" />}>
+                      <Button variant="secondary" icon={<Icon name="download" size={16} />}>
                         Exportar Financeiro
                       </Button>
                     </PermissionGuard>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Download, FileSpreadsheet, Search } from 'lucide-react'
+import { Icon } from './Icon'
 import { Button } from './Button'
 import type { Column } from './DataTable'
 import { FeedbackBanner } from './FeedbackBanner'
@@ -53,7 +53,7 @@ export function ReportWorkspace<T extends object>({
     <>
       <Button
         variant="secondary"
-        icon={<Download size={t.icon.sm} />}
+        icon={<Icon name="download" size={t.icon.sm} />}
         disabled={!hasPreview || loading}
         onClick={() => onExport('PDF')}
       >
@@ -61,7 +61,7 @@ export function ReportWorkspace<T extends object>({
       </Button>
       <Button
         variant="secondary"
-        icon={<FileSpreadsheet size={t.icon.sm} />}
+        icon={<Icon name="spreadsheet" size={t.icon.sm} />}
         disabled={!hasPreview || loading}
         onClick={() => onExport('Excel')}
       >
@@ -82,7 +82,7 @@ export function ReportWorkspace<T extends object>({
             {filters}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: t.space[4] }}>
-            <Button icon={<Search size={t.icon.sm} />} loading={loading} onClick={onPreview}>
+            <Button icon={<Icon name="search" size={t.icon.sm} />} loading={loading} onClick={onPreview}>
               {previewLabel}
             </Button>
           </div>

@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard } from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -23,10 +23,10 @@ export default function PerfilAcessoVisualizacao({ perfil, onBack, onEdit }: Per
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>
+            <Button variant="secondary" onClick={onBack} icon={<Icon name="arrow-left" size={14} />}>
               Voltar
             </Button>
-            <Button variant="primary" onClick={onEdit} icon={<Pencil size={14} />}>
+            <Button variant="primary" onClick={onEdit} icon={<Icon name="edit" size={14} />}>
               Editar
             </Button>
           </>

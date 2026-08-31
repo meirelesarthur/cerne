@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
@@ -51,8 +51,8 @@ export default function PlanejamentoPecuarioPage() {
     { key: 'unitPrice', label: 'Vl. unit./ha', width: 150, align: 'right', render: (row) => row.unitPrice ? formatCurrency(row.unitPrice) : '—' },
     { key: 'total', label: 'Vl. total/ha', width: 150, align: 'right', render: (row) => row.quantity && row.unitPrice ? formatCurrency(row.quantity * row.unitPrice) : '—' },
     { key: 'actions', label: 'Ações', width: 72, align: 'right', sortable: false, render: (row) => row.kind === 'species' || row.kind === 'operation' ? null : <DropdownMenu items={[
-      { id: 'edit', label: 'Editar', icon: <Pencil size={15} />, onClick: () => openEditor(row) },
-      { id: 'delete', label: 'Excluir…', icon: <Trash2 size={15} />, danger: true, divider: true, onClick: () => setDeleteTarget(row) },
+      { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={15} />, onClick: () => openEditor(row) },
+      { id: 'delete', label: 'Excluir…', icon: <Icon name="delete" size={15} />, danger: true, divider: true, onClick: () => setDeleteTarget(row) },
     ]} /> },
   ]
 
@@ -70,7 +70,7 @@ export default function PlanejamentoPecuarioPage() {
   return (
     <PageContainer style={{ paddingBottom: 0 }}>
       <PageCard>
-        <PageHeader title="Planejamento Pecuário" description="Custos e insumos por espécie, categoria e operação." actions={<Button icon={<Plus size={16} />} onClick={() => openEditor()}>Adicionar Item</Button>} />
+        <PageHeader title="Planejamento Pecuário" description="Custos e insumos por espécie, categoria e operação." actions={<Button icon={<Icon name="add" size={16} />} onClick={() => openEditor()}>Adicionar Item</Button>} />
         <DataTable columns={columns} data={rows} keyField="id" getChildren={(row) => row.children} />
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: t.space[4] }}>
           <Badge label={`Total planejado: ${formatCurrency(total)}/ha`} variant="success" />

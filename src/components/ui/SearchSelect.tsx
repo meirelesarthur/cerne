@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useId, useCallback } from 'react'
-import { Search, X, ChevronDown, HelpCircle, Check } from 'lucide-react'
+import { Icon } from './Icon'
 import { Tooltip } from './Tooltip'
 import { IconButton } from './IconButton'
 import { t } from '../../design/tokens'
@@ -148,7 +148,7 @@ export function SearchSelect({
             {hint && (
               <Tooltip label={hint}>
                 <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-                  <HelpCircle size={12} color={t.color.neutral[400]} />
+                  <Icon name="help" size={12} color={t.color.neutral[400]} />
                 </span>
               </Tooltip>
             )}
@@ -177,7 +177,7 @@ export function SearchSelect({
           cursor: disabled ? 'not-allowed' : undefined,
           transition: `border-color ${t.transition.base}`,
         }}>
-          <Search size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} aria-hidden="true" />
+          <Icon name="search" size={13} color={open ? t.color.brand[600] : colors.fg.subtle} style={{ flexShrink: 0 }} />
           <input
             id={id}
             name={name}
@@ -206,13 +206,13 @@ export function SearchSelect({
           />
           {query && onClear && !disabled && (
             <IconButton
-              icon={<X size={11} />}
+              icon={<Icon name="close" size={11} />}
               aria-label="Limpar seleção"
               onClick={() => { onClear(); setOpen(false) }}
               size="xs"
             />
           )}
-          <ChevronDown size={12} color={colors.fg.subtle} aria-hidden="true" />
+          <Icon name="chevron-down" size={12} color={colors.fg.subtle} />
         </div>
 
         {open && (
@@ -350,7 +350,7 @@ function OptionRow({ option, optionId, isSelected, isActive, onSelect, colors, d
       </span>
 
       {option.icon && isSelected && (
-        <Check size={15} color={colors.accent.default} style={{ flexShrink: 0 }} aria-hidden="true" />
+        <Icon name="check" size={15} color={colors.accent.default} style={{ flexShrink: 0 }} />
       )}
     </button>
   )

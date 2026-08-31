@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Save, MapPin } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer }  from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { Button }         from '../../../components/ui/Button'
@@ -87,7 +87,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
             </Button>
             <Button
               variant="primary"
-              icon={<Save size={13} />}
+              icon={<Icon name="save" size={13} />}
               onClick={handleSubmit}
               loading={submitting}
               disabled={!isValid || submitting}
@@ -118,7 +118,7 @@ export default function EnderecoForm({ mode, parentNode, initialData, onBack, on
             borderRadius: t.radius.base,
             border: `1px solid ${tipoColor.text}22`,
           }}>
-            <MapPin size={14} color={tipoColor.text} />
+            <Icon name="location" size={14} color={tipoColor.text} />
             <span style={{
               fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold,
               color: tipoColor.text, fontFamily: t.font.family.sans,

@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge }          from '../../../components/ui/Badge'
 import { Button }         from '../../../components/ui/Button'
 import { DetailGrid }     from '../../../components/ui/DetailGrid'
@@ -47,8 +47,8 @@ export default function ContaBancariaDetalhe({ conta, allContas, onBack, onEdit 
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={onBack} icon={<ArrowLeft size={14} />}>Voltar</Button>
-            <Button variant="primary" onClick={onEdit} icon={<Pencil size={14} />}>Editar</Button>
+            <Button variant="secondary" onClick={onBack} icon={<Icon name="arrow-left" size={14} />}>Voltar</Button>
+            <Button variant="primary" onClick={onEdit} icon={<Icon name="edit" size={14} />}>Editar</Button>
           </>
         }
       >

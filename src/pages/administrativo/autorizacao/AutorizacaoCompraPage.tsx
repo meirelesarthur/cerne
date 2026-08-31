@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Eye, ShieldCheck } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Badge, type BadgeVariant } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { DataTable, type Column } from '../../../components/ui/DataTable'
@@ -100,7 +100,7 @@ export default function AutorizacaoCompraPage() {
       <DropdownMenu items={[{
         id: 'open',
         label: request.status === 'approval' ? 'Revisar e autorizar' : request.status === 'authorized' ? 'Dar ciência' : 'Ver detalhes',
-        icon: request.status === 'approval' ? <ShieldCheck size={15} /> : <Eye size={15} />,
+        icon: request.status === 'approval' ? <Icon name="shield-check" size={15} /> : <Icon name="view" size={15} />,
         onClick: () => setSelected(request),
       }]} />
     ) },

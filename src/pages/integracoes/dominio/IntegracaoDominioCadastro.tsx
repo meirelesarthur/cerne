@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Save, Wifi } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { AsyncSearchSelect } from '../../../components/ui/AsyncSearchSelect'
 import { Button } from '../../../components/ui/Button'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
@@ -71,10 +71,10 @@ export default function IntegracaoDominioCadastro({
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />}>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<Icon name="arrow-left" size={14} />}>
               Cancelar
             </Button>
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} disabled={connection !== 'success'}>
+            <Button variant="primary" onClick={handleSave} icon={<Icon name="save" size={14} />} disabled={connection !== 'success'}>
               {isEdit ? 'Salvar alterações' : 'Salvar Integração'}
             </Button>
           </>
@@ -122,7 +122,7 @@ export default function IntegracaoDominioCadastro({
               <ToggleSwitch checked={enabled} onChange={setEnabled} />
             </div>
             <div style={{ marginTop: t.space[4] }}>
-              <Button variant="secondary" icon={<Wifi size={16} />} loading={testing} disabled={!issuer || !accountant || token.length < 10} onClick={testConnection}>
+              <Button variant="secondary" icon={<Icon name="wifi" size={16} />} loading={testing} disabled={!issuer || !accountant || token.length < 10} onClick={testConnection}>
                 Testar Conexão
               </Button>
             </div>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Pencil, Trash2, Eye } from 'lucide-react'
+import { Icon } from './Icon'
 import { DropdownMenu } from './DropdownMenu'
 
 const meta: Meta<typeof DropdownMenu> = {
@@ -15,9 +15,9 @@ type Story = StoryObj<typeof DropdownMenu>
 export const Default: Story = {
   args: {
     items: [
-      { id: 'view', label: 'Visualizar', icon: <Eye size={13} />, onClick: () => {} },
-      { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => {} },
-      { id: 'del', label: 'Excluir', icon: <Trash2 size={13} />, onClick: () => {}, danger: true, divider: true },
+      { id: 'view', label: 'Visualizar', icon: <Icon name="view" size={13} />, onClick: () => {} },
+      { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={13} />, onClick: () => {} },
+      { id: 'del', label: 'Excluir', icon: <Icon name="delete" size={13} />, onClick: () => {}, danger: true, divider: true },
     ],
   },
 }

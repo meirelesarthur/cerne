@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Pencil, Trash2, Eye, Download } from 'lucide-react'
+import { Icon } from './Icon'
 import { IconButton } from './IconButton'
 
 const meta: Meta<typeof IconButton> = {
@@ -20,7 +20,7 @@ type Story = StoryObj<typeof IconButton>
 
 export const Default: Story = {
   args: {
-    icon: <Pencil />,
+    icon: <Icon name="edit" />,
     'aria-label': 'Editar',
     tooltip: 'Editar',
   },
@@ -32,9 +32,9 @@ export const Variantes: Story = {
   name: 'Variantes (ghost, outline, subtle)',
   render: () => (
     <div style={{ display: 'flex', gap: 12 }}>
-      <IconButton icon={<Eye />} aria-label="Visualizar" variant="ghost" tooltip="Ghost" />
-      <IconButton icon={<Eye />} aria-label="Visualizar" variant="outline" tooltip="Outline" />
-      <IconButton icon={<Eye />} aria-label="Visualizar" variant="subtle" tooltip="Subtle" />
+      <IconButton icon={<Icon name="view" />} aria-label="Visualizar" variant="ghost" tooltip="Ghost" />
+      <IconButton icon={<Icon name="view" />} aria-label="Visualizar" variant="outline" tooltip="Outline" />
+      <IconButton icon={<Icon name="view" />} aria-label="Visualizar" variant="subtle" tooltip="Subtle" />
     </div>
   ),
 }
@@ -45,9 +45,9 @@ export const Tamanhos: Story = {
   name: 'Tamanhos (xs, sm, md)',
   render: () => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <IconButton icon={<Download />} aria-label="Exportar" size="xs" tooltip="xs" />
-      <IconButton icon={<Download />} aria-label="Exportar" size="sm" tooltip="sm" />
-      <IconButton icon={<Download />} aria-label="Exportar" size="md" tooltip="md" />
+      <IconButton icon={<Icon name="download" />} aria-label="Exportar" size="xs" tooltip="xs" />
+      <IconButton icon={<Icon name="download" />} aria-label="Exportar" size="sm" tooltip="sm" />
+      <IconButton icon={<Icon name="download" />} aria-label="Exportar" size="md" tooltip="md" />
     </div>
   ),
 }
@@ -58,9 +58,9 @@ export const AcoesDeLinha: Story = {
   name: 'Ações de linha (padrão de tabela)',
   render: () => (
     <div style={{ display: 'flex', gap: 6 }}>
-      <IconButton icon={<Eye />} aria-label="Visualizar fazenda" tooltip="Visualizar" />
-      <IconButton icon={<Pencil />} aria-label="Editar fazenda" tooltip="Editar" />
-      <IconButton icon={<Trash2 />} aria-label="Excluir fazenda" tooltip="Excluir" danger />
+      <IconButton icon={<Icon name="view" />} aria-label="Visualizar fazenda" tooltip="Visualizar" />
+      <IconButton icon={<Icon name="edit" />} aria-label="Editar fazenda" tooltip="Editar" />
+      <IconButton icon={<Icon name="delete" />} aria-label="Excluir fazenda" tooltip="Excluir" danger />
     </div>
   ),
 }
@@ -69,7 +69,7 @@ export const AcoesDeLinha: Story = {
 
 export const Desabilitado: Story = {
   args: {
-    icon: <Trash2 />,
+    icon: <Icon name="delete" />,
     'aria-label': 'Excluir',
     disabled: true,
     danger: true,

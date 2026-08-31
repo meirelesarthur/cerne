@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { PieChart } from 'lucide-react'
+import { type IconName } from './Icon'
 import { DonutChart } from './DonutChart'
 import { ChartCard } from './ChartCard'
 
@@ -108,7 +108,7 @@ export const DentroDoChartCard: Story = {
   name: 'Dentro do ChartCard',
   render: () => (
     <div style={{ maxWidth: 440 }}>
-      <ChartCard icon={PieChart} title="Distribuição de Custos — Safra 24/25">
+      <ChartCard icon={'chart-pie'} title="Distribuição de Custos — Safra 24/25">
         <DonutChart
           data={[
             { label: 'Insumos', value: 54000 },

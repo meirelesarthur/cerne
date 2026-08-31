@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus, Download } from 'lucide-react'
+import { Icon } from './Icon'
 import { PageHeader } from './PageHeader'
 
 const meta: Meta<typeof PageHeader> = {
@@ -62,7 +62,7 @@ export const WithActions: Story = {
             color: '#1a1a1a',
           }}
         >
-          <Download size={14} />
+          <Icon name="download" size={14} />
           Exportar
         </button>
         <button
@@ -80,7 +80,7 @@ export const WithActions: Story = {
             color: 'white',
           }}
         >
-          <Plus size={14} />
+          <Icon name="add" size={14} />
           Nova Fazenda
         </button>
       </>

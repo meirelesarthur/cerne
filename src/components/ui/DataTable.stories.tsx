@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Pencil, Eye } from 'lucide-react'
+import { Icon } from './Icon'
 import { DataTable, type Column } from './DataTable'
 import { Badge } from './Badge'
 import { Pagination } from './Pagination'
@@ -33,8 +33,8 @@ const columns: Column<Fazenda>[] = [
     align: 'center',
     render: () => (
       <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-        <Eye size={14} color="#9ca3af" style={{ cursor: 'pointer' }} />
-        <Pencil size={14} color="#9ca3af" style={{ cursor: 'pointer' }} />
+        <Icon name="view" size={14} color="#9ca3af" style={{ cursor: 'pointer' }} />
+        <Icon name="edit" size={14} color="#9ca3af" style={{ cursor: 'pointer' }} />
       </div>
     ),
   },

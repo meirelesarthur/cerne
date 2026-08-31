@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Pencil, Trash2, Eye, HelpCircle, Users } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }        from '../../../components/ui/PageCard'
 import { PageHeader }      from '../../../components/ui/PageHeader'
@@ -172,10 +172,10 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
             align="right"
             ariaLabel={`Ações de ${p.name}`}
             items={[
-              { id: 'view', label: 'Ver detalhes', icon: <Eye size={13} />, onClick: () => onView(p.id) },
-              { id: 'edit', label: 'Editar', icon: <Pencil size={13} />, onClick: () => onEdit(p.id) },
+              { id: 'view', label: 'Ver detalhes', icon: <Icon name="view" size={13} />, onClick: () => onView(p.id) },
+              { id: 'edit', label: 'Editar', icon: <Icon name="edit" size={13} />, onClick: () => onEdit(p.id) },
               ...(canDelete
-                ? [{ id: 'delete', label: 'Excluir…', icon: <Trash2 size={13} />, onClick: () => setDeleteId(p.id), danger: true, divider: true }]
+                ? [{ id: 'delete', label: 'Excluir…', icon: <Icon name="delete" size={13} />, onClick: () => setDeleteId(p.id), danger: true, divider: true }]
                 : []),
             ]}
           />
@@ -194,10 +194,10 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
           count={pessoas.length}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-              <Button variant="ghost" size="sm" icon={<HelpCircle size={14} />} onClick={() => setSaibaMais(true)}>
+              <Button variant="ghost" size="sm" icon={<Icon name="help" size={14} />} onClick={() => setSaibaMais(true)}>
                 Saiba mais
               </Button>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Nova Pessoa
               </Button>
             </div>
@@ -273,7 +273,7 @@ export default function PessoasLista({ pessoas, onNew, onEdit, onView, onDelete 
               width: t.space[10], height: t.space[10], borderRadius: t.radius.xl,
               background: colors.accent.subtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <Users size={22} color={colors.accent.default} />
+              <Icon name="users" size={22} color={colors.accent.default} />
             </div>
             <Heading level={2} size="xl" weight="bold">Pessoas Unificado</Heading>
           </div>

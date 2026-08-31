@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { IconButton } from './IconButton'
@@ -67,7 +67,7 @@ export function FormPageHeader({
       <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], flexShrink: 0 }}>
         {actions}
         <IconButton
-          icon={<X size={20} strokeWidth={2} />}
+          icon={<Icon name="close" size={20} />}
           onClick={onBack}
           aria-label={closeLabel}
         />

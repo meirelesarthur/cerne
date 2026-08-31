@@ -1,4 +1,4 @@
-import { ChevronRight, PanelLeftClose } from 'lucide-react'
+import { Icon } from '../ui/Icon'
 import logoFull from '../../assets/Logo.svg'
 import logoFullWhite from '../../assets/Logo-white.svg'
 import logoMin from '../../assets/logo-min.svg'
@@ -90,7 +90,7 @@ export default function Sidebar({
                   b.style.color = colors.fg.subtle
                 }}
               >
-                <PanelLeftClose size={15} strokeWidth={1.8} />
+                <Icon name="sidebar-collapse" size={15} />
               </button>
             </>
         }
@@ -99,7 +99,7 @@ export default function Sidebar({
       {/* Navigation */}
       <div className="nav-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {modules.map((module) => {
-          const Icon = module.icon
+          const icon = module.icon
           const isActive = activeModuleId === module.id
           const isExpanded = expandedModuleId === module.id
           const highlighted = isActive || isExpanded
@@ -113,7 +113,7 @@ export default function Sidebar({
                   onClick={(e) => { e.stopPropagation(); onModuleClick(module) }}
                   style={{ marginBottom: 2 }}
                 >
-                  <Icon size={16} />
+                  <Icon name={icon} size={16} />
                 </button>
               </Tooltip>
             )
@@ -128,12 +128,12 @@ export default function Sidebar({
               onClick={(e) => { e.stopPropagation(); onModuleClick(module) }}
               style={{ marginBottom: 2 }}
             >
-              <Icon size={15} style={{ flexShrink: 0, minWidth: 15 }} />
+              <Icon name={icon} size={15} style={{ minWidth: 15 }} />
               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {module.label}
               </span>
               {(module.groups || module.flatItems) && (
-                <ChevronRight
+                <Icon name="chevron-right"
                   size={13}
                   style={{
                     flexShrink: 0,

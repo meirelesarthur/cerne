@@ -1,5 +1,5 @@
 import React from 'react'
-import { Lock, Sparkles } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -66,9 +66,8 @@ export function UpgradePrompt({
           fontFamily: t.font.family.sans,
         }}
       >
-        <Lock
+        <Icon name="lock"
           size={14}
-          aria-hidden="true"
           style={{ color: colors.accent.default, flexShrink: 0 }}
         />
         <span
@@ -126,7 +125,7 @@ export function UpgradePrompt({
           flexShrink:     0,
         }}
       >
-        <Sparkles size={22} aria-hidden="true" />
+        <Icon name="sparkles" size={22} />
       </div>
 
       {/* Título */}
@@ -170,7 +169,7 @@ export function UpgradePrompt({
             color:        colors.accent.default,
           }}
         >
-          <Lock size={10} aria-hidden="true" />
+          <Icon name="lock" size={10} />
           A partir do plano {PLAN_LABEL[requiredPlan]}
         </div>
       )}
@@ -181,7 +180,7 @@ export function UpgradePrompt({
           variant="primary"
           size="md"
           onClick={onUpgrade}
-          icon={<Sparkles size={14} aria-hidden="true" />}
+          icon={<Icon name="sparkles" size={14} />}
           style={{ marginTop: t.space[1] }}
         >
           Fazer upgrade

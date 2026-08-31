@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
-import { CloudRain, Droplets, Filter, X, Sun, Cloud, CloudSun } from 'lucide-react'
+import { Icon, type IconName } from '../../components/ui/Icon'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
@@ -66,10 +66,10 @@ const FORECAST = [
 // ─── Weather icon ─────────────────────────────────────────────────────────────
 
 function WeatherIcon({ condition, size = 16, color }: { condition: string; size?: number; color: string }) {
-  if (condition === 'rain') return <CloudRain size={size} color={color} />
-  if (condition === 'cloudy') return <Cloud size={size} color={color} />
-  if (condition === 'partly') return <CloudSun size={size} color={color} />
-  return <Sun size={size} color={color} />
+  if (condition === 'rain') return <Icon name="rain" size={size} color={color} />
+  if (condition === 'cloudy') return <Icon name="cloud" size={size} color={color} />
+  if (condition === 'partly') return <Icon name="cloud-sun" size={size} color={color} />
+  return <Icon name="sun" size={size} color={color} />
 }
 
 // ─── Bar Chart wrapper ────────────────────────────────────────────────────────
@@ -248,7 +248,7 @@ export default function Pluviometria() {
                 </span>
               )}
               <DashboardAnalysis input={analise} fonte="Open-Meteo · Prata (MG)" />
-              <Button icon={<Filter size={t.icon.xs} />} size="md" onClick={() => setFilterOpen(true)}>
+              <Button icon={<Icon name="filter" size={t.icon.xs} />} size="md" onClick={() => setFilterOpen(true)}>
                 Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
               </Button>
             </>
@@ -391,7 +391,7 @@ export default function Pluviometria() {
                             alignItems: 'center',
                             gap: 1,
                           }}>
-                            <Droplets size={8} />
+                            <Icon name="water" size={8} />
                             {f.rain}
                           </span>
                         ) : (
@@ -461,7 +461,7 @@ export default function Pluviometria() {
                 >
                   {area}
                   <IconButton
-                    icon={<X size={10} />}
+                    icon={<Icon name="close" size={10} />}
                     aria-label={`Remover ${area}`}
                     onClick={() => removeArea(area)}
                     size="xs"

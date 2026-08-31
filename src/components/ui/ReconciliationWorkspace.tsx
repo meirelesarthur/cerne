@@ -1,4 +1,4 @@
-import { ArrowRight, Link2, Plus } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Badge } from './Badge'
@@ -57,11 +57,11 @@ export function ReconciliationWorkspace({ bankItems, systemItems, onLink, onCrea
         <h2 id="bank-movements-title" style={{ margin: `0 0 ${t.space[3]}px`, color: colors.fg.default, fontFamily: t.font.family.sans, fontSize: t.font.size.md, fontWeight: t.font.weight.semibold }}>Arquivo do banco</h2>
         <div style={{ display: 'grid', gap: t.space[3] }}>
           {bankItems.length === 0 ? <EmptyState message="Nenhum movimento bancário pendente." /> : bankItems.map((item) => (
-            <MovementCard key={item.id} item={item} actions={item.status === 'pending' || !item.status ? <><Button variant="ghost" size="sm" icon={<Link2 size={14} />} onClick={() => onLink(item)}>Vincular título</Button><Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={() => onCreate(item)}>Criar movimento</Button></> : undefined} />
+            <MovementCard key={item.id} item={item} actions={item.status === 'pending' || !item.status ? <><Button variant="ghost" size="sm" icon={<Icon name="link" size={14} />} onClick={() => onLink(item)}>Vincular título</Button><Button variant="secondary" size="sm" icon={<Icon name="add" size={14} />} onClick={() => onCreate(item)}>Criar movimento</Button></> : undefined} />
           ))}
         </div>
       </section>
-      <div aria-hidden="true" className="rotate-90 xl:rotate-0" style={{ width: t.size.iconBtn.md, height: t.size.iconBtn.md, marginTop: t.space[8], borderRadius: t.radius.full, display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.accent.subtle, color: colors.accent.default }}><ArrowRight size={t.icon.xs} /></div>
+      <div aria-hidden="true" className="rotate-90 xl:rotate-0" style={{ width: t.size.iconBtn.md, height: t.size.iconBtn.md, marginTop: t.space[8], borderRadius: t.radius.full, display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.accent.subtle, color: colors.accent.default }}><Icon name="arrow-right" size={t.icon.xs} /></div>
       <section aria-labelledby="system-movements-title">
         <h2 id="system-movements-title" style={{ margin: `0 0 ${t.space[3]}px`, color: colors.fg.default, fontFamily: t.font.family.sans, fontSize: t.font.size.md, fontWeight: t.font.weight.semibold }}>Movimentos do sistema</h2>
         <div style={{ display: 'grid', gap: t.space[3] }}>

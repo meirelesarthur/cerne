@@ -1,5 +1,5 @@
 import React from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Button } from './Button'
@@ -66,7 +66,7 @@ export function RepeaterList<T>({
           </div>
           <div style={{ flexShrink: 0, paddingTop: align === 'start' ? t.space[5] + 2 : 0 }}>
             <IconButton
-              icon={<Trash2 size={15} />}
+              icon={<Icon name="delete" size={15} />}
               onClick={() => onRemove(index)}
               aria-label={removeLabel}
               variant="ghost"
@@ -81,7 +81,7 @@ export function RepeaterList<T>({
         <Button
           variant="ghost"
           size="sm"
-          icon={<Plus size={14} />}
+          icon={<Icon name="add" size={14} />}
           onClick={onAdd}
           disabled={disabled}
           style={{ color: colors.accent.default }}

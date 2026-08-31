@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { Button } from './Button'
 import { InterpretationLetter } from './InterpretationLetter'
@@ -50,7 +50,7 @@ export function DashboardAnalysis({ input, carta, fonte }: DashboardAnalysisProp
       <Button
         variant="secondary"
         size="md"
-        icon={<Sparkles size={t.icon.xs} />}
+        icon={<Icon name="sparkles" size={t.icon.xs} />}
         onClick={() => setOpen(true)}
         title="Leitura assistida do que os gráficos estão mostrando"
       >

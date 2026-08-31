@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useRef, useEffect, useId, useCallback } from 'react'
-import { Calendar, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
+import { Icon } from './Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Tooltip } from './Tooltip'
@@ -265,7 +265,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           }}
           className="gb-focusable"
         >
-          <ChevronLeft size={t.icon.sm} />
+          <Icon name="chevron-left" size={t.icon.sm} />
         </button>
 
         <span style={{
@@ -289,7 +289,7 @@ function CalendarPopover({ year, month, onPrev, onNext, children }: CalendarPopo
           }}
           className="gb-focusable"
         >
-          <ChevronRight size={t.icon.sm} />
+          <Icon name="chevron-right" size={t.icon.sm} />
         </button>
       </div>
 
@@ -363,10 +363,9 @@ function TriggerField({ id, displayValue, placeholder, open, disabled, isError, 
       }}>
         {displayValue || placeholder}
       </span>
-      <Calendar
+      <Icon name="calendar"
         size={t.icon.sm}
         color={open ? colors.accent.default : colors.fg.subtle}
-        aria-hidden="true"
         style={{ flexShrink: 0, transition: `color ${t.transition.base}` }}
       />
     </button>
@@ -405,7 +404,7 @@ function FieldLabel({ htmlFor, label, required, hint, colors }: FieldLabelProps)
       {hint && (
         <Tooltip label={hint}>
           <span style={{ display: 'flex', alignItems: 'center', cursor: 'default' }}>
-            <HelpCircle size={t.icon.xs} color={t.color.neutral[400]} />
+            <Icon name="help" size={t.icon.xs} color={t.color.neutral[400]} />
           </span>
         </Tooltip>
       )}

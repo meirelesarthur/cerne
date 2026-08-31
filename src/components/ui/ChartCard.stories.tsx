@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { TrendingUp, Droplets } from 'lucide-react'
+import { type IconName } from './Icon'
 import { ChartCard } from './ChartCard'
 import { LineChart } from './LineChart'
 import { t } from '../../design/tokens'
@@ -27,7 +27,7 @@ const MESES = ['Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan']
 
 export const Default: Story = {
   render: () => (
-    <ChartCard icon={TrendingUp} title="Evolução de Receita">
+    <ChartCard icon={'trend-up'} title="Evolução de Receita">
       <LineChart
         labels={MESES}
         series={[{ name: 'Receita', data: [42000, 48000, 51000, 46000, 55000, 62000] }]}
@@ -46,7 +46,7 @@ export const ComAcao: Story = {
   name: 'Com ação no header',
   render: () => (
     <ChartCard
-      icon={Droplets}
+      icon={'water'}
       title="Volume Pluviométrico"
       action={
         <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[500] }}>Últimos 6 meses</span>

@@ -1,8 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Plus, Pencil, Trash2, Package, Eye,
-  Download,
-} from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageHeader }      from '../../../components/ui/PageHeader'
 import { PageContainer }   from '../../../components/ui/PageContainer'
 import { PageCard }         from '../../../components/ui/PageCard'
@@ -268,9 +265,9 @@ export default function ProdutosLista({
       sortable: false,
       render: prod => (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }} onClick={e => e.stopPropagation()}>
-          <IconButton icon={<Eye size={t.icon.xs} />} aria-label="Visualizar" onClick={() => onView(prod.id)} size="sm" variant="ghost" />
-          <IconButton icon={<Pencil size={t.icon.xs} />} aria-label="Editar"  onClick={() => onEdit(prod.id)} size="sm" variant="ghost" />
-          <IconButton icon={<Trash2 size={t.icon.xs} />} aria-label="Excluir" onClick={() => setDeleteTarget(prod)} size="sm" variant="ghost" danger />
+          <IconButton icon={<Icon name="view" size={t.icon.xs} />} aria-label="Visualizar" onClick={() => onView(prod.id)} size="sm" variant="ghost" />
+          <IconButton icon={<Icon name="edit" size={t.icon.xs} />} aria-label="Editar"  onClick={() => onEdit(prod.id)} size="sm" variant="ghost" />
+          <IconButton icon={<Icon name="delete" size={t.icon.xs} />} aria-label="Excluir" onClick={() => setDeleteTarget(prod)} size="sm" variant="ghost" danger />
         </div>
       ),
     },
@@ -287,10 +284,10 @@ export default function ProdutosLista({
           count={produtos.length}
           actions={
             <div style={{ display: 'flex', gap: 8 }}>
-              <Button variant="secondary" size="md" icon={<Download size={14} />} disabled>
+              <Button variant="secondary" size="md" icon={<Icon name="download" size={14} />} disabled>
                 Exportar
               </Button>
-              <Button variant="primary" size="md" icon={<Plus size={14} />} onClick={onNew}>
+              <Button variant="primary" size="md" icon={<Icon name="add" size={14} />} onClick={onNew}>
                 Adicionar Produto
               </Button>
             </div>
@@ -341,7 +338,7 @@ export default function ProdutosLista({
             const hasSearch = searchRaw.length > 0 || !!grupoFilter || !!catFilter || !!classeFilter || !!tipoFilter || !!ativoFilter
             return (
               <EmptyState
-                icon={<Package size={40} strokeWidth={1.5} />}
+                icon={<Icon name="package" size={40} />}
                 message={hasSearch ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
                 description={hasSearch ? 'Ajuste os filtros de busca.' : 'Comece cadastrando o primeiro produto.'}
                 action={hasSearch ? undefined : { label: 'Adicionar Produto', onClick: onNew }}

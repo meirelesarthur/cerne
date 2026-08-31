@@ -52,7 +52,7 @@ import PlanosPage        from '../../pages/planos/PlanosPage'
 import EstadosContaPage  from '../../pages/design-system/EstadosContaPage'
 import CoberturaDesignSystemPage from '../../pages/design-system/CoberturaDesignSystemPage'
 import { menuModules, type NavModule, type NavGroup } from '../../data/menuData'
-import { Construction } from 'lucide-react'
+import { Icon } from '../ui/Icon'
 import { NavigationContext } from '../../context/NavigationContext'
 
 interface AppLayoutProps {
@@ -93,7 +93,7 @@ function FuncionalidadePlaceholder({ itemId, module }: { itemId: string; module?
           justifyContent: 'center',
         }}
       >
-        <Construction size={24} color={colors.accent.default} strokeWidth={1.5} />
+        <Icon name="construction" size={24} color={colors.accent.default} />
       </div>
       <div>
         <div style={{ fontSize: t.font.size.lg, fontWeight: 600, color: colors.fg.default, fontFamily: t.font.family.sans, marginBottom: 4 }}>

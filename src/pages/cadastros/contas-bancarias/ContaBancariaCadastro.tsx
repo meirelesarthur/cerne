@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { PageContainer } from '../../../components/ui/PageContainer'
 import { PageCard }       from '../../../components/ui/PageCard'
 import { FormPageHeader } from '../../../components/ui/FormPageHeader'
@@ -188,10 +188,10 @@ export default function ContaBancariaCadastro({
       <PageCard
         footer={
           <>
-            <Button variant="secondary" onClick={guard.guardedBack} icon={<ArrowLeft size={14} />} disabled={submitting}>
+            <Button variant="secondary" onClick={guard.guardedBack} icon={<Icon name="arrow-left" size={14} />} disabled={submitting}>
               Voltar
             </Button>
-            <Button variant="primary" onClick={handleSave} icon={<Save size={14} />} loading={submitting} disabled={submitting}>
+            <Button variant="primary" onClick={handleSave} icon={<Icon name="save" size={14} />} loading={submitting} disabled={submitting}>
               {isEdit ? 'Salvar alterações' : 'Salvar'}
             </Button>
           </>

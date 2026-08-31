@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Trash2, Upload } from 'lucide-react'
+import { Icon } from '../../../components/ui/Icon'
 import { Button } from '../../../components/ui/Button'
 import { CrudPattern } from '../../../components/ui/CrudPattern'
 import { FeedbackBanner } from '../../../components/ui/FeedbackBanner'
@@ -42,9 +42,9 @@ export default function AnimaisPage() {
         ]}
         headerActions={(
           <>
-            <Button variant="ghost" icon={<Upload size={16} />} onClick={() => setImportOpen(true)}>Importar</Button>
-            <Button variant="secondary" icon={<Download size={16} />} onClick={() => show('Exportação XLS preparada com sucesso.')}>Exportar</Button>
-            <Button variant="destructive" icon={<Trash2 size={16} />} onClick={() => setDeleteOpen(true)}>Excluir tudo…</Button>
+            <Button variant="ghost" icon={<Icon name="upload" size={16} />} onClick={() => setImportOpen(true)}>Importar</Button>
+            <Button variant="secondary" icon={<Icon name="download" size={16} />} onClick={() => show('Exportação XLS preparada com sucesso.')}>Exportar</Button>
+            <Button variant="destructive" icon={<Icon name="delete" size={16} />} onClick={() => setDeleteOpen(true)}>Excluir tudo…</Button>
           </>
         )}
       />

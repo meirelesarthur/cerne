@@ -50,6 +50,24 @@ const GRID: LatLngTuple[][] = [
 const cell = (r: number, c: number): LatLngTuple[] =>
   [GRID[r][c], GRID[r][c + 1], GRID[r + 1][c + 1], GRID[r + 1][c]]
 
+/** Indicadores de um lote de animais dentro de uma área de pastagem. */
+interface PecuariaStat { label: string; value: string }
+
+interface Pecuaria {
+  /** Um lote de animais = uma linha (nome do lote → nº de cabeças). */
+  lotes: PecuariaStat[]
+  animais: number
+  uaHa: string
+  pesoMedio: string
+  gmd: string
+  nascimentos: number
+  mortes: number
+  ultimaMovimentacao: string
+  consumoMedio: string
+  /** Itens da dieta/suplementação no período (mineral, ração, adaptação…). */
+  dieta: PecuariaStat[]
+}
+
 interface Talhao {
   id: string; name: string; area: string; crop: string
   cultivar: string; plantio: string; colheita: string; status: string
@@ -57,6 +75,8 @@ interface Talhao {
   ultimaOperacao: string; proximaOperacao: string; responsavel: string
   custoHa: string; receitaPrevista: string; margemHa: string
   coords: LatLngTuple[]
+  /** Só preenchido para `crop === 'Pastagem'` — troca o painel de hover para lotes. */
+  pecuaria?: Pecuaria
 }
 
 const TALHAOES: Talhao[] = [
@@ -122,6 +142,20 @@ const TALHAOES: Talhao[] = [
     yieldForecast: '—', moisture: '55%', ndvi: '0.42', populacao: '0,4 UA/ha',
     ultimaOperacao: 'Roçada — 02/11', proximaOperacao: 'Calagem — 15/04', responsavel: 'Equipe Oeste',
     custoHa: 'R$ 620', receitaPrevista: '—', margemHa: '—',
+    pecuaria: {
+      lotes: [
+        { label: 'Vacas DG +', value: '3 cab' },
+        { label: 'Novilha Prenha', value: '4 cab' },
+      ],
+      animais: 7, uaHa: '0,28', pesoMedio: '288 kg', gmd: '0,58 kg/dia',
+      nascimentos: 2, mortes: 1, ultimaMovimentacao: 'Entrada de lote — 10/01',
+      consumoMedio: '28,86 kg/cab',
+      dieta: [
+        { label: 'Sal Mineral Adençado 56PB', value: '12,00 sc' },
+        { label: 'Sal Mineral Coequi Plus 25kg', value: '70,00 sc' },
+        { label: 'Dieta Adaptação', value: '120,00 kg' },
+      ],
+    },
   },
   {
     id: 'T10', name: 'Talhão Água Limpa', area: '410 ha', crop: 'Soja', coords: cell(2, 1),
@@ -143,6 +177,19 @@ const TALHAOES: Talhao[] = [
     yieldForecast: '—', moisture: '61%', ndvi: '0.51', populacao: '0,9 UA/ha',
     ultimaOperacao: 'Adubação — 28/10', proximaOperacao: 'Entrada de lote — 10/01', responsavel: 'Equipe Sul',
     custoHa: 'R$ 780', receitaPrevista: '—', margemHa: '—',
+    pecuaria: {
+      lotes: [
+        { label: 'Bois Engorda', value: '19 cab' },
+        { label: 'Novilhas Recria', value: '15 cab' },
+      ],
+      animais: 34, uaHa: '0,19', pesoMedio: '417 kg', gmd: '0,81 kg/dia',
+      nascimentos: 1, mortes: 0, ultimaMovimentacao: 'Pesagem — 15/12',
+      consumoMedio: '34,20 kg/cab',
+      dieta: [
+        { label: 'Sal Mineral Proteinado 40PB', value: '18,00 sc' },
+        { label: 'Suplemento Energético 20kg', value: '45,00 sc' },
+      ],
+    },
   },
 ]
 
@@ -227,7 +274,7 @@ const CROP_FILL: Record<string, number> = { 'Pastagem': 0.20 }
 
 /** Traduz o talhão do dataset na área do mapa: rótulo, ícone e painel de hover. */
 function toMapArea(tl: Talhao): FarmArea {
-  return {
+  const base = {
     id: tl.id,
     name: tl.name,
     subtitle: tl.area,
@@ -235,6 +282,44 @@ function toMapArea(tl: Talhao): FarmArea {
     color: CROP_COLOR[tl.crop] ?? t.color.neutral[400],
     fillOpacity: CROP_FILL[tl.crop] ?? 0.28,
     icon: CROP_ICON[tl.crop] ?? 'sprout',
+  }
+
+  // Pastagem carrega lote(s) de animais, não lavoura — painel de hover troca
+  // "Cultura/Lavoura" por "Lotes/Rebanho" mantendo a mesma grade 2×4.
+  if (tl.pecuaria) {
+    const p = tl.pecuaria
+    return {
+      ...base,
+      headline: `Pecuária · ${tl.status}`,
+      groups: [
+        { title: 'Lotes', rows: p.lotes },
+        {
+          title: 'Rebanho',
+          rows: [
+            { label: 'Animais', value: String(p.animais) },
+            { label: 'UA/ha', value: p.uaHa },
+            { label: 'Peso médio', value: p.pesoMedio },
+            { label: 'GMD', value: p.gmd },
+          ],
+        },
+        {
+          title: 'Movimentação',
+          rows: [
+            { label: 'Nascimentos', value: String(p.nascimentos) },
+            { label: 'Mortes', value: String(p.mortes) },
+            { label: 'Última mov.', value: p.ultimaMovimentacao },
+          ],
+        },
+        {
+          title: 'Nutrição',
+          rows: [{ label: 'Consumo médio', value: p.consumoMedio }, ...p.dieta],
+        },
+      ],
+    }
+  }
+
+  return {
+    ...base,
     headline: `${tl.crop} · ${tl.status}`,
     groups: [
       {

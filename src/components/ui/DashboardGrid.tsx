@@ -64,9 +64,7 @@ export function DashboardGrid({ children }: DashboardGridProps) {
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[4],
-        // Sem padding: o vão de 8px do chassi (gap entre submenu, Topbar e área
-        // de conteúdo) já é o respiro do dashboard. Um padding aqui somava ao
-        // vão e afastava os blocos do submenu em 24px.
+        padding: t.space[4],
         background: colors.bg.outer,
         // Sem raio: a área de conteúdo já arredonda o que está dentro dela
         // (`overflow: auto` recorta pelo raio), e um raio aqui deixaria a cor da
@@ -118,6 +116,7 @@ export function DashboardHeader({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: t.space[3],
+        padding: `0 ${t.space[1]}px`,
         // Título nunca racha no meio da palavra: o CSS global do app herda
         // `overflow-wrap: break-word`, que em caixa estreita quebrava
         // "Desempenho" em duas linhas. Quem cede espaço primeiro são as ações,
@@ -350,7 +349,9 @@ interface DashboardSkeletonProps {
 export function DashboardSkeleton({ kpis = 4, blocks = [260, 200] }: DashboardSkeletonProps) {
   return (
     <DashboardGrid>
-      <Skeleton height={26} width={200} />
+      <div style={{ padding: `0 ${t.space[1]}px` }}>
+        <Skeleton height={26} width={200} />
+      </div>
       {kpis > 0 && (
         <DashboardRow>
           {Array.from({ length: kpis }, (_, i) => (

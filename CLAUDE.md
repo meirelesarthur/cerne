@@ -226,8 +226,7 @@ PageContainer (style={{ paddingBottom: 0 }})
 
 Dashboard não usa `PageCard`. A casca é o `DashboardGrid`: cada bloco é um card com fill
 próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos. O
-canvas assume o nível do chassi (`bg.outer`, sem raio e sem padding — o vão de 8px do
-chassi é o respiro): não lê como folha sobre a tela,
+canvas assume o nível do chassi (`bg.outer`, sem raio): não lê como folha sobre a tela,
 e os blocos ficam sendo as únicas superfícies.
 
 ```

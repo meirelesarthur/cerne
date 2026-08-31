@@ -793,9 +793,7 @@ Três degraus, do mais externo ao conteúdo (tema claro):
 da mesma cor do próprio fundo e desapareceria.
 
 O canvas do dashboard **não tem fill próprio**: assume o `bg.outer`, o mesmo dos
-vãos e da faixa da Topbar em volta, sem raio e **sem padding** — o vão de 8px do
-chassi já é o respiro, e um padding aqui somava a ele (os blocos ficavam a 24px
-do submenu em vez de 8px). Assim ele não lê como uma folha
+vãos e da faixa da Topbar em volta, e sem raio. Assim ele não lê como uma folha
 posta sobre a tela — continua na moldura do chassi, e as únicas superfícies que
 sobram são os blocos.
 

@@ -43,6 +43,15 @@ const donutData = [
   { label: 'Outros',      pct: 8,  color: t.color.neutral[400] },
 ]
 
+// reflete cost_centers + expenses.center_id
+const contasPagarPorCentro = [
+  { centro: 'Lavoura — Soja',    valor: 'R$ 68.400' },
+  { centro: 'Lavoura — Milho',   valor: 'R$ 41.200' },
+  { centro: 'Pecuária',          valor: 'R$ 22.750' },
+  { centro: 'Administrativo',    valor: 'R$ 15.900' },
+  { centro: 'Manutenção/Frota',  valor: 'R$ 9.480'  },
+]
+
 const heatmapRows = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
 const heatmapCols = ['6h', '9h', '12h', '15h', '18h', '21h', '0h', '3h']
 const heatmapData = [
@@ -138,6 +147,34 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
           </div>
         )
       })}
+    </div>
+  )
+}
+
+// ─── Contas a Pagar por Centro de Custo ───────────────────────────────────────
+
+function ContasPagarPorCentro({ colors, isGbMode }: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
+  const [hovIdx, setHovIdx] = useState<number | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
+      {contasPagarPorCentro.map((item, i) => (
+        <div key={i}
+          onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: `${t.space[2]}px ${t.space[2]}px`,
+            borderRadius: t.radius.base,
+            background: hovIdx === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+            transition: `background ${t.transition.base}`, cursor: 'default',
+          }}>
+          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
+            {item.centro}
+          </span>
+          <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
+            {item.valor}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -306,10 +343,15 @@ export default function DashFinanceiro() {
         </DashboardCard>
       </DashboardRow>
 
-      {/* Fileira 4 — Vencimentos */}
-      <DashboardCard title="Vencimentos próximos (30 dias)">
-        <VencimentosList colors={colors} isGbMode={isGbMode} />
-      </DashboardCard>
+      {/* Fileira 4 — Vencimentos + Contas a pagar por centro de custo */}
+      <DashboardRow>
+        <DashboardCard title="Vencimentos próximos (30 dias)" flex={3}>
+          <VencimentosList colors={colors} isGbMode={isGbMode} />
+        </DashboardCard>
+        <DashboardCard title="Contas a pagar por centro de custo" flex={2}>
+          <ContasPagarPorCentro colors={colors} isGbMode={isGbMode} />
+        </DashboardCard>
+      </DashboardRow>
     </DashboardGrid>
   )
 }

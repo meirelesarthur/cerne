@@ -21,6 +21,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -88,9 +89,9 @@ export default function DashEstoqueNutricao() {
   const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('60')
-  const [produto, setProduto] = useState('todos')
-  const [armazem, setArmazem] = useState('todos')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '60')
+  const [produto, setProduto] = useUrlFilter('produto', 'todos')
+  const [armazem, setArmazem] = useUrlFilter('armazem', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)

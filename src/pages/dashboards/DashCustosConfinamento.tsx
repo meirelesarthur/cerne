@@ -25,6 +25,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -107,10 +108,10 @@ export default function DashCustosConfinamento() {
   const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('6')
-  const [categoria, setCategoria] = useState('todas')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '6')
+  const [categoria, setCategoria] = useUrlFilter('categoria', 'todas')
   // Safra única nos mocks — o filtro existe para manter o recorte explícito
-  const [safra, setSafra] = useState('25/26')
+  const [safra, setSafra] = useUrlFilter('safra', '25/26')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)

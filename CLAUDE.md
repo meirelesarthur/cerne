@@ -240,6 +240,14 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 - Rótulo do bloco na prop `title`; legenda/filtro/botão na prop `action`.
 - Bloco que sangra (mapa) → `DashboardCard bare`.
 - Borda só no GBMode — regra do `DashboardCard`, nunca replicada na tela.
+- **Largura por espaço, não por janela:** card declara mínimo
+  (`t.size.dashCardMin`/`dashKpiMin`) e cresce pelo peso; a fileira quebra sozinha.
+  Não usar media query de viewport — a área de conteúdo é ~500px mais estreita que
+  a janela.
+- **Filtro na URL:** `useUrlFilter('periodo', '12')` em vez de `useState`.
+- **Cor de série:** categoria distinta → `t.chart.series` em ordem (sem o vermelho
+  `series[4]` para categoria não-negativa); nível do mesmo indicador → tons da mesma
+  matiz; status/sinal → feedback; sobra ("Outros") → neutro.
 - **Altura de gráfico** de `t.size.chart.{sm,md,lg}` (180/220/260); mesma fileira, mesmo
   degrau. Sparkline de KPI: `t.size.sparkline`.
 - **Rótulo em caixa de sentença e em uma linha**; aviso/detalhe vira chip no `action`.
@@ -256,6 +264,9 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 literal, procure o token:
 
 - **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) · `t.size.sparkline` (40).
+- **Card de dashboard:** `t.size.dashCardMin` (300) · `t.size.dashKpiMin` (180).
+- **Trilha de progresso:** `t.color.state.track.{base,gb}` · **sobre mídia:**
+  `t.color.overlay.onMedia`.
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34),
   `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`,
   `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).

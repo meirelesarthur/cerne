@@ -13,6 +13,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Area Chart — Acessos Diários ─────────────────────────────────────────────
 
@@ -122,7 +123,7 @@ const USR_KPIS = [
 export default function DashUsuarios() {
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('30')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '30')
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)

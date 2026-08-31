@@ -181,6 +181,19 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
 - **Bloco que sangra** (mapa, imagem) usa `DashboardCard bare` — sem padding interno.
 - **Sem borda no tema claro** (quem separa é o canvas); no GBMode o card mantém a hairline
   verde, necessária sobre fundo escuro. Isso vive no `DashboardCard` — não replicar na tela.
+- **Largura é por espaço, não por janela:** a fileira não muda de layout num
+  breakpoint. Cada card declara um mínimo (`t.size.dashCardMin` / `dashKpiMin`) e
+  cresce pelo peso para ocupar a sobra; quando os mínimos não caibem, ele passa
+  para a linha seguinte. Isso é obrigatório porque a área de conteúdo é 400–500px
+  mais estreita que a janela (sidebar + submenu) — media query de viewport erra o
+  alvo. `DashboardStack width` é largura PREFERIDA, não fixa.
+- **Filtro vive na URL:** `useUrlFilter('periodo', '12')` no lugar de `useState`,
+  para a visão filtrada ser recarregável e compartilhável. O valor default não
+  aparece na query.
+- **Cor de série por natureza do dado:** categorias distintas → `t.chart.series`
+  em ordem (evitando `series[4]`, vermelho, em categoria não-negativa); níveis do
+  mesmo indicador (total × subconjunto) → tons da mesma matiz; status e sinal →
+  paleta de feedback; sobra de composição ("Outros") → neutro.
 - **Altura de gráfico** vem de `t.size.chart.{sm,md,lg}` — nunca número solto. Cards na
   mesma fileira usam o mesmo degrau, senão um fecha antes do outro.
 - **Rótulo em caixa de sentença**, em uma linha: "Ativos por categoria", não "Ativos por
@@ -201,6 +214,10 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
 
 - **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) — escala fechada; blocos
   da MESMA fileira usam sempre o mesmo degrau. `t.size.sparkline` (40) na base do KPI.
+- **Card de dashboard:** `t.size.dashCardMin` (300) / `t.size.dashKpiMin` (180) — largura
+  mínima antes de a fileira quebrar a linha.
+- **Trilha de barra de progresso:** `t.color.state.track.{base,gb}`.
+- **Controle sobre mídia** (chip sobre mapa/imagem): `t.color.overlay.onMedia`.
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34), `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`, `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.

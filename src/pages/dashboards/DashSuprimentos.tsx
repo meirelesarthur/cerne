@@ -13,6 +13,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -116,7 +117,7 @@ export default function DashSuprimentos() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [categoria, setCategoria] = useState('todas')
+  const [categoria, setCategoria] = useUrlFilter('categoria', 'todas')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)

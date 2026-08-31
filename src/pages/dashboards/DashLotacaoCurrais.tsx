@@ -21,6 +21,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -58,8 +59,8 @@ export default function DashLotacaoCurrais() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   // Pátio único nos mocks — o filtro mantém o recorte explícito
-  const [patio, setPatio] = useState('principal')
-  const [setor, setSetor] = useState('todos')
+  const [patio, setPatio] = useUrlFilter('patio', 'principal')
+  const [setor, setSetor] = useUrlFilter('setor', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)

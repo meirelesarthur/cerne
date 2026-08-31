@@ -14,6 +14,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Stacked Bar Data ─────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export default function DashDepreciacoes() {
   const { colors } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600)

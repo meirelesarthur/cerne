@@ -28,6 +28,7 @@ import {
   type OverviewDataset,
 } from '../../insights/overviewInsights'
 import { useFarm } from '../../context/FarmContext'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useChartScale } from '../../hooks/useChartScale'
 import { niceAxisTicks, formatAxisValue } from '../../utils/chartAxis'
@@ -741,8 +742,8 @@ export default function OverviewPanel() {
   const { colors, isGbMode } = useTheme()
   const { currentFarm } = useFarm()
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('10')
-  const [serie, setSerie] = useState<'realizado' | 'previsto'>('realizado')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '10')
+  const [serie, setSerie] = useUrlFilter<'realizado' | 'previsto'>('serie', 'realizado')
   const [cartaOpen, setCartaOpen] = useState(false)
   // Tablet/estreito: empilha colunas e dispensa divisores verticais
   const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)

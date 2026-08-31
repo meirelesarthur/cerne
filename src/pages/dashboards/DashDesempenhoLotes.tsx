@@ -22,6 +22,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -86,9 +87,9 @@ export default function DashDesempenhoLotes() {
   const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('7')
-  const [curral, setCurral] = useState('todos')
-  const [lote, setLote] = useState('todos')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '7')
+  const [curral, setCurral] = useUrlFilter('curral', 'todos')
+  const [lote, setLote] = useUrlFilter('lote', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)

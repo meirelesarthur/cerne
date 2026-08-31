@@ -12,6 +12,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
 
@@ -143,7 +144,7 @@ const ATIVOS_KPIS = [
 export default function DashAtivos() {
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)

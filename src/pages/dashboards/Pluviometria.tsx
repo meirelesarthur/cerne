@@ -20,6 +20,7 @@ import {
 } from '../../components/ui/DashboardGrid'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -138,8 +139,8 @@ export default function Pluviometria() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   const [selectedAreas, setSelectedAreas] = useState<string[]>(ALL_AREAS)
-  const [dateStart, setDateStart] = useState('01/06/2025')
-  const [dateEnd, setDateEnd] = useState('25/05/2026')
+  const [dateStart, setDateStart] = useUrlFilter('de', '01/06/2025')
+  const [dateEnd, setDateEnd] = useUrlFilter('ate', '25/05/2026')
   const [filterOpen, setFilterOpen] = useState(false)
 
   useEffect(() => {

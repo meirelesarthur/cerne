@@ -73,11 +73,14 @@ Environment Variables) — o padrão embutido no código é o último build publ
 `npm run chromatic`; **atualize o fallback em `CoberturaDesignSystemPage.tsx` (ou a env var) a
 cada novo build relevante**, para não deixar o link apontando para uma revisão antiga.
 
-**Estado atual (Build 12, Chromatic CLI v18.1.0):** 90 componentes / 302 stories / 604
-snapshots. Esses números do Chromatic contam **todas** as `.stories.tsx` do repositório
-(inclui layout, dashboards, páginas soltas) — são uma contagem diferente e maior do que os
-"85/85 componentes de `ui/`" do resumo executivo acima (esse é escopado só a
-`src/components/ui/`). Não confundir os dois totais.
+**Estado atual (Build 14, Chromatic CLI v18.1.0):** 97 componentes / 339 stories / 678
+snapshots — publicado da branch `dashboards`, com 58 mudanças visuais aguardando revisão
+(esperado: a correção de tipografia/altura dos gráficos SVG e os três níveis de fundo do
+tema claro tocam quase todo snapshot com gráfico ou card). Esses números do Chromatic
+contam **todas** as `.stories.tsx` do repositório (inclui layout, dashboards, páginas
+soltas) — são uma contagem diferente e maior do que os "92/94 componentes de `ui/`" do
+resumo executivo acima (esse é escopado só a `src/components/ui/`). Não confundir os dois
+totais.
 
 **Automação (ainda manual, hoje):** não há CI publicando no Chromatic a cada push — o publish é
 manual via `npm run chromatic`. Se quiser automatizar, o próximo passo natural é um workflow de

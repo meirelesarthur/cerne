@@ -38,9 +38,9 @@ import { t } from '../../design/tokens'
 // build publicado via `npm run chromatic` — atualize ao trocar de projeto
 // Chromatic ou publicar um Storybook com host próprio.
 const STORYBOOK_URL =
-  import.meta.env.VITE_STORYBOOK_URL || 'https://69fbb4d23569b2759aad4d30-awatevdqwv.chromatic.com/'
+  import.meta.env.VITE_STORYBOOK_URL || 'https://69fbb4d23569b2759aad4d30-ngubcwpceb.chromatic.com/'
 const CHROMATIC_BUILD_URL =
-  import.meta.env.VITE_CHROMATIC_URL || 'https://www.chromatic.com/build?appId=69fbb4d23569b2759aad4d30&number=12'
+  import.meta.env.VITE_CHROMATIC_URL || 'https://www.chromatic.com/build?appId=69fbb4d23569b2759aad4d30&number=14'
 
 // ─── Config visual dos vereditos ────────────────────────────────────────────
 

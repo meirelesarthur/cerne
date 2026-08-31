@@ -26,8 +26,8 @@ import {
 
 // KPI sparklines (últimas 7 semanas)
 const kpiSparklines: Record<string, number[]> = {
-  'Saldo Total': [142000, 138500, 151200, 147800, 155000, 149300, 157600],
-  'Consumo Médio Diário': [3820, 3940, 3870, 4010, 3950, 4080, 4120],
+  'Saldo total': [142000, 138500, 151200, 147800, 155000, 149300, 157600],
+  'Consumo médio diário': [3820, 3940, 3870, 4010, 3950, 4080, 4120],
 }
 
 // Gráfico 1 — Saldo de estoque por armazém (kg)
@@ -98,21 +98,21 @@ export default function DashEstoqueNutricao() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[240, 260]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.lg]} />
   }
 
   const kpis = [
     {
-      label: 'Saldo Total',
+      label: 'Saldo total',
       value: `${(saldoTotalKg / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} t`,
       trend: '5,2% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Saldo Total',
+      sparkKey: 'Saldo total',
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Cobertura Média',
+      label: 'Cobertura média',
       value: `${coberturaMediaDias} dias`,
       trend: itensCriticos > 0
         ? `${itensCriticos} item${itensCriticos > 1 ? 's' : ''} crítico${itensCriticos > 1 ? 's' : ''}`
@@ -125,7 +125,7 @@ export default function DashEstoqueNutricao() {
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Itens em Estoque',
+      label: 'Itens em estoque',
       value: String(itensEmEstoque),
       trend: 'produtos ativos',
       up: true,
@@ -134,12 +134,12 @@ export default function DashEstoqueNutricao() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'Consumo Médio Diário',
+      label: 'Consumo médio diário',
       value: `${consumoMedioDiario.toLocaleString('pt-BR')} kg/dia`,
       trend: '1,8% vs sem. ant.',
       up: false,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Consumo Médio Diário',
+      sparkKey: 'Consumo médio diário',
       sparkColor: t.chart.series[0],
     },
   ]
@@ -197,7 +197,7 @@ export default function DashEstoqueNutricao() {
               <SparklineArea
                 data={kpiSparklines[kpi.sparkKey]}
                 color={kpi.sparkColor}
-                height={40}
+                height={t.size.sparkline}
               />
             )}
           </DashboardKpiCard>
@@ -206,18 +206,18 @@ export default function DashEstoqueNutricao() {
 
       {/* Fileira 2 — Saldo por armazém + Evolução de consumo */}
       <DashboardRow>
-        <DashboardCard title="Saldo por Armazém (kg)">
+        <DashboardCard title="Saldo por armazém (kg)">
           <BarChart
             data={mockSaldoArmazem.filter((a) => armazem === 'todos' || a.label === armazem)}
-            height={240}
+            height={t.size.chart.md}
             yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
           />
         </DashboardCard>
-        <DashboardCard title="Evolução de Consumo (kg/semana)">
+        <DashboardCard title="Consumo semanal (kg)">
           <LineChart
             series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
             labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
-            height={240}
+            height={t.size.chart.md}
             area
             showLegend
             yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
@@ -227,19 +227,23 @@ export default function DashEstoqueNutricao() {
 
       {/* Fileira 3 — Cobertura por produto */}
       <DashboardCard
-        title={
-          <>
-            Cobertura por Produto (dias restantes) — itens críticos (
-            <AlertTriangle size={10} color={t.color.feedback.error.solid as string} style={{ verticalAlign: -1, margin: '0 2px' }} aria-hidden="true" />
-            ) abaixo de {CRITICO_THRESHOLD} dias
-          </>
+        title="Cobertura por produto (dias)"
+        action={
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: t.space[1],
+            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+            color: t.color.feedback.error.text, background: t.color.feedback.error.bg,
+            borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`,
+            fontFamily: t.font.family.sans, whiteSpace: 'nowrap',
+          }}>
+            <AlertTriangle size={t.font.size.xs} aria-hidden="true" />
+            crítico abaixo de {CRITICO_THRESHOLD} dias
+          </span>
         }
       >
         <BarChart
-          data={mockCoberturaProdutos
-            .filter((p) => produto === 'todos' || p.label === produto)
-            .map((p) => ({ ...p, label: p.value <= CRITICO_THRESHOLD ? `⚠ ${p.label}` : p.label }))}
-          height={260}
+          data={mockCoberturaProdutos.filter((p) => produto === 'todos' || p.label === produto)}
+          height={t.size.chart.lg}
           horizontal
           yFormat={(v) => `${Math.round(v)}d`}
         />

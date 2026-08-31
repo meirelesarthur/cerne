@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
+import { ChartLegend } from '../../components/ui/ChartLegend'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -183,10 +184,10 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
 // ─── DashLivroCaixa ───────────────────────────────────────────────────────────
 
 const LC_KPIS = [
-  { label: 'Total Entradas', value: 'R$ 1.247.830', trend: '18,3%', up: true  },
-  { label: 'Total Saídas',   value: 'R$ 984.220',   trend: '7,4%',  up: false },
-  { label: 'Saldo Período',  value: 'R$ 263.610',   trend: '22,1%', up: true  },
-  { label: 'Saldo Anterior', value: 'R$ 412.800',   trend: null,    up: true  },
+  { label: 'Total de entradas', value: 'R$ 1.247.830', trend: '18,3%', up: true  },
+  { label: 'Total de saídas',   value: 'R$ 984.220',   trend: '7,4%',  up: false },
+  { label: 'Saldo do período',  value: 'R$ 263.610',   trend: '22,1%', up: true  },
+  { label: 'Saldo anterior',    value: 'R$ 412.800',   trend: null,    up: true  },
 ]
 
 export default function DashLivroCaixa() {
@@ -201,7 +202,7 @@ export default function DashLivroCaixa() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[220, 300]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.lg]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -243,28 +244,22 @@ export default function DashLivroCaixa() {
 
       {/* Fileira 2 — Fluxo de caixa */}
       <DashboardCard
-        title="Fluxo de Caixa — Realizado"
+        title="Fluxo de caixa realizado"
         action={
-          <>
-            {[
-              { label: 'Entradas', color: t.color.brand[600], dashed: false },
-              { label: 'Saídas',   color: t.color.feedback.error.solid, dashed: false },
+          <ChartLegend
+            marker="line"
+            items={[
+              { label: 'Entradas', color: t.color.brand[600] },
+              { label: 'Saídas',   color: t.color.feedback.error.solid },
               { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
-            ].map(item => (
-              <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={4} style={{ display: 'block' }} aria-hidden="true">
-                  <line x1={0} y1={2} x2={16} y2={2} stroke={item.color} strokeWidth={2} strokeDasharray={item.dashed ? '4,3' : undefined} strokeLinecap="round" />
-                </svg>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.label}</span>
-              </div>
-            ))}
-          </>
+            ]}
+          />
         }
       >
         <LineChart
           series={fluxoSeriesFiltrado}
           labels={labels}
-          height={220}
+          height={t.size.chart.md}
           yFormat={fluxoYFormat}
           area
           showLegend={false}
@@ -273,10 +268,10 @@ export default function DashLivroCaixa() {
 
       {/* Fileira 3 — Movimentações + Saldo por Conta */}
       <DashboardRow>
-        <DashboardCard title="Últimas Movimentações" flex={3}>
+        <DashboardCard title="Últimas movimentações" flex={3}>
           <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
         </DashboardCard>
-        <DashboardCard title="Saldo por Conta" flex={2}>
+        <DashboardCard title="Saldo por conta" flex={2}>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />
         </DashboardCard>
       </DashboardRow>

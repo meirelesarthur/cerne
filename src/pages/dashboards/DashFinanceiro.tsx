@@ -6,11 +6,11 @@ import { FilterSelect } from '../../components/ui/FilterSelect'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
+import { ChartLegend } from '../../components/ui/ChartLegend'
 import {
   DashboardGrid,
   DashboardHeader,
   DashboardRow,
-  DashboardStack,
   DashboardCard,
   DashboardKpiCard,
   DashboardSkeleton,
@@ -151,13 +151,13 @@ export default function DashFinanceiro() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[240, 220]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} />
   }
 
   const kpis = [
-    { label: 'Receitas do Mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true  },
-    { label: 'Despesas do Mês',  value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
-    { label: 'Saldo Disponível', value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true  },
+    { label: 'Receitas do mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true  },
+    { label: 'Despesas do mês',  value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
+    { label: 'Saldo disponível', value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true  },
     { label: 'Inadimplência',    value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
   ]
 
@@ -206,55 +206,49 @@ export default function DashFinanceiro() {
         ))}
       </DashboardRow>
 
-      {/* Fileira 2 — Receitas vs Despesas + (Categorias / Orçamento) */}
+      {/* Fileira 2 — Receitas vs despesas + Categorias */}
       <DashboardRow>
         <DashboardCard
-          title={`Receitas vs Despesas — ${nMeses} meses`}
+          title={`Receitas vs despesas (${nMeses} meses)`}
           flex={2}
           action={
-            <>
-              {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.feedback.error.solid, label: 'Despesas' }].map(s => (
-                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ width: 8, height: 2, borderRadius: 1, background: s.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>{s.label}</span>
-                </div>
-              ))}
-            </>
+            <ChartLegend
+              marker="line"
+              items={[
+                { label: 'Receitas', color: t.color.brand[600] },
+                { label: 'Despesas', color: t.color.feedback.error.solid },
+              ]}
+            />
           }
         >
-          <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: t.font.lineHeight.tight, marginBottom: t.space[3] }}>
-            R$ 892K
-          </div>
           <LineChart
             series={lineSeries}
             labels={chartLabels}
-            height={200}
+            height={t.size.chart.md}
             yFormat={yFormat}
             area
             showLegend={false}
           />
         </DashboardCard>
 
-        <DashboardStack flex={1}>
-          <DashboardCard title="Despesas por Categoria">
-            <DonutChart
-              data={donutSlices}
-              height={160}
-              centerLabel="Total"
-              centerValue="100%"
-              showLegend
-              valueFormat={(v) => `${v}%`}
-            />
-          </DashboardCard>
-          <DashboardCard title="Orçamento Anual">
-            <ArcGauge colors={colors} />
-          </DashboardCard>
-        </DashboardStack>
+        <DashboardCard title="Despesas por categoria" flex={1}>
+          <DonutChart
+            data={donutSlices}
+            height={t.size.chart.md}
+            centerValue="R$ 634K"
+            centerLabel="no mês"
+            showLegend
+            valueFormat={(v) => `${v}%`}
+          />
+        </DashboardCard>
       </DashboardRow>
 
-      {/* Fileira 3 — Heatmap + Vencimentos */}
+      {/* Fileira 3 — Orçamento + Atividade por hora */}
       <DashboardRow>
-        <DashboardCard title="Atividade de Receita por Hora">
+        <DashboardCard title="Orçamento anual" flex={1}>
+          <ArcGauge colors={colors} />
+        </DashboardCard>
+        <DashboardCard title="Atividade de receita por hora" flex={2}>
           <HeatmapChart
             data={heatmapData}
             rowLabels={heatmapRows}
@@ -263,10 +257,12 @@ export default function DashFinanceiro() {
             isGbMode={isGbMode}
           />
         </DashboardCard>
-        <DashboardCard title="Vencimentos Próximos — 30 dias">
-          <VencimentosList colors={colors} isGbMode={isGbMode} />
-        </DashboardCard>
       </DashboardRow>
+
+      {/* Fileira 4 — Vencimentos */}
+      <DashboardCard title="Vencimentos próximos (30 dias)">
+        <VencimentosList colors={colors} isGbMode={isGbMode} />
+      </DashboardCard>
     </DashboardGrid>
   )
 }

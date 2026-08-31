@@ -5,6 +5,7 @@ import { FilterSelect } from '../../components/ui/FilterSelect'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { ChartLegend } from '../../components/ui/ChartLegend'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -85,10 +86,10 @@ const PROJ_SERIES_FULL = [
 // ─── KPIs ─────────────────────────────────────────────────────────────────────
 
 const DEP_KPIS = [
-  { label: 'Valor Total Bens',   value: 'R$ 8,4M',   trend: '2,1%', up: true  },
-  { label: 'Depreciação Mensal', value: 'R$ 42.380',  trend: null,   up: true  },
-  { label: 'Dep. Acumulada',     value: 'R$ 2,1M',   trend: '6,3%', up: true  },
-  { label: 'Valor Residual',     value: 'R$ 6,3M',   trend: '0,8%', up: false },
+  { label: 'Valor total em bens',    value: 'R$ 8,4M',   trend: '2,1%', up: true  },
+  { label: 'Depreciação mensal',     value: 'R$ 42.380', trend: null,   up: true  },
+  { label: 'Depreciação acumulada',  value: 'R$ 2,1M',   trend: '6,3%', up: true  },
+  { label: 'Valor residual',         value: 'R$ 6,3M',   trend: '0,8%', up: false },
 ]
 
 // ─── DashDepreciacoes ─────────────────────────────────────────────────────────
@@ -105,7 +106,7 @@ export default function DashDepreciacoes() {
   }, [])
 
   if (loading) {
-    return <DashboardSkeleton kpis={4} blocks={[210, 220]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses da série empilhada
@@ -146,11 +147,11 @@ export default function DashDepreciacoes() {
       </DashboardRow>
 
       {/* Fileira 2 — Depreciação por categoria */}
-      <DashboardCard title={`Depreciação por Categoria — ${nMeses} Meses`}>
+      <DashboardCard title="Depreciação por categoria">
         <StackedBarChart
           series={stackedSeries}
           labels={stackedLabels}
-          height={210}
+          height={t.size.chart.md}
           yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
           showLegend
         />
@@ -158,35 +159,32 @@ export default function DashDepreciacoes() {
 
       {/* Fileira 3 — Composição + Projeção */}
       <DashboardRow>
-        <DashboardCard title="Composição por Tipo de Bem">
+        <DashboardCard title="Composição por tipo de bem">
           <DonutChart
             data={DONUT_SLICES}
-            height={220}
-            centerValue="R$8,4M"
+            height={t.size.chart.md}
+            centerValue="R$ 8,4M"
             centerLabel="total"
             showLegend
             valueFormat={(v) => `R$ ${(v / 1_000_000).toFixed(1)}M`}
           />
         </DashboardCard>
         <DashboardCard
-          title="Projeção Próximos 24 Meses"
+          title="Projeção — próximos 24 meses"
           action={
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <div style={{ width: 16, height: 2, background: t.color.brand[600], borderRadius: 1 }} />
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Realizado</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={2} aria-hidden="true"><line x1="0" y1="1" x2="16" y2="1" stroke={t.color.brand[400]} strokeWidth="2" strokeDasharray="4 2" /></svg>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Projeção</span>
-              </div>
-            </>
+            <ChartLegend
+              marker="line"
+              items={[
+                { label: 'Realizado', color: t.color.brand[600] },
+                { label: 'Projeção',  color: t.color.brand[400], dashed: true },
+              ]}
+            />
           }
         >
           <LineChart
             series={PROJ_SERIES_FULL}
             labels={PROJ_LABELS}
-            height={210}
+            height={t.size.chart.md}
             yFormat={(v) => `${(v / 1_000_000).toFixed(1)}M`}
             area
             showLegend={false}

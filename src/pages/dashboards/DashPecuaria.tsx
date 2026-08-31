@@ -50,8 +50,8 @@ const MANEJOS_SERIES = [
 // ─── DashPecuaria ─────────────────────────────────────────────────────────────
 
 const PEC_KPIS = [
-  { label: 'Total Cabeças',  value: '4.280',       trend: '3,2%', up: true  },
-  { label: 'Peso Médio',     value: '384 kg',       trend: '1,8%', up: true  },
+  { label: 'Total de cabeças',  value: '4.280',       trend: '3,2%', up: true  },
+  { label: 'Peso médio',     value: '384 kg',       trend: '1,8%', up: true  },
   { label: 'Arrobas/mês',   value: '2.156 @',      trend: '7,4%', up: true  },
   { label: 'GMD',            value: '0,82 kg/dia',  trend: '0,4%', up: false },
 ]
@@ -67,7 +67,7 @@ export default function DashPecuaria() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[240, 220]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -110,20 +110,20 @@ export default function DashPecuaria() {
 
       {/* Fileira 2 — Evolução + Composição */}
       <DashboardRow>
-        <DashboardCard title="Evolução do Rebanho" flex={2}>
+        <DashboardCard title="Evolução do rebanho" flex={2}>
           <LineChart
             series={rebanhoSeries}
             labels={labels}
-            height={240}
+            height={t.size.chart.md}
             area
             showLegend
             yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
           />
         </DashboardCard>
-        <DashboardCard title="Composição do Rebanho" flex={1}>
+        <DashboardCard title="Composição do rebanho" flex={1}>
           <DonutChart
             data={rebanhoComp.map((d) => ({ label: d.label, value: d.pct, color: d.color }))}
-            height={220}
+            height={t.size.chart.md}
             centerValue="4.280"
             centerLabel="cabeças"
             showLegend
@@ -133,11 +133,11 @@ export default function DashPecuaria() {
       </DashboardRow>
 
       {/* Fileira 3 — Manejos */}
-      <DashboardCard title="Manejos por Mês">
+      <DashboardCard title="Manejos por mês">
         <GroupedBarChart
           series={manejosSeries}
           labels={labels}
-          height={220}
+          height={t.size.chart.md}
           showLegend
         />
       </DashboardCard>

@@ -20,6 +20,7 @@ import { Button } from '../../components/ui/Button'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Trend } from '../../components/ui/Trend'
+import { ChartLegend } from '../../components/ui/ChartLegend'
 import { Tabs } from '../../components/ui/Tabs'
 import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
 import {
@@ -29,6 +30,7 @@ import {
 import { useFarm } from '../../context/FarmContext'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useChartScale } from '../../hooks/useChartScale'
+import { niceAxisTicks, formatAxisValue } from '../../utils/chartAxis'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
@@ -50,9 +52,12 @@ const TALHAOES: Talhao[] = [
 
 // ─── Séries mensais — realizado x previsto ────────────────────────────────────
 
+// Pico de setembro (venda da safra) mantido, mas na ordem de grandeza da série:
+// em 3.800 contra ~600 dos demais meses, o eixo achatava os outros 9 pontos na
+// linha de base e o gráfico parecia quebrado.
 const AREA_DATA = [
   { month: 'Ago', receitas: 320,  despesas: 280 },
-  { month: 'Set', receitas: 3800, despesas: 3600 },
+  { month: 'Set', receitas: 1450, despesas: 1180 },
   { month: 'Out', receitas: 600,  despesas: 380 },
   { month: 'Nov', receitas: 820,  despesas: 540 },
   { month: 'Dez', receitas: 740,  despesas: 340 },
@@ -83,7 +88,7 @@ const SERIE_INFO = {
 
 // Receitas da safra anterior, alinhadas mês a mês — linha fantasma para
 // comparação YoY no gráfico de área (apenas na série "Realizado").
-const PREV_SAFRA_RECEITAS = [280, 3400, 520, 700, 690, 820, 1010, 870, 1150, 1040]
+const PREV_SAFRA_RECEITAS = [280, 1290, 520, 700, 690, 820, 1010, 870, 1150, 1040]
 
 // Cor de margem (3ª série do gráfico de área) — distinta de receita/despesa.
 const MARGEM_COLOR = t.color.accent.purple.text
@@ -297,10 +302,14 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
   prevSeries?: number[]
 }) {
   const [hov, setHov] = useState<number | null>(null)
-  const W = 700; const H = 200; const PL = 40; const PT = 16; const PR = 8; const PB = 32
-  const { ref: chartRef, k } = useChartScale(W)
+  const FALLBACK_W = 700; const H = 200; const PL = 44; const PT = 16; const PR = 8; const PB = 32
+  // viewBox casado à largura real: 1 unidade = 1px (mesma regra do kit de gráficos)
+  const { ref: chartRef, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
   const cW = W - PL - PR; const cH = H - PT - PB
-  const maxV = Math.max(...data.map(d => d.receitas), ...(prevSeries ?? [])) * 1.12
+  const yTicks = niceAxisTicks(0, Math.max(...data.map(d => d.receitas), ...(prevSeries ?? [])))
+  const maxV = yTicks[yTicks.length - 1]
   const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
     data.map((d, i) => [PL + (i / (data.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
 
@@ -323,9 +332,9 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
   const areaClose = (path: string, baseY: number) =>
     `${path} L ${PL + cW} ${baseY} L ${PL} ${baseY} Z`
 
-  const yVals = [0, maxV * 0.25, maxV * 0.5, maxV * 0.75, maxV].map(v => ({
+  const yVals = yTicks.map(v => ({
     v, y: PT + cH - (v / maxV) * cH,
-    label: v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${Math.round(v)}`,
+    label: v >= 1000 ? `${formatAxisValue(v / 1000)}k` : formatAxisValue(v),
   }))
 
   const recGradId = isGbMode ? 'recGbGrad' : 'recGrad'
@@ -350,8 +359,8 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           <g key={i}>
             <line x1={PL} y1={yl.y} x2={W - PR} y2={yl.y}
               stroke={colors.border.default} strokeWidth={0.5} strokeDasharray={i === 0 ? undefined : '4 3'} />
-            <text x={PL - 6} y={yl.y + 4} textAnchor="end" fontSize={t.font.size['3xs'] * k}
-              fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">{yl.label}</text>
+            <text x={PL - 6} y={yl.y + 4} textAnchor="end"
+              fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k }}>{yl.label}</text>
           </g>
         ))}
 
@@ -374,9 +383,9 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
           const isH = hov === i
           return (
             <g key={i}>
-              <text x={x} y={PT + cH + 18} textAnchor="middle" fontSize={t.font.size['3xs'] * k}
+              <text x={x} y={PT + cH + 18} textAnchor="middle"
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
-                fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
+                fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k, fontWeight: isH ? 600 : 400 }}>
                 {d.month}
               </text>
               {/* Hover zone */}
@@ -539,8 +548,11 @@ function CostCompositionBar({ label, total, segments, colors }: {
 
 function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: boolean }) {
   const [hov, setHov] = useState<number | null>(null)
-  const W = 700; const H = 170; const PL = 44; const PT = 12; const PR = 8; const PB = 26
-  const { ref: chartRef, k } = useChartScale(W)
+  const FALLBACK_W = 700; const H = 170; const PL = 44; const PT = 12; const PR = 8; const PB = 26
+  // viewBox casado à largura real: 1 unidade = 1px (mesma regra do kit de gráficos)
+  const { ref: chartRef, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
   const cW = W - PL - PR; const cH = H - PT - PB
   const data = CASHFLOW_12M
 
@@ -563,7 +575,7 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
           fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
         {/* Linha do zero */}
         <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
-        <text x={PL - 6} y={zeroY + 3} textAnchor="end" fontSize={t.font.size['3xs'] * k} fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif">0</text>
+        <text x={PL - 6} y={zeroY + 3} textAnchor="end" fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k }}>0</text>
 
         {/* Barras de fluxo líquido mensal */}
         {data.map((d, i) => {
@@ -577,9 +589,9 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
                 fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
                 opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
                 style={{ transition: `opacity ${t.transition.fast}` }} />
-              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={t.font.size['3xs'] * k}
+              <text x={x(i)} y={H - 8} textAnchor="middle"
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
-                fontFamily="Outfit,sans-serif" fontWeight={isH ? 600 : 400}>
+                fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k, fontWeight: isH ? 600 : 400 }}>
                 {d.month}
               </text>
               <rect x={x(i) - cW / data.length / 2} y={PT} width={cW / data.length} height={cH} fill="transparent"
@@ -596,8 +608,8 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
         {hov !== null && (
           <g>
             <circle cx={cumPts[hov][0]} cy={cumPts[hov][1]} r={4} fill={t.color.accent.purple.text} stroke={colors.bg.surface} strokeWidth={2} />
-            <text x={x(hov)} y={PT + 2} textAnchor="middle" fontSize={t.font.size['3xs'] * k} fontWeight={600}
-              fill={colors.fg.default as string} fontFamily="Outfit,sans-serif">
+            <text x={x(hov)} y={PT + 2} textAnchor="middle"
+              fill={colors.fg.default as string} fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k, fontWeight: 600 }}>
               {`líq. ${fmtCompact(data[hov].net * 1000)} · acum. ${fmtCompact(cum[hov] * 1000)}`}
             </text>
           </g>
@@ -814,7 +826,6 @@ export default function OverviewPanel() {
               value={kpi.value}
               trend={kpi.trend}
               up={kpi.up}
-              valueSize="3xl"
             />
           ))}
         </DashboardRow>
@@ -847,19 +858,15 @@ export default function OverviewPanel() {
                   {serieInfo.label}
                 </div>
               </div>
-              {/* Legend */}
-              <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[3] }}>
-                {[
-                  { color: t.color.brand[600], label: 'Receitas' },
-                  { color: t.color.feedback.error.solid, label: 'Despesas' },
-                  { color: MARGEM_COLOR, label: 'Margem' },
-                  ...(serie === 'realizado' ? [{ color: colors.fg.subtle as string, label: 'Safra anterior' }] : []),
-                ].map(s => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
-                  </div>
-                ))}
+              <div style={{ marginBottom: t.space[3] }}>
+                <ChartLegend
+                  items={[
+                    { label: 'Receitas', color: t.color.brand[600] },
+                    { label: 'Despesas', color: t.color.feedback.error.solid },
+                    { label: 'Margem',   color: MARGEM_COLOR },
+                    ...(serie === 'realizado' ? [{ label: 'Safra anterior', color: colors.fg.subtle as string }] : []),
+                  ]}
+                />
               </div>
               <AreaChart
                 colors={colors}
@@ -869,50 +876,44 @@ export default function OverviewPanel() {
               />
             </DashboardCard>
 
-            {/* Insight computado + Resultado operacional (DRE) */}
-            <DashboardRow>
-              <DashboardCard
-                title="Insights"
-                action={
-                  <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
-                    Ver carta completa
-                  </Button>
-                }
-              >
-                <p style={{ fontSize: t.font.size.lg, color: colors.fg.subtle, lineHeight: 1.6, margin: 0, fontWeight: t.font.weight.normal }}>
-                  {insight.text}
-                  <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>{insight.strong}</strong>
-                  {insight.tail}
-                </p>
-              </DashboardCard>
+            {/* Insight computado pelo motor de interpretação */}
+            <DashboardCard
+              title="Insights"
+              action={
+                <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
+                  Ver carta completa
+                </Button>
+              }
+            >
+              <p style={{ fontSize: t.font.size.base, color: colors.fg.subtle, lineHeight: t.font.lineHeight.relaxed, margin: 0, fontWeight: t.font.weight.normal }}>
+                {insight.text}
+                <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>{insight.strong}</strong>
+                {insight.tail}
+              </p>
+            </DashboardCard>
 
-              <DashboardCard
-                title="Resultado operacional (DRE)"
-                action={
-                  <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
-                    Detalhes
-                  </Button>
-                }
-              >
-                <SankeyFunnel stages={DRE_STAGES} colors={colors} isGbMode={isGbMode} chartHeight={150} />
-              </DashboardCard>
-            </DashboardRow>
+            {/* Resultado operacional (DRE) — receita → custos → resultado */}
+            <DashboardCard
+              title="Resultado operacional (DRE)"
+              action={
+                <Button variant="ghost" size="sm" icon={<Wheat size={11} />}>
+                  Detalhes
+                </Button>
+              }
+            >
+              <SankeyFunnel stages={DRE_STAGES} colors={colors} isGbMode={isGbMode} chartHeight={150} />
+            </DashboardCard>
 
             {/* Resultado operacional — realizado x previsto x atrasado */}
             <DashboardCard
-              title="Resultado operacional · saldo total no período"
+              title="Realizado x previsto no período"
               action={
-                <>
-                  {[
-                    { color: t.color.brand[600], label: 'Receitas' },
-                    { color: t.color.feedback.error.solid, label: 'Despesas' },
-                  ].map(s => (
-                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                      <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
-                    </div>
-                  ))}
-                </>
+                <ChartLegend
+                  items={[
+                    { label: 'Receitas', color: t.color.brand[600] },
+                    { label: 'Despesas', color: t.color.feedback.error.solid },
+                  ]}
+                />
               }
             >
               <div style={{
@@ -931,20 +932,15 @@ export default function OverviewPanel() {
 
             {/* Fluxo de caixa projetado — acumulado 12 meses */}
             <DashboardCard
-              title="Fluxo de caixa projetado — próximos 12 meses"
+              title="Fluxo de caixa projetado (12 meses)"
               action={
-                <>
-                  {[
-                    { color: t.color.brand[600], label: 'Fluxo líquido +' },
-                    { color: t.color.feedback.error.solid, label: 'Fluxo líquido −' },
-                    { color: t.color.accent.purple.text, label: 'Acumulado' },
-                  ].map(s => (
-                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                      <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
-                    </div>
-                  ))}
-                </>
+                <ChartLegend
+                  items={[
+                    { label: 'Fluxo líquido +', color: t.color.brand[600] },
+                    { label: 'Fluxo líquido −', color: t.color.feedback.error.solid },
+                    { label: 'Acumulado',       color: t.color.accent.purple.text },
+                  ]}
+                />
               }
             >
               <CashflowChart colors={colors} isGbMode={isGbMode} />
@@ -973,12 +969,12 @@ export default function OverviewPanel() {
             <DashboardCard
               title="Resultado por cultura"
               action={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: t.color.brand[600], display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Realizada</span>
-                  <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: t.color.brand[200], display: 'inline-block', marginLeft: t.space[2] }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>A realizar</span>
-                </div>
+                <ChartLegend
+                  items={[
+                    { label: 'Realizada',  color: t.color.brand[600] },
+                    { label: 'A realizar', color: t.color.brand[200] },
+                  ]}
+                />
               }
             >
               {AREA_BY_CROP.map(([crop, ha]) => (
@@ -1029,17 +1025,12 @@ export default function OverviewPanel() {
                   }} />
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: t.space[3] }}>
-                {[
-                  { color: isGbMode ? t.color.brand[500] : t.color.neutral[700], label: 'Realizado' },
-                  { color: isGbMode ? 'rgba(255,255,255,0.15)' : t.color.neutral[200], label: 'Previsto' },
-                ].map(s => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: t.radius.full, background: s.color, display: 'inline-block' }} />
-                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{s.label}</span>
-                  </div>
-                ))}
-              </div>
+              <ChartLegend
+                items={[
+                  { label: 'Realizado', color: isGbMode ? t.color.brand[500] : t.color.neutral[700] },
+                  { label: 'Previsto',  color: isGbMode ? 'rgba(255,255,255,0.15)' : t.color.neutral[200] },
+                ]}
+              />
             </DashboardCard>
 
             {/* Custo de produção — composição COE x COT */}

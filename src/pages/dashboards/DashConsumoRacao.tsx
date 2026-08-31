@@ -83,7 +83,7 @@ export default function DashConsumoRacao() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[220, 260]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.lg]} />
   }
 
   // ── Dados filtrados (período fatia as semanas; lote/formulação filtram séries)
@@ -108,7 +108,7 @@ export default function DashConsumoRacao() {
 
   const kpis = [
     {
-      label: 'Ração Produzida',
+      label: 'Ração produzida',
       value: `${racaoProduzidaKg.toLocaleString('pt-BR')} kg`,
       trend: '3,4% vs sem. ant.',
       up: true,
@@ -117,7 +117,7 @@ export default function DashConsumoRacao() {
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Ração Distribuída',
+      label: 'Ração distribuída',
       value: `${racaoDistribuidaKg.toLocaleString('pt-BR')} kg`,
       trend: '2,8% vs sem. ant.',
       up: true,
@@ -126,7 +126,7 @@ export default function DashConsumoRacao() {
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Consumo Médio',
+      label: 'Consumo médio',
       value: `${consumoMedio.toFixed(1)} kg/an./dia`,
       trend: '0,5 kg vs sem. ant.',
       up: true,
@@ -135,7 +135,7 @@ export default function DashConsumoRacao() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'Custo Médio da Batida',
+      label: 'Custo médio da batida',
       value: `R$ ${custoMedioBatida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       trend: '1,2% vs mês ant.',
       up: false,
@@ -198,7 +198,7 @@ export default function DashConsumoRacao() {
               <SparklineArea
                 data={kpiSparklines[kpi.sparkKey]}
                 color={kpi.sparkColor}
-                height={40}
+                height={t.size.sparkline}
               />
             )}
           </DashboardKpiCard>
@@ -206,11 +206,11 @@ export default function DashConsumoRacao() {
       </DashboardRow>
 
       {/* Fileira 2 — Consumo por lote */}
-      <DashboardCard title="Consumo de Ração por Lote — Kg/animal/dia (semanal)">
+      <DashboardCard title="Consumo por lote (kg/animal/dia)">
         <LineChart
           series={consumoSeries}
           labels={weekLabels}
-          height={220}
+          height={t.size.chart.md}
           area
           showLegend
           yFormat={(v) => `${v.toFixed(1)} kg`}
@@ -219,17 +219,17 @@ export default function DashConsumoRacao() {
 
       {/* Fileira 3 — Custo da batida + Composição */}
       <DashboardRow>
-        <DashboardCard title="Custo Médio da Batida por Formulação (R$/batida)">
+        <DashboardCard title="Custo médio da batida (R$)">
           <BarChart
             data={custoBatidaData}
-            height={260}
+            height={t.size.chart.lg}
             yFormat={(v) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           />
         </DashboardCard>
-        <DashboardCard title="Composição de Matérias-Primas da Ração (%)">
+        <DashboardCard title="Matérias-primas da ração (%)">
           <DonutChart
             data={mockComposicaoData}
-            height={260}
+            height={t.size.chart.lg}
             centerLabel="ingredientes"
             centerValue={String(mockComposicaoData.length)}
             showLegend

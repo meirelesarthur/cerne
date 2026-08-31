@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
-import {
-  CloudRain, Droplets,
-  Filter, X, Sun, Cloud, CloudSun, TrendingUp,
-  BarChart2, Activity,
-} from 'lucide-react'
+import { CloudRain, Droplets, Filter, X, Sun, Cloud, CloudSun } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
@@ -13,10 +9,12 @@ import { FormField } from '../../components/ui/FormField'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
 import { ChartCard } from '../../components/ui/ChartCard'
+import { ChartLegend } from '../../components/ui/ChartLegend'
 import {
   DashboardGrid,
   DashboardHeader,
   DashboardRow,
+  DashboardCard,
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
@@ -88,23 +86,14 @@ function PluvioBarChart() {
   ]
   const barLabels = BAR_DATA.map(d => d.month)
 
-  const legend = (
-    <div style={{ display: 'flex', gap: t.space[4] }}>
-      {barSeries.map(s => (
-        <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 3, background: s.color }} />
-          <span style={{ fontSize: t.font.size.xs, color: isGbMode ? t.color.neutral[400] : t.color.neutral[400], fontFamily: t.font.family.sans }}>{s.name}</span>
-        </div>
-      ))}
-    </div>
-  )
+  const legend = <ChartLegend items={barSeries.map(s => ({ label: s.name, color: s.color }))} />
 
   return (
-    <ChartCard icon={BarChart2} title="Pluviometria (dias)" action={legend}>
+    <ChartCard title="Pluviometria (dias)" action={legend}>
       <GroupedBarChart
         series={barSeries}
         labels={barLabels}
-        height={190}
+        height={t.size.chart.lg}
         yFormat={v => `${v}d`}
         showLegend={false}
       />
@@ -127,20 +116,14 @@ function VolumeAreaChart() {
 
   const lineColor = isGbMode ? t.color.brand[500] : t.color.brand[600]
 
-  const areaLegend = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-      <TrendingUp size={14} color={lineColor} />
-      <div style={{ width: 24, height: 2.5, background: lineColor, borderRadius: 2 }} />
-      <span style={{ fontSize: t.font.size.xs, color: isGbMode ? t.color.neutral[400] : t.color.neutral[400], fontFamily: t.font.family.sans }}>Realizado</span>
-    </div>
-  )
+  const areaLegend = <ChartLegend marker="line" items={[{ label: 'Realizado', color: lineColor }]} />
 
   return (
-    <ChartCard icon={Activity} title="Volume Pluviométrico (mm)" action={areaLegend}>
+    <ChartCard title="Volume pluviométrico (mm)" action={areaLegend}>
       <LineChart
         series={lineSeries}
         labels={VOLUME_LABELS}
-        height={170}
+        height={t.size.chart.md}
         yFormat={v => `${v}mm`}
         area
         showLegend={false}
@@ -178,7 +161,7 @@ export default function Pluviometria() {
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[300, 220]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} />
   }
 
   // KPIs da fileira de topo — cada um vira um card com fill próprio; quem
@@ -191,9 +174,9 @@ export default function Pluviometria() {
     badge?: { label: string; variant: 'warning' | 'danger' }
   }[] = [
     { label: 'Acumulado (7 dias)', value: '19.2mm', trend: '+3.4mm vs mês ant.', up: true },
-    { label: 'Umidade do Solo', value: '17%', trend: '-5% vs mês ant.', up: false },
-    { label: 'Próxima Chuva (>15mm)', value: 'Sem prev.', badge: { label: 'Sem previsão', variant: 'warning' } },
-    { label: 'Alertas Ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
+    { label: 'Umidade do solo', value: '17%', trend: '-5% vs mês ant.', up: false },
+    { label: 'Próxima chuva (>15mm)', value: 'Sem prev.', badge: { label: 'Sem previsão', variant: 'warning' } },
+    { label: 'Alertas ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
   ]
 
   return (
@@ -249,50 +232,23 @@ export default function Pluviometria() {
 
           {/* Right panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], height: '100%' }}>
-            {/* Alert */}
-            <div
-              style={{
-                background: isGbMode ? t.color.gb.surface : t.color.feedback.warning.bg,
-                backdropFilter: isGbMode ? 'blur(20px)' : undefined,
-                WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
-                borderRadius: t.radius['2xl'],
-                border: `1px solid ${colors.border.default}`,
-                boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-                padding: t.space[4],
-                boxSizing: 'border-box',
-              }}
-            >
-              <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.feedback.notice, fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
-                Janela de Aplicação
-              </div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: isGbMode ? t.color.amber[400] : t.color.amber[800], fontFamily: t.font.family.sans, marginBottom: t.space[2], textShadow: isGbMode ? `0 0 20px ${t.color.amber[400]}66` : undefined }}>
+            {/* Janela de aplicação */}
+            <DashboardCard title="Janela de aplicação" tone="warning">
+              <div style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.bold, color: isGbMode ? t.color.amber[400] : t.color.amber[800], fontFamily: t.font.family.sans, marginBottom: t.space[2], lineHeight: t.font.lineHeight.tight }}>
                 Atenção
               </div>
-              <div style={{ fontSize: t.font.size.sm, color: isGbMode ? `${t.color.amber[400]}a6` : t.color.amber[900], fontFamily: t.font.family.sans, lineHeight: 1.65, marginBottom: t.space[2] }}>
+              <div style={{ fontSize: t.font.size.sm, color: isGbMode ? `${t.color.amber[400]}a6` : t.color.amber[900], fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed, marginBottom: t.space[2] }}>
                 Vento em 2.4km/h e probabilidade de chuva de 4% para as próximas 8 horas.
               </div>
-              <div style={{ fontSize: t.font.size.xs, color: t.color.feedback.notice, fontFamily: t.font.family.sans, opacity: 0.65 }}>
+              <div style={{ fontSize: t.font.size.xs, color: t.color.feedback.notice, fontFamily: t.font.family.sans }}>
                 Fonte: Open-Meteo · Prata (MG)
               </div>
-            </div>
+            </DashboardCard>
 
-            {/* Forecast */}
-            <div style={{
-              background: isGbMode ? t.color.gb.surface : colors.bg.surface,
-              backdropFilter: isGbMode ? 'blur(20px)' : undefined,
-              WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
-              borderRadius: t.radius['2xl'],
-              border: `1px solid ${colors.border.default}`,
-              boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-              padding: `${t.space[4]}px ${t.space[3]}px`,
-              flex: 1,
-              boxSizing: 'border-box' as const,
-            }}>
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1], paddingInline: t.space[1] }}>
-                <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
-                  Previsão da Semana
-                </span>
+            {/* Previsão da semana */}
+            <DashboardCard
+              title="Previsão da semana"
+              action={
                 <span style={{
                   fontSize: t.font.size.xs,
                   color: colors.accent.default,
@@ -300,11 +256,13 @@ export default function Pluviometria() {
                   background: colors.accent.subtle,
                   borderRadius: t.radius.full,
                   padding: `2px ${t.space[2]}px`,
+                  whiteSpace: 'nowrap',
                 }}>
                   Open-Meteo
                 </span>
-              </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[3], paddingInline: t.space[1] }}>
+              }
+            >
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[3] }}>
                 Prata (MG)
               </div>
 
@@ -399,7 +357,7 @@ export default function Pluviometria() {
                   )
                 })}
               </div>
-            </div>
+            </DashboardCard>
           </div>
         </div>
 

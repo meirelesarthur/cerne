@@ -25,15 +25,15 @@ const funnelStages = [
 
 const kpiSparklines: Record<string, number[]> = {
   'Solicitações':      [210, 240, 228, 255, 262, 270, 284],
-  'Cotações Abertas':  [52, 58, 55, 61, 63, 65, 67],
-  'Pedidos de Compra': [31, 35, 38, 40, 41, 43, 43],
+  'Cotações abertas':  [52, 58, 55, 61, 63, 65, 67],
+  'Pedidos de compra': [31, 35, 38, 40, 41, 43, 43],
   'Recebimentos':      [40, 38, 39, 37, 38, 36, 38],
 }
 
 const funnelMeta = [
-  { label: 'Valor Médio',  values: ['R$ 1.240', 'R$ 4.820', 'R$ 12.600', 'R$ 11.900'] },
-  { label: 'Lead Time',    values: ['1 dia', '3 dias', '7 dias', '12 dias'] },
-  { label: 'Prazo Médio',  values: ['Imediato', '48h', '15 dias', '30 dias'] },
+  { label: 'Valor médio',  values: ['R$ 1.240', 'R$ 4.820', 'R$ 12.600', 'R$ 11.900'] },
+  { label: 'Lead time',    values: ['1 dia', '3 dias', '7 dias', '12 dias'] },
+  { label: 'Prazo médio',  values: ['Imediato', '48h', '15 dias', '30 dias'] },
 ] as const
 
 const categoriaData = [
@@ -124,13 +124,13 @@ export default function DashSuprimentos() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[260, 240]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} />
   }
 
   const kpis = [
     { label: 'Solicitações',     value: '284', trend: '8,3% vs mês ant.', up: true  },
-    { label: 'Cotações Abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
-    { label: 'Pedidos de Compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
+    { label: 'Cotações abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
+    { label: 'Pedidos de compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
     { label: 'Recebimentos',     value: '38',  trend: '1,2% vs mês ant.', up: false },
   ]
 
@@ -165,7 +165,7 @@ export default function DashSuprimentos() {
             <SparklineArea
               data={kpiSparklines[kpi.label]}
               color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid}
-              height={40}
+              height={t.size.sparkline}
             />
           </DashboardKpiCard>
         ))}
@@ -173,7 +173,7 @@ export default function DashSuprimentos() {
 
       {/* Fileira 2 — Funil de suprimentos */}
       <DashboardCard
-        title="Solicitações → Recebimentos — Funil de suprimentos"
+        title="Funil de suprimentos"
         action={
           <div style={{
             fontSize: t.font.size.xs, color: t.color.feedback.success.text,
@@ -184,10 +184,6 @@ export default function DashSuprimentos() {
           </div>
         }
       >
-        <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: t.font.lineHeight.tight, marginBottom: t.space[4] }}>
-          284
-        </div>
-
         <SankeyFunnel stages={funnelStages} colors={colors} isGbMode={isGbMode} chartHeight={160} />
 
         {/* Meta table */}
@@ -217,17 +213,17 @@ export default function DashSuprimentos() {
 
       {/* Fileira 3 — Gastos por categoria + Fornecedores */}
       <DashboardRow>
-        <DashboardCard title="Gastos por Categoria">
+        <DashboardCard title="Gastos por categoria">
           <BarChart
             data={categoriaData
               .filter((c) => categoria === 'todas' || c.label === categoria)
               .map((c) => ({ label: c.label, value: c.value }))}
             horizontal
-            height={240}
+            height={t.size.chart.md}
             yFormat={(v) => `R$ ${(v / 1000).toFixed(0)}K`}
           />
         </DashboardCard>
-        <DashboardCard title="Top Fornecedores">
+        <DashboardCard title="Top fornecedores">
           <FornecedoresList colors={colors} isGbMode={isGbMode} categoria={categoria} />
         </DashboardCard>
       </DashboardRow>

@@ -13,7 +13,6 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Area Chart — Acessos Diários ─────────────────────────────────────────────
 
@@ -38,16 +37,16 @@ const MODULOS = [
   { label: 'Outros',          pct:  7, acessos: 13, color: t.color.neutral[300] },
 ]
 
-function DonutModulos({ stacked }: { stacked: boolean }) {
+function DonutModulos() {
   const { colors, isGbMode } = useTheme()
   const [hovSeg, setHovSeg] = useState<number | null>(null)
 
   return (
-    <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: stacked ? 'stretch' : 'center', gap: t.space[4] }}>
-      <div style={{ width: 180, flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4] }}>
+      <div>
         <DonutChart
           data={MODULOS.map((m) => ({ label: m.label, value: m.pct, color: m.color }))}
-          height={180}
+          height={t.size.chart.sm}
           centerValue="183"
           centerLabel="sessões"
           showLegend={false}
@@ -55,7 +54,7 @@ function DonutModulos({ stacked }: { stacked: boolean }) {
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2], flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[1] }}>
         {MODULOS.map((seg, i) => (
           <div
             key={i}
@@ -73,7 +72,10 @@ function DonutModulos({ stacked }: { stacked: boolean }) {
             onMouseLeave={() => setHovSeg(null)}
           >
             <div style={{ width: 9, height: 9, borderRadius: 2, background: seg.color, flexShrink: 0 }} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.muted as string, fontFamily: t.font.family.sans, flex: 1 }}>{seg.label}</span>
+            <span style={{
+              fontSize: t.font.size.xs, color: colors.fg.muted as string, fontFamily: t.font.family.sans,
+              flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>{seg.label}</span>
             <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{seg.pct}%</span>
             <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>{seg.acessos}</span>
           </div>
@@ -109,18 +111,16 @@ const HOURLY_SERIES = [
 // ─── DashUsuarios ─────────────────────────────────────────────────────────────
 
 const USR_KPIS = [
-  { label: 'Usuários Ativos',      value: '47',      trend: '5,2%',  up: true  },
-  { label: 'Sessões Hoje',         value: '183',     trend: '12,4%', up: true  },
-  { label: 'Tempo Médio Sessão',   value: '8,4 min', trend: '0,8%',  up: false },
-  { label: 'Módulos Acessados',    value: '9 / 11',  trend: null,    up: true  },
+  { label: 'Usuários ativos',      value: '47',      trend: '5,2%',  up: true  },
+  { label: 'Sessões hoje',         value: '183',     trend: '12,4%', up: true  },
+  { label: 'Tempo médio de sessão',   value: '8,4 min', trend: '0,8%',  up: false },
+  { label: 'Módulos acessados',    value: '9 / 11',  trend: null,    up: true  },
 ]
 
 export default function DashUsuarios() {
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('30')
-  // Tablet/estreito: o donut de módulos usa layout compacto
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
@@ -128,7 +128,7 @@ export default function DashUsuarios() {
   }, [])
 
   if (loading) {
-    return <DashboardSkeleton kpis={4} blocks={[220, 160]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.sm]} />
   }
 
   return (
@@ -165,27 +165,27 @@ export default function DashUsuarios() {
 
       {/* Fileira 2 — Acessos diários + Módulos */}
       <DashboardRow>
-        <DashboardCard title="Acessos Diários" flex={2}>
+        <DashboardCard title="Acessos diários" flex={2}>
           <LineChart
             series={[{ name: 'Sessões', data: DAILY_VALUES.slice(-Number(periodo)), color: t.color.brand[600] }]}
             labels={DAILY_LABELS.slice(-Number(periodo))}
-            height={220}
+            height={t.size.chart.lg}
             area
             showLegend={false}
             yFormat={(v) => String(Math.round(v))}
           />
         </DashboardCard>
-        <DashboardCard title="Módulos Mais Acessados" flex={1}>
-          <DonutModulos stacked={stacked} />
+        <DashboardCard title="Módulos mais acessados" flex={1}>
+          <DonutModulos />
         </DashboardCard>
       </DashboardRow>
 
       {/* Fileira 3 — Picos por hora */}
-      <DashboardCard title="Picos de Acesso por Hora">
+      <DashboardCard title="Picos de acesso por hora">
         <StackedBarChart
           series={HOURLY_SERIES}
           labels={HOURLY_LABELS}
-          height={160}
+          height={t.size.chart.sm}
           showLegend
           yFormat={(v) => String(Math.round(v))}
         />

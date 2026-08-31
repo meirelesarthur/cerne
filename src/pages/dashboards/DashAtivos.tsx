@@ -32,7 +32,7 @@ const CATEGORIAS_SERIES = [
     color: t.color.brand[600],
   },
   {
-    name: 'Em Operação',
+    name: 'Em operação',
     data: CATEGORIAS.map(c => c.op),
     color: t.color.brand[200],
   },
@@ -49,7 +49,7 @@ interface StatusItem {
 
 const STATUS_ITEMS: StatusItem[] = [
   { label: 'Operacional',          count: 298, pct: 87.1, color: t.color.brand[600] },
-  { label: 'Manutenção Preventiva', count: 13,  pct: 3.8,  color: t.color.feedback.notice },
+  { label: 'Manutenção preventiva', count: 13,  pct: 3.8,  color: t.color.feedback.notice },
   { label: 'Corretiva / Parado',   count: 18,  pct: 5.3,  color: t.color.feedback.error.text },
   { label: 'Aposentado / Baixa',   count: 13,  pct: 3.8,  color: t.color.neutral[400] },
 ]
@@ -128,10 +128,10 @@ const MANUT_SERIES = [
 // ─── DashAtivos ───────────────────────────────────────────────────────────────
 
 const ATIVOS_KPIS = [
-  { label: 'Total de Ativos',   value: '342',     trend: '5,4%',  up: true  },
-  { label: 'Em Operação',       value: '298',     trend: '3,2%',  up: true  },
-  { label: 'Em Manutenção',     value: '31',      trend: '12,4%', up: false },
-  { label: 'Valor Patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
+  { label: 'Total de ativos',   value: '342',     trend: '5,4%',  up: true  },
+  { label: 'Em operação',       value: '298',     trend: '3,2%',  up: true  },
+  { label: 'Em manutenção',     value: '31',      trend: '12,4%', up: false },
+  { label: 'Valor patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
 ]
 
 export default function DashAtivos() {
@@ -145,7 +145,7 @@ export default function DashAtivos() {
   }, [])
 
   if (loading) {
-    return <DashboardSkeleton kpis={4} blocks={[260, 200]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses da série de manutenções
@@ -187,25 +187,25 @@ export default function DashAtivos() {
 
       {/* Fileira 2 — Categorias + Status */}
       <DashboardRow>
-        <DashboardCard title="Ativos por Categoria" flex={3}>
+        <DashboardCard title="Ativos por categoria" flex={3}>
           <GroupedBarChart
             series={CATEGORIAS_SERIES}
             labels={CATEGORIAS_LABELS}
-            height={260}
+            height={t.size.chart.lg}
             showLegend
           />
         </DashboardCard>
-        <DashboardCard title="Status dos Ativos" flex={2}>
+        <DashboardCard title="Status dos ativos" flex={2}>
           <StatusCards />
         </DashboardCard>
       </DashboardRow>
 
       {/* Fileira 3 — Manutenções */}
-      <DashboardCard title="Manutenções por Mês">
+      <DashboardCard title="Manutenções por mês">
         <GroupedBarChart
           series={manutSeries}
           labels={manutLabels}
-          height={200}
+          height={t.size.chart.md}
           showLegend
         />
       </DashboardCard>

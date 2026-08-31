@@ -35,20 +35,20 @@ const mockSetores = ['Setor A', 'Setor B', 'Setor C', 'Setor D', 'Setor E']
 
 const mockStackedSeries = [
   {
-    name: 'Animais alojados',
+    name: 'Alojados',
     data: [340, 480, 290, 520, 410],
     color: t.color.brand[600],
   },
   {
-    name: 'Capacidade restante',
+    name: 'Disponível',
     data: [160, 20, 210, 80, 190],
     color: t.color.feedback.success.solid,
   },
 ]
 
 const kpiSparklines: Record<string, number[]> = {
-  'Taxa de Ocupação': [71, 74, 76, 79, 81, 83, 85],
-  'Total de Animais': [1820, 1870, 1910, 1960, 1990, 2020, 2040],
+  'Taxa de ocupação': [71, 74, 76, 79, 81, 83, 85],
+  'Total de animais': [1820, 1870, 1910, 1960, 1990, 2020, 2040],
 }
 
 // ─── DashLotacaoCurrais ───────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ export default function DashLotacaoCurrais() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[260]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg]} />
   }
 
   // KPI derivados dos mocks
@@ -81,25 +81,25 @@ export default function DashLotacaoCurrais() {
 
   const kpis = [
     {
-      label: 'Taxa de Ocupação',
+      label: 'Taxa de ocupação',
       value: `${taxaOcupacao}%`,
       trend: '2,1 p.p. vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Taxa de Ocupação',
+      sparkKey: 'Taxa de ocupação',
       sparkColor: t.color.brand[600],
     },
     {
-      label: 'Total de Animais',
+      label: 'Total de animais',
       value: totalAnimais.toLocaleString('pt-BR'),
       trend: '1,9% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Total de Animais',
+      sparkKey: 'Total de animais',
       sparkColor: t.color.brand[600],
     },
     {
-      label: 'Currais Disponíveis',
+      label: 'Currais disponíveis',
       value: String(curraisDisponiveis),
       trend: curraisDisponiveis > 0 ? 'Disponíveis agora' : 'Nenhum disponível',
       up: curraisDisponiveis > 0,
@@ -110,7 +110,7 @@ export default function DashLotacaoCurrais() {
       sparkColor: t.color.feedback.success.solid,
     },
     {
-      label: 'Capacidade Total',
+      label: 'Capacidade total',
       value: capacidadeTotal.toLocaleString('pt-BR'),
       trend: 'cab. totais',
       up: true,
@@ -161,7 +161,7 @@ export default function DashLotacaoCurrais() {
               <SparklineArea
                 data={kpiSparklines[kpi.sparkKey]}
                 color={kpi.sparkColor}
-                height={40}
+                height={t.size.sparkline}
               />
             )}
           </DashboardKpiCard>
@@ -170,24 +170,24 @@ export default function DashLotacaoCurrais() {
 
       {/* Fileira 2 — Status + Ocupação por setor */}
       <DashboardRow>
-        <DashboardCard title="Distribuição por Status">
+        <DashboardCard title="Distribuição por status">
           <DonutChart
             data={mockStatusData}
-            height={260}
+            height={t.size.chart.lg}
             centerLabel="currais"
             centerValue={String(mockStatusData.reduce((a, d) => a + d.value, 0))}
             showLegend
             valueFormat={(v) => `${v} currais`}
           />
         </DashboardCard>
-        <DashboardCard title="Ocupação por Setor (cab.)">
+        <DashboardCard title="Ocupação por setor (cab.)">
           <StackedBarChart
             series={mockStackedSeries.map((s) => ({
               ...s,
               data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
             }))}
             labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
-            height={260}
+            height={t.size.chart.lg}
             horizontal
             showLegend
             yFormat={(v) => `${v}`}

@@ -74,12 +74,12 @@ const mockStackedSeries = [
 // Série de linha dupla: custo/@  e custo animal/dia (escala: /@; animal/dia ×8 para coexistir)
 const mockLineSeries = [
   {
-    name: 'Custo por Arroba (R$/@)',
+    name: 'Por arroba (R$/@)',
     data: mockCustoArroba,
     color: t.chart.series[0],
   },
   {
-    name: 'Custo Animal/Dia (R$/cab ×8)',
+    name: 'Animal/dia (R$ ×8)',
     data: mockCustoAnimalDia.map((v) => Math.round(v * 8 * 10) / 10),
     color: t.chart.series[2],
   },
@@ -118,7 +118,7 @@ export default function DashCustosConfinamento() {
   }, [])
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[260, 240]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.lg]} />
   }
 
   // KPI derivados dos mocks — último mês disponível (Jun)
@@ -130,7 +130,7 @@ export default function DashCustosConfinamento() {
 
   const kpis = [
     {
-      label: 'Custo por Arroba',
+      label: 'Custo por arroba',
       value: `R$ ${custoArrobaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/@`,
       trend: '2,5% vs mês ant.', // sem "+": a seta (▼) já indica que o aumento de custo é desfavorável
       up: false, // custo subindo = desfavorável
@@ -139,7 +139,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Custo Animal/Dia',
+      label: 'Custo animal/dia',
       value: `R$ ${custoAnimalDiaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       trend: '2,6% vs mês ant.',
       up: false,
@@ -148,7 +148,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'COE (Custo Operacional)',
+      label: 'COE (custo operacional)',
       value: `R$ ${(coeAtual * 1000).toLocaleString('pt-BR')}`,
       trend: '4,5% vs mês ant.',
       up: false,
@@ -157,7 +157,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Margem Bruta',
+      label: 'Margem bruta',
       value: `${margemAtual.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`,
       trend: '−0,6 p.p. vs mês ant.',
       up: false,
@@ -219,7 +219,7 @@ export default function DashCustosConfinamento() {
               <SparklineArea
                 data={kpiSparklines[kpi.sparkKey]}
                 color={kpi.sparkColor}
-                height={40}
+                height={t.size.sparkline}
               />
             )}
           </DashboardKpiCard>
@@ -228,22 +228,22 @@ export default function DashCustosConfinamento() {
 
       {/* Fileira 2 — Composição por mês + Evolução de custo */}
       <DashboardRow>
-        <DashboardCard title="Composição de Custo por Mês (R$ mil)" flex={3}>
+        <DashboardCard title="Composição de custo por mês (R$ mil)" flex={3}>
           <StackedBarChart
             series={mockStackedSeries
               .filter((s) => categoria === 'todas' || s.name === categoria)
               .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
             labels={MESES.slice(-Number(periodo))}
-            height={260}
+            height={t.size.chart.lg}
             showLegend
             yFormat={(v) => `R$ ${v}`}
           />
         </DashboardCard>
-        <DashboardCard title="Evolução de Custo por Arroba e Animal/Dia" flex={2}>
+        <DashboardCard title="Custo por arroba e animal/dia" flex={2}>
           <LineChart
             series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
             labels={MESES.slice(-Number(periodo))}
-            height={260}
+            height={t.size.chart.lg}
             area={false}
             showLegend
             yFormat={(v) => `R$ ${v}`}
@@ -252,10 +252,10 @@ export default function DashCustosConfinamento() {
       </DashboardRow>
 
       {/* Fileira 3 — Composição total do período */}
-      <DashboardCard title="Composição Total do Período (R$ mil)">
+      <DashboardCard title="Composição total do período (R$ mil)">
         <DonutChart
           data={mockDonutData}
-          height={240}
+          height={t.size.chart.lg}
           centerLabel="COE total"
           centerValue={`R$ ${mockDonutData.reduce((a, d) => a + d.value, 0).toLocaleString('pt-BR')}`}
           showLegend

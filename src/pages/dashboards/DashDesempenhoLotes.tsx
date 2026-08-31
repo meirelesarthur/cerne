@@ -67,7 +67,7 @@ const mockGmdSeries = [
 // Histórico de sparklines (7 pontos de GMD médio diário)
 const kpiSparklines: Record<string, number[]> = {
   'Média GMD': [1.30, 1.33, 1.36, 1.38, 1.40, 1.42, 1.38],
-  'Ganho Total': [3200, 3580, 3940, 4260, 4600, 4920, 5180],
+  'Ganho total': [3200, 3580, 3940, 4260, 4600, 4920, 5180],
 }
 
 // Lista compacta de lotes com últimas pesagens
@@ -98,7 +98,7 @@ export default function DashDesempenhoLotes() {
   const bc = colors.border.default as string
 
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[260, 240]} />
+    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} />
   }
 
   // ── KPIs derivados dos mocks ────────────────────────────────────────────────
@@ -143,16 +143,16 @@ export default function DashDesempenhoLotes() {
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Ganho Total',
+      label: 'Ganho total',
       value: `${ganhoTotal.toLocaleString('pt-BR')} kg`,
       trend: '5,8% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Ganho Total',
+      sparkKey: 'Ganho total',
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Peso Médio Final',
+      label: 'Peso médio final',
       value: `${pesoMedioFinal.toLocaleString('pt-BR')} kg`,
       trend: '3,2% vs pesagem ant.',
       up: true,
@@ -161,7 +161,7 @@ export default function DashDesempenhoLotes() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'Lotes Ativos',
+      label: 'Lotes ativos',
       value: String(lotesAtivos),
       trend: 'lotes em confinamento',
       up: true,
@@ -224,7 +224,7 @@ export default function DashDesempenhoLotes() {
               <SparklineArea
                 data={kpiSparklines[kpi.sparkKey]}
                 color={kpi.sparkColor}
-                height={40}
+                height={t.size.sparkline}
               />
             )}
           </DashboardKpiCard>
@@ -233,21 +233,21 @@ export default function DashDesempenhoLotes() {
 
       {/* Fileira 2 — Evolução de peso + GMD */}
       <DashboardRow>
-        <DashboardCard title="Evolução de Peso Médio por Lote (kg)">
+        <DashboardCard title="Peso médio por lote (kg)">
           <LineChart
             series={lotesSeries}
             labels={pesagemLabels}
-            height={260}
+            height={t.size.chart.lg}
             area={false}
             showLegend
             yFormat={(v) => `${v} kg`}
           />
         </DashboardCard>
-        <DashboardCard title="Comparativo de GMD: atual vs meta (kg/dia)">
+        <DashboardCard title="GMD: atual vs meta (kg/dia)">
           <GroupedBarChart
             series={gmdSeries}
             labels={gmdLabels}
-            height={260}
+            height={t.size.chart.lg}
             showLegend
             yFormat={(v) => `${v.toFixed(2)} kg/dia`}
           />
@@ -255,7 +255,7 @@ export default function DashDesempenhoLotes() {
       </DashboardRow>
 
       {/* Fileira 3 — Detalhamento por lote */}
-      <DashboardCard title="Detalhamento por Lote">
+      <DashboardCard title="Detalhamento por lote">
         {/* Tabela de detalhamento — grid CSS com semântica de tabela via ARIA */}
         <div role="table" aria-label="Detalhamento por lote">
           {/* Cabeçalho da lista */}

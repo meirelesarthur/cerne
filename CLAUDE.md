@@ -240,6 +240,14 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 - Rótulo do bloco na prop `title`; legenda/filtro/botão na prop `action`.
 - Bloco que sangra (mapa) → `DashboardCard bare`.
 - Borda só no GBMode — regra do `DashboardCard`, nunca replicada na tela.
+- **Altura de gráfico** de `t.size.chart.{sm,md,lg}` (180/220/260); mesma fileira, mesmo
+  degrau. Sparkline de KPI: `t.size.sparkline`.
+- **Rótulo em caixa de sentença e em uma linha**; aviso/detalhe vira chip no `action`.
+- **KPI sem `valueSize`**: o degrau sai do comprimento do valor.
+- **Legenda de série** via `ChartLegend`/legenda interna do gráfico — nunca ponto+rótulo
+  montado na tela. Não repetir na tela um número que a fileira de KPIs já mostra.
+- Em `<text>`/`<tspan>` de SVG, tamanho e peso de fonte vão em `style` — o atributo de
+  apresentação perde para o CSS global.
 - Referências: `OverviewPanel.tsx`, `DashAtivos.tsx`, `Pluviometria.tsx`.
 
 ### Regra D — Tokens disponíveis (use estes, não invente literais)
@@ -247,6 +255,7 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
 literal, procure o token:
 
+- **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) · `t.size.sparkline` (40).
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34),
   `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`,
   `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).

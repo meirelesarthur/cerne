@@ -181,6 +181,17 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
 - **Bloco que sangra** (mapa, imagem) usa `DashboardCard bare` — sem padding interno.
 - **Sem borda no tema claro** (quem separa é o canvas); no GBMode o card mantém a hairline
   verde, necessária sobre fundo escuro. Isso vive no `DashboardCard` — não replicar na tela.
+- **Altura de gráfico** vem de `t.size.chart.{sm,md,lg}` — nunca número solto. Cards na
+  mesma fileira usam o mesmo degrau, senão um fecha antes do outro.
+- **Rótulo em caixa de sentença**, em uma linha: "Ativos por categoria", não "Ativos por
+  Categoria" nem "Cobertura por Produto (dias restantes) — itens críticos abaixo de 14
+  dias". Detalhe/aviso vai como chip no `action`, não no título.
+- **Valor de KPI** não recebe `valueSize`: o degrau sai do comprimento do texto
+  (`DashboardKpiCard`), para "R$ 8,4M" e "Déficit Hídrico" conviverem na mesma fileira.
+- **Legenda de série** é `ChartLegend` (no `action` do card) ou a legenda interna do
+  próprio gráfico — nunca ponto + rótulo montados na tela.
+- **Sem número repetido**: se o valor já está na fileira de KPIs, não repetir como herói
+  dentro do card do gráfico.
 - Referências: `OverviewPanel.tsx` (grade completa, 2 colunas), `DashAtivos.tsx` (grade
   simples), `Pluviometria.tsx` (grade + overlay de filtros).
 
@@ -188,6 +199,8 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
 
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um literal, procure o token — lista completa e valores reais na [Seção 3](#3-sistema-de-tokens). Atalhos mais usados:
 
+- **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) — escala fechada; blocos
+  da MESMA fileira usam sempre o mesmo degrau. `t.size.sparkline` (40) na base do KPI.
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34), `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`, `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
@@ -487,11 +500,23 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `HeatmapChart` | Mapa de calor em grid, intensidade por opacidade |
 | `SankeyFunnel` | Funil SVG com conectores de fluxo e tooltip por estágio |
 | `SparklineArea` | Mini-gráfico de linha/área para tendências |
-| `ChartCard` | Wrapper de gráfico com cabeçalho, ação e expansão em modal |
+| `ChartCard` | Bloco de gráfico com expansão em modal (frame do `DashboardCard`) |
 | `KpiStatCard` | Cartão de métrica com ícone, valor grande e chip de tendência |
+| `ChartLegend` | Legenda de séries em HTML — ao lado do título do card (ponto ou traço) |
+| `ChartSvgLegend` | Legenda de séries dentro do SVG do gráfico, com passo pelo texto |
 | `MapView` | Mapa Leaflet somente-leitura: perímetro GeoJSON ou marcador de coordenada |
 
-> Todos os gráficos SVG seguem o mesmo padrão interno (`viewBox` fixo, `useChartScale`, tooltip via hover, paleta `t.chart.series`) — ao criar um gráfico novo, siga esse padrão em vez de inventar um approach diferente. Exceção a confirmar: `HeatmapChart` recebe `colors`/`isGbMode` via prop em vez de `useTheme()` interno como os demais — checar antes de copiar esse componente como referência de tema.
+> **Tipografia em SVG:** o `font-size` como ATRIBUTO de apresentação perde para o CSS
+> global do app — todo texto de gráfico renderizava 16px em vez do token. Em `<text>`/
+> `<tspan>` o tamanho e o peso vão sempre em `style={{ … }}`.
+>
+> **Escala:** o `viewBox` dos gráficos é casado à largura real medida (`useChartScale().width`),
+> então 1 unidade = 1px: `height` é a altura renderizada de fato e cada fonte sai no px do
+> token. Eixo, padding e afinamento de rótulo saem de `src/utils/chartAxis.ts`
+> (`niceAxisMax`/`niceAxisTicks`/`axisLabelPad`/`axisLabelStep`/`truncateAxisLabel`), que
+> mede o texto de verdade em canvas em vez de estimar por caractere.
+
+> Todos os gráficos SVG seguem o mesmo padrão interno (`viewBox` casado à largura, `useChartScale`, tooltip via hover, paleta `t.chart.series`) — ao criar um gráfico novo, siga esse padrão em vez de inventar um approach diferente. Exceção a confirmar: `HeatmapChart` recebe `colors`/`isGbMode` via prop em vez de `useTheme()` interno como os demais — checar antes de copiar esse componente como referência de tema.
 
 ### Ações & Identidade
 

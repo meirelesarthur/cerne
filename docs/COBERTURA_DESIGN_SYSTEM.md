@@ -159,6 +159,9 @@ Confirmado em `LINKS_NOVAS_FUNCIONALIDADES.md` — a simplicidade é intencional
   `DashboardRow`/`DashboardStack` + `DashboardCard`/`DashboardKpiCard` + `DashboardSkeleton` —
   cada bloco é um card com fill próprio e o canvas é o que forma os separadores (o card único
   com `HDivider`/`VDivider` internos foi retirado dos dashboards).
+  A legenda de série saiu das telas para o kit: `ChartLegend` (HTML, no `action` do card) e
+  `ChartSvgLegend` (dentro do SVG). Eixo, padding e afinamento de rótulo vivem em
+  `src/utils/chartAxis.ts` — medindo o texto, não estimando.
 - **Relatórios (92 telas no discovery)** — `ReportWorkspace` é a âncora; endereçados um a um.
 
 ## Histórico de fechamento (Fases do backlog de cobertura)

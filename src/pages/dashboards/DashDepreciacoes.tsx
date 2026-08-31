@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Stacked Bar Data ─────────────────────────────────────────────────────────
 
@@ -91,33 +94,18 @@ const DEP_KPIS = [
 // ─── DashDepreciacoes ─────────────────────────────────────────────────────────
 
 export default function DashDepreciacoes() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (loading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    return <DashboardSkeleton kpis={4} blocks={[210, 220]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses da série empilhada
@@ -126,47 +114,39 @@ export default function DashDepreciacoes() {
   const stackedSeries = STACKED_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="md" weight="semibold">Depreciações</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Depreciações"
+        subtitle="Depreciação acumulada, composição e projeção do patrimônio"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3',  label: 'Últimos 3 meses' },
+              { value: '6',  label: 'Últimos 6 meses' },
+              { value: '12', label: 'Últimos 12 meses' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {DEP_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            {kpi.trend && <Trend value={kpi.trend} up={kpi.up} />}
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {DEP_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Stacked bar — full width */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
-            Depreciação por Categoria — {nMeses} Meses
-          </div>
-        </div>
+      {/* Fileira 2 — Depreciação por categoria */}
+      <DashboardCard title={`Depreciação por Categoria — ${nMeses} Meses`}>
         <StackedBarChart
           series={stackedSeries}
           labels={stackedLabels}
@@ -174,15 +154,11 @@ export default function DashDepreciacoes() {
           yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
           showLegend
         />
-      </div>
-      <HDivider color={bc} />
+      </DashboardCard>
 
-      {/* Donut + Projection */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'stretch' }}>
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Composição por Tipo de Bem
-          </div>
+      {/* Fileira 3 — Composição + Projeção */}
+      <DashboardRow>
+        <DashboardCard title="Composição por Tipo de Bem">
           <DonutChart
             data={DONUT_SLICES}
             height={220}
@@ -191,24 +167,22 @@ export default function DashDepreciacoes() {
             showLegend
             valueFormat={(v) => `R$ ${(v / 1_000_000).toFixed(1)}M`}
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-            <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
-              Projeção Próximos 24 Meses
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4] }}>
+        </DashboardCard>
+        <DashboardCard
+          title="Projeção Próximos 24 Meses"
+          action={
+            <>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
                 <div style={{ width: 16, height: 2, background: t.color.brand[600], borderRadius: 1 }} />
-                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Realizado</span>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Realizado</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={2}><line x1="0" y1="1" x2="16" y2="1" stroke={t.color.brand[400]} strokeWidth="2" strokeDasharray="4 2" /></svg>
-                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Projeção</span>
+                <svg width={16} height={2} aria-hidden="true"><line x1="0" y1="1" x2="16" y2="1" stroke={t.color.brand[400]} strokeWidth="2" strokeDasharray="4 2" /></svg>
+                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Projeção</span>
               </div>
-            </div>
-          </div>
+            </>
+          }
+        >
           <LineChart
             series={PROJ_SERIES_FULL}
             labels={PROJ_LABELS}
@@ -217,8 +191,8 @@ export default function DashDepreciacoes() {
             area
             showLegend={false}
           />
-        </div>
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

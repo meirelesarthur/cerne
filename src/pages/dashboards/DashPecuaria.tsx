@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
-import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -55,33 +57,17 @@ const PEC_KPIS = [
 ]
 
 export default function DashPecuaria() {
-  const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (isLoading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    return <DashboardSkeleton kpis={4} blocks={[240, 220]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -91,46 +77,40 @@ export default function DashPecuaria() {
   const manejosSeries = MANEJOS_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="md" weight="semibold">Pecuária de Corte</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Pecuária de Corte"
+        subtitle="Rebanho, composição e manejos do período"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3',  label: 'Últimos 3 meses' },
+              { value: '6',  label: 'Últimos 6 meses' },
+              { value: '12', label: 'Últimos 12 meses' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {PEC_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {PEC_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Area chart + Donut */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: stacked ? undefined : 'stretch' }}>
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Evolução do Rebanho
-          </div>
+      {/* Fileira 2 — Evolução + Composição */}
+      <DashboardRow>
+        <DashboardCard title="Evolução do Rebanho" flex={2}>
           <LineChart
             series={rebanhoSeries}
             labels={labels}
@@ -139,12 +119,8 @@ export default function DashPecuaria() {
             showLegend
             yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Composição do Rebanho
-          </div>
+        </DashboardCard>
+        <DashboardCard title="Composição do Rebanho" flex={1}>
           <DonutChart
             data={rebanhoComp.map((d) => ({ label: d.label, value: d.pct, color: d.color }))}
             height={220}
@@ -153,22 +129,18 @@ export default function DashPecuaria() {
             showLegend
             valueFormat={(v) => `${v}%`}
           />
-        </div>
-      </div>
-      <HDivider color={bc} />
+        </DashboardCard>
+      </DashboardRow>
 
-      {/* Row 3 — Manejos */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-          Manejos por Mês
-        </div>
+      {/* Fileira 3 — Manejos */}
+      <DashboardCard title="Manejos por Mês">
         <GroupedBarChart
           series={manejosSeries}
           labels={labels}
           height={220}
           showLegend
         />
-      </div>
-    </div>
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

@@ -1,24 +1,20 @@
 import { useEffect, useState } from 'react'
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  AlertCircle,
-  BarChart2,
-  Clock,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardStack,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -148,34 +144,14 @@ export default function DashFinanceiro() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={600} />
-      </div>
-    )
+    return <DashboardSkeleton kpis={4} blocks={[240, 220]} />
   }
 
   const kpis = [
@@ -199,71 +175,55 @@ export default function DashFinanceiro() {
   const donutSlices = donutData.map(d => ({ label: d.label, value: d.pct, color: d.color }))
 
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Financeiro"
+        subtitle="Receitas, despesas, orçamento e vencimentos"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3',  label: 'Últimos 3 meses' },
+              { value: '6',  label: 'Últimos 6 meses' },
+              { value: '12', label: 'Últimos 12 meses' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Financeiro</Heading>
-        </div>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── KPI row ────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Chart row: Area (2/3) + Donut (1/3) ──────────────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Area chart */}
-        <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-            <div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
-                R$ 892K
-              </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
-                Receitas vs Despesas — 12 meses
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: t.space[4] }}>
+      {/* Fileira 2 — Receitas vs Despesas + (Categorias / Orçamento) */}
+      <DashboardRow>
+        <DashboardCard
+          title={`Receitas vs Despesas — ${nMeses} meses`}
+          flex={2}
+          action={
+            <>
               {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.feedback.error.solid, label: 'Despesas' }].map(s => (
                 <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ width: 8, height: 2, borderRadius: 1, background: s.color, display: 'inline-block' }} />
                   <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>{s.label}</span>
                 </div>
               ))}
-            </div>
+            </>
+          }
+        >
+          <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: t.font.lineHeight.tight, marginBottom: t.space[3] }}>
+            R$ 892K
           </div>
           <LineChart
             series={lineSeries}
@@ -273,16 +233,10 @@ export default function DashFinanceiro() {
             area
             showLegend={false}
           />
-        </div>
+        </DashboardCard>
 
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Donut + Gauge stacked */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[3] }}>
-              Despesas por Categoria
-            </div>
+        <DashboardStack flex={1}>
+          <DashboardCard title="Despesas por Categoria">
             <DonutChart
               data={donutSlices}
               height={160}
@@ -291,30 +245,16 @@ export default function DashFinanceiro() {
               showLegend
               valueFormat={(v) => `${v}%`}
             />
-          </div>
-          <HDivider color={bc} />
-          <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[2] }}>
-              Orçamento Anual
-            </div>
+          </DashboardCard>
+          <DashboardCard title="Orçamento Anual">
             <ArcGauge colors={colors} />
-          </div>
-        </div>
-      </div>
+          </DashboardCard>
+        </DashboardStack>
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── Bottom row: Heatmap (1/2) + Vencimentos (1/2) ────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Heatmap */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Atividade de Receita por Hora
-            </span>
-          </div>
+      {/* Fileira 3 — Heatmap + Vencimentos */}
+      <DashboardRow>
+        <DashboardCard title="Atividade de Receita por Hora">
           <HeatmapChart
             data={heatmapData}
             rowLabels={heatmapRows}
@@ -322,22 +262,11 @@ export default function DashFinanceiro() {
             colors={colors}
             isGbMode={isGbMode}
           />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Vencimentos */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Clock size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Vencimentos Próximos — 30 dias
-            </span>
-          </div>
+        </DashboardCard>
+        <DashboardCard title="Vencimentos Próximos — 30 dias">
           <VencimentosList colors={colors} isGbMode={isGbMode} />
-        </div>
-
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

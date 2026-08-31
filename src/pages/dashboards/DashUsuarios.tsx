@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
 import { LineChart } from '../../components/ui/LineChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── Area Chart — Acessos Diários ─────────────────────────────────────────────
@@ -111,11 +116,10 @@ const USR_KPIS = [
 ]
 
 export default function DashUsuarios() {
-  const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('30')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
+  // Tablet/estreito: o donut de módulos usa layout compacto
   const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
@@ -123,60 +127,45 @@ export default function DashUsuarios() {
     return () => clearTimeout(id)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (loading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    return <DashboardSkeleton kpis={4} blocks={[220, 160]} />
   }
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="sm" weight="semibold">Análise de Usuários</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '7',  label: 'Últimos 7 dias' },
-            { value: '15', label: 'Últimos 15 dias' },
-            { value: '30', label: 'Últimos 30 dias' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Análise de Usuários"
+        subtitle="Acessos, módulos e horários de pico da equipe"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '7',  label: 'Últimos 7 dias' },
+              { value: '15', label: 'Últimos 15 dias' },
+              { value: '30', label: 'Últimos 30 dias' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {USR_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            {kpi.trend && (
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
-            )}
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {USR_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Area chart + Donut */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Acessos Diários</div>
+      {/* Fileira 2 — Acessos diários + Módulos */}
+      <DashboardRow>
+        <DashboardCard title="Acessos Diários" flex={2}>
           <LineChart
             series={[{ name: 'Sessões', data: DAILY_VALUES.slice(-Number(periodo)), color: t.color.brand[600] }]}
             labels={DAILY_LABELS.slice(-Number(periodo))}
@@ -185,18 +174,14 @@ export default function DashUsuarios() {
             showLegend={false}
             yFormat={(v) => String(Math.round(v))}
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Módulos Mais Acessados</div>
+        </DashboardCard>
+        <DashboardCard title="Módulos Mais Acessados" flex={1}>
           <DonutModulos stacked={stacked} />
-        </div>
-      </div>
-      <HDivider color={bc} />
+        </DashboardCard>
+      </DashboardRow>
 
-      {/* Row 3 — Hourly stacked */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Picos de Acesso por Hora</div>
+      {/* Fileira 3 — Picos por hora */}
+      <DashboardCard title="Picos de Acesso por Hora">
         <StackedBarChart
           series={HOURLY_SERIES}
           labels={HOURLY_LABELS}
@@ -204,7 +189,7 @@ export default function DashUsuarios() {
           showLegend
           yFormat={(v) => String(Math.round(v))}
         />
-      </div>
-    </div>
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

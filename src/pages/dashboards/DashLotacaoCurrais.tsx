@@ -7,22 +7,20 @@
 // - Filtros de Pátio e Setor devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 
 import { useEffect, useState } from 'react'
-import {
-  LayoutGrid,
-  PieChart,
-  BarChart2,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -56,40 +54,20 @@ const kpiSparklines: Record<string, number[]> = {
 // ─── DashLotacaoCurrais ───────────────────────────────────────────────────────
 
 export default function DashLotacaoCurrais() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   // Pátio único nos mocks — o filtro mantém o recorte explícito
   const [patio, setPatio] = useState('principal')
   const [setor, setSetor] = useState('todos')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    return <DashboardSkeleton kpis={4} blocks={[260]} />
   }
 
   // KPI derivados dos mocks
@@ -143,83 +121,56 @@ export default function DashLotacaoCurrais() {
   ]
 
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Lotação de Currais"
+        subtitle="Ocupação, status e capacidade do pátio de confinamento"
+        actions={
+          <>
+            <FilterSelect
+              ariaLabel="Filtrar por pátio"
+              options={[{ value: 'principal', label: 'Pátio Principal' }]}
+              value={patio}
+              onChange={setPatio}
+            />
+            <FilterSelect
+              ariaLabel="Filtrar por setor"
+              options={[
+                { value: 'todos', label: 'Todos os Setores' },
+                ...mockSetores.map((s) => ({ value: s, label: s })),
+              ]}
+              value={setor}
+              onChange={setSetor}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <LayoutGrid size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Lotação de Currais</Heading>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <FilterSelect
-            ariaLabel="Filtrar por pátio"
-            options={[{ value: 'principal', label: 'Pátio Principal' }]}
-            value={patio}
-            onChange={setPatio}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por setor"
-            options={[
-              { value: 'todos', label: 'Todos os Setores' },
-              ...mockSetores.map((s) => ({ value: s, label: s })),
-            ]}
-            value={setor}
-            onChange={setSetor}
-          />
-        </div>
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{
-              fontSize: t.font.size.xs, color: colors.fg.subtle as string,
-              marginBottom: t.space[1], fontFamily: t.font.family.sans,
-            }}>
-              {kpi.label}
-            </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: kpi.valueColor, lineHeight: 1.1, marginBottom: t.space[2],
-              fontFamily: t.font.family.sans,
-            }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+            valueColor={kpi.valueColor}
+          >
             {kpi.sparkKey && (
-              <div style={{ marginTop: t.space[3], height: 40 }}>
-                <SparklineArea
-                  data={kpiSparklines[kpi.sparkKey]}
-                  color={kpi.sparkColor}
-                  height={40}
-                />
-              </div>
+              <SparklineArea
+                data={kpiSparklines[kpi.sparkKey]}
+                color={kpi.sparkColor}
+                height={40}
+              />
             )}
-          </div>,
-        ])}
-      </div>
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── Gráficos: Donut (status) + StackedBar (por setor) ────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Gráfico 1 — Status dos Currais */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <PieChart size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Distribuição por Status
-            </span>
-          </div>
+      {/* Fileira 2 — Status + Ocupação por setor */}
+      <DashboardRow>
+        <DashboardCard title="Distribuição por Status">
           <DonutChart
             data={mockStatusData}
             height={260}
@@ -228,18 +179,8 @@ export default function DashLotacaoCurrais() {
             showLegend
             valueFormat={(v) => `${v} currais`}
           />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Gráfico 2 — Animais alojados vs Capacidade restante por Setor */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Ocupação por Setor (cab.)
-            </span>
-          </div>
+        </DashboardCard>
+        <DashboardCard title="Ocupação por Setor (cab.)">
           <StackedBarChart
             series={mockStackedSeries.map((s) => ({
               ...s,
@@ -251,9 +192,8 @@ export default function DashLotacaoCurrais() {
             showLegend
             yFormat={(v) => `${v}`}
           />
-        </div>
-
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

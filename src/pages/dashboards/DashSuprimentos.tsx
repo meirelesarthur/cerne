@@ -1,23 +1,18 @@
 import { useEffect, useState } from 'react'
-import {
-  ClipboardList,
-  FileText,
-  ShoppingCart,
-  PackageCheck,
-  BarChart2,
-  Users,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -122,34 +117,14 @@ export default function DashSuprimentos() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [categoria, setCategoria] = useState('todas')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    return <DashboardSkeleton kpis={4} blocks={[260, 240]} />
   }
 
   const kpis = [
@@ -160,62 +135,46 @@ export default function DashSuprimentos() {
   ]
 
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Suprimentos"
+        subtitle="Do pedido ao recebimento — funil, gastos e fornecedores"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por categoria"
+            options={[
+              { value: 'todas', label: 'Todas as categorias' },
+              ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+            ]}
+            value={categoria}
+            onChange={setCategoria}
+          />
+        }
+      />
 
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Suprimentos</Heading>
-        </div>
-        <FilterSelect
-          ariaLabel="Filtrar por categoria"
-          options={[
-            { value: 'todas', label: 'Todas as categorias' },
-            ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
-          ]}
-          value={categoria}
-          onChange={setCategoria}
-        />
-      </div>
+      {/* Fileira 1 — KPIs com sparkline */}
+      <DashboardRow wrap>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          >
+            <SparklineArea
+              data={kpiSparklines[kpi.label]}
+              color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid}
+              height={40}
+            />
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── KPI row com sparklines ──────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-            <div style={{ marginTop: t.space[3], height: 40 }}>
-              <SparklineArea data={kpiSparklines[kpi.label]} color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid} height={40} />
-            </div>
-          </div>,
-        ])}
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Sankey Funnel ──────────────────────────────────────────────────────── */}
-      <div style={{ padding: `${t.space[5]}px` }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
-              284
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
-              Solicitações → Recebimentos — Funil de suprimentos
-            </div>
-          </div>
+      {/* Fileira 2 — Funil de suprimentos */}
+      <DashboardCard
+        title="Solicitações → Recebimentos — Funil de suprimentos"
+        action={
           <div style={{
             fontSize: t.font.size.xs, color: t.color.feedback.success.text,
             background: t.color.feedback.success.bg, borderRadius: t.radius.full,
@@ -223,6 +182,10 @@ export default function DashSuprimentos() {
           }}>
             13,4% taxa final
           </div>
+        }
+      >
+        <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: t.font.lineHeight.tight, marginBottom: t.space[4] }}>
+          284
         </div>
 
         <SankeyFunnel stages={funnelStages} colors={colors} isGbMode={isGbMode} chartHeight={160} />
@@ -250,20 +213,11 @@ export default function DashSuprimentos() {
             </div>
           ))}
         </div>
-      </div>
+      </DashboardCard>
 
-      <HDivider color={bc} />
-
-      {/* ── Bottom row: HBar (1/2) + Fornecedores (1/2) ──────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Gastos por Categoria
-            </span>
-          </div>
+      {/* Fileira 3 — Gastos por categoria + Fornecedores */}
+      <DashboardRow>
+        <DashboardCard title="Gastos por Categoria">
           <BarChart
             data={categoriaData
               .filter((c) => categoria === 'todas' || c.label === categoria)
@@ -272,21 +226,11 @@ export default function DashSuprimentos() {
             height={240}
             yFormat={(v) => `R$ ${(v / 1000).toFixed(0)}K`}
           />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Users size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Top Fornecedores
-            </span>
-          </div>
+        </DashboardCard>
+        <DashboardCard title="Top Fornecedores">
           <FornecedoresList colors={colors} isGbMode={isGbMode} categoria={categoria} />
-        </div>
-
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

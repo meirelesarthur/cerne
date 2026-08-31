@@ -173,12 +173,52 @@ export function DashboardRow({ children, align = 'stretch', wrap = false }: Dash
   )
 }
 
+// ─── DashboardStack ────────────────────────────────────────────────────────────
+
+interface DashboardStackProps {
+  children: React.ReactNode
+  /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
+  flex?: number
+}
+
+/**
+ * Coluna de cards dentro de uma fileira — para quando uma célula da fileira
+ * carrega dois blocos empilhados (ex.: donut acima, gauge abaixo). Mantém o
+ * mesmo gap do canvas e devolve largura total aos cards internos.
+ */
+export function DashboardStack({ children, flex }: DashboardStackProps) {
+  const { inRow, stacked, wrap } = useContext(RowContext)
+
+  const flexValue = !inRow
+    ? undefined
+    : stacked
+      ? (wrap ? '1 1 45%' : undefined)
+      : `${flex ?? 1} 1 0%`
+
+  return (
+    <div
+      style={{
+        flex: flexValue,
+        minWidth: inRow ? 0 : undefined,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: t.space[4],
+      }}
+    >
+      {/* Cards internos voltam a ser de largura total dentro da coluna. */}
+      <RowContext.Provider value={{ inRow: false, stacked, wrap: false }}>
+        {children}
+      </RowContext.Provider>
+    </div>
+  )
+}
+
 // ─── DashboardCard ─────────────────────────────────────────────────────────────
 
 interface DashboardCardProps {
   children: React.ReactNode
-  /** Rótulo do bloco, no topo do card. */
-  title?: string
+  /** Rótulo do bloco, no topo do card. Aceita nó para rótulos com ícone/legenda. */
+  title?: React.ReactNode
   /** Slot à direita do rótulo — FilterSelect, Tabs, Button, IconButton. */
   action?: React.ReactNode
   /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
@@ -306,8 +346,8 @@ export function DashboardSkeleton({ kpis = 4, blocks = [260, 200] }: DashboardSk
 interface DashboardKpiCardProps {
   label: string
   value: string
-  /** Variação percentual (ex.: `'5,4%'`). Renderiza `Trend`. */
-  trend?: string
+  /** Variação percentual (ex.: `'5,4%'`). Ausente/`null` omite o `Trend`. */
+  trend?: string | null
   /** Direção da variação. Default `true` (alta). */
   up?: boolean
   /** Texto de apoio abaixo do valor. */
@@ -316,6 +356,14 @@ interface DashboardKpiCardProps {
   flex?: number
   /** Tamanho do valor principal. Default `2xl`. */
   valueSize?: keyof typeof t.font.size
+  /**
+   * Cor do valor quando ele carrega semântica própria (ex.: verde para
+   * "currais disponíveis", vermelho para "nenhum disponível"). Default: cor de
+   * texto padrão do tema.
+   */
+  valueColor?: string
+  /** Conteúdo extra na base do card — ex.: `SparklineArea` da série do KPI. */
+  children?: React.ReactNode
 }
 
 /**
@@ -330,6 +378,8 @@ export function DashboardKpiCard({
   sub,
   flex,
   valueSize = '2xl',
+  valueColor,
+  children,
 }: DashboardKpiCardProps) {
   const { colors } = useTheme()
 
@@ -348,7 +398,7 @@ export function DashboardKpiCard({
         style={{
           fontSize: t.font.size[valueSize],
           fontWeight: t.font.weight.bold,
-          color: colors.fg.default as string,
+          color: valueColor ?? (colors.fg.default as string),
           lineHeight: t.font.lineHeight.tight,
           marginBottom: trend || sub ? t.space[2] : 0,
         }}
@@ -367,6 +417,7 @@ export function DashboardKpiCard({
         </div>
       )}
       {trend && <Trend value={trend} up={up} />}
+      {children && <div style={{ marginTop: t.space[3] }}>{children}</div>}
     </DashboardCard>
   )
 }

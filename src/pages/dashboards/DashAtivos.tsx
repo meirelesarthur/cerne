@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
 
@@ -132,33 +135,17 @@ const ATIVOS_KPIS = [
 ]
 
 export default function DashAtivos() {
-  const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
     return () => clearTimeout(id)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (loading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    return <DashboardSkeleton kpis={4} blocks={[260, 200]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses da série de manutenções
@@ -167,65 +154,61 @@ export default function DashAtivos() {
   const manutSeries = MANUT_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="sm" weight="semibold">Ativos</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Ativos"
+        subtitle="Patrimônio, operação e manutenções da frota"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3',  label: 'Últimos 3 meses' },
+              { value: '6',  label: 'Últimos 6 meses' },
+              { value: '12', label: 'Últimos 12 meses' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {ATIVOS_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {ATIVOS_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Grouped H-bar + Status */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-        <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
+      {/* Fileira 2 — Categorias + Status */}
+      <DashboardRow>
+        <DashboardCard title="Ativos por Categoria" flex={3}>
           <GroupedBarChart
             series={CATEGORIAS_SERIES}
             labels={CATEGORIAS_LABELS}
             height={260}
             showLegend
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
+        </DashboardCard>
+        <DashboardCard title="Status dos Ativos" flex={2}>
           <StatusCards />
-        </div>
-      </div>
-      <HDivider color={bc} />
+        </DashboardCard>
+      </DashboardRow>
 
-      {/* Row 3 — Manutenções */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
+      {/* Fileira 3 — Manutenções */}
+      <DashboardCard title="Manutenções por Mês">
         <GroupedBarChart
           series={manutSeries}
           labels={manutLabels}
           height={200}
           showLegend
         />
-      </div>
-    </div>
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

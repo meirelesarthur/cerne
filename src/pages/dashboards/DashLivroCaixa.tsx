@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -190,29 +194,14 @@ export default function DashLivroCaixa() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
-
   if (isLoading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    return <DashboardSkeleton kpis={4} blocks={[220, 300]} />
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -221,57 +210,57 @@ export default function DashLivroCaixa() {
   const fluxoSeriesFiltrado = fluxoSeries.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="sm" weight="semibold">Livro Caixa</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Livro Caixa"
+        subtitle="Entradas, saídas e saldo das contas da fazenda"
+        actions={
+          <FilterSelect
+            ariaLabel="Filtrar por período"
+            options={[
+              { value: '3',  label: 'Últimos 3 meses' },
+              { value: '6',  label: 'Últimos 6 meses' },
+              { value: '12', label: 'Últimos 12 meses' },
+            ]}
+            value={periodo}
+            onChange={setPeriodo}
+          />
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {LC_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            {kpi.trend && (
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
-            )}
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow wrap>
+        {LC_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Fluxo area chart full width */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>Fluxo de Caixa — Realizado</div>
-          <div style={{ display: 'flex', gap: t.space[5] }}>
+      {/* Fileira 2 — Fluxo de caixa */}
+      <DashboardCard
+        title="Fluxo de Caixa — Realizado"
+        action={
+          <>
             {[
               { label: 'Entradas', color: t.color.brand[600], dashed: false },
               { label: 'Saídas',   color: t.color.feedback.error.solid, dashed: false },
               { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
             ].map(item => (
               <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={4} style={{ display: 'block' }}>
+                <svg width={16} height={4} style={{ display: 'block' }} aria-hidden="true">
                   <line x1={0} y1={2} x2={16} y2={2} stroke={item.color} strokeWidth={2} strokeDasharray={item.dashed ? '4,3' : undefined} strokeLinecap="round" />
                 </svg>
                 <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.label}</span>
               </div>
             ))}
-          </div>
-        </div>
+          </>
+        }
+      >
         <LineChart
           series={fluxoSeriesFiltrado}
           labels={labels}
@@ -280,21 +269,17 @@ export default function DashLivroCaixa() {
           area
           showLegend={false}
         />
-      </div>
-      <HDivider color={bc} />
+      </DashboardCard>
 
-      {/* Row 3 — Movimentações + Saldo por Conta */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-        <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
+      {/* Fileira 3 — Movimentações + Saldo por Conta */}
+      <DashboardRow>
+        <DashboardCard title="Últimas Movimentações" flex={3}>
           <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
+        </DashboardCard>
+        <DashboardCard title="Saldo por Conta" flex={2}>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />
-        </div>
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

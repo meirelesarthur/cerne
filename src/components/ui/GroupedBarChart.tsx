@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { ChartSvgLegend, chartLegendHeight } from './ChartSvgLegend'
-import { niceAxisMax, formatAxisValue, axisLabelPad, axisLabelStep } from '../../utils/chartAxis'
+import { niceAxisMax, formatAxisValue, axisLabelPad, truncateAxisLabel } from '../../utils/chartAxis'
 import { useChartScale } from '../../hooks/useChartScale'
 
 export interface GroupedSeries {
@@ -85,8 +85,6 @@ export function GroupedBarChart({
 
   const chartH = H - PAD_TOP - PAD_BOTTOM - LEGEND_H
   const chartW = W - PAD_LEFT - PAD_RIGHT
-  // Rótulos do eixo X afinados para não colidirem quando há muitos grupos.
-  const xStep = axisLabelStep(labels, chartW, t.font.size.xs)
 
   const numGroups = labels.length
   const numSeries = series.length
@@ -152,19 +150,18 @@ export function GroupedBarChart({
       {/* Bars */}
       {labels.map((label, gi) => (
         <g key={gi}>
-          {/* Group label */}
-          {gi % xStep === 0 && (
-            <text
-              x={xOfGroup(gi)}
-              y={PAD_TOP + chartH + 18}
-              textAnchor="middle"
-              fill={colors.fg.subtle as string}
-              fontFamily={t.font.family.sans}
-              style={{ fontSize: t.font.size.xs * k }}
-            >
-              {label}
-            </text>
-          )}
+          {/* Group label — truncado ao vão do grupo: afinar (esconder de N em N)
+              perderia a categoria inteira; abreviar mantém todas legíveis. */}
+          <text
+            x={xOfGroup(gi)}
+            y={PAD_TOP + chartH + 18}
+            textAnchor="middle"
+            fill={colors.fg.subtle as string}
+            fontFamily={t.font.family.sans}
+            style={{ fontSize: t.font.size.xs * k }}
+          >
+            {truncateAxisLabel(label, groupW - 6, t.font.size.xs)}
+          </text>
 
           {series.map((s, si) => {
             const col = getColor(s, si)

@@ -36,7 +36,8 @@ const kpiSparklines: Record<string, number[]> = {
 
 const funnelMeta = [
   { label: 'Valor médio',  values: ['R$ 1.240', 'R$ 4.820', 'R$ 12.600', 'R$ 11.900'] },
-  { label: 'Lead time',    values: ['1 dia', '3 dias', '7 dias', '12 dias'] },
+  // reflete supply_status_slas
+  { label: 'Lead time',    values: ['2 dias', '4 dias', '8 dias', '15 dias'] },
   { label: 'Prazo médio',  values: ['Imediato', '48h', '15 dias', '30 dias'] },
 ] as const
 
@@ -49,12 +50,13 @@ const categoriaData = [
   { label: 'Outros',       value: 90000 },
 ] as const
 
+// savingPct reflete request_quotations.saving
 const fornecedores = [
-  { nome: 'AgroSul Insumos',    categoria: 'Defensivos',    valor: 'R$ 284.500', badge: 'Excelente' as const, pct: 92 },
-  { nome: 'Sementes Primavera', categoria: 'Sementes',      valor: 'R$ 198.200', badge: 'Excelente' as const, pct: 80 },
-  { nome: 'FertMax Nutrição',   categoria: 'Fertilizantes', valor: 'R$ 156.800', badge: 'Bom'       as const, pct: 64 },
-  { nome: 'CombustAgro',        categoria: 'Combustível',   valor: 'R$ 94.300',  badge: 'Bom'       as const, pct: 38 },
-  { nome: 'Peças & Campo',      categoria: 'Peças',         valor: 'R$ 61.100',  badge: 'Regular'   as const, pct: 25 },
+  { nome: 'AgroSul Insumos',    categoria: 'Defensivos',    valor: 'R$ 284.500', savingPct: 18, pct: 92 },
+  { nome: 'Sementes Primavera', categoria: 'Sementes',      valor: 'R$ 198.200', savingPct: 16, pct: 80 },
+  { nome: 'FertMax Nutrição',   categoria: 'Fertilizantes', valor: 'R$ 156.800', savingPct: 11, pct: 64 },
+  { nome: 'CombustAgro',        categoria: 'Combustível',   valor: 'R$ 94.300',  savingPct: 9,  pct: 38 },
+  { nome: 'Peças & Campo',      categoria: 'Peças',         valor: 'R$ 61.100',  savingPct: 6,  pct: 25 },
 ] as const
 
 type Badge = 'Excelente' | 'Bom' | 'Regular'
@@ -62,6 +64,13 @@ const badgeStyle: Record<Badge, { color: string; bg: string }> = {
   Excelente: { color: t.color.feedback.success.text, bg: t.color.feedback.success.bg },
   Bom:       { color: t.color.feedback.info.text,    bg: t.color.feedback.info.bg },
   Regular:   { color: t.color.feedback.warning.text, bg: t.color.feedback.warning.bg },
+}
+
+// Faixas de economia (savingPct) → badge de desempenho do fornecedor
+function badgeFromSaving(savingPct: number): Badge {
+  if (savingPct > 15) return 'Excelente'
+  if (savingPct >= 8) return 'Bom'
+  return 'Regular'
 }
 
 // ─── Fornecedores List ────────────────────────────────────────────────────────
@@ -72,7 +81,8 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[2] }}>
       {visiveis.map((f, i) => {
-        const bs = badgeStyle[f.badge]
+        const badge = badgeFromSaving(f.savingPct)
+        const bs = badgeStyle[badge]
         return (
           <div key={i}
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
@@ -100,7 +110,7 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
                   color: bs.color, background: bs.bg,
                   borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`, fontFamily: t.font.family.sans,
                 }}>
-                  {f.badge}
+                  {badge}
                 </span>
               </div>
             </div>

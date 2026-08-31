@@ -9,6 +9,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -773,6 +774,10 @@ export default function OverviewPanel() {
           subtitle={currentFarm ? `Visão geral · ${currentFarm.name}` : 'Visão geral da safra'}
           actions={
             <>
+              <DashboardAnalysis
+                carta={carta}
+                fonte={currentFarm ? `${currentFarm.name} · base do painel` : undefined}
+              />
               <DashboardFilters
                 fields={[
                   {
@@ -888,8 +893,8 @@ export default function OverviewPanel() {
             <DashboardCard
               title="Insights"
               action={
-                <Button variant="secondary" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
-                  Ver carta completa
+                <Button variant="ghost" size="sm" icon={<MessageCircle size={11} />} onClick={() => setCartaOpen(true)}>
+                  Ler a carta
                 </Button>
               }
             >

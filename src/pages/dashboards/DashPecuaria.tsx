@@ -4,6 +4,8 @@ import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -84,27 +86,60 @@ export default function DashPecuaria() {
   const rebanhoSeries = REBANHO_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
   const manejosSeries = MANEJOS_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Pecuária de Corte',
+    scope: `rebanho · últimos ${nMeses} meses`,
+    kpis: PEC_KPIS,
+    blocks: [
+      {
+        block: 'Evolução do rebanho',
+        kind: 'timeline',
+        labels,
+        series: rebanhoSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'cabeças',
+      },
+      {
+        block: 'Composição do rebanho',
+        kind: 'composition',
+        labels: rebanhoComp.map((c) => c.label),
+        series: [{ name: 'Participação', data: rebanhoComp.map((c) => c.pct) }],
+        unit: '%',
+        concentrationRisk: false,
+      },
+      {
+        block: 'Manejos por mês',
+        kind: 'timeline',
+        labels,
+        series: manejosSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'manejos',
+      },
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Pecuária de Corte"
         subtitle="Rebanho, composição e manejos do período"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '12',
-                options: [
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '12', label: 'Últimos 12 meses' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

@@ -6,6 +6,8 @@ import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -120,27 +122,60 @@ export default function DashDepreciacoes() {
   const stackedLabels = MONTHS_SHORT.slice(-nMeses)
   const stackedSeries = STACKED_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Depreciações',
+    scope: `patrimônio · últimos ${nMeses} meses`,
+    kpis: DEP_KPIS,
+    blocks: [
+      {
+        block: 'Depreciação por categoria',
+        kind: 'timeline',
+        labels: stackedLabels,
+        series: stackedSeries.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Composição por tipo de bem',
+        kind: 'composition',
+        labels: DONUT_SLICES.map((d) => d.label),
+        series: [{ name: 'Valor', data: DONUT_SLICES.map((d) => d.value) }],
+        currency: true,
+      },
+      {
+        block: 'Projeção — próximos 24 meses',
+        kind: 'timeline',
+        labels: PROJ_LABELS,
+        series: PROJ_SERIES_FULL.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+    ],
+    notes: ['A projeção repete o último valor realizado para os meses futuros — é extrapolação, não previsão de modelo.'],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Depreciações"
         subtitle="Depreciação acumulada, composição e projeção do patrimônio"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '12',
-                options: [
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '12', label: 'Últimos 12 meses' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

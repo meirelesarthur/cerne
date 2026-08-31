@@ -5,6 +5,8 @@ import { LineChart } from '../../components/ui/LineChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -139,27 +141,59 @@ export default function DashUsuarios() {
     return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.sm]} /> : null
   }
 
+  const analise: DashboardReadingInput = {
+    title: 'Análise de Usuários',
+    scope: `acessos · últimos ${periodo} dias`,
+    kpis: USR_KPIS,
+    blocks: [
+      {
+        block: 'Acessos diários',
+        kind: 'timeline',
+        labels: DAILY_LABELS.slice(-Number(periodo)),
+        series: [{ name: 'Sessões', data: DAILY_VALUES.slice(-Number(periodo)) }],
+        unit: 'sessões',
+      },
+      {
+        block: 'Módulos mais acessados',
+        kind: 'composition',
+        labels: MODULOS.map((m) => m.label),
+        series: [{ name: 'Acessos', data: MODULOS.map((m) => m.acessos) }],
+        unit: 'acessos',
+      },
+      {
+        block: 'Picos de acesso por hora',
+        kind: 'timeline',
+        labels: HOURLY_LABELS,
+        series: HOURLY_SERIES.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'sessões',
+      },
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Análise de Usuários"
         subtitle="Acessos, módulos e horários de pico da equipe"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '30',
-                options: [
-                  { value: '7',  label: 'Últimos 7 dias' },
-                  { value: '15', label: 'Últimos 15 dias' },
-                  { value: '30', label: 'Últimos 30 dias' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '30',
+                  options: [
+                    { value: '7',  label: 'Últimos 7 dias' },
+                    { value: '15', label: 'Últimos 15 dias' },
+                    { value: '30', label: 'Últimos 30 dias' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

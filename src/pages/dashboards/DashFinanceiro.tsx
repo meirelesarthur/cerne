@@ -7,6 +7,8 @@ import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -180,27 +182,60 @@ export default function DashFinanceiro() {
 
   const donutSlices = donutData.map(d => ({ label: d.label, value: d.pct, color: d.color }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Financeiro',
+    scope: `receitas e despesas · últimos ${nMeses} meses`,
+    kpis,
+    blocks: [
+      {
+        block: `Receitas vs despesas (${nMeses} meses)`,
+        kind: 'timeline',
+        labels: chartLabels,
+        series: lineSeries.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Despesas por categoria',
+        kind: 'composition',
+        labels: donutData.map((d) => d.label),
+        series: [{ name: 'Participação', data: donutData.map((d) => d.pct) }],
+        unit: '%',
+      },
+      {
+        block: 'Vencimentos próximos (30 dias)',
+        kind: 'composition',
+        labels: vencimentos.map((v) => v.nome),
+        series: [{ name: 'Valor', data: vencimentos.map((v) => Number(v.valor.replace(/[^0-9]/g, ''))) }],
+        currency: true,
+      },
+    ],
+    notes: [`${vencimentos.filter((v) => v.status !== 'Pendente').length} de ${vencimentos.length} vencimentos do recorte já estão atrasados.`],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Financeiro"
         subtitle="Receitas, despesas, orçamento e vencimentos"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '12',
-                options: [
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '12', label: 'Últimos 12 meses' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

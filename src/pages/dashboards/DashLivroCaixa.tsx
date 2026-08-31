@@ -5,6 +5,8 @@ import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -216,27 +218,52 @@ export default function DashLivroCaixa() {
   const labels = monthLabels.slice(-nMeses)
   const fluxoSeriesFiltrado = fluxoSeries.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Livro Caixa',
+    scope: `contas da fazenda · últimos ${nMeses} meses`,
+    kpis: LC_KPIS,
+    blocks: [
+      {
+        block: 'Fluxo de caixa realizado',
+        kind: 'timeline',
+        labels,
+        series: fluxoSeriesFiltrado.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Saldo por conta',
+        kind: 'composition',
+        labels: contas.map((c) => c.nome),
+        series: [{ name: 'Saldo', data: contas.map((c) => c.saldo) }],
+        currency: true,
+      },
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Livro Caixa"
         subtitle="Entradas, saídas e saldo das contas da fazenda"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '12',
-                options: [
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '12', label: 'Últimos 12 meses' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

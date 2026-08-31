@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext'
 import { usePrefersReducedMotion } from '../../components/ui/usePrefersReducedMotion'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -165,27 +167,65 @@ export default function DashAtivos() {
   const manutLabels = MANUT_LABELS.slice(-nMeses)
   const manutSeries = MANUT_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  // Leitura da tela — os mesmos dados dos blocos, na ordem em que aparecem
+  const analise: DashboardReadingInput = {
+    title: 'Ativos',
+    scope: `frota da fazenda · últimos ${nMeses} meses`,
+    kpis: ATIVOS_KPIS,
+    blocks: [
+      {
+        block: 'Ativos por categoria',
+        kind: 'composition',
+        labels: CATEGORIAS_LABELS,
+        series: [{ name: 'Total', data: CATEGORIAS.map((c) => c.total) }],
+        unit: 'ativos',
+      },
+      {
+        block: 'Status dos ativos',
+        kind: 'composition',
+        labels: STATUS_ITEMS.map((item) => item.label),
+        series: [{ name: 'Ativos', data: STATUS_ITEMS.map((item) => item.count) }],
+        unit: 'ativos',
+        // Composição de estado: concentrar no estado bom é o objetivo, não risco.
+        concentrationRisk: false,
+      },
+      {
+        block: 'Manutenções por mês',
+        kind: 'timeline',
+        labels: manutLabels,
+        series: manutSeries.map((serie) => ({ name: serie.name, data: serie.data })),
+        unit: 'manutenções',
+      },
+    ],
+    notes: [
+      `Em operação hoje: ${CATEGORIAS.reduce((acc, c) => acc + c.op, 0)} de ${CATEGORIAS.reduce((acc, c) => acc + c.total, 0)} ativos.`,
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Ativos"
         subtitle="Patrimônio, operação e manutenções da frota"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '12',
-                options: [
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '12', label: 'Últimos 12 meses' },
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base de ativos" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

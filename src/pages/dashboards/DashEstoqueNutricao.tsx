@@ -13,6 +13,8 @@ import { SparklineArea } from '../../components/ui/SparklineArea'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -150,46 +152,83 @@ export default function DashEstoqueNutricao() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Estoque Nutrição',
+    scope: produto === 'todos' ? 'todos os produtos de nutrição' : `produto ${produto}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Saldo por armazém (kg)',
+        kind: 'composition',
+        labels: mockSaldoArmazem.map((a) => a.label),
+        series: [{ name: 'Saldo', data: mockSaldoArmazem.map((a) => a.value) }],
+        unit: 'kg',
+      },
+      {
+        block: 'Consumo semanal (kg)',
+        kind: 'timeline',
+        labels: mockConsumoLabels,
+        series: mockConsumoSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'kg',
+      },
+      {
+        block: 'Cobertura por produto (dias)',
+        kind: 'composition',
+        labels: mockCoberturaProdutos.map((p) => p.label),
+        series: [{ name: 'Cobertura', data: mockCoberturaProdutos.map((p) => p.value) }],
+        unit: 'dias',
+        concentrationRisk: false,
+      },
+    ],
+    notes: [
+      `Limite crítico de cobertura: ${CRITICO_THRESHOLD} dias.`,
+      `Itens abaixo do limite no recorte: ${itensCriticos}.`,
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Estoque Nutrição"
         subtitle="Saldo, consumo e cobertura dos insumos de nutrição"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '60',
-                options: [
-                  { value: '30', label: 'Últimos 30 dias' },
-                  { value: '60', label: 'Últimos 60 dias' },
-                ],
-              },
-              {
-                label: 'Produto',
-                value: produto,
-                onChange: setProduto,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os Produtos' },
-                  ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
-                ],
-              },
-              {
-                label: 'Armazém',
-                value: armazem,
-                onChange: setArmazem,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os Armazéns' },
-                  ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '60',
+                  options: [
+                    { value: '30', label: 'Últimos 30 dias' },
+                    { value: '60', label: 'Últimos 60 dias' },
+                  ],
+                },
+                {
+                  label: 'Produto',
+                  value: produto,
+                  onChange: setProduto,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Produtos' },
+                    ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
+                  ],
+                },
+                {
+                  label: 'Armazém',
+                  value: armazem,
+                  onChange: setArmazem,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Armazéns' },
+                    ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

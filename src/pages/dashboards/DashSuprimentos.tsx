@@ -5,6 +5,8 @@ import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { BarChart } from '../../components/ui/BarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -140,26 +142,59 @@ export default function DashSuprimentos() {
     { label: 'Recebimentos',     value: '38',  trend: '1,2% vs mês ant.', up: false },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Suprimentos',
+    scope: categoria === 'todas' ? 'todas as categorias' : `categoria ${categoria}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Funil de suprimentos',
+        kind: 'timeline',
+        labels: funnelStages.map((stage) => stage.label),
+        series: [{ name: 'Volume no estágio', data: funnelStages.map((stage) => stage.value) }],
+        unit: 'documentos',
+      },
+      {
+        block: 'Gastos por categoria',
+        kind: 'composition',
+        labels: categoriaData.map((c) => c.label),
+        series: [{ name: 'Gasto', data: categoriaData.map((c) => c.value) }],
+        currency: true,
+      },
+      {
+        block: 'Top fornecedores',
+        kind: 'composition',
+        labels: fornecedores.map((f) => f.nome),
+        series: [{ name: 'Compras', data: fornecedores.map((f) => Number(f.valor.replace(/[^0-9]/g, ''))) }],
+        currency: true,
+      },
+    ],
+    notes: [`Conversão de ponta a ponta do funil: ${((funnelStages[funnelStages.length - 1].value / funnelStages[0].value) * 100).toFixed(1).replace('.', ',')}%.`],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Suprimentos"
         subtitle="Do pedido ao recebimento — funil, gastos e fornecedores"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Categoria',
-                value: categoria,
-                onChange: setCategoria,
-                defaultValue: 'todas',
-                options: [
-                  { value: 'todas', label: 'Todas as categorias' },
-                  ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Categoria',
+                  value: categoria,
+                  onChange: setCategoria,
+                  defaultValue: 'todas',
+                  options: [
+                    { value: 'todas', label: 'Todas as categorias' },
+                    ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

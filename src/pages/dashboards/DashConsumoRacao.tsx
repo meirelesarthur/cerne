@@ -16,6 +16,8 @@ import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -151,46 +153,78 @@ export default function DashConsumoRacao() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Consumo de Ração',
+    scope: lote === 'todos' ? `todos os lotes · ${weekCount} semanas` : `${lote} · ${weekCount} semanas`,
+    kpis,
+    blocks: [
+      {
+        block: 'Consumo por lote (kg/animal/dia)',
+        kind: 'timeline',
+        labels: weekLabels,
+        series: consumoSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'kg',
+      },
+      {
+        block: 'Custo médio da batida (R$)',
+        kind: 'composition',
+        labels: custoBatidaData.map((f) => f.label),
+        series: [{ name: 'Custo', data: custoBatidaData.map((f) => f.value) }],
+        currency: true,
+      },
+      {
+        block: 'Matérias-primas da ração (%)',
+        kind: 'composition',
+        labels: mockComposicaoData.map((d) => d.label),
+        series: [{ name: 'Participação', data: mockComposicaoData.map((d) => d.value) }],
+        unit: '%',
+      },
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Consumo de Ração"
         subtitle="Produção, distribuição, custo da batida e composição"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '60',
-                options: [
-                  { value: '30', label: 'Últimos 30 dias' },
-                  { value: '60', label: 'Últimos 60 dias' },
-                ],
-              },
-              {
-                label: 'Formulação',
-                value: formulacao,
-                onChange: setFormulacao,
-                defaultValue: 'todas',
-                options: [
-                  { value: 'todas', label: 'Todas as formulações' },
-                  ...mockCustoBatidaData.map((f) => ({ value: f.label, label: f.label })),
-                ],
-              },
-              {
-                label: 'Lote',
-                value: lote,
-                onChange: setLote,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os lotes' },
-                  ...mockConsumoSeries.map((s) => ({ value: s.name, label: s.name })),
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '60',
+                  options: [
+                    { value: '30', label: 'Últimos 30 dias' },
+                    { value: '60', label: 'Últimos 60 dias' },
+                  ],
+                },
+                {
+                  label: 'Formulação',
+                  value: formulacao,
+                  onChange: setFormulacao,
+                  defaultValue: 'todas',
+                  options: [
+                    { value: 'todas', label: 'Todas as formulações' },
+                    ...mockCustoBatidaData.map((f) => ({ value: f.label, label: f.label })),
+                  ],
+                },
+                {
+                  label: 'Lote',
+                  value: lote,
+                  onChange: setLote,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os lotes' },
+                    ...mockConsumoSeries.map((s) => ({ value: s.name, label: s.name })),
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

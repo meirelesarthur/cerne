@@ -13,6 +13,8 @@ import { SparklineArea } from '../../components/ui/SparklineArea'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -126,33 +128,60 @@ export default function DashLotacaoCurrais() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Lotação de Currais',
+    scope: setor === 'todos' ? 'todos os setores do pátio' : `setor ${setor}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Distribuição por status',
+        kind: 'composition',
+        labels: mockStatusData.map((d) => d.label),
+        series: [{ name: 'Currais', data: mockStatusData.map((d) => d.value) }],
+        unit: 'currais',
+        concentrationRisk: false,
+      },
+      {
+        block: 'Ocupação por setor (cab.)',
+        kind: 'timeline',
+        labels: mockSetores,
+        series: mockStackedSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'cabeças',
+      },
+    ],
+    notes: [`Taxa de ocupação do pátio no recorte: ${taxaOcupacao}%.`],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Lotação de Currais"
         subtitle="Ocupação, status e capacidade do pátio de confinamento"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Pátio',
-                value: patio,
-                onChange: setPatio,
-                defaultValue: 'principal',
-                options: [{ value: 'principal', label: 'Pátio Principal' }],
-              },
-              {
-                label: 'Setor',
-                value: setor,
-                onChange: setSetor,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os Setores' },
-                  ...mockSetores.map((s) => ({ value: s, label: s })),
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Pátio',
+                  value: patio,
+                  onChange: setPatio,
+                  defaultValue: 'principal',
+                  options: [{ value: 'principal', label: 'Pátio Principal' }],
+                },
+                {
+                  label: 'Setor',
+                  value: setor,
+                  onChange: setSetor,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Setores' },
+                    ...mockSetores.map((s) => ({ value: s, label: s })),
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

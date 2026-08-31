@@ -9,6 +9,8 @@ import { FormField } from '../../components/ui/FormField'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
 import { ChartCard } from '../../components/ui/ChartCard'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import {
   DashboardGrid,
@@ -185,6 +187,35 @@ export default function Pluviometria() {
     { label: 'Alertas ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Pluviômetro',
+    scope: `chuva e umidade · ${dateStart} a ${dateEnd}`,
+    kpis: kpis.map((kpi) => ({ label: kpi.label, value: kpi.value, trend: kpi.trend, up: kpi.up })),
+    blocks: [
+      {
+        block: 'Pluviometria (dias)',
+        kind: 'timeline',
+        labels: BAR_DATA.map((d) => d.month),
+        series: [
+          { name: 'Dias com chuva', data: BAR_DATA.map((d) => d.comChuva) },
+          { name: 'Dias sem chuva', data: BAR_DATA.map((d) => d.semChuva) },
+        ],
+        unit: 'dias',
+      },
+      {
+        block: 'Volume pluviométrico (mm)',
+        kind: 'timeline',
+        labels: VOLUME_LABELS,
+        series: [{ name: 'Volume', data: VOLUME_DATA }],
+        unit: 'mm',
+      },
+    ],
+    notes: [
+      `Previsão da semana: ${FORECAST.filter((f) => f.rain > 0).length} de ${FORECAST.length} dias com chuva prevista.`,
+      `Áreas no recorte: ${selectedAreas.length} de ${ALL_AREAS.length}.`,
+    ],
+  }
+
   return (
     <>
       <DashboardGrid>
@@ -209,6 +240,7 @@ export default function Pluviometria() {
                   ● Open-Meteo Live
                 </span>
               )}
+              <DashboardAnalysis input={analise} fonte="Open-Meteo · Prata (MG)" />
               <Button icon={<Filter size={t.icon.xs} />} size="md" onClick={() => setFilterOpen(true)}>
                 Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
               </Button>

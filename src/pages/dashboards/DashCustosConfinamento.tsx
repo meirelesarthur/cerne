@@ -17,6 +17,8 @@ import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -175,43 +177,83 @@ export default function DashCustosConfinamento() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Custos do Confinamento',
+    scope: `safra ${safra} · ${periodo} meses`,
+    kpis,
+    blocks: [
+      {
+        block: 'Composição de custo por mês (R$ mil)',
+        kind: 'timeline',
+        labels: MESES.slice(-Number(periodo)),
+        series: mockStackedSeries
+          .filter((s) => categoria === 'todas' || s.name === categoria)
+          .map((s) => ({ name: s.name, data: s.data.slice(-Number(periodo)) })),
+        currency: true,
+        scale: 1000,
+      },
+      {
+        block: 'Custo por arroba e animal/dia',
+        kind: 'timeline',
+        labels: MESES.slice(-Number(periodo)),
+        series: [{ name: 'Custo por arroba', data: mockCustoArroba.slice(-Number(periodo)) }],
+        currency: true,
+      },
+      {
+        block: 'Composição total do período (R$ mil)',
+        kind: 'composition',
+        labels: mockDonutData.map((d) => d.label),
+        series: [{ name: 'Custo', data: mockDonutData.map((d) => d.value) }],
+        currency: true,
+        scale: 1000,
+      },
+    ],
+    notes: [
+      `Margem bruta do último mês do recorte: ${margemAtual.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%.`,
+      'Custo subindo é variação desfavorável — o Trend dos KPIs de custo aponta para baixo quando o valor cresce.',
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Custos do Confinamento"
         subtitle="Custo por arroba, COE, margem e composição de custo"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '6',
-                options: [
-                  { value: '3', label: 'Abr–Jun 2025' },
-                  { value: '6', label: 'Jan–Jun 2025' },
-                ],
-              },
-              {
-                label: 'Categoria de custo',
-                value: categoria,
-                onChange: setCategoria,
-                defaultValue: 'todas',
-                options: [
-                  { value: 'todas', label: 'Todas as categorias' },
-                  ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
-                ],
-              },
-              {
-                label: 'Safra',
-                value: safra,
-                onChange: setSafra,
-                defaultValue: '25/26',
-                options: [{ value: '25/26', label: 'Safra 25/26' }],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '6',
+                  options: [
+                    { value: '3', label: 'Abr–Jun 2025' },
+                    { value: '6', label: 'Jan–Jun 2025' },
+                  ],
+                },
+                {
+                  label: 'Categoria de custo',
+                  value: categoria,
+                  onChange: setCategoria,
+                  defaultValue: 'todas',
+                  options: [
+                    { value: 'todas', label: 'Todas as categorias' },
+                    ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
+                  ],
+                },
+                {
+                  label: 'Safra',
+                  value: safra,
+                  onChange: setSafra,
+                  defaultValue: '25/26',
+                  options: [{ value: '25/26', label: 'Safra 25/26' }],
+                },
+              ]}
+            />
+          </>
         }
       />
 

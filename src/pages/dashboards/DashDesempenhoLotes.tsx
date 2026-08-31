@@ -15,6 +15,8 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -178,46 +180,76 @@ export default function DashDesempenhoLotes() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Desempenho de Lotes',
+    scope: `${lotesFiltrados.length} lote(s) · últimas ${nPesagens} pesagens`,
+    kpis,
+    blocks: [
+      {
+        block: 'Peso médio por lote (kg)',
+        kind: 'timeline',
+        labels: pesagemLabels,
+        series: lotesSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'kg',
+      },
+      {
+        block: 'GMD: atual vs meta (kg/dia)',
+        kind: 'composition',
+        labels: gmdLabels,
+        series: [{ name: 'GMD atual', data: gmdSeries[0]?.data ?? [] }],
+        unit: 'kg/dia',
+        concentrationRisk: false,
+      },
+    ],
+    notes: [
+      'Meta de GMD do confinamento: 1,40 kg/dia — lote abaixo disso aparece em vermelho no detalhamento.',
+      `Lotes acima da meta no recorte: ${lotesFiltrados.filter((l) => l.gmd >= 1.4).length} de ${lotesFiltrados.length}.`,
+    ],
+  }
+
   return (
     <DashboardGrid>
       <DashboardHeader
         title="Desempenho de Lotes"
         subtitle="GMD, evolução de peso e detalhamento dos lotes em confinamento"
         actions={
-          <DashboardFilters
-            fields={[
-              {
-                label: 'Período',
-                value: periodo,
-                onChange: setPeriodo,
-                defaultValue: '7',
-                options: [
-                  { value: '4', label: 'Últimas 4 pesagens' },
-                  { value: '7', label: 'Últimas 7 pesagens' },
-                ],
-              },
-              {
-                label: 'Curral',
-                value: curral,
-                onChange: setCurral,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os currais' },
-                  ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
-                ],
-              },
-              {
-                label: 'Lote',
-                value: lote,
-                onChange: setLote,
-                defaultValue: 'todos',
-                options: [
-                  { value: 'todos', label: 'Todos os lotes' },
-                  ...mockLoteLabels.map((l) => ({ value: l, label: l })),
-                ],
-              },
-            ]}
-          />
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '7',
+                  options: [
+                    { value: '4', label: 'Últimas 4 pesagens' },
+                    { value: '7', label: 'Últimas 7 pesagens' },
+                  ],
+                },
+                {
+                  label: 'Curral',
+                  value: curral,
+                  onChange: setCurral,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os currais' },
+                    ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
+                  ],
+                },
+                {
+                  label: 'Lote',
+                  value: lote,
+                  onChange: setLote,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os lotes' },
+                    ...mockLoteLabels.map((l) => ({ value: l, label: l })),
+                  ],
+                },
+              ]}
+            />
+          </>
         }
       />
 

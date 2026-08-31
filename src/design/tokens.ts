@@ -468,8 +468,10 @@ export const size = {
   mapPin: 28,
   /** Largura do painel de detalhe exibido no hover de uma área do mapa */
   mapPanel: 460,
-  /** Altura da faixa de mapa do Painel de Controle (Visão Geral) */
-  mapStrip: 312,
+  /** Altura mínima padrão de qualquer mapa do sistema (MapView, faixa do FarmAreasMap) */
+  mapMinHeight: 500,
+  /** Altura da faixa de mapa do Painel de Controle (Visão Geral) — piso: `mapMinHeight` */
+  mapStrip: 500,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

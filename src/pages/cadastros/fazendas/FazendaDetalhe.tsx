@@ -110,7 +110,7 @@ function TabLocalizacao({ f }: { f: FazendaDetalheData }) {
       <div>
         <SectionTitle>Demarcação da Área</SectionTitle>
         {hasLocation ? (
-          <MapView geoJSON={f.perimetroGeoJSON} lat={f.latitude} lng={f.longitude} height={340} />
+          <MapView geoJSON={f.perimetroGeoJSON} lat={f.latitude} lng={f.longitude} height={t.size.mapMinHeight} />
         ) : (
           <EmptyState
             icon={<Icon name="location" size={28} />}

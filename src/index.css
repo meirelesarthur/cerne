@@ -283,3 +283,35 @@ body {
   border-radius: 9999px;
   padding: 2px 10px;
 }
+
+/* ─── Entrada animada dos dashboards ───────────────────────────────────────────
+   Cada DashboardCard entra com fade + leve translateY, escalonado card a card
+   via `--dash-stagger` (setado inline pelo próprio componente). Gráficos de
+   linha/área revelam da esquerda para a direita por trás de um clip-path — o
+   mesmo efeito de entrada do Recharts — sem distorcer o traçado.
+   Durações/easing espelham t.animation.duration.slower / t.animation.easing.standard. */
+@keyframes dash-card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-card-in {
+  animation: dash-card-in 400ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: var(--dash-stagger, 0ms);
+}
+
+@keyframes chart-reveal-w {
+  from { width: 0; }
+  to   { width: var(--reveal-w, 100%); }
+}
+.chart-reveal-rect {
+  animation: chart-reveal-w 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-card-in,
+  .chart-reveal-rect {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}

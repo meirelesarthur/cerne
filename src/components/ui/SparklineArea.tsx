@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { t } from '../../design/tokens'
 import { useChartScale } from '../../hooks/useChartScale'
 
@@ -44,6 +45,10 @@ export function SparklineArea({
 
   const areaPath = `${linePath} L ${W},${H} L 0,${H} Z`
   const gradId = `spk_${color.replace(/[^a-zA-Z0-9]/g, '')}`
+  // Revelação da esquerda para a direita (estilo de entrada Recharts) via
+  // clip-path animado em CSS — não distorce o traçado, só o recorta enquanto
+  // a largura do recorte cresce.
+  const clipId = `spk-clip-${useId()}`
 
   return (
     <div ref={ref} style={{ width: '100%' }}>
@@ -59,16 +64,25 @@ export function SparklineArea({
           <stop offset="0%" stopColor={color} stopOpacity={0.28} />
           <stop offset="100%" stopColor={color} stopOpacity={0.02} />
         </linearGradient>
+        <clipPath id={clipId}>
+          <rect
+            className="chart-reveal-rect"
+            x={0} y={0} width={W} height={H}
+            style={{ ['--reveal-w' as string]: `${W}px` }}
+          />
+        </clipPath>
       </defs>
-      {filled && <path d={areaPath} fill={`url(#${gradId})`} />}
-      <path
-        d={linePath}
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath={`url(#${clipId})`}>
+        {filled && <path d={areaPath} fill={`url(#${gradId})`} />}
+        <path
+          d={linePath}
+          fill="none"
+          stroke={color}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
     </svg>
     </div>
   )

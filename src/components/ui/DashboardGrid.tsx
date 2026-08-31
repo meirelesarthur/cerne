@@ -179,6 +179,12 @@ interface DashboardStackProps {
   children: React.ReactNode
   /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
   flex?: number
+  /**
+   * Largura fixa em px — coluna que não deve esticar (ex.: painel lateral de
+   * 320px do Painel Geral). Ignorada quando a fileira empilha. Tem precedência
+   * sobre `flex`.
+   */
+  width?: number
 }
 
 /**
@@ -186,20 +192,25 @@ interface DashboardStackProps {
  * carrega dois blocos empilhados (ex.: donut acima, gauge abaixo). Mantém o
  * mesmo gap do canvas e devolve largura total aos cards internos.
  */
-export function DashboardStack({ children, flex }: DashboardStackProps) {
+export function DashboardStack({ children, flex, width }: DashboardStackProps) {
   const { inRow, stacked, wrap } = useContext(RowContext)
+
+  const fixed = width !== undefined && !stacked
 
   const flexValue = !inRow
     ? undefined
-    : stacked
-      ? (wrap ? '1 1 45%' : undefined)
-      : `${flex ?? 1} 1 0%`
+    : fixed
+      ? '0 0 auto'
+      : stacked
+        ? (wrap ? '1 1 45%' : undefined)
+        : `${flex ?? 1} 1 0%`
 
   return (
     <div
       style={{
         flex: flexValue,
-        minWidth: inRow ? 0 : undefined,
+        width: fixed ? width : undefined,
+        minWidth: inRow && !fixed ? 0 : undefined,
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[4],

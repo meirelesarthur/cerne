@@ -415,6 +415,21 @@ export const size = {
   errorPayloadMax: 156,
   /** Largura da barra de rolagem — espelha `::-webkit-scrollbar { width }` em index.css */
   scrollbar: 4,
+  /**
+   * Alturas de área de gráfico nos dashboards. Escala fechada de 3 degraus —
+   * blocos da mesma fileira usam sempre o MESMO degrau, para os cards fecharem
+   * na mesma linha de base.
+   *   sm  bloco auxiliar / faixa densa (barra por hora, picos)
+   *   md  padrão de bloco em fileira de 2+ cards
+   *   lg  bloco protagonista (largura total ou gráfico de leitura fina)
+   */
+  chart: {
+    sm: 180,
+    md: 220,
+    lg: 260,
+  },
+  /** Altura do sparkline na base do KPI (DashboardKpiCard) */
+  sparkline: 40,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

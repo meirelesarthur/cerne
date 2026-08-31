@@ -161,7 +161,7 @@ bloco é um card com fill próprio e o **canvas é o que forma os separadores** 
 `HDivider`/`VDivider` entre blocos, sem card único embrulhando a tela.
 
 ```
-DashboardGrid                          ← canvas (bg.canvas) + gap uniforme entre as fileiras
+DashboardGrid                          ← canvas sem fill próprio (bg.outer) + gap entre as fileiras
   └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
   └── DashboardRow wrap                ← fileira de KPIs
         └── DashboardKpiCard ×N        ← 1 KPI = 1 card (antes eram colunas com VDivider)
@@ -779,13 +779,18 @@ Três degraus, do mais externo ao conteúdo (tema claro):
 
 | Nível | Token | Light | Onde aparece |
 |---|---|---|---|
-| Fundo do app | `bg.canvas` | `#E8E8E8` | Raiz atrás de tudo; também o canvas do `DashboardGrid` |
-| Segundo nível | `bg.outer` | `#F2F2F2` | Card externo do chassi — moldura e faixa da Topbar |
+| Fundo do app | `bg.canvas` | `#E8E8E8` | Raiz atrás de tudo (chassi, Login, ErrorPage) |
+| Segundo nível | `bg.outer` | `#F2F2F2` | Card externo do chassi — moldura, faixa da Topbar e canvas do `DashboardGrid` |
 | Menus e feature | `bg.sidebar` / `bg.content` | `#FFFFFF` | Sidebar, SecondaryNav e a área onde a tela é renderizada |
 
 `bg.content` existe separado de `bg.surface` porque no GBMode ele acompanha o
 `outer`: se a área de conteúdo tivesse a cor de superfície, o `PageCard` ficaria
 da mesma cor do próprio fundo e desapareceria.
+
+O canvas do dashboard **não tem fill próprio**: assume o `bg.outer`, o mesmo dos
+vãos e da faixa da Topbar em volta, e sem raio. Assim ele não lê como uma folha
+posta sobre a tela — continua na moldura do chassi, e as únicas superfícies que
+sobram são os blocos.
 
 ## 11. Temas — Light e GBMode
 

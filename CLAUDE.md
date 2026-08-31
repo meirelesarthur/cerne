@@ -225,10 +225,12 @@ PageContainer (style={{ paddingBottom: 0 }})
 ### Regra G — Composição canônica de Dashboards
 
 Dashboard não usa `PageCard`. A casca é o `DashboardGrid`: cada bloco é um card com fill
-próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos.
+próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos. O
+canvas assume o nível do chassi (`bg.outer`, sem raio): não lê como folha sobre a tela,
+e os blocos ficam sendo as únicas superfícies.
 
 ```
-DashboardGrid                          ← canvas (bg.canvas) + gap entre as fileiras
+DashboardGrid                          ← canvas sem fill próprio (bg.outer) + gap entre as fileiras
   └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
   └── DashboardRow wrap → DashboardKpiCard ×N        ← 1 KPI = 1 card
   └── DashboardRow → DashboardCard flex={3} + flex={2}

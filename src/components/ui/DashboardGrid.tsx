@@ -45,8 +45,13 @@ interface DashboardGridProps {
 }
 
 /**
- * Canvas do dashboard. Preenche a área de conteúdo, pinta o fundo que separa os
- * blocos e distribui as fileiras com gap uniforme.
+ * Canvas do dashboard. Preenche a área de conteúdo e distribui as fileiras com
+ * gap uniforme.
+ *
+ * O canvas NÃO tem fill próprio: assume o nível do chassi (`bg.outer`), o mesmo
+ * dos vãos e da faixa da Topbar em volta. Assim ele não lê como uma folha
+ * colocada sobre a tela — some na moldura, e as únicas superfícies que sobram
+ * são os blocos. É o fundo comum que forma os separadores entre eles.
  */
 export function DashboardGrid({ children }: DashboardGridProps) {
   const { colors } = useTheme()
@@ -60,8 +65,10 @@ export function DashboardGrid({ children }: DashboardGridProps) {
         flexDirection: 'column',
         gap: t.space[4],
         padding: t.space[4],
-        background: colors.bg.canvas,
-        borderRadius: t.radius['2xl'],
+        background: colors.bg.outer,
+        // Sem raio: a área de conteúdo já arredonda o que está dentro dela
+        // (`overflow: auto` recorta pelo raio), e um raio aqui deixaria a cor da
+        // área aparecendo nos cantos, quebrando a continuidade com o chassi.
         fontFamily: t.font.family.sans,
       }}
     >

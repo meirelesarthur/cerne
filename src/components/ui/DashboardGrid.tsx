@@ -81,7 +81,11 @@ interface DashboardHeaderProps {
   actions?: React.ReactNode
   /** Nível semântico do título. Default `2`. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
-  /** Tamanho tokenizado do título. Default `lg`. */
+  /**
+   * Tamanho tokenizado do título. Default `2xl` — mesmo degrau do `PageHeader`
+   * das listagens, para o título de um dashboard não competir em escala com o
+   * de uma tela de cadastro.
+   */
   size?: keyof typeof t.font.size
 }
 
@@ -94,7 +98,7 @@ export function DashboardHeader({
   subtitle,
   actions,
   level = 2,
-  size = 'lg',
+  size = '2xl',
 }: DashboardHeaderProps) {
   const { colors } = useTheme()
   const stacked = useMediaQuery(STACK_QUERY)
@@ -238,6 +242,12 @@ interface DashboardCardProps {
   bare?: boolean
   /** Altura mínima do bloco. */
   minHeight?: number
+  /**
+   * Tom do bloco. `default` usa a superfície neutra; `warning` pinta o fill de
+   * aviso (`feedback.warning.bg`) para blocos que comunicam atenção — evita o
+   * card de alerta montado à mão na tela.
+   */
+  tone?: 'default' | 'warning'
 }
 
 /**
@@ -252,6 +262,7 @@ export function DashboardCard({
   flex,
   bare = false,
   minHeight,
+  tone = 'default',
 }: DashboardCardProps) {
   const { colors, isGbMode } = useTheme()
   const { inRow, stacked, wrap } = useContext(RowContext)
@@ -272,7 +283,9 @@ export function DashboardCard({
         minHeight,
         display: 'flex',
         flexDirection: 'column',
-        background: isGbMode ? t.color.gb.surface : colors.bg.surface,
+        background: isGbMode
+          ? t.color.gb.surface
+          : (tone === 'warning' ? t.color.feedback.warning.bg : colors.bg.surface),
         backdropFilter: isGbMode ? 'blur(20px)' : undefined,
         WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
         border: isGbMode ? `1px solid ${colors.border.default}` : 'none',
@@ -303,7 +316,13 @@ export function DashboardCard({
             <span />
           )}
           {action && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexShrink: 0 }}>
+            // `flexWrap` deixa legenda longa quebrar em vez de ser cortada pela
+            // borda do card; controles (FilterSelect/Button) não encolhem abaixo
+            // do próprio conteúdo, então continuam íntegros.
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+              flexWrap: 'wrap', gap: `${t.space[1]}px ${t.space[2]}px`, minWidth: 0,
+            }}>
               {action}
             </div>
           )}
@@ -365,7 +384,11 @@ interface DashboardKpiCardProps {
   sub?: string
   /** Peso da largura dentro da fileira. Default `1`. */
   flex?: number
-  /** Tamanho do valor principal. Default `2xl`. */
+  /**
+   * Tamanho do valor principal. Por padrão desce em degraus conforme o
+   * comprimento do texto (ver `kpiValueSize`) — informe para forçar um degrau
+   * fixo.
+   */
   valueSize?: keyof typeof t.font.size
   /**
    * Cor do valor quando ele carrega semântica própria (ex.: verde para
@@ -381,6 +404,18 @@ interface DashboardKpiCardProps {
  * KPI como card preenchido — substitui as cópias locais de "rótulo + valor
  * grande + Trend" que antes viviam separadas por `VDivider` dentro do card único.
  */
+/**
+ * Degraus graduais do valor do KPI. Número curto ocupa o degrau grande; texto
+ * longo ("Déficit Hídrico", "0,82 kg/dia") desce um degrau em vez de estourar o
+ * card em duas linhas. Mesma lógica do `KpiStatCard`, calibrada para o teto de
+ * `2xl` — o degrau do título do dashboard.
+ */
+function kpiValueSize(value: string): keyof typeof t.font.size {
+  if (value.length > 18) return 'md'
+  if (value.length > 13) return 'xl'
+  return '2xl'
+}
+
 export function DashboardKpiCard({
   label,
   value,
@@ -388,11 +423,12 @@ export function DashboardKpiCard({
   up = true,
   sub,
   flex,
-  valueSize = '2xl',
+  valueSize,
   valueColor,
   children,
 }: DashboardKpiCardProps) {
   const { colors } = useTheme()
+  const resolvedValueSize = valueSize ?? kpiValueSize(value)
 
   return (
     <DashboardCard flex={flex}>
@@ -407,7 +443,7 @@ export function DashboardKpiCard({
       </div>
       <div
         style={{
-          fontSize: t.font.size[valueSize],
+          fontSize: t.font.size[resolvedValueSize],
           fontWeight: t.font.weight.bold,
           color: valueColor ?? (colors.fg.default as string),
           lineHeight: t.font.lineHeight.tight,

@@ -1,6 +1,5 @@
-import { useRef, useEffect, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import { useState } from 'react'
+import type { LatLngTuple } from 'leaflet'
 import {
   Layers, ArrowRight, ChevronDown, TrendingUp, TrendingDown,
   DollarSign, Wheat, BarChart2, MessageCircle, Settings2, Wallet,
@@ -23,6 +22,8 @@ import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Trend } from '../../components/ui/Trend'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { Tabs } from '../../components/ui/Tabs'
+import { FarmAreasMap } from '../../components/ui/FarmAreasMap'
+import type { FarmArea, FarmAreaIcon } from '../../components/ui/FarmAreasMap'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
 import {
@@ -37,20 +38,115 @@ import { niceAxisTicks, formatAxisValue } from '../../utils/chartAxis'
 
 // ─── Talhões ──────────────────────────────────────────────────────────────────
 
+/**
+ * Malha de vértices compartilhados entre talhões vizinhos: `cell(r, c)` fecha o
+ * quadrilátero entre quatro pontos da grade, então as divisas saem irregulares
+ * (como no campo) e sem vãos entre áreas.
+ */
+const GRID: LatLngTuple[][] = [
+  [[-18.7692, -52.6800], [-18.7712, -52.6534], [-18.7688, -52.6198], [-18.7706, -52.5961], [-18.7684, -52.5650]],
+  [[-18.7814, -52.6822], [-18.7796, -52.6488], [-18.7819, -52.6247], [-18.7791, -52.5922], [-18.7810, -52.5628]],
+  [[-18.7898, -52.6779], [-18.7918, -52.6541], [-18.7893, -52.6206], [-18.7913, -52.5975], [-18.7889, -52.5662]],
+  [[-18.8021, -52.6808], [-18.8002, -52.6503], [-18.8026, -52.6231], [-18.7998, -52.5940], [-18.8018, -52.5641]],
+]
+
+const cell = (r: number, c: number): LatLngTuple[] =>
+  [GRID[r][c], GRID[r][c + 1], GRID[r + 1][c + 1], GRID[r + 1][c]]
+
 interface Talhao {
   id: string; name: string; area: string; crop: string
-  yieldForecast: string; status: string; moisture: string; ndvi: string
-  coords: L.LatLngTuple[]; color: string; fillColor: string; fillOpacity: number
+  cultivar: string; plantio: string; colheita: string; status: string
+  yieldForecast: string; moisture: string; ndvi: string; populacao: string
+  ultimaOperacao: string; proximaOperacao: string; responsavel: string
+  custoHa: string; receitaPrevista: string; margemHa: string
+  coords: LatLngTuple[]
 }
 
 const TALHAOES: Talhao[] = [
-  { id: 'T1', name: 'Talhão Santa Maria', area: '320 ha', crop: 'Soja', yieldForecast: '64 sc/ha', status: 'Em crescimento', moisture: '68%', ndvi: '0.74', coords: [[-18.760,-52.650],[-18.760,-52.628],[-18.780,-52.628],[-18.780,-52.650]], color: '#059669', fillColor: '#059669', fillOpacity: 0.28 },
-  { id: 'T2', name: 'Talhão Cerrado Norte', area: '480 ha', crop: 'Milho', yieldForecast: '140 sc/ha', status: 'Germinação', moisture: '72%', ndvi: '0.61', coords: [[-18.760,-52.626],[-18.760,-52.600],[-18.780,-52.600],[-18.780,-52.626]], color: '#d97706', fillColor: '#d97706', fillOpacity: 0.28 },
-  { id: 'T3', name: 'Talhão Rio Verde', area: '250 ha', crop: 'Soja', yieldForecast: '60 sc/ha', status: 'Floração', moisture: '74%', ndvi: '0.81', coords: [[-18.782,-52.650],[-18.782,-52.634],[-18.797,-52.634],[-18.797,-52.650]], color: '#047857', fillColor: '#047857', fillOpacity: 0.35 },
-  { id: 'T4', name: 'Talhão Sul', area: '190 ha', crop: 'Cana-de-açúcar', yieldForecast: '85 t/ha', status: 'Maturação', moisture: '65%', ndvi: '0.69', coords: [[-18.782,-52.632],[-18.782,-52.614],[-18.797,-52.614],[-18.797,-52.632]], color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.25 },
-  { id: 'T5', name: 'Talhão Leste', area: '360 ha', crop: 'Milho', yieldForecast: '132 sc/ha', status: 'Em crescimento', moisture: '70%', ndvi: '0.65', coords: [[-18.782,-52.612],[-18.782,-52.596],[-18.797,-52.596],[-18.797,-52.612]], color: '#d97706', fillColor: '#d97706', fillOpacity: 0.28 },
-  { id: 'T6', name: 'Talhão Reserva', area: '140 ha', crop: 'Pastagem', yieldForecast: '—', status: 'Pousio', moisture: '55%', ndvi: '0.42', coords: [[-18.799,-52.650],[-18.799,-52.632],[-18.814,-52.632],[-18.814,-52.650]], color: '#9ca3af', fillColor: '#9ca3af', fillOpacity: 0.20 },
-  { id: 'T7', name: 'Talhão Água Limpa', area: '410 ha', crop: 'Soja', yieldForecast: '58 sc/ha', status: 'Enchimento de grãos', moisture: '76%', ndvi: '0.78', coords: [[-18.799,-52.630],[-18.799,-52.610],[-18.814,-52.610],[-18.814,-52.630]], color: '#059669', fillColor: '#059669', fillOpacity: 0.30 },
+  {
+    id: 'T1', name: 'Talhão Santa Maria', area: '320 ha', crop: 'Soja', coords: cell(0, 0),
+    cultivar: 'BMX Zeus IPRO', plantio: '12/10', colheita: '04/02', status: 'Em crescimento',
+    yieldForecast: '64 sc/ha', moisture: '68%', ndvi: '0.74', populacao: '312 mil pl/ha',
+    ultimaOperacao: 'Fungicida — 18/12', proximaOperacao: 'Inseticida — 02/01', responsavel: 'Equipe Norte',
+    custoHa: 'R$ 6.480', receitaPrevista: 'R$ 2,70M', margemHa: 'R$ 3.850',
+  },
+  {
+    id: 'T2', name: 'Talhão Cerrado Norte', area: '480 ha', crop: 'Milho', coords: cell(0, 1),
+    cultivar: 'DKB 390 PRO4', plantio: '08/11', colheita: '19/03', status: 'Germinação',
+    yieldForecast: '140 sc/ha', moisture: '72%', ndvi: '0.61', populacao: '68 mil pl/ha',
+    ultimaOperacao: 'Semeadura — 08/11', proximaOperacao: 'Cobertura N — 06/12', responsavel: 'Equipe Norte',
+    custoHa: 'R$ 5.120', receitaPrevista: 'R$ 3,90M', margemHa: 'R$ 2.640',
+  },
+  {
+    id: 'T3', name: 'Talhão Barreiro', area: '275 ha', crop: 'Soja', coords: cell(0, 2),
+    cultivar: 'NS 6906 IPRO', plantio: '15/10', colheita: '08/02', status: 'Floração',
+    yieldForecast: '61 sc/ha', moisture: '71%', ndvi: '0.79', populacao: '305 mil pl/ha',
+    ultimaOperacao: 'Herbicida — 21/12', proximaOperacao: 'Fungicida — 05/01', responsavel: 'Equipe Centro',
+    custoHa: 'R$ 6.240', receitaPrevista: 'R$ 2,21M', margemHa: 'R$ 3.610',
+  },
+  {
+    id: 'T4', name: 'Talhão Boa Vista', area: '305 ha', crop: 'Milho', coords: cell(0, 3),
+    cultivar: 'AG 8700 PRO3', plantio: '14/11', colheita: '26/03', status: 'Em crescimento',
+    yieldForecast: '128 sc/ha', moisture: '66%', ndvi: '0.63', populacao: '65 mil pl/ha',
+    ultimaOperacao: 'Cobertura N — 19/12', proximaOperacao: 'Fungicida — 09/01', responsavel: 'Equipe Centro',
+    custoHa: 'R$ 4.980', receitaPrevista: 'R$ 2,26M', margemHa: 'R$ 2.310',
+  },
+  {
+    id: 'T5', name: 'Talhão Rio Verde', area: '250 ha', crop: 'Soja', coords: cell(1, 0),
+    cultivar: 'TMG 7067 IPRO', plantio: '09/10', colheita: '31/01', status: 'Enchimento de grãos',
+    yieldForecast: '60 sc/ha', moisture: '74%', ndvi: '0.81', populacao: '298 mil pl/ha',
+    ultimaOperacao: 'Fungicida — 27/12', proximaOperacao: 'Dessecação — 20/01', responsavel: 'Equipe Oeste',
+    custoHa: 'R$ 6.310', receitaPrevista: 'R$ 1,98M', margemHa: 'R$ 3.470',
+  },
+  {
+    id: 'T6', name: 'Talhão Sul', area: '190 ha', crop: 'Cana-de-açúcar', coords: cell(1, 1),
+    cultivar: 'RB 96 6928 — 3º corte', plantio: '02/03', colheita: '14/07', status: 'Maturação',
+    yieldForecast: '85 t/ha', moisture: '65%', ndvi: '0.69', populacao: '11 colmos/m',
+    ultimaOperacao: 'Maturador — 11/12', proximaOperacao: 'Corte — 14/07', responsavel: 'Equipe Sul',
+    custoHa: 'R$ 8.160', receitaPrevista: 'R$ 1,91M', margemHa: 'R$ 1.980',
+  },
+  {
+    id: 'T7', name: 'Talhão Leste', area: '360 ha', crop: 'Milho', coords: cell(1, 2),
+    cultivar: 'P3898 VYHR', plantio: '11/11', colheita: '22/03', status: 'Em crescimento',
+    yieldForecast: '132 sc/ha', moisture: '70%', ndvi: '0.65', populacao: '66 mil pl/ha',
+    ultimaOperacao: 'Cobertura N — 16/12', proximaOperacao: 'Inseticida — 07/01', responsavel: 'Equipe Leste',
+    custoHa: 'R$ 5.040', receitaPrevista: 'R$ 2,75M', margemHa: 'R$ 2.520',
+  },
+  {
+    id: 'T8', name: 'Talhão Pontal', area: '210 ha', crop: 'Cana-de-açúcar', coords: cell(1, 3),
+    cultivar: 'CTC 4 — 2º corte', plantio: '18/03', colheita: '02/08', status: 'Desenvolvimento',
+    yieldForecast: '92 t/ha', moisture: '69%', ndvi: '0.72', populacao: '13 colmos/m',
+    ultimaOperacao: 'Adubação — 05/12', proximaOperacao: 'Maturador — 28/05', responsavel: 'Equipe Sul',
+    custoHa: 'R$ 7.940', receitaPrevista: 'R$ 2,28M', margemHa: 'R$ 2.240',
+  },
+  {
+    id: 'T9', name: 'Talhão Reserva', area: '140 ha', crop: 'Pastagem', coords: cell(2, 0),
+    cultivar: 'Braquiária Marandu', plantio: 'Formação 2021', colheita: '—', status: 'Pousio',
+    yieldForecast: '—', moisture: '55%', ndvi: '0.42', populacao: '0,4 UA/ha',
+    ultimaOperacao: 'Roçada — 02/11', proximaOperacao: 'Calagem — 15/04', responsavel: 'Equipe Oeste',
+    custoHa: 'R$ 620', receitaPrevista: '—', margemHa: '—',
+  },
+  {
+    id: 'T10', name: 'Talhão Água Limpa', area: '410 ha', crop: 'Soja', coords: cell(2, 1),
+    cultivar: 'BMX Bônus IPRO', plantio: '05/10', colheita: '27/01', status: 'Enchimento de grãos',
+    yieldForecast: '58 sc/ha', moisture: '76%', ndvi: '0.78', populacao: '289 mil pl/ha',
+    ultimaOperacao: 'Fungicida — 23/12', proximaOperacao: 'Dessecação — 16/01', responsavel: 'Equipe Oeste',
+    custoHa: 'R$ 6.050', receitaPrevista: 'R$ 3,14M', margemHa: 'R$ 3.180',
+  },
+  {
+    id: 'T11', name: 'Talhão Capão Alto', area: '330 ha', crop: 'Milho', coords: cell(2, 2),
+    cultivar: 'DKB 290 PRO3', plantio: '17/11', colheita: '30/03', status: 'Germinação',
+    yieldForecast: '124 sc/ha', moisture: '64%', ndvi: '0.58', populacao: '63 mil pl/ha',
+    ultimaOperacao: 'Semeadura — 17/11', proximaOperacao: 'Cobertura N — 14/12', responsavel: 'Equipe Leste',
+    custoHa: 'R$ 4.860', receitaPrevista: 'R$ 2,37M', margemHa: 'R$ 2.180',
+  },
+  {
+    id: 'T12', name: 'Talhão Vargem', area: '165 ha', crop: 'Pastagem', coords: cell(2, 3),
+    cultivar: 'Panicum Mombaça', plantio: 'Formação 2019', colheita: '—', status: 'Em descanso',
+    yieldForecast: '—', moisture: '61%', ndvi: '0.51', populacao: '0,9 UA/ha',
+    ultimaOperacao: 'Adubação — 28/10', proximaOperacao: 'Entrada de lote — 10/01', responsavel: 'Equipe Sul',
+    custoHa: 'R$ 780', receitaPrevista: '—', margemHa: '—',
+  },
 ]
 
 // ─── Séries mensais — realizado x previsto ────────────────────────────────────
@@ -122,6 +218,66 @@ const AREA_BY_CROP = (() => {
   return [...acc.entries()].sort((a, b) => b[1] - a[1])
 })()
 const TOTAL_HA = AREA_BY_CROP.reduce((s, [, ha]) => s + ha, 0)
+
+/** Ícone e densidade de preenchimento do polígono, estáveis por cultura. */
+const CROP_ICON: Record<string, FarmAreaIcon> = {
+  'Soja':           'sprout',
+  'Milho':          'wheat',
+  'Cana-de-açúcar': 'leaf',
+  'Pastagem':       'trees',
+}
+const CROP_FILL: Record<string, number> = { 'Pastagem': 0.20 }
+
+/** Traduz o talhão do dataset na área do mapa: rótulo, ícone e painel de hover. */
+function toMapArea(tl: Talhao): FarmArea {
+  return {
+    id: tl.id,
+    name: tl.name,
+    subtitle: tl.area,
+    coords: tl.coords,
+    color: CROP_COLOR[tl.crop] ?? t.color.neutral[400],
+    fillOpacity: CROP_FILL[tl.crop] ?? 0.28,
+    icon: CROP_ICON[tl.crop] ?? 'sprout',
+    headline: `${tl.crop} · ${tl.status}`,
+    groups: [
+      {
+        title: 'Cultura',
+        rows: [
+          { label: 'Cultivar', value: tl.cultivar },
+          { label: 'Plantio', value: tl.plantio },
+          { label: 'Colheita', value: tl.colheita },
+        ],
+      },
+      {
+        title: 'Lavoura',
+        rows: [
+          { label: 'Produtividade', value: tl.yieldForecast },
+          { label: 'Umidade', value: tl.moisture },
+          { label: 'NDVI', value: tl.ndvi },
+          { label: 'População', value: tl.populacao },
+        ],
+      },
+      {
+        title: 'Manejo',
+        rows: [
+          { label: 'Última op.', value: tl.ultimaOperacao },
+          { label: 'Próxima op.', value: tl.proximaOperacao },
+          { label: 'Responsável', value: tl.responsavel },
+        ],
+      },
+      {
+        title: 'Resultado',
+        rows: [
+          { label: 'Custo/ha', value: tl.custoHa },
+          { label: 'Receita prev.', value: tl.receitaPrevista },
+          { label: 'Margem/ha', value: tl.margemHa },
+        ],
+      },
+    ],
+  }
+}
+
+const MAP_AREAS: FarmArea[] = TALHAOES.map(toMapArea)
 
 // Resultado operacional (DRE) — receita decrescendo através das camadas de custo
 // até o resultado. Cruza o total de receita com a composição de custo (COE/COT).
@@ -251,42 +407,6 @@ const OVERVIEW_DATASET: OverviewDataset = {
     }
   }),
   cashflow12m: CASHFLOW_12M,
-}
-
-// ─── Talhões Map ──────────────────────────────────────────────────────────────
-
-function TalhoesMap() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container || mapRef.current) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    })
-    const map = L.map(container, { zoomControl: false, attributionControl: false }).setView([-18.787,-52.625], 13)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map)
-    L.control.zoom({ position: 'bottomright' }).addTo(map)
-    TALHAOES.forEach(talhao => {
-      const poly = L.polygon(talhao.coords, { color: talhao.color, fillColor: talhao.fillColor, fillOpacity: talhao.fillOpacity, weight: 2.5 })
-      poly.bindTooltip(`<div style="font-family:Outfit,sans-serif;font-size:12px;padding:4px 8px"><b>${talhao.name}</b><br/>${talhao.crop} · ${talhao.area}</div>`, { sticky: true, opacity: 1, offset: [10,0] })
-      poly.on('mouseover', () => poly.setStyle({ weight: 3.5, fillOpacity: Math.min(talhao.fillOpacity + 0.18, 0.65) }))
-      poly.on('mouseout', () => poly.setStyle({ weight: 2.5, fillOpacity: talhao.fillOpacity }))
-      poly.addTo(map)
-    })
-    mapRef.current = map
-    // O card resolve a largura depois do primeiro paint (grade flex do
-    // dashboard). Sem invalidateSize o Leaflet mantém o tamanho antigo e
-    // carrega tiles só na faixa central do bloco.
-    const observer = new ResizeObserver(() => map.invalidateSize())
-    observer.observe(container)
-    return () => { observer.disconnect(); map.remove(); mapRef.current = null }
-  }, [])
-  return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
 }
 
 // ─── KPI stat (top row, efferd style) ────────────────────────────────────────
@@ -833,7 +953,7 @@ export default function OverviewPanel() {
 
         {/* ── Mapa dos talhões — bloco que sangra até a borda do card ────────── */}
         <DashboardCard bare>
-          <div style={{ height: 260, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ height: t.size.mapStrip, position: 'relative', overflow: 'hidden' }}>
             <div style={{
               position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
               display: 'flex', alignItems: 'center', gap: t.space[1],
@@ -853,7 +973,7 @@ export default function OverviewPanel() {
               <span style={{ fontSize: t.font.size.xs, color: t.color.neutral[0], fontWeight: t.font.weight.semibold }}>{TALHAOES.length} talhões</span>
               <ArrowRight size={10} color={t.color.neutral[0]} />
             </div>
-            <TalhoesMap />
+            <FarmAreasMap areas={MAP_AREAS} ariaLabel="Mapa dos talhões da fazenda" />
           </div>
         </DashboardCard>
 

@@ -464,6 +464,12 @@ export const size = {
   dashCardMin: 300,
   /** Idem para o card de KPI — cabem 4 por fileira em ~800px de conteúdo. */
   dashKpiMin: 180,
+  /** Marcador circular de área no mapa (FarmAreasMap) */
+  mapPin: 28,
+  /** Largura do painel de detalhe exibido no hover de uma área do mapa */
+  mapPanel: 460,
+  /** Altura da faixa de mapa do Painel de Controle (Visão Geral) */
+  mapStrip: 312,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────
@@ -513,6 +519,9 @@ export const shadow = {
 
   /** Realce de marca de gráfico (barra/fatia/ponto) — usar via `drop-shadow(...)` */
   chartMark:     '0 2px 4px rgba(0,0,0,0.12)',
+
+  /** Rótulo de área sobre imagem de satélite — usar via `text-shadow` (garante leitura do texto claro sobre fundo variável) */
+  mapLabel:      '0 1px 3px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.45)',
 }
 
 // ─── Bordas ───────────────────────────────────────────────────────────────────
@@ -531,6 +540,8 @@ export const zIndex = {
   dropdown: 100,
   overlay:  200,
   drawer:   201,
+  /** Painel de detalhe do mapa — acima da camada de controles do Leaflet (800) */
+  mapPanel: 900,
   toast:    9999,
 }
 

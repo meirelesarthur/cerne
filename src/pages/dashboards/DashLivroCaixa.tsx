@@ -125,11 +125,11 @@ const movimentacoesColumns: Column<Movimentacao>[] = [
   },
 ]
 
-function MovimentacoesTabela(_: { colors: ReturnType<typeof useTheme>['colors']; isGbMode: boolean }) {
+function MovimentacoesTabela({ data }: { data: Movimentacao[] }) {
   return (
     <DataTable<Movimentacao>
       columns={movimentacoesColumns}
-      data={movimentacoes}
+      data={data}
       keyField="data"
     />
   )
@@ -200,6 +200,8 @@ export default function DashLivroCaixa() {
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
+  // tipo reflete accounting_entries.origin
+  const [tipo, setTipo] = useUrlFilter('tipo', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -218,6 +220,11 @@ export default function DashLivroCaixa() {
   const nMeses = Number(periodo)
   const labels = monthLabels.slice(-nMeses)
   const fluxoSeriesFiltrado = fluxoSeries.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
+
+  // Filtro por tipo de movimentação — aplicado sobre a tabela de movimentações
+  const movimentacoesFiltradas = tipo === 'todos'
+    ? movimentacoes
+    : movimentacoes.filter((m) => m.tipo === tipo)
 
   const analise: DashboardReadingInput = {
     title: 'Livro Caixa',
@@ -260,6 +267,18 @@ export default function DashLivroCaixa() {
                     { value: '3',  label: 'Últimos 3 meses' },
                     { value: '6',  label: 'Últimos 6 meses' },
                     { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+                {
+                  label: 'Tipo de movimentação',
+                  value: tipo,
+                  onChange: setTipo,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos',         label: 'Todos' },
+                    { value: 'Receita',       label: 'Receita' },
+                    { value: 'Despesa',       label: 'Despesa' },
+                    { value: 'Transferência', label: 'Transferência' },
                   ],
                 },
               ]}
@@ -311,7 +330,7 @@ export default function DashLivroCaixa() {
       {/* Fileira 3 — Movimentações + Saldo por Conta */}
       <DashboardRow>
         <DashboardCard title="Últimas movimentações" flex={3}>
-          <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
+          <MovimentacoesTabela data={movimentacoesFiltradas} />
         </DashboardCard>
         <DashboardCard title="Saldo por conta" flex={2}>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />

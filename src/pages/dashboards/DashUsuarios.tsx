@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { LineChart } from '../../components/ui/LineChart'
+import { Badge } from '../../components/ui/Badge'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
@@ -120,6 +121,8 @@ const HOURLY_SERIES = [
 const USR_KPIS = [
   { label: 'Usuários ativos',      value: '47',      trend: '5,2%',  up: true  },
   { label: 'Sessões hoje',         value: '183',     trend: '12,4%', up: true  },
+  // reflete user_accesses.ip_address distinct
+  { label: 'Acessos por IP único', value: '142',     trend: '9,1%',  up: true  },
   { label: 'Tempo médio de sessão',   value: '8,4 min', trend: '0,8%',  up: false },
   { label: 'Módulos acessados',    value: '9 / 11',  trend: null,    up: true  },
 ]
@@ -139,7 +142,7 @@ export default function DashUsuarios() {
   if (loading) {
     // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
     // visível, ela fica o mínimo de `t.delay.loadingMin`.
-    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.sm]} /> : null
+    return showSkeleton ? <DashboardSkeleton kpis={5} blocks={[t.size.chart.md, t.size.chart.sm]} /> : null
   }
 
   const analise: DashboardReadingInput = {
@@ -223,13 +226,23 @@ export default function DashUsuarios() {
             yFormat={(v) => String(Math.round(v))}
           />
         </DashboardCard>
-        <DashboardCard title="Módulos mais acessados" flex={1}>
+        {/* proxy via audits.auditable_type / user_agent — não há tabela de sessão/canal explícita no schema */}
+        <DashboardCard
+          title="Módulos mais acessados"
+          flex={1}
+          action={<Badge label="Estimado via log de auditoria" variant="neutral" />}
+        >
           <DonutModulos />
         </DashboardCard>
       </DashboardRow>
 
       {/* Fileira 3 — Picos por hora */}
-      <FocusableChartCard title="Picos de acesso por hora" series={HOURLY_SERIES}>
+      {/* proxy via audits.auditable_type / user_agent — não há tabela de sessão/canal explícita no schema */}
+      <FocusableChartCard
+        title="Picos de acesso por hora"
+        series={HOURLY_SERIES}
+        action={() => <Badge label="Estimado via log de auditoria" variant="neutral" />}
+      >
         {(series) => (
           <StackedBarChart
             series={series}

@@ -39,6 +39,22 @@ const rebanhoComp = [
 const vermifugData = [42, 38, 55, 48, 60, 45, 52, 58, 44, 50, 62, 48]
 const pesagensData = [30, 28, 40, 35, 45, 32, 38, 42, 30, 36, 48, 35]
 
+// Composição por raça do rebanho — percentuais somam 100
+// shape reflete breeds + animals.category_id
+const mockComposicaoRaca = [
+  { label: 'Nelore',   pct: 46, color: t.chart.series[0] },
+  { label: 'Angus',    pct: 21, color: t.chart.series[1] },
+  { label: 'Brangus',  pct: 15, color: t.chart.series[2] },
+  { label: 'Senepol',  pct: 10, color: t.chart.series[3] },
+  { label: 'Cruzado',  pct: 8,  color: t.chart.series[4] },
+] as const
+
+// KPIs de nascimentos/mortes do período — shape reflete birth_animals / death_animals
+const PEC_KPIS_VITAIS = [
+  { label: 'Nascimentos no período', value: '186', trend: '8,4% vs período ant.', up: true  },
+  { label: 'Mortes no período',      value: '9',   trend: '1,1% vs período ant.', up: false },
+]
+
 // ─── Séries para LineChart ────────────────────────────────────────────────────
 
 const REBANHO_SERIES = [
@@ -108,6 +124,14 @@ export default function DashPecuaria() {
         concentrationRisk: false,
       },
       {
+        block: 'Composição por raça',
+        kind: 'composition',
+        labels: mockComposicaoRaca.map((c) => c.label),
+        series: [{ name: 'Participação', data: mockComposicaoRaca.map((c) => c.pct) }],
+        unit: '%',
+        concentrationRisk: false,
+      },
+      {
         block: 'Manejos por mês',
         kind: 'timeline',
         labels,
@@ -157,6 +181,19 @@ export default function DashPecuaria() {
         ))}
       </DashboardRow>
 
+      {/* Fileira 1b — Nascimentos/Mortes do período */}
+      <DashboardRow>
+        {PEC_KPIS_VITAIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
+
       {/* Fileira 2 — Evolução + Composição */}
       <DashboardRow>
         <FocusableChartCard title="Evolução do rebanho" flex={2} series={rebanhoSeries}>
@@ -177,6 +214,16 @@ export default function DashPecuaria() {
             height={t.size.chart.md}
             centerValue="4.280"
             centerLabel="cabeças"
+            showLegend
+            valueFormat={(v) => `${v}%`}
+          />
+        </DashboardCard>
+        <DashboardCard title="Composição por raça" flex={1}>
+          <DonutChart
+            data={mockComposicaoRaca.map((d) => ({ label: d.label, value: d.pct, color: d.color }))}
+            height={t.size.chart.md}
+            centerValue="5"
+            centerLabel="raças"
             showLegend
             valueFormat={(v) => `${v}%`}
           />

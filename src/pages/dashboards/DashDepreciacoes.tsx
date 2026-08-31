@@ -59,13 +59,42 @@ const DONUT_SLICES = [
 
 const PROJ_MONTHS_COUNT = 24
 const CURRENT_MONTH = 11
+const VALOR_RESIDUAL_ATUAL = 6_300_000
+
+// Metodologia: os 12 primeiros pontos (M1–M12, índice 0–CURRENT_MONTH) são o
+// valor residual realizado, derivado da depreciação mensal total de
+// `STACKED_DATA` (reflete assets.acquisition_value − depreciations.accumulated_value).
+// A projeção (M13+) não usa mais decay arbitrário: a taxa de depreciação
+// mensal futura é a média móvel das últimas `TAXA_JANELA` saídas mensais reais
+// — projetada para frente a partir do valor residual atual até o piso do
+// valor residual mínimo estimado.
+const TAXA_JANELA = 6
+
+function generateHistoricoResidual() {
+  // Valor residual em M(i) = valor atual + soma da depreciação mensal dos
+  // meses ainda não decorridos (caminhar para trás a partir de hoje).
+  const depMensalTotal = STACKED_DATA.map((d) => d.maq + d.vei + d.benf + d.outros)
+  const historico = new Array(CURRENT_MONTH + 1).fill(0)
+  historico[CURRENT_MONTH] = VALOR_RESIDUAL_ATUAL
+  for (let i = CURRENT_MONTH - 1; i >= 0; i--) {
+    historico[i] = historico[i + 1] + depMensalTotal[i + 1]
+  }
+  return historico
+}
 
 function generateProjection() {
-  return Array.from({ length: PROJ_MONTHS_COUNT }, (_, i) => {
-    const base = 6_300_000 - i * 220_000
-    const jitter = i < CURRENT_MONTH ? (Math.sin(i * 1.3) * 50_000) : 0
-    return Math.max(base + jitter, 1_000_000)
-  })
+  const historico = generateHistoricoResidual()
+
+  // Taxa mensal média real: média da depreciação dos últimos `TAXA_JANELA`
+  // meses do histórico (não mais um decremento arbitrário por mês).
+  const janela = STACKED_DATA.slice(-TAXA_JANELA).map((d) => d.maq + d.vei + d.benf + d.outros)
+  const taxaMensalMedia = janela.reduce((acc, v) => acc + v, 0) / janela.length
+
+  const projecao = Array.from({ length: PROJ_MONTHS_COUNT - historico.length }, (_, i) =>
+    Math.max(VALOR_RESIDUAL_ATUAL - taxaMensalMedia * (i + 1), 1_000_000),
+  )
+
+  return [...historico, ...projecao]
 }
 
 const PROJ_VALUES = generateProjection()
@@ -150,7 +179,7 @@ export default function DashDepreciacoes() {
         currency: true,
       },
     ],
-    notes: ['A projeção repete o último valor realizado para os meses futuros — é extrapolação, não previsão de modelo.'],
+    notes: [`A projeção usa a taxa de depreciação mensal média dos últimos ${TAXA_JANELA} meses realizados, projetada para frente — não é mais um decaimento arbitrário.`],
   }
 
   return (

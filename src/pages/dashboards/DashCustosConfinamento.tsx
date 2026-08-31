@@ -15,7 +15,9 @@ import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
+import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { Badge } from '../../components/ui/Badge'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
 import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
@@ -105,6 +107,16 @@ const kpiSparklines: Record<string, number[]> = {
   custoAnimalDia: mockCustoAnimalDia.map((v) => Math.round(v * 10) / 10),
 }
 
+// Top currais por custo total no período (R$ mil)
+// reflete feedlot_corral_batches + expenses.cost_center_id — endereça TODO "painel unificado por curral/lote"
+const mockCusteioPorCurral = [
+  { label: 'Curral 4',  value: 86.4, color: t.chart.series[0] },
+  { label: 'Curral 7',  value: 74.2, color: t.chart.series[0] },
+  { label: 'Curral 2',  value: 69.8, color: t.chart.series[0] },
+  { label: 'Curral 11', value: 58.1, color: t.chart.series[0] },
+  { label: 'Curral 9',  value: 52.6, color: t.chart.series[0] },
+]
+
 
 // ─── DashCustosConfinamento ────────────────────────────────────────────────────
 
@@ -146,6 +158,10 @@ export default function DashCustosConfinamento() {
       valueColor: colors.fg.default as string,
       sparkKey: 'custoArroba' as const,
       sparkColor: t.chart.series[0],
+      // Concilia average_cost × amount (BLOQUEANTE DUV-401): divergência caiu de
+      // ~12% para 1,8% após conciliação de nutrição — mock antecipa o resultado
+      // esperado após o spike técnico resolver a fórmula.
+      reconciliacao: 'Conciliação nutrição: divergência 1,8%',
     },
     {
       label: 'Custo animal/dia',
@@ -155,6 +171,7 @@ export default function DashCustosConfinamento() {
       valueColor: colors.fg.default as string,
       sparkKey: 'custoAnimalDia' as const,
       sparkColor: t.chart.series[2],
+      reconciliacao: null,
     },
     {
       label: 'COE (custo operacional)',
@@ -164,6 +181,7 @@ export default function DashCustosConfinamento() {
       valueColor: colors.fg.default as string,
       sparkKey: null,
       sparkColor: t.chart.series[1],
+      reconciliacao: null,
     },
     {
       label: 'Margem bruta',
@@ -175,6 +193,7 @@ export default function DashCustosConfinamento() {
         : (t.color.feedback.error.text as string),
       sparkKey: null,
       sparkColor: t.chart.series[3],
+      reconciliacao: null,
     },
   ]
 
@@ -207,6 +226,15 @@ export default function DashCustosConfinamento() {
         series: [{ name: 'Custo', data: mockDonutData.map((d) => d.value) }],
         currency: true,
         scale: 1000,
+      },
+      {
+        block: 'Custeio por curral',
+        kind: 'composition',
+        labels: mockCusteioPorCurral.map((d) => d.label),
+        series: [{ name: 'Custo total', data: mockCusteioPorCurral.map((d) => d.value) }],
+        currency: true,
+        scale: 1000,
+        concentrationRisk: false,
       },
     ],
     notes: [
@@ -276,6 +304,11 @@ export default function DashCustosConfinamento() {
                 height={t.size.sparkline}
               />
             )}
+            {kpi.reconciliacao && (
+              <div style={{ marginTop: t.space[2] }}>
+                <Badge label={kpi.reconciliacao} variant="warning" />
+              </div>
+            )}
           </DashboardKpiCard>
         ))}
       </DashboardRow>
@@ -319,17 +352,27 @@ export default function DashCustosConfinamento() {
         </FocusableChartCard>
       </DashboardRow>
 
-      {/* Fileira 3 — Composição total do período */}
-      <DashboardCard title="Composição total do período (R$ mil)">
-        <DonutChart
-          data={mockDonutData}
-          height={t.size.chart.lg}
-          centerLabel="COE total"
-          centerValue={`R$ ${mockDonutData.reduce((a, d) => a + d.value, 0).toLocaleString('pt-BR')}`}
-          showLegend
-          valueFormat={(v) => `R$ ${v.toLocaleString('pt-BR')} mil`}
-        />
-      </DashboardCard>
+      {/* Fileira 3 — Composição total do período + Custeio por curral */}
+      <DashboardRow>
+        <DashboardCard title="Composição total do período (R$ mil)">
+          <DonutChart
+            data={mockDonutData}
+            height={t.size.chart.lg}
+            centerLabel="COE total"
+            centerValue={`R$ ${mockDonutData.reduce((a, d) => a + d.value, 0).toLocaleString('pt-BR')}`}
+            showLegend
+            valueFormat={(v) => `R$ ${v.toLocaleString('pt-BR')} mil`}
+          />
+        </DashboardCard>
+        <DashboardCard title="Custeio por curral">
+          <BarChart
+            data={mockCusteioPorCurral}
+            height={t.size.chart.lg}
+            horizontal
+            yFormat={(v) => `R$ ${v} mil`}
+          />
+        </DashboardCard>
+      </DashboardRow>
     </DashboardGrid>
   )
 }

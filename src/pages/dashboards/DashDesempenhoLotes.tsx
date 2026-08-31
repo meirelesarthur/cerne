@@ -56,6 +56,10 @@ const mockLotesSeries = [
 // Labels dos lotes para o comparativo de GMD
 const mockLoteLabels = ['Lote A-01', 'Lote B-03', 'Lote C-02', 'Lote D-05', 'Lote E-04']
 
+// Meta de GMD por curral (kg/dia) — uma por lote, na mesma ordem de mockLoteLabels
+// meta por curral reflete feedlot_corrals.expected_adg (hoje fixa, banco já tem por curral)
+const mockGmdMetaPorLote = [1.35, 1.30, 1.45, 1.55, 1.40]
+
 // GMD atual vs meta por lote (kg/dia)
 const mockGmdSeries = [
   {
@@ -65,7 +69,7 @@ const mockGmdSeries = [
   },
   {
     name: 'GMD meta',
-    data: [1.40, 1.40, 1.40, 1.40, 1.40],
+    data: mockGmdMetaPorLote,
     color: t.chart.series[3],
   },
 ]
@@ -74,16 +78,20 @@ const mockGmdSeries = [
 const kpiSparklines: Record<string, number[]> = {
   'Média GMD': [1.30, 1.33, 1.36, 1.38, 1.40, 1.42, 1.38],
   'Ganho total': [3200, 3580, 3940, 4260, 4600, 4920, 5180],
+  // derivado de feedlot_corral_diet_histories.feed_intake × custo da dieta
+  'Custo por kg de ganho': [8.90, 8.75, 8.62, 8.55, 8.48, 8.40, 8.40],
 }
 
 // Lista compacta de lotes com últimas pesagens
-const mockLotesDetalhe = [
+const mockLotesDetalheBase = [
   { id: 'A-01', curral: 'Curral 4',  animais: 85, pesoMedio: 421, ganhoTotal: 8585, gmd: 1.45 },
   { id: 'B-03', curral: 'Curral 7',  animais: 72, pesoMedio: 390, ganhoTotal: 6840, gmd: 1.31 },
   { id: 'C-02', curral: 'Curral 2',  animais: 91, pesoMedio: 423, ganhoTotal: 7553, gmd: 1.38 },
   { id: 'D-05', curral: 'Curral 11', animais: 68, pesoMedio: 398, ganhoTotal: 6460, gmd: 1.52 },
   { id: 'E-04', curral: 'Curral 9',  animais: 79, pesoMedio: 376, ganhoTotal: 6004, gmd: 1.26 },
 ]
+// Meta de GMD embutida por lote (mesma ordem de mockGmdMetaPorLote)
+const mockLotesDetalhe = mockLotesDetalheBase.map((l, i) => ({ ...l, meta: mockGmdMetaPorLote[i] }))
 
 
 // ─── DashDesempenhoLotes ──────────────────────────────────────────────────────
@@ -179,6 +187,16 @@ export default function DashDesempenhoLotes() {
       sparkKey: null,
       sparkColor: t.chart.series[0],
     },
+    {
+      // derivado de feedlot_corral_diet_histories.feed_intake × custo da dieta
+      label: 'Custo por kg de ganho',
+      value: 'R$ 8,40/kg',
+      trend: '4,5% vs mês ant.',
+      up: false, // custo subindo é desfavorável
+      valueColor: colors.fg.default as string,
+      sparkKey: 'Custo por kg de ganho',
+      sparkColor: t.chart.series[2],
+    },
   ]
 
   const analise: DashboardReadingInput = {
@@ -203,8 +221,8 @@ export default function DashDesempenhoLotes() {
       },
     ],
     notes: [
-      'Meta de GMD do confinamento: 1,40 kg/dia — lote abaixo disso aparece em vermelho no detalhamento.',
-      `Lotes acima da meta no recorte: ${lotesFiltrados.filter((l) => l.gmd >= 1.4).length} de ${lotesFiltrados.length}.`,
+      'Meta de GMD varia por curral (feedlot_corrals.expected_adg) — lote abaixo da própria meta aparece em vermelho no detalhamento.',
+      `Lotes acima da meta no recorte: ${lotesFiltrados.filter((l) => l.gmd >= l.meta).length} de ${lotesFiltrados.length}.`,
     ],
   }
 
@@ -346,7 +364,7 @@ export default function DashDesempenhoLotes() {
 
           {/* Linhas */}
           {lotesFiltrados.map((lote, i) => {
-            const isAboveMeta = lote.gmd >= 1.40
+            const isAboveMeta = lote.gmd >= lote.meta
             const isLast = i === lotesFiltrados.length - 1
             return (
               <div

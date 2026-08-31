@@ -21,6 +21,7 @@ import {
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
+import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { useSeriesFocus } from '../../hooks/useSeriesFocus'
 import { useDelayedLoading } from '../../hooks/useDelayedLoading'
@@ -52,6 +53,16 @@ const BAR_DATA = [
 
 const VOLUME_DATA = [0, 5, 8, 25, 75, 130, 175, 200, 225, 185, 130, 18]
 const VOLUME_LABELS = ['Jun/25','Jul','Ago','Set','Out','Nov','Dez','Jan/26','Fev','Mar','Abr','Mai']
+
+// Acumulado por área (mm) — reflete area_rainfall (chuva por talhão), hoje só
+// existe como filtro plano de 20 nomes; aqui recorta as 5 áreas de maior volume.
+const AREA_ACUMULADO = [
+  { label: 'Módulo 5',    value: 212 },
+  { label: 'Módulo 3',    value: 198 },
+  { label: 'Conf L1-7',   value: 185 },
+  { label: 'Módulo 1',    value: 171 },
+  { label: 'Capineira 1', value: 160 },
+]
 
 const FORECAST = [
   { day: 'Segunda', min: 18, max: 29, rain: 0.2, condition: 'rain'   as const },
@@ -143,6 +154,26 @@ function VolumeAreaChart() {
   )
 }
 
+// ─── Bar Chart wrapper — Acumulado por área ──────────────────────────────────
+
+function AcumuladoAreaChart() {
+  const { isGbMode } = useTheme()
+
+  return (
+    <ChartCard title="Acumulado por área">
+      <BarChart
+        data={AREA_ACUMULADO.map(a => ({
+          label: a.label,
+          value: a.value,
+          color: isGbMode ? t.color.brand[500] : t.color.brand[600],
+        }))}
+        height={t.size.chart.sm}
+        yFormat={v => `${v}mm`}
+      />
+    </ChartCard>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Pluviometria() {
@@ -176,7 +207,7 @@ export default function Pluviometria() {
   if (isLoading) {
     // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
     // visível, ela fica o mínimo de `t.delay.loadingMin`.
-    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} /> : null
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md, t.size.chart.sm]} /> : null
   }
 
   // KPIs da fileira de topo — cada um vira um card com fill próprio; quem
@@ -214,6 +245,13 @@ export default function Pluviometria() {
         kind: 'timeline',
         labels: VOLUME_LABELS,
         series: [{ name: 'Volume', data: VOLUME_DATA }],
+        unit: 'mm',
+      },
+      {
+        block: 'Acumulado por área',
+        kind: 'composition',
+        labels: AREA_ACUMULADO.map((a) => a.label),
+        series: [{ name: 'Acumulado', data: AREA_ACUMULADO.map((a) => a.value) }],
         unit: 'mm',
       },
     ],
@@ -408,6 +446,9 @@ export default function Pluviometria() {
 
         {/* ── Fileira 3 — Volume pluviométrico ─────────────────────────── */}
         <VolumeAreaChart />
+
+        {/* ── Fileira 4 — Acumulado por área ────────────────────────────── */}
+        <AcumuladoAreaChart />
       </DashboardGrid>
 
       {/* ── Filter Drawer ────────────────────────────────────────────── */}

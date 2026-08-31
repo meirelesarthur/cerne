@@ -278,7 +278,7 @@ export const SHOWCASE_FILTERABLE_COMPONENTS: string[] = Array.from(
   new Set(SCREEN_SHOWCASE.flatMap((entry) => entry.components ?? [])),
 ).sort((a, b) => a.localeCompare(b))
 
-// ─── Componentes de src/components/ui/ (85) ────────────────────────────────
+// ─── Componentes de src/components/ui/ (92) ────────────────────────────────
 
 const AMPLO = 'Uso amplo — presente na maioria das telas de Cadastros/Financeiro/Administrativo (ver Storybook para exemplos isolados).'
 
@@ -336,6 +336,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'ChartSvgLegend', status: 'coberto', screens: 'components/ui/{Bar,GroupedBar,StackedBar,Line}Chart (legenda interna)' },
   { name: 'Checkbox', status: 'coberto', screens: AMPLO },
   { name: 'ConfirmDialog', status: 'coberto', screens: AMPLO },
+  { name: 'DashboardAnalysis', status: 'coberto', screens: 'pages/dashboards/* (botão Análise + carta de leitura)' },
   { name: 'DashboardFilters', status: 'coberto', screens: 'pages/dashboards/* (botão Filtros + FilterDrawer)' },
   { name: 'DashboardGrid', status: 'coberto', screens: 'pages/dashboards/* (casca das 14 telas: Grid/Header/Row/Stack/Card/KpiCard/Skeleton)' },
   { name: 'DataTable', status: 'coberto', screens: 'integracoes/dominio, planejamento-pecuario, ofx (+ via CrudPattern/ResponsiveDataTable)' },
@@ -345,6 +346,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'EmptyState', status: 'coberto', screens: AMPLO },
   { name: 'FarmSwitcher', status: 'coberto', screens: 'components/layout/Topbar' },
   { name: 'FeedbackBanner', status: 'coberto', screens: 'autorizacao, baixa-titulos, ofx, dominio, mapa-confinamento, usuarios, design-system/EstadosContaPage' },
+  { name: 'FocusableChartCard', status: 'coberto', screens: 'pages/dashboards/* (bloco de várias séries com seletor de foco)' },
   { name: 'FormField', status: 'coberto', screens: AMPLO },
   { name: 'FormPageHeader', status: 'coberto', screens: 'AMPLO — cabeçalho de todos os formulários de cadastro' },
   { name: 'FormSection', status: 'coberto', screens: AMPLO },

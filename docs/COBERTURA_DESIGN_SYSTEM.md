@@ -1,7 +1,7 @@
 # Cobertura do Design System — matriz componente → tela-referência
 
 Este documento é a **fonte de dados única** de cobertura do design system GB CERNE: quais dos
-85 componentes de `src/components/ui/` já têm uma tela-referência viva, e qual o veredito de
+94 componentes de `src/components/ui/` já têm uma tela-referência viva, e qual o veredito de
 riqueza de cada um dos 11 padrões-âncora do discovery agro365→GB.Cerne (Dashboards e Relatórios
 ficam fora — tratados um a um, separadamente).
 
@@ -19,11 +19,14 @@ dev-only; ver seção "Visibilidade do painel" abaixo.
 
 | Métrica | Valor |
 |---|---:|
-| Componentes de `ui/` com tela-referência viva | **85 / 85** |
+| Componentes de `ui/` com tela-referência viva | **92 / 94** |
 | Padrões primários (fora dashboard/relatório) com referência Rica | **10 / 10** |
 | Sub-componentes de CRUD com referência Rica | 5 / 5 |
 | Lacunas de conteúdo (RBAC visível) | 0 (fechada) |
 | Telas catalogadas na Vitrine por tela | 22 |
+
+Fora do catálogo por enquanto: `EditableFieldTable` e `PermissionMatrixField` — ainda sem
+linha em `designSystemCoverage.ts`.
 
 ## Vitrine por tela — taxonomia para handoff
 

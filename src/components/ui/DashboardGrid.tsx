@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useContext, useMemo, useRef, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { Heading } from './Heading'
@@ -38,6 +38,23 @@ interface RowContextValue {
 
 const RowContext = createContext<RowContextValue>({ inRow: false })
 
+// ─── StaggerContext ────────────────────────────────────────────────────────────
+// Contador de entrada dos `DashboardCard` — cada card pede o próximo índice UMA
+// vez (no mount) e usa ele para escalonar o delay da animação de entrada. Vive
+// no `DashboardGrid` para o escalonamento cobrir o dashboard inteiro, não só a
+// fileira atual.
+
+interface StaggerContextValue {
+  next: () => number
+}
+
+const StaggerContext = createContext<StaggerContextValue | null>(null)
+
+/** Teto de degraus escalonados — acima disso os cards entram juntos no último delay. */
+const STAGGER_MAX_STEPS = 14
+/** Passo de delay entre cards consecutivos. */
+const STAGGER_STEP_MS = 45
+
 // ─── DashboardGrid ─────────────────────────────────────────────────────────────
 
 interface DashboardGridProps {
@@ -55,25 +72,31 @@ interface DashboardGridProps {
  */
 export function DashboardGrid({ children }: DashboardGridProps) {
   const { colors } = useTheme()
+  // Contador do escalonamento de entrada — persiste entre re-renders (ref), não
+  // reseta o índice já atribuído aos cards montados (eles o capturam uma vez).
+  const counterRef = useRef(0)
+  const stagger = useMemo<StaggerContextValue>(() => ({ next: () => counterRef.current++ }), [])
 
   return (
-    <div
-      style={{
-        minHeight: '100%',
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: t.space[4],
-        padding: t.space[4],
-        background: colors.bg.outer,
-        // Sem raio: a área de conteúdo já arredonda o que está dentro dela
-        // (`overflow: auto` recorta pelo raio), e um raio aqui deixaria a cor da
-        // área aparecendo nos cantos, quebrando a continuidade com o chassi.
-        fontFamily: t.font.family.sans,
-      }}
-    >
-      {children}
-    </div>
+    <StaggerContext.Provider value={stagger}>
+      <div
+        style={{
+          minHeight: '100%',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: t.space[4],
+          padding: t.space[4],
+          background: colors.bg.outer,
+          // Sem raio: a área de conteúdo já arredonda o que está dentro dela
+          // (`overflow: auto` recorta pelo raio), e um raio aqui deixaria a cor da
+          // área aparecendo nos cantos, quebrando a continuidade com o chassi.
+          fontFamily: t.font.family.sans,
+        }}
+      >
+        {children}
+      </div>
+    </StaggerContext.Provider>
   )
 }
 
@@ -267,6 +290,10 @@ export function DashboardCard({
 }: DashboardCardProps) {
   const { colors, isGbMode } = useTheme()
   const { inRow } = useContext(RowContext)
+  const stagger = useContext(StaggerContext)
+  // Índice de entrada capturado uma única vez no mount — re-renders (filtro,
+  // hover) não reescalonam um card que já entrou na tela.
+  const [staggerIndex] = useState(() => stagger?.next() ?? 0)
 
   // Fora de fileira o card é de largura total. Dentro da fileira ele parte da
   // largura mínima, cresce pelo peso para ocupar a sobra e passa para a linha
@@ -275,6 +302,7 @@ export function DashboardCard({
 
   return (
     <div
+      className="dash-card-in"
       style={{
         flex: flexValue,
         minWidth: inRow ? minWidth : undefined,
@@ -293,6 +321,7 @@ export function DashboardCard({
         overflow: 'hidden',
         boxSizing: 'border-box',
         fontFamily: t.font.family.sans,
+        animationDelay: `${Math.min(staggerIndex, STAGGER_MAX_STEPS) * STAGGER_STEP_MS}ms`,
       }}
     >
       {(title || action) && (

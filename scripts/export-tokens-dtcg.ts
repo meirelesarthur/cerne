@@ -203,6 +203,12 @@ const core: Record<string, DTCGNode> = {
 
   icon: dimensionGroup(t.icon as unknown as Record<string, unknown>),
 
+  // Espessura de traço é grandeza sem unidade no SVG (`stroke-width` em
+  // unidades do viewBox) — DTCG `number`, não `dimension`.
+  stroke: Object.fromEntries(
+    Object.entries(t.stroke).map(([k, v]) => [k, { $value: v, $type: 'number' }])
+  ),
+
   // DTCG não tem tipo "borderRadius" — raios são "dimension".
   radius: Object.fromEntries(
     Object.entries(t.radius).map(([k, v]) => [k, { $value: px(v), $type: 'dimension' }])

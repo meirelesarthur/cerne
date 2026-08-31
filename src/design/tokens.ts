@@ -485,6 +485,15 @@ export const icon = {
   xl: 26,  // estados vazios, ilustração leve
 }
 
+/**
+ * Espessura de traço. `icon` é o padrão da família de ícones (HugeIcons,
+ * stroke-rounded) e vale para toda a aplicação — o `<Icon>` aplica sozinho.
+ * Nunca passar espessura de ícone na página: alterar aqui muda a tela inteira.
+ */
+export const stroke = {
+  icon: 1.5,
+}
+
 // ─── Border radius ────────────────────────────────────────────────────────────
 
 export const radius = {
@@ -677,7 +686,7 @@ export const component = {
 // Importe `t` para acesso rápido: t.color.brand[600], t.space[4], t.font.size.base
 
 export const t = {
-  color, font, space, size, icon, radius, shadow, border, transition,
+  color, font, space, size, icon, stroke, radius, shadow, border, transition,
   zIndex, animation, delay, glow,
   breakpoint, layout, chart, component, themePalette,
 }

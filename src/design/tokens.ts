@@ -219,7 +219,7 @@ export const color = {
 
 export interface ThemePalette {
   fg:     { default: string; muted: string; subtle: string; onAccent: string }
-  bg:     { canvas: string; outer: string; surface: string; subtle: string; input: string; sidebar: string }
+  bg:     { canvas: string; outer: string; content: string; surface: string; subtle: string; input: string; sidebar: string }
   border: { default: string; subtle: string }
   accent: { default: string; hover: string; subtle: string }
   nav: {
@@ -237,8 +237,17 @@ const lightPalette: ThemePalette = {
     onAccent: primitive.neutral[0],     // #ffffff
   },
   bg: {
-    canvas:  '#f0f0f0',
-    outer:   primitive.neutral[50],     // #fafafa
+    /** Fundo do app — nível mais externo, atrás do chassi inteiro */
+    canvas:  '#e8e8e8',
+    /** Segundo nível — card externo do chassi (onde fica a Topbar) */
+    outer:   '#f2f2f2',
+    /**
+     * Área de conteúdo (feature) — a região onde a tela é renderizada.
+     * No tema claro é branca, como os menus; no GBMode acompanha o `outer`,
+     * senão ficaria da mesma cor do `PageCard` e o card desapareceria no fundo.
+     */
+    content: primitive.neutral[0],      // #ffffff
+    /** Superfície de card/menu */
     surface: primitive.neutral[0],      // #ffffff
     subtle:  primitive.neutral[100],    // #f5f5f5
     input:   primitive.neutral[50],     // #fafafa
@@ -275,6 +284,7 @@ const gbModePalette: ThemePalette = {
   bg: {
     canvas:  '#051008',
     outer:   '#081a12',
+    content: '#081a12',                 // = outer: sem camada extra sob o card
     surface: '#0e2a1d',
     subtle:  '#0b1e14',
     input:   '#132f22',

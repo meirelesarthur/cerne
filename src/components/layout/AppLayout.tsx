@@ -376,6 +376,11 @@ export default function AppLayout({ children, onLogout }: AppLayoutProps) {
               flex: 1,
               overflow: 'auto',
               minWidth: 0,
+              // Área de conteúdo (feature) é branca no tema claro, como os menus:
+              // o cinza do chassi (bg.outer) aparece só na moldura e na faixa da
+              // Topbar. No GBMode o token acompanha o `outer` (ver tokens.ts).
+              background: colors.bg.content,
+              borderRadius: t.radius.xl,
             }}
           >
             {pageContent}

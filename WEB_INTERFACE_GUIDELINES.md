@@ -282,7 +282,7 @@ Duas camadas: **primitivas** (ramps crus, sem papel definido) e **semânticas** 
 | `color.overlay.{modal,drawer}` | rgba do scrim atrás de Modal/Drawer |
 | `color.gb.{accent,surface}` | Acento e superfície translúcida específicos do GBMode |
 
-**Temas** (`useTheme().colors`, não `t.color` direto): `fg.{default,muted,subtle,onAccent}`, `bg.{canvas,outer,surface,subtle,input,sidebar}`, `border.{default,subtle}`, `accent.{default,hover,subtle}`, `nav.*`, `shadow` — um conjunto por tema (`light`/`gbMode`).
+**Temas** (`useTheme().colors`, não `t.color` direto): `fg.{default,muted,subtle,onAccent}`, `bg.{canvas,outer,content,surface,subtle,input,sidebar}`, `border.{default,subtle}`, `accent.{default,hover,subtle}`, `nav.*`, `shadow` — um conjunto por tema (`light`/`gbMode`).
 
 **Regra de hue consistency:** em superfícies com background de cor (ex: card brand, GBMode), bordas, sombras e texto de suporte devem ser tingidos ao mesmo hue — nunca usar cinza neutro puro sobre fundo colorido.
 
@@ -772,6 +772,20 @@ Todo componente e toda tela deve ter **todos os estados desenhados** antes de ir
 - `ProgressBar` no topo de cards/seções com operação em andamento.
 
 ---
+
+### Níveis de fundo do chassi
+
+Três degraus, do mais externo ao conteúdo (tema claro):
+
+| Nível | Token | Light | Onde aparece |
+|---|---|---|---|
+| Fundo do app | `bg.canvas` | `#E8E8E8` | Raiz atrás de tudo; também o canvas do `DashboardGrid` |
+| Segundo nível | `bg.outer` | `#F2F2F2` | Card externo do chassi — moldura e faixa da Topbar |
+| Menus e feature | `bg.sidebar` / `bg.content` | `#FFFFFF` | Sidebar, SecondaryNav e a área onde a tela é renderizada |
+
+`bg.content` existe separado de `bg.surface` porque no GBMode ele acompanha o
+`outer`: se a área de conteúdo tivesse a cor de superfície, o `PageCard` ficaria
+da mesma cor do próprio fundo e desapareceria.
 
 ## 11. Temas — Light e GBMode
 

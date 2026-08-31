@@ -54,8 +54,10 @@ const mockStackedSeries = [
 ]
 
 const kpiSparklines: Record<string, number[]> = {
-  'Taxa de ocupação': [71, 74, 76, 79, 81, 83, 85],
-  'Total de animais': [1820, 1870, 1910, 1960, 1990, 2020, 2040],
+  'Taxa de ocupação':     [71, 74, 76, 79, 81, 83, 85],
+  'Total de animais':     [1820, 1870, 1910, 1960, 1990, 2020, 2040],
+  'Currais disponíveis':  [24, 22, 21, 19, 20, 18, 18],
+  'Capacidade total':     [2620, 2620, 2660, 2660, 2700, 2700, 2700],
 }
 
 // Pátios do confinamento — cada um escala os mocks de status/ocupação por um
@@ -153,7 +155,7 @@ export default function DashLotacaoCurrais() {
       valueColor: curraisDisponiveis > 0
         ? (t.color.feedback.success.text as string)
         : (t.color.feedback.error.text as string),
-      sparkKey: null,
+      sparkKey: 'Currais disponíveis',
       sparkColor: t.color.feedback.success.solid,
     },
     {
@@ -162,7 +164,7 @@ export default function DashLotacaoCurrais() {
       trend: 'cab. totais',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: null,
+      sparkKey: 'Capacidade total',
       sparkColor: t.color.brand[600],
     },
   ]

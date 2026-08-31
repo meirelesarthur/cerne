@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
-import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -20,10 +27,12 @@ const matrizes  = [1160, 1170, 1175, 1180, 1190, 1185, 1195, 1200, 1195, 1205, 1
 const bezerros  = [730,  740,  745,  755,  760,  750,  765,  770,  755,  770,  780,  754]
 
 const rebanhoComp = [
-  { label: 'Novilhos',  pct: 38, color: t.color.brand[600] },
-  { label: 'Matrizes',  pct: 28, color: t.chart.series[6] },
+  { label: 'Novilhos',  pct: 38, color: t.chart.series[0] },
+  { label: 'Matrizes',  pct: 28, color: t.chart.series[1] },
   { label: 'Touros',    pct: 8,  color: t.chart.series[3] },
-  { label: 'Bezerros',  pct: 18, color: t.color.brand[400] },
+  { label: 'Bezerros',  pct: 18, color: t.chart.series[2] },
+  // Descarte é a sobra da composição — neutro de propósito, não compete com
+  // as categorias produtivas.
   { label: 'Descarte',  pct: 8,  color: t.color.neutral[400] },
 ] as const
 
@@ -33,55 +42,43 @@ const pesagensData = [30, 28, 40, 35, 45, 32, 38, 42, 30, 36, 48, 35]
 // ─── Séries para LineChart ────────────────────────────────────────────────────
 
 const REBANHO_SERIES = [
-  { name: 'Novilhos', data: novilhos, color: t.color.brand[600] },
-  { name: 'Matrizes', data: matrizes, color: t.chart.series[6] },
-  { name: 'Bezerros', data: bezerros, color: t.color.brand[400] },
+  { name: 'Novilhos', data: novilhos, color: t.chart.series[0] },
+  { name: 'Matrizes', data: matrizes, color: t.chart.series[1] },
+  { name: 'Bezerros', data: bezerros, color: t.chart.series[2] },
 ]
 
 // ─── Séries para GroupedBarChart ──────────────────────────────────────────────
 
 const MANEJOS_SERIES = [
-  { name: 'Vermifugações', data: vermifugData, color: t.color.brand[600] },
-  { name: 'Pesagens',      data: pesagensData, color: t.chart.series[6] },
+  { name: 'Vermifugações', data: vermifugData, color: t.chart.series[0] },
+  { name: 'Pesagens',      data: pesagensData, color: t.chart.series[1] },
 ]
 
 // ─── DashPecuaria ─────────────────────────────────────────────────────────────
 
 const PEC_KPIS = [
-  { label: 'Total Cabeças',  value: '4.280',       trend: '3,2%', up: true  },
-  { label: 'Peso Médio',     value: '384 kg',       trend: '1,8%', up: true  },
+  { label: 'Total de cabeças',  value: '4.280',       trend: '3,2%', up: true  },
+  { label: 'Peso médio',     value: '384 kg',       trend: '1,8%', up: true  },
   { label: 'Arrobas/mês',   value: '2.156 @',      trend: '7,4%', up: true  },
   { label: 'GMD',            value: '0,82 kg/dia',  trend: '0,4%', up: false },
 ]
 
 export default function DashPecuaria() {
-  const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} /> : null
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -90,85 +87,113 @@ export default function DashPecuaria() {
   const rebanhoSeries = REBANHO_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
   const manejosSeries = MANEJOS_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Pecuária de Corte',
+    scope: `rebanho · últimos ${nMeses} meses`,
+    kpis: PEC_KPIS,
+    blocks: [
+      {
+        block: 'Evolução do rebanho',
+        kind: 'timeline',
+        labels,
+        series: rebanhoSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'cabeças',
+      },
+      {
+        block: 'Composição do rebanho',
+        kind: 'composition',
+        labels: rebanhoComp.map((c) => c.label),
+        series: [{ name: 'Participação', data: rebanhoComp.map((c) => c.pct) }],
+        unit: '%',
+        concentrationRisk: false,
+      },
+      {
+        block: 'Manejos por mês',
+        kind: 'timeline',
+        labels,
+        series: manejosSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'manejos',
+      },
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="md" weight="semibold">Pecuária de Corte</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Pecuária de Corte"
+        subtitle="Rebanho, composição e manejos do período"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {PEC_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
-
-      {/* Row 2 — Area chart + Donut */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: stacked ? undefined : 'stretch' }}>
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Evolução do Rebanho
-          </div>
-          <LineChart
-            series={rebanhoSeries}
-            labels={labels}
-            height={240}
-            area
-            showLegend
-            yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {PEC_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Composição do Rebanho
-          </div>
+        ))}
+      </DashboardRow>
+
+      {/* Fileira 2 — Evolução + Composição */}
+      <DashboardRow>
+        <FocusableChartCard title="Evolução do rebanho" flex={2} series={rebanhoSeries}>
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={labels}
+              height={t.size.chart.md}
+              area
+              showLegend
+              yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
+            />
+          )}
+        </FocusableChartCard>
+        <DashboardCard title="Composição do rebanho" flex={1}>
           <DonutChart
             data={rebanhoComp.map((d) => ({ label: d.label, value: d.pct, color: d.color }))}
-            height={220}
+            height={t.size.chart.md}
             centerValue="4.280"
             centerLabel="cabeças"
             showLegend
             valueFormat={(v) => `${v}%`}
           />
-        </div>
-      </div>
-      <HDivider color={bc} />
+        </DashboardCard>
+      </DashboardRow>
 
-      {/* Row 3 — Manejos */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-          Manejos por Mês
-        </div>
-        <GroupedBarChart
-          series={manejosSeries}
-          labels={labels}
-          height={220}
-          showLegend
-        />
-      </div>
-    </div>
+      {/* Fileira 3 — Manejos */}
+      <FocusableChartCard title="Manejos por mês" series={manejosSeries}>
+        {(series) => (
+          <GroupedBarChart
+            series={series}
+            labels={labels}
+            height={t.size.chart.md}
+            showLegend
+          />
+        )}
+      </FocusableChartCard>
+    </DashboardGrid>
   )
 }

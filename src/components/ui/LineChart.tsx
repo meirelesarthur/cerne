@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { ChartSvgLegend, chartLegendHeight } from './ChartSvgLegend'
+import { niceAxisTicks, formatAxisValue, axisLabelPad, axisLabelStep } from '../../utils/chartAxis'
 import { useChartScale } from '../../hooks/useChartScale'
 
 export interface LineSeries {
@@ -29,7 +31,7 @@ export function LineChart({
   series,
   labels,
   height = 220,
-  yFormat = (v) => String(v),
+  yFormat = formatAxisValue,
   showGrid = true,
   showLegend,
   area = false,
@@ -38,8 +40,14 @@ export function LineChart({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
   const showLegendFinal = showLegend ?? series.length > 1
-  const W = 800
-  const { ref, k } = useChartScale(W)
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `height` é a
+  // altura renderizada de fato (antes o SVG escalava pelo viewBox e o mesmo
+  // valor rendia alturas diferentes conforme a largura do card) e cada fonte
+  // sai no px do token — por isso `k` vale 1.
+  const FALLBACK_W = 800
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
 
   // Guard: vazio ou todos zero
   const allData = series.flatMap((s) => s.data)
@@ -55,8 +63,8 @@ export function LineChart({
             x={400}
             y={height / 2}
             textAnchor="middle"
-            fontSize={t.font.size.sm * k}
             fill={colors.fg.subtle as string}
+            style={{ fontSize: t.font.size.sm * k }}
           >
             Sem dados
           </text>
@@ -65,25 +73,28 @@ export function LineChart({
     )
   }
 
-  const LEGEND_H = showLegendFinal ? 28 : 0
+  const LEGEND_H = showLegendFinal ? chartLegendHeight(k) : 0
   const PAD_TOP = 16
   const PAD_BOTTOM = 32
-  const PAD_LEFT = 56
   const PAD_RIGHT = 16
   const chartH = height - PAD_TOP - PAD_BOTTOM - LEGEND_H
-  const chartW = W - PAD_LEFT - PAD_RIGHT
 
   const allValues = allData
-  const dataMin = Math.min(...allValues)
-  const dataMax = Math.max(...allValues)
-  const range = dataMax - dataMin || 1
+  // Eixo em degraus redondos (não começa em zero): o topo e a base saem de
+  // `niceAxisTicks`, garantindo rótulo limpo em vez de fração longa.
+  const yTicks = niceAxisTicks(Math.min(...allValues), Math.max(...allValues))
+  const axisMin = yTicks[0]
+  const axisMax = yTicks[yTicks.length - 1]
+  const range = axisMax - axisMin || 1
+
+  // Padding do eixo dimensionado pelo rótulo mais longo (ver `axisLabelPad`).
+  const PAD_LEFT = axisLabelPad(yTicks.map(yFormat), t.font.size.xs)
+  const chartW = W - PAD_LEFT - PAD_RIGHT
+  // Rótulos do eixo X afinados para não colidirem em séries longas (30 dias).
+  const xStep = axisLabelStep(labels, chartW, t.font.size.xs)
 
   const xOf = (i: number) => PAD_LEFT + (i / Math.max(labels.length - 1, 1)) * chartW
-  const yOf = (v: number) => PAD_TOP + chartH - ((v - dataMin) / range) * chartH
-
-  // Y ticks (4 levels)
-  const TICKS = 4
-  const yTicks = Array.from({ length: TICKS }, (_, i) => dataMin + (range / (TICKS - 1)) * i)
+  const yOf = (v: number) => PAD_TOP + chartH - ((v - axisMin) / range) * chartH
 
   // Tooltip width estimation
   const ttW = 120
@@ -179,24 +190,24 @@ export function LineChart({
           x={PAD_LEFT - 6}
           y={yOf(tick) + 4}
           textAnchor="end"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {yFormat(tick)}
         </text>
       ))}
 
       {/* X-axis labels */}
-      {labels.map((label, i) => (
+      {labels.map((label, i) => i % xStep !== 0 ? null : (
         <text
           key={i}
           x={xOf(i)}
           y={PAD_TOP + chartH + 20}
           textAnchor="middle"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {label}
         </text>
@@ -273,10 +284,9 @@ export function LineChart({
             <text
               x={ttXPos + ttPad}
               y={ttYPos + ttPad + ttLineH - 4}
-              fontSize={t.font.size.xs * k}
-              fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k, fontWeight: t.font.weight.semibold }}
             >
               {labels[idx]}
             </text>
@@ -294,9 +304,9 @@ export function LineChart({
                   <text
                     x={ttXPos + ttPad + 14}
                     y={ttYPos + ttPad + ttLineH + si * ttLineH + 12}
-                    fontSize={t.font.size.xs * k}
                     fill={colors.fg.muted as string}
                     fontFamily={t.font.family.sans}
+                    style={{ fontSize: t.font.size.xs * k }}
                   >
                     {s.name}: {yFormat(val)}
                   </text>
@@ -309,26 +319,13 @@ export function LineChart({
 
       {/* Legend */}
       {showLegendFinal && (
-        <g transform={`translate(${PAD_LEFT}, ${height - LEGEND_H + 4})`}>
-          {series.map((s, i) => {
-            const col = getSeriesColor(s, i)
-            const offsetX = i * 110
-            return (
-              <g key={i} transform={`translate(${offsetX}, 0)`}>
-                <circle cx={6} cy={8} r={5} fill={col} />
-                <text
-                  x={14}
-                  y={12}
-                  fontSize={t.font.size.xs * k}
-                  fill={colors.fg.muted as string}
-                  fontFamily={t.font.family.sans}
-                >
-                  {s.name}
-                </text>
-              </g>
-            )
-          })}
-        </g>
+        <ChartSvgLegend
+          items={series.map((s, i) => ({ name: s.name, color: getSeriesColor(s, i) }))}
+          k={k}
+          x={PAD_LEFT}
+          y={height - LEGEND_H + 4}
+          maxWidth={chartW}
+        />
       )}
     </svg>
     </div>

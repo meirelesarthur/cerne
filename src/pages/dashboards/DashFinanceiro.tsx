@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react'
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  AlertCircle,
-  BarChart2,
-  Clock,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { HeatmapChart } from '../../components/ui/HeatmapChart'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { LineChart } from '../../components/ui/LineChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { GaugeChart } from '../../components/ui/GaugeChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { ChartLegend } from '../../components/ui/ChartLegend'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ function ArcGauge({ colors }: { colors: ReturnType<typeof useTheme>['colors'] })
         {segments.map((seg, i) => (
           <div key={i} onMouseEnter={() => setSegHov(i)} onMouseLeave={() => setSegHov(null)}
             title={`${seg.label}: ${(seg.pct * 100).toFixed(0)}%`}
-            style={{ flex: seg.pct, background: seg.color, opacity: segHov !== null && segHov !== i ? 0.3 : 1, transition: 'opacity 0.18s ease', cursor: 'pointer' }} />
+            style={{ flex: seg.pct, background: seg.color, opacity: segHov !== null && segHov !== i ? 0.3 : 1, transition: `opacity ${t.transition.smooth}`, cursor: 'pointer' }} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: t.space[2] }}>
@@ -110,8 +111,8 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
-              background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
-              transition: 'background 0.15s ease', cursor: 'default',
+              background: hovIdx === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+              transition: `background ${t.transition.base}`, cursor: 'default',
             }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>
@@ -147,41 +148,25 @@ export default function DashFinanceiro() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={600} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} /> : null
   }
 
   const kpis = [
-    { label: 'Receitas do Mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true  },
-    { label: 'Despesas do Mês',  value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
-    { label: 'Saldo Disponível', value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true  },
+    { label: 'Receitas do mês',  value: 'R$ 892.450', trend: '12,4% vs mês ant.', up: true  },
+    { label: 'Despesas do mês',  value: 'R$ 634.120', trend: '3,1% vs mês ant.',  up: false },
+    { label: 'Saldo disponível', value: 'R$ 258.330', trend: '28,7% vs mês ant.', up: true  },
     { label: 'Inadimplência',    value: 'R$ 45.200',  trend: '5,2% vs mês ant.',  up: false },
   ]
 
@@ -194,127 +179,123 @@ export default function DashFinanceiro() {
   ]
 
   const yFormat = (v: number) =>
-    v >= 1000000 ? `R$ ${(v / 1000000).toFixed(1)}M` : `R$ ${(v / 1000).toFixed(0)}K`
+    v >= 1000000 ? `R$ ${(v / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M` : `R$ ${(v / 1000).toFixed(0)}K`
 
   const donutSlices = donutData.map(d => ({ label: d.label, value: d.pct, color: d.color }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Financeiro',
+    scope: `receitas e despesas · últimos ${nMeses} meses`,
+    kpis,
+    blocks: [
+      {
+        block: `Receitas vs despesas (${nMeses} meses)`,
+        kind: 'timeline',
+        labels: chartLabels,
+        series: lineSeries.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Despesas por categoria',
+        kind: 'composition',
+        labels: donutData.map((d) => d.label),
+        series: [{ name: 'Participação', data: donutData.map((d) => d.pct) }],
+        unit: '%',
+      },
+      {
+        block: 'Vencimentos próximos (30 dias)',
+        kind: 'composition',
+        labels: vencimentos.map((v) => v.nome),
+        series: [{ name: 'Valor', data: vencimentos.map((v) => Number(v.valor.replace(/[^0-9]/g, ''))) }],
+        currency: true,
+      },
+    ],
+    notes: [`${vencimentos.filter((v) => v.status !== 'Pendente').length} de ${vencimentos.length} vencimentos do recorte já estão atrasados.`],
+  }
+
   return (
-    <div style={cardStyle}>
-
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Financeiro</Heading>
-        </div>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Chart row: Area (2/3) + Donut (1/3) ──────────────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Area chart */}
-        <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[3] }}>
-            <div>
-              <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
-                R$ 892K
-              </div>
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
-                Receitas vs Despesas — 12 meses
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: t.space[4] }}>
-              {[{ color: t.color.brand[600], label: 'Receitas' }, { color: t.color.feedback.error.solid, label: 'Despesas' }].map(s => (
-                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ width: 8, height: 2, borderRadius: 1, background: s.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <LineChart
-            series={lineSeries}
-            labels={chartLabels}
-            height={200}
-            yFormat={yFormat}
-            area
-            showLegend={false}
-          />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Donut + Gauge stacked */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[3] }}>
-              Despesas por Categoria
-            </div>
-            <DonutChart
-              data={donutSlices}
-              height={160}
-              centerLabel="Total"
-              centerValue="100%"
-              showLegend
-              valueFormat={(v) => `${v}%`}
+    <DashboardGrid>
+      <DashboardHeader
+        title="Financeiro"
+        subtitle="Receitas, despesas, orçamento e vencimentos"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
             />
-          </div>
-          <HDivider color={bc} />
-          <div style={{ padding: `${t.space[5]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[2] }}>
-              Orçamento Anual
-            </div>
-            <ArcGauge colors={colors} />
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* ── Bottom row: Heatmap (1/2) + Vencimentos (1/2) ────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
+      {/* Fileira 2 — Receitas vs despesas + Categorias */}
+      <DashboardRow>
+        <FocusableChartCard
+          title={`Receitas vs despesas (${nMeses} meses)`}
+          flex={2}
+          series={lineSeries}
+          action={(series) => (
+            <ChartLegend
+              marker="line"
+              items={series.map((serie) => ({ label: serie.name, color: serie.color }))}
+            />
+          )}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={chartLabels}
+              height={t.size.chart.md}
+              yFormat={yFormat}
+              area
+              showLegend={false}
+            />
+          )}
+        </FocusableChartCard>
 
-        {/* Heatmap */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Atividade de Receita por Hora
-            </span>
-          </div>
+        <DashboardCard title="Despesas por categoria" flex={1}>
+          <DonutChart
+            data={donutSlices}
+            height={t.size.chart.md}
+            centerValue="R$ 634K"
+            centerLabel="no mês"
+            showLegend
+            valueFormat={(v) => `${v}%`}
+          />
+        </DashboardCard>
+      </DashboardRow>
+
+      {/* Fileira 3 — Orçamento + Atividade por hora */}
+      <DashboardRow>
+        <DashboardCard title="Orçamento anual" flex={1}>
+          <ArcGauge colors={colors} />
+        </DashboardCard>
+        <DashboardCard title="Atividade de receita por hora" flex={2}>
           <HeatmapChart
             data={heatmapData}
             rowLabels={heatmapRows}
@@ -322,22 +303,13 @@ export default function DashFinanceiro() {
             colors={colors}
             isGbMode={isGbMode}
           />
-        </div>
+        </DashboardCard>
+      </DashboardRow>
 
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Vencimentos */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Clock size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Vencimentos Próximos — 30 dias
-            </span>
-          </div>
-          <VencimentosList colors={colors} isGbMode={isGbMode} />
-        </div>
-
-      </div>
-    </div>
+      {/* Fileira 4 — Vencimentos */}
+      <DashboardCard title="Vencimentos próximos (30 dias)">
+        <VencimentosList colors={colors} isGbMode={isGbMode} />
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

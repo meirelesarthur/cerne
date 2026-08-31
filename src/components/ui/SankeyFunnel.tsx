@@ -26,9 +26,15 @@ export function SankeyFunnel({
 }: SankeyFunnelProps) {
   const [hovIdx, setHovIdx] = useState<number | null>(null)
 
-  const W = 800
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `chartHeight` é a
+  // altura renderizada de fato — com viewBox fixo, o mesmo valor rendia
+  // alturas diferentes conforme a largura do card — e cada fonte sai no px do
+  // token, por isso `k` vale 1.
+  const FALLBACK_W = 800
   const H = chartHeight
-  const { ref, k } = useChartScale(W)
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
   const n = stages.length
   const maxVal = stages[0]?.value || 1
   const blockW = 56
@@ -58,6 +64,7 @@ export function SankeyFunnel({
     <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
+      height={H}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid meet"
       style={{ display: 'block', fontFamily: t.font.family.sans }}
@@ -107,16 +114,15 @@ export function SankeyFunnel({
               style={{ transition: 'opacity 0.18s ease' }}
             />
 
-            {/* Value */}
+            {/* Value — em faixa fina (sem badge de %) o número vai ao centro da
+                faixa; a 9px acima ele invadia o sublabel desenhado logo acima. */}
             <text
               x={cx}
-              y={midY - 9}
+              y={bandH[i] > 36 ? midY - 9 : midY + 4}
               textAnchor="middle"
-              fontSize={t.font.size.base * k}
-              fontWeight={700}
               fill={t.color.neutral[0]}
               opacity={dimmed ? 0.2 : 1}
-              style={{ transition: 'opacity 0.18s ease' }}
+              style={{ fontSize: t.font.size.base * k, fontWeight: 700, transition: 'opacity 0.18s ease' }}
             >
               {fmtVal(stage.value)}
             </text>
@@ -138,11 +144,9 @@ export function SankeyFunnel({
                   x={cx}
                   y={midY + 13}
                   textAnchor="middle"
-                  fontSize={t.font.size['3xs'] * k}
-                  fontWeight={600}
                   fill={t.color.neutral[0]}
                   opacity={dimmed ? 0 : 1}
-                  style={{ transition: 'opacity 0.18s ease' }}
+                  style={{ fontSize: t.font.size['3xs'] * k, fontWeight: 600, transition: 'opacity 0.18s ease' }}
                 >
                   {pct(stage.value)}%
                 </text>
@@ -154,10 +158,9 @@ export function SankeyFunnel({
               x={labelX}
               y={H - 4}
               textAnchor={labelAnchor}
-              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
-              style={{ transition: 'opacity 0.18s ease' }}
+              style={{ fontSize: t.font.size['3xs'] * k, transition: 'opacity 0.18s ease' }}
             >
               {stage.label}
             </text>
@@ -168,8 +171,8 @@ export function SankeyFunnel({
                 x={labelX}
                 y={topY[i] - 6}
                 textAnchor={labelAnchor}
-                fontSize={t.font.size['3xs'] * k}
                 fill={colors.fg.subtle as string}
+                style={{ fontSize: t.font.size['3xs'] * k }}
               >
                 {stage.sublabel}
               </text>
@@ -205,10 +208,9 @@ export function SankeyFunnel({
             <text
               x={ttX + 8}
               y={finalY + 14}
-              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
-              fontWeight={600}
+              style={{ fontSize: t.font.size['3xs'] * k, fontWeight: 600 }}
             >
               {stage.label}: {fmtVal(stage.value)}
             </text>
@@ -216,9 +218,9 @@ export function SankeyFunnel({
               <text
                 x={ttX + 8}
                 y={finalY + 27}
-                fontSize={t.font.size['3xs'] * k}
                 fill={color}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size['3xs'] * k }}
               >
                 Conv. {pct(stage.value)}% do total
               </text>

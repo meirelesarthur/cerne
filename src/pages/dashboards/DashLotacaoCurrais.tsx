@@ -7,22 +7,25 @@
 // - Filtros de Pátio e Setor devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 
 import { useEffect, useState } from 'react'
-import {
-  LayoutGrid,
-  PieChart,
-  BarChart2,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -37,59 +40,43 @@ const mockSetores = ['Setor A', 'Setor B', 'Setor C', 'Setor D', 'Setor E']
 
 const mockStackedSeries = [
   {
-    name: 'Animais alojados',
+    name: 'Alojados',
     data: [340, 480, 290, 520, 410],
     color: t.color.brand[600],
   },
   {
-    name: 'Capacidade restante',
+    name: 'Disponível',
     data: [160, 20, 210, 80, 190],
     color: t.color.feedback.success.solid,
   },
 ]
 
 const kpiSparklines: Record<string, number[]> = {
-  'Taxa de Ocupação': [71, 74, 76, 79, 81, 83, 85],
-  'Total de Animais': [1820, 1870, 1910, 1960, 1990, 2020, 2040],
+  'Taxa de ocupação': [71, 74, 76, 79, 81, 83, 85],
+  'Total de animais': [1820, 1870, 1910, 1960, 1990, 2020, 2040],
 }
 
 // ─── DashLotacaoCurrais ───────────────────────────────────────────────────────
 
 export default function DashLotacaoCurrais() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   // Pátio único nos mocks — o filtro mantém o recorte explícito
-  const [patio, setPatio] = useState('principal')
-  const [setor, setSetor] = useState('todos')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [patio, setPatio] = useUrlFilter('patio', 'principal')
+  const [setor, setSetor] = useUrlFilter('setor', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg]} /> : null
   }
 
   // KPI derivados dos mocks
@@ -103,25 +90,25 @@ export default function DashLotacaoCurrais() {
 
   const kpis = [
     {
-      label: 'Taxa de Ocupação',
+      label: 'Taxa de ocupação',
       value: `${taxaOcupacao}%`,
       trend: '2,1 p.p. vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Taxa de Ocupação',
+      sparkKey: 'Taxa de ocupação',
       sparkColor: t.color.brand[600],
     },
     {
-      label: 'Total de Animais',
+      label: 'Total de animais',
       value: totalAnimais.toLocaleString('pt-BR'),
       trend: '1,9% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Total de Animais',
+      sparkKey: 'Total de animais',
       sparkColor: t.color.brand[600],
     },
     {
-      label: 'Currais Disponíveis',
+      label: 'Currais disponíveis',
       value: String(curraisDisponiveis),
       trend: curraisDisponiveis > 0 ? 'Disponíveis agora' : 'Nenhum disponível',
       up: curraisDisponiveis > 0,
@@ -132,7 +119,7 @@ export default function DashLotacaoCurrais() {
       sparkColor: t.color.feedback.success.solid,
     },
     {
-      label: 'Capacidade Total',
+      label: 'Capacidade total',
       value: capacidadeTotal.toLocaleString('pt-BR'),
       trend: 'cab. totais',
       up: true,
@@ -142,118 +129,116 @@ export default function DashLotacaoCurrais() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Lotação de Currais',
+    scope: setor === 'todos' ? 'todos os setores do pátio' : `setor ${setor}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Distribuição por status',
+        kind: 'composition',
+        labels: mockStatusData.map((d) => d.label),
+        series: [{ name: 'Currais', data: mockStatusData.map((d) => d.value) }],
+        unit: 'currais',
+        concentrationRisk: false,
+      },
+      {
+        block: 'Ocupação por setor (cab.)',
+        kind: 'timeline',
+        labels: mockSetores,
+        series: mockStackedSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'cabeças',
+      },
+    ],
+    notes: [`Taxa de ocupação do pátio no recorte: ${taxaOcupacao}%.`],
+  }
+
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Lotação de Currais"
+        subtitle="Ocupação, status e capacidade do pátio de confinamento"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Pátio',
+                  value: patio,
+                  onChange: setPatio,
+                  defaultValue: 'principal',
+                  options: [{ value: 'principal', label: 'Pátio Principal' }],
+                },
+                {
+                  label: 'Setor',
+                  value: setor,
+                  onChange: setSetor,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Setores' },
+                    ...mockSetores.map((s) => ({ value: s, label: s })),
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <LayoutGrid size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Lotação de Currais</Heading>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <FilterSelect
-            ariaLabel="Filtrar por pátio"
-            options={[{ value: 'principal', label: 'Pátio Principal' }]}
-            value={patio}
-            onChange={setPatio}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por setor"
-            options={[
-              { value: 'todos', label: 'Todos os Setores' },
-              ...mockSetores.map((s) => ({ value: s, label: s })),
-            ]}
-            value={setor}
-            onChange={setSetor}
-          />
-        </div>
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{
-              fontSize: t.font.size.xs, color: colors.fg.subtle as string,
-              marginBottom: t.space[1], fontFamily: t.font.family.sans,
-            }}>
-              {kpi.label}
-            </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: kpi.valueColor, lineHeight: 1.1, marginBottom: t.space[2],
-              fontFamily: t.font.family.sans,
-            }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+            valueColor={kpi.valueColor}
+          >
             {kpi.sparkKey && (
-              <div style={{ marginTop: t.space[3], height: 40 }}>
-                <SparklineArea
-                  data={kpiSparklines[kpi.sparkKey]}
-                  color={kpi.sparkColor}
-                  height={40}
-                />
-              </div>
+              <SparklineArea
+                data={kpiSparklines[kpi.sparkKey]}
+                color={kpi.sparkColor}
+                height={t.size.sparkline}
+              />
             )}
-          </div>,
-        ])}
-      </div>
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── Gráficos: Donut (status) + StackedBar (por setor) ────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Gráfico 1 — Status dos Currais */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <PieChart size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Distribuição por Status
-            </span>
-          </div>
+      {/* Fileira 2 — Status + Ocupação por setor */}
+      <DashboardRow>
+        <DashboardCard title="Distribuição por status">
           <DonutChart
             data={mockStatusData}
-            height={260}
+            height={t.size.chart.lg}
             centerLabel="currais"
             centerValue={String(mockStatusData.reduce((a, d) => a + d.value, 0))}
             showLegend
             valueFormat={(v) => `${v} currais`}
           />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Gráfico 2 — Animais alojados vs Capacidade restante por Setor */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Ocupação por Setor (cab.)
-            </span>
-          </div>
-          <StackedBarChart
-            series={mockStackedSeries.map((s) => ({
-              ...s,
-              data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
-            }))}
-            labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
-            height={260}
-            horizontal
-            showLegend
-            yFormat={(v) => `${v}`}
-          />
-        </div>
-
-      </div>
-    </div>
+        </DashboardCard>
+        <FocusableChartCard
+          title="Ocupação por setor (cab.)"
+          series={mockStackedSeries.map((s) => ({
+            ...s,
+            data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
+          }))}
+        >
+          {(series) => (
+            <StackedBarChart
+              series={series}
+              labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
+              height={t.size.chart.lg}
+              horizontal
+              showLegend
+              yFormat={(v) => `${v}`}
+            />
+          )}
+        </FocusableChartCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

@@ -116,6 +116,8 @@ Antes de escrever qualquer JSX de tela, verifique o catálogo da [Seção 4](#4-
 | Avatar `<div>` com iniciais + gradiente | `Avatar` |
 | Breadcrumb `<nav>` inline | `Breadcrumb` |
 | Tooltip inline com `position: fixed` | `Tooltip` |
+| Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
+| KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
 | `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
 | Tabela que precisa virar cards no mobile, feita na mão | `ResponsiveDataTable` |
 | Busca + chips de filtro + "Limpar tudo" remontados na página | `ListToolbar` ou `TableToolbar` |
@@ -152,10 +154,88 @@ PageContainer (style={{ paddingBottom: 0 }})
 
 > `CrudPattern`, `ReconciliationWorkspace`, `ReportWorkspace` e `EntityBoard` já existem no repositório como telas-padrão que montam esse fluxo inteiro (listagem+modal+exclusão, conciliação, relatório, kanban). São referência de composição consolidada, não primitivas para importar dentro de uma tela nova — ver observação na [Seção 4](#4-catálogo-de-componentes).
 
+### Regra G — Composição canônica de Dashboards
+
+Dashboard **não** usa a casca de listagem (`PageCard`). A casca é o `DashboardGrid`: cada
+bloco é um card com fill próprio e o **canvas é o que forma os separadores** — sem
+`HDivider`/`VDivider` entre blocos, sem card único embrulhando a tela.
+
+```
+DashboardGrid                          ← canvas sem fill próprio (bg.outer) + gap entre as fileiras
+  └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
+  └── DashboardRow wrap                ← fileira de KPIs
+        └── DashboardKpiCard ×N        ← 1 KPI = 1 card (antes eram colunas com VDivider)
+  └── DashboardRow                     ← fileira de blocos com pesos
+        ├── DashboardCard flex={3}
+        └── DashboardCard flex={2}
+  └── DashboardRow
+        ├── DashboardStack flex={1}    ← coluna de cards dentro da fileira
+        └── DashboardStack width={320} ← coluna de largura fixa (painel lateral)
+  └── DashboardCard                    ← bloco de largura total
+isLoading → DashboardSkeleton          ← reproduz a própria grade (sem layout shift)
+overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
+```
+
+- **Filtro é botão + drawer:** `DashboardFilters` no `actions` do cabeçalho — nunca uma
+  fileira de `FilterSelect` soltos, que crescia com o número de filtros e não mostrava
+  quantos estavam ativos. Cada campo declara seu `defaultValue`, que é o que define
+  "filtro ativo" e o que o "Limpar" restaura.
+- **Rótulo do bloco** vai na prop `title` do card; legenda, `Tabs` e botões
+  vão na prop `action`. Nunca um `<div>` de título solto dentro do card.
+- **Bloco que sangra** (mapa, imagem) usa `DashboardCard bare` — sem padding interno.
+- **Sem borda no tema claro** (quem separa é o canvas); no GBMode o card mantém a hairline
+  verde, necessária sobre fundo escuro. Isso vive no `DashboardCard` — não replicar na tela.
+- **Largura é por espaço, não por janela:** a fileira não muda de layout num
+  breakpoint. Cada card declara um mínimo (`t.size.dashCardMin` / `dashKpiMin`) e
+  cresce pelo peso para ocupar a sobra; quando os mínimos não caibem, ele passa
+  para a linha seguinte. Isso é obrigatório porque a área de conteúdo é 400–500px
+  mais estreita que a janela (sidebar + submenu) — media query de viewport erra o
+  alvo. `DashboardStack width` é largura PREFERIDA, não fixa.
+- **Filtro vive na URL:** `useUrlFilter('periodo', '12')` no lugar de `useState`,
+  para a visão filtrada ser recarregável e compartilhável. O valor default não
+  aparece na query.
+- **Cor de série por natureza do dado:** categorias distintas → `t.chart.series`
+  em ordem (evitando `series[4]`, vermelho, em categoria não-negativa); níveis do
+  mesmo indicador (total × subconjunto) → tons da mesma matiz; status e sinal →
+  paleta de feedback; sobra de composição ("Outros") → neutro.
+- **Altura de gráfico** vem de `t.size.chart.{sm,md,lg}` — nunca número solto. Cards na
+  mesma fileira usam o mesmo degrau, senão um fecha antes do outro.
+- **Texto dentro de forma fechada se ajusta à forma, não ao contrário:** o valor central
+  do `DonutChart` escolhe o maior degrau de `t.font.size` que cabe no buraco do anel (e a
+  legenda vira coluna à direita quando o card é retangular, liberando a altura inteira
+  para o anel). Nunca deixar o número vazar nem abreviar o valor por conta própria — o
+  formato do número é do chamador.
+- **Rótulo em caixa de sentença**, em uma linha: "Ativos por categoria", não "Ativos por
+  Categoria" nem "Cobertura por Produto (dias restantes) — itens críticos abaixo de 14
+  dias". Detalhe/aviso vai como chip no `action`, não no título.
+- **Valor de KPI** não recebe `valueSize`: o degrau sai do comprimento do texto
+  (`DashboardKpiCard`), para "R$ 8,4M" e "Déficit Hídrico" conviverem na mesma fileira.
+- **Legenda de série** é `ChartLegend` (no `action` do card) ou a legenda interna do
+  próprio gráfico — nunca ponto + rótulo montados na tela.
+- **Bloco de várias séries é `FocusableChartCard`:** o seletor no canto direito do
+  rótulo isola uma série, que passa a ocupar o gráfico com o eixo reescalado nela —
+  comparar é uma leitura, olhar uma série de perto é outra. O estado mora no card, não
+  na tela (e não vai para a URL: é leitura, não recorte de dado). Não use em
+  **composição de item único** (barra por categoria, donut): ali o valor do gráfico é
+  justamente a comparação entre as partes, e isolar um item deixaria uma barra sozinha —
+  esse recorte é papel do filtro da tela, que reflete em todos os blocos. Também não use
+  quando o próprio bloco É a comparação de duas séries ("GMD: atual vs meta") — sem a
+  outra, a série não diz nada.
+- **Sem número repetido**: se o valor já está na fileira de KPIs, não repetir como herói
+  dentro do card do gráfico.
+- Referências: `OverviewPanel.tsx` (grade completa, 2 colunas), `DashAtivos.tsx` (grade
+  simples), `Pluviometria.tsx` (grade + overlay de filtros).
+
 ### Regra D — Tokens disponíveis (use estes, não invente literais)
 
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um literal, procure o token — lista completa e valores reais na [Seção 3](#3-sistema-de-tokens). Atalhos mais usados:
 
+- **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) — escala fechada; blocos
+  da MESMA fileira usam sempre o mesmo degrau. `t.size.sparkline` (40) na base do KPI.
+- **Card de dashboard:** `t.size.dashCardMin` (300) / `t.size.dashKpiMin` (180) — largura
+  mínima antes de a fileira quebrar a linha.
+- **Trilha de barra de progresso:** `t.color.state.track.{base,gb}`.
+- **Controle sobre mídia** (chip sobre mapa/imagem): `t.color.overlay.onMedia`.
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34), `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`, `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).
 - **Sombras de card:** `t.shadow.card` / `cardHover` / `cardDark` / `cardDarkHover` (idle/hover × light/GBMode).
 - **Overlays:** `t.color.overlay.modal` / `t.color.overlay.drawer`.
@@ -220,7 +300,7 @@ Duas camadas: **primitivas** (ramps crus, sem papel definido) e **semânticas** 
 | `color.overlay.{modal,drawer}` | rgba do scrim atrás de Modal/Drawer |
 | `color.gb.{accent,surface}` | Acento e superfície translúcida específicos do GBMode |
 
-**Temas** (`useTheme().colors`, não `t.color` direto): `fg.{default,muted,subtle,onAccent}`, `bg.{canvas,outer,surface,subtle,input,sidebar}`, `border.{default,subtle}`, `accent.{default,hover,subtle}`, `nav.*`, `shadow` — um conjunto por tema (`light`/`gbMode`).
+**Temas** (`useTheme().colors`, não `t.color` direto): `fg.{default,muted,subtle,onAccent}`, `bg.{canvas,outer,content,surface,subtle,input,sidebar}`, `border.{default,subtle}`, `accent.{default,hover,subtle}`, `nav.*`, `shadow` — um conjunto por tema (`light`/`gbMode`).
 
 **Regra de hue consistency:** em superfícies com background de cor (ex: card brand, GBMode), bordas, sombras e texto de suporte devem ser tingidos ao mesmo hue — nunca usar cinza neutro puro sobre fundo colorido.
 
@@ -349,6 +429,30 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `Card` | Contêiner de superfície genérico com sombra/borda/raio configuráveis |
 | `Divider` | Linha divisória horizontal com rótulo opcional |
 | `SectionDividers` | Divisores H/V com gradiente esmaecido nas pontas |
+| `DashboardGrid` | Canvas do dashboard: fundo que separa os blocos + gap entre fileiras |
+| `DashboardHeader` | Cabeçalho de dashboard: título, subtítulo e filtros sobre o canvas |
+| `DashboardRow` | Fileira de cards com pesos por `flex`, empilha abaixo de `md` |
+| `DashboardStack` | Coluna de cards dentro de uma fileira (peso ou largura fixa) |
+| `DashboardCard` | Bloco preenchido do dashboard: título, ação, `bare` para sangrar |
+| `DashboardKpiCard` | KPI como card: rótulo, valor, `Trend`, sparkline opcional |
+| `DashboardSkeleton` | Loading do dashboard reproduzindo a própria grade |
+| `DashboardFilters` | Botão "Filtros" do cabeçalho + `FilterDrawer` lateral com os campos |
+| `FocusableChartCard` | Bloco de gráfico com seletor de foco de série no canto do rótulo |
+
+### Hooks do kit
+
+Antes de escrever lógica de tela, veja se já existe (Regra F, degrau 2):
+
+| Hook | Uso |
+|---|---|
+| `useTheme` | Cores do tema ativo + `isGbMode` (`src/context/ThemeContext`) |
+| `useUrlFilter` | Filtro de tela espelhado na query string (deep-link) |
+| `useDelayedLoading` | Guardas de loading: anti-flash (`t.delay.loadingShow`) e anti-flicker (`t.delay.loadingMin`) |
+| `useChartScale` | Largura real medida do wrapper do gráfico — base do `viewBox` 1:1 |
+| `usePrefersReducedMotion` | Anula transição/animação inline quando o SO pede menos movimento |
+| `useMediaQuery` | Media query real onde `@media` não alcança (estilo inline). Em dashboard, prefira largura mínima de card + quebra de fileira |
+| `useFocusTrap` | Prende o foco em modal/drawer aberto |
+| `useSeriesFocus` | Foco de uma série dentro do card do gráfico — devolve as séries visíveis e o seletor (use `FocusableChartCard`, que já o encapsula) |
 
 ### Navegação & Progresso
 
@@ -443,16 +547,30 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `GroupedBarChart` | Barras agrupadas SVG |
 | `StackedBarChart` | Barras empilhadas SVG, vertical/horizontal |
 | `LineChart` | Linha/área SVG multi-série |
-| `DonutChart` | Donut SVG com hover, tooltip, legenda, rótulo central |
+| `DonutChart` | Donut SVG com hover, tooltip, rótulo central que se ajusta ao buraco e legenda ao lado (card largo) ou abaixo |
 | `GaugeChart` | Medidor semicircular SVG proporcional a valor/máximo |
 | `HeatmapChart` | Mapa de calor em grid, intensidade por opacidade |
 | `SankeyFunnel` | Funil SVG com conectores de fluxo e tooltip por estágio |
 | `SparklineArea` | Mini-gráfico de linha/área para tendências |
-| `ChartCard` | Wrapper de gráfico com cabeçalho, ação e expansão em modal |
+| `ChartCard` | Bloco de gráfico com expansão em modal (frame do `DashboardCard`) |
 | `KpiStatCard` | Cartão de métrica com ícone, valor grande e chip de tendência |
+| `ChartLegend` | Legenda de séries em HTML — ao lado do título do card (ponto ou traço) |
+| `ChartSvgLegend` | Legenda de séries dentro do SVG do gráfico, com passo pelo texto |
 | `MapView` | Mapa Leaflet somente-leitura: perímetro GeoJSON ou marcador de coordenada |
 
-> Todos os gráficos SVG seguem o mesmo padrão interno (`viewBox` fixo, `useChartScale`, tooltip via hover, paleta `t.chart.series`) — ao criar um gráfico novo, siga esse padrão em vez de inventar um approach diferente. Exceção a confirmar: `HeatmapChart` recebe `colors`/`isGbMode` via prop em vez de `useTheme()` interno como os demais — checar antes de copiar esse componente como referência de tema.
+> **Tipografia em SVG:** o `font-size` como ATRIBUTO de apresentação perde para o CSS
+> global do app — todo texto de gráfico renderizava 16px em vez do token. Em `<text>`/
+> `<tspan>` o tamanho e o peso vão sempre em `style={{ … }}`.
+>
+> **Escala:** o `viewBox` de TODO gráfico do kit é casado à largura real medida
+> (`useChartScale().width`), então 1 unidade = 1px: `height` é a altura renderizada de fato
+> e cada fonte sai no px do token. Com `viewBox` fixo o mesmo valor rendia alturas
+> diferentes conforme a largura do card — medido antes da correção: sparkline de 40px
+> renderizando 22px, funil de 160 em 101, e gauge de 160 em 310. Eixo, padding e afinamento de rótulo saem de `src/utils/chartAxis.ts`
+> (`niceAxisMax`/`niceAxisTicks`/`axisLabelPad`/`axisLabelStep`/`truncateAxisLabel`), que
+> mede o texto de verdade em canvas em vez de estimar por caractere.
+
+> Todos os gráficos SVG seguem o mesmo padrão interno (`viewBox` casado à largura, `useChartScale`, tooltip via hover, paleta `t.chart.series`) — ao criar um gráfico novo, siga esse padrão em vez de inventar um approach diferente. Exceção a confirmar: `HeatmapChart` recebe `colors`/`isGbMode` via prop em vez de `useTheme()` interno como os demais — checar antes de copiar esse componente como referência de tema.
 
 ### Ações & Identidade
 
@@ -663,7 +781,7 @@ Todo componente e toda tela deve ter **todos os estados desenhados** antes de ir
 
 | Estado | Implementação |
 |---|---|
-| Loading | `Skeleton` (listas/cards) ou prop `loading` do `Button` |
+| Loading | `Skeleton` (listas/cards) ou prop `loading` do `Button`, atrás de `useDelayedLoading` |
 | Vazio | `EmptyState` com mensagem + ação de recuperação |
 | Erro | Mensagem orientada à solução + ação de retry |
 | Sucesso | `Toast` ou `Badge` success |
@@ -675,6 +793,25 @@ Todo componente e toda tela deve ter **todos os estados desenhados** antes de ir
 - `ProgressBar` no topo de cards/seções com operação em andamento.
 
 ---
+
+### Níveis de fundo do chassi
+
+Três degraus, do mais externo ao conteúdo (tema claro):
+
+| Nível | Token | Light | Onde aparece |
+|---|---|---|---|
+| Fundo do app | `bg.canvas` | `#E8E8E8` | Raiz atrás de tudo (chassi, Login, ErrorPage) |
+| Segundo nível | `bg.outer` | `#F2F2F2` | Card externo do chassi — moldura, faixa da Topbar e canvas do `DashboardGrid` |
+| Menus e feature | `bg.sidebar` / `bg.content` | `#FFFFFF` | Sidebar, SecondaryNav e a área onde a tela é renderizada |
+
+`bg.content` existe separado de `bg.surface` porque no GBMode ele acompanha o
+`outer`: se a área de conteúdo tivesse a cor de superfície, o `PageCard` ficaria
+da mesma cor do próprio fundo e desapareceria.
+
+O canvas do dashboard **não tem fill próprio**: assume o `bg.outer`, o mesmo dos
+vãos e da faixa da Topbar em volta, e sem raio. Assim ele não lê como uma folha
+posta sobre a tela — continua na moldura do chassi, e as únicas superfícies que
+sobram são os blocos.
 
 ## 11. Temas — Light e GBMode
 

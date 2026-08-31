@@ -63,16 +63,16 @@ export const ComAcao: Story = {
   ),
 }
 
-// ─── Compacto ───────────────────────────────────────────────────────────────────
+// ─── Sem ícone (padrão nos dashboards — ver Regra G) ────────────────────────────
 
-export const Compacto: Story = {
-  name: 'Compacto',
+export const SemIcone: Story = {
+  name: 'Sem ícone',
   render: () => (
-    <ChartCard icon={TrendingUp} title="Margem por Hectare" compact>
+    <ChartCard title="Margem por hectare">
       <LineChart
         labels={MESES}
         series={[{ name: 'Margem', data: [800, 950, 1020, 890, 1100, 1250] }]}
-        height={130}
+        height={t.size.chart.sm}
         yFormat={(v) => `R$${v}`}
         showLegend={false}
       />

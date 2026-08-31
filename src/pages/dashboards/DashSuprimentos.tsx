@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react'
-import {
-  ClipboardList,
-  FileText,
-  ShoppingCart,
-  PackageCheck,
-  BarChart2,
-  Users,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -30,15 +29,15 @@ const funnelStages = [
 
 const kpiSparklines: Record<string, number[]> = {
   'Solicitações':      [210, 240, 228, 255, 262, 270, 284],
-  'Cotações Abertas':  [52, 58, 55, 61, 63, 65, 67],
-  'Pedidos de Compra': [31, 35, 38, 40, 41, 43, 43],
+  'Cotações abertas':  [52, 58, 55, 61, 63, 65, 67],
+  'Pedidos de compra': [31, 35, 38, 40, 41, 43, 43],
   'Recebimentos':      [40, 38, 39, 37, 38, 36, 38],
 }
 
 const funnelMeta = [
-  { label: 'Valor Médio',  values: ['R$ 1.240', 'R$ 4.820', 'R$ 12.600', 'R$ 11.900'] },
-  { label: 'Lead Time',    values: ['1 dia', '3 dias', '7 dias', '12 dias'] },
-  { label: 'Prazo Médio',  values: ['Imediato', '48h', '15 dias', '30 dias'] },
+  { label: 'Valor médio',  values: ['R$ 1.240', 'R$ 4.820', 'R$ 12.600', 'R$ 11.900'] },
+  { label: 'Lead time',    values: ['1 dia', '3 dias', '7 dias', '12 dias'] },
+  { label: 'Prazo médio',  values: ['Imediato', '48h', '15 dias', '30 dias'] },
 ] as const
 
 const categoriaData = [
@@ -80,8 +79,8 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
-              background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
-              transition: 'background 0.15s ease', cursor: 'default',
+              background: hovIdx === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+              transition: `background ${t.transition.base}`, cursor: 'default',
             }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
               <div>
@@ -105,7 +104,7 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
                 </span>
               </div>
             </div>
-            <div style={{ height: 4, background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100], borderRadius: t.radius.full, overflow: 'hidden' }}>
+            <div style={{ height: 4, background: isGbMode ? t.color.state.track.gb : t.color.state.track.base, borderRadius: t.radius.full, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${f.pct}%`, background: t.color.brand[600], borderRadius: t.radius.full }} />
             </div>
           </div>
@@ -121,101 +120,107 @@ export default function DashSuprimentos() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [categoria, setCategoria] = useState('todas')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [categoria, setCategoria] = useUrlFilter('categoria', 'todas')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} /> : null
   }
 
   const kpis = [
     { label: 'Solicitações',     value: '284', trend: '8,3% vs mês ant.', up: true  },
-    { label: 'Cotações Abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
-    { label: 'Pedidos de Compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
+    { label: 'Cotações abertas', value: '67',  trend: '4,1% vs mês ant.', up: true  },
+    { label: 'Pedidos de compra', value: '43', trend: '2,7% vs mês ant.', up: true  },
     { label: 'Recebimentos',     value: '38',  trend: '1,2% vs mês ant.', up: false },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Suprimentos',
+    scope: categoria === 'todas' ? 'todas as categorias' : `categoria ${categoria}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Funil de suprimentos',
+        kind: 'timeline',
+        labels: funnelStages.map((stage) => stage.label),
+        series: [{ name: 'Volume no estágio', data: funnelStages.map((stage) => stage.value) }],
+        unit: 'documentos',
+      },
+      {
+        block: 'Gastos por categoria',
+        kind: 'composition',
+        labels: categoriaData.map((c) => c.label),
+        series: [{ name: 'Gasto', data: categoriaData.map((c) => c.value) }],
+        currency: true,
+      },
+      {
+        block: 'Top fornecedores',
+        kind: 'composition',
+        labels: fornecedores.map((f) => f.nome),
+        series: [{ name: 'Compras', data: fornecedores.map((f) => Number(f.valor.replace(/[^0-9]/g, ''))) }],
+        currency: true,
+      },
+    ],
+    notes: [`Conversão de ponta a ponta do funil: ${((funnelStages[funnelStages.length - 1].value / funnelStages[0].value) * 100).toFixed(1).replace('.', ',')}%.`],
+  }
+
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Suprimentos"
+        subtitle="Do pedido ao recebimento — funil, gastos e fornecedores"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Categoria',
+                  value: categoria,
+                  onChange: setCategoria,
+                  defaultValue: 'todas',
+                  options: [
+                    { value: 'todas', label: 'Todas as categorias' },
+                    ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <BarChart2 size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Suprimentos</Heading>
-        </div>
-        <FilterSelect
-          ariaLabel="Filtrar por categoria"
-          options={[
-            { value: 'todas', label: 'Todas as categorias' },
-            ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
-          ]}
-          value={categoria}
-          onChange={setCategoria}
-        />
-      </div>
+      {/* Fileira 1 — KPIs com sparkline */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          >
+            <SparklineArea
+              data={kpiSparklines[kpi.label]}
+              color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid}
+              height={t.size.sparkline}
+            />
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── KPI row com sparklines ──────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
-            <div style={{ marginTop: t.space[3], height: 40 }}>
-              <SparklineArea data={kpiSparklines[kpi.label]} color={kpi.up ? t.color.brand[600] : t.color.feedback.error.solid} height={40} />
-            </div>
-          </div>,
-        ])}
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Sankey Funnel ──────────────────────────────────────────────────────── */}
-      <div style={{ padding: `${t.space[5]}px` }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1 }}>
-              284
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginTop: t.space[1] }}>
-              Solicitações → Recebimentos — Funil de suprimentos
-            </div>
-          </div>
+      {/* Fileira 2 — Funil de suprimentos */}
+      <DashboardCard
+        title="Funil de suprimentos"
+        action={
           <div style={{
             fontSize: t.font.size.xs, color: t.color.feedback.success.text,
             background: t.color.feedback.success.bg, borderRadius: t.radius.full,
@@ -223,8 +228,8 @@ export default function DashSuprimentos() {
           }}>
             13,4% taxa final
           </div>
-        </div>
-
+        }
+      >
         <SankeyFunnel stages={funnelStages} colors={colors} isGbMode={isGbMode} chartHeight={160} />
 
         {/* Meta table */}
@@ -250,43 +255,24 @@ export default function DashSuprimentos() {
             </div>
           ))}
         </div>
-      </div>
+      </DashboardCard>
 
-      <HDivider color={bc} />
-
-      {/* ── Bottom row: HBar (1/2) + Fornecedores (1/2) ──────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Gastos por Categoria
-            </span>
-          </div>
+      {/* Fileira 3 — Gastos por categoria + Fornecedores */}
+      <DashboardRow>
+        <DashboardCard title="Gastos por categoria">
           <BarChart
             data={categoriaData
               .filter((c) => categoria === 'todas' || c.label === categoria)
               .map((c) => ({ label: c.label, value: c.value }))}
             horizontal
-            height={240}
+            height={t.size.chart.md}
             yFormat={(v) => `R$ ${(v / 1000).toFixed(0)}K`}
           />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Users size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>
-              Top Fornecedores
-            </span>
-          </div>
+        </DashboardCard>
+        <DashboardCard title="Top fornecedores">
           <FornecedoresList colors={colors} isGbMode={isGbMode} categoria={categoria} />
-        </div>
-
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

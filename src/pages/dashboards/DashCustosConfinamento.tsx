@@ -10,24 +10,26 @@
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
 
 import { useEffect, useState } from 'react'
-import {
-  DollarSign,
-  BarChart2,
-  TrendingUp,
-  PieChart,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -77,12 +79,12 @@ const mockStackedSeries = [
 // Série de linha dupla: custo/@  e custo animal/dia (escala: /@; animal/dia ×8 para coexistir)
 const mockLineSeries = [
   {
-    name: 'Custo por Arroba (R$/@)',
+    name: 'Por arroba (R$/@)',
     data: mockCustoArroba,
     color: t.chart.series[0],
   },
   {
-    name: 'Custo Animal/Dia (R$/cab ×8)',
+    name: 'Animal/dia (R$ ×8)',
     data: mockCustoAnimalDia.map((v) => Math.round(v * 8 * 10) / 10),
     color: t.chart.series[2],
   },
@@ -107,41 +109,25 @@ const kpiSparklines: Record<string, number[]> = {
 // ─── DashCustosConfinamento ────────────────────────────────────────────────────
 
 export default function DashCustosConfinamento() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('6')
-  const [categoria, setCategoria] = useState('todas')
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '6')
+  const [categoria, setCategoria] = useUrlFilter('categoria', 'todas')
   // Safra única nos mocks — o filtro existe para manter o recorte explícito
-  const [safra, setSafra] = useState('25/26')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [safra, setSafra] = useUrlFilter('safra', '25/26')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.lg]} /> : null
   }
 
   // KPI derivados dos mocks — último mês disponível (Jun)
@@ -153,7 +139,7 @@ export default function DashCustosConfinamento() {
 
   const kpis = [
     {
-      label: 'Custo por Arroba',
+      label: 'Custo por arroba',
       value: `R$ ${custoArrobaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/@`,
       trend: '2,5% vs mês ant.', // sem "+": a seta (▼) já indica que o aumento de custo é desfavorável
       up: false, // custo subindo = desfavorável
@@ -162,7 +148,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Custo Animal/Dia',
+      label: 'Custo animal/dia',
       value: `R$ ${custoAnimalDiaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       trend: '2,6% vs mês ant.',
       up: false,
@@ -171,7 +157,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'COE (Custo Operacional)',
+      label: 'COE (custo operacional)',
       value: `R$ ${(coeAtual * 1000).toLocaleString('pt-BR')}`,
       trend: '4,5% vs mês ant.',
       up: false,
@@ -180,7 +166,7 @@ export default function DashCustosConfinamento() {
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Margem Bruta',
+      label: 'Margem bruta',
       value: `${margemAtual.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`,
       trend: '−0,6 p.p. vs mês ant.',
       up: false,
@@ -192,148 +178,158 @@ export default function DashCustosConfinamento() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Custos do Confinamento',
+    scope: `safra ${safra} · ${periodo} meses`,
+    kpis,
+    blocks: [
+      {
+        block: 'Composição de custo por mês (R$ mil)',
+        kind: 'timeline',
+        labels: MESES.slice(-Number(periodo)),
+        series: mockStackedSeries
+          .filter((s) => categoria === 'todas' || s.name === categoria)
+          .map((s) => ({ name: s.name, data: s.data.slice(-Number(periodo)) })),
+        currency: true,
+        scale: 1000,
+      },
+      {
+        block: 'Custo por arroba e animal/dia',
+        kind: 'timeline',
+        labels: MESES.slice(-Number(periodo)),
+        series: [{ name: 'Custo por arroba', data: mockCustoArroba.slice(-Number(periodo)) }],
+        currency: true,
+      },
+      {
+        block: 'Composição total do período (R$ mil)',
+        kind: 'composition',
+        labels: mockDonutData.map((d) => d.label),
+        series: [{ name: 'Custo', data: mockDonutData.map((d) => d.value) }],
+        currency: true,
+        scale: 1000,
+      },
+    ],
+    notes: [
+      `Margem bruta do último mês do recorte: ${margemAtual.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%.`,
+      'Custo subindo é variação desfavorável — o Trend dos KPIs de custo aponta para baixo quando o valor cresce.',
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Custos do Confinamento"
+        subtitle="Custo por arroba, COE, margem e composição de custo"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '6',
+                  options: [
+                    { value: '3', label: 'Abr–Jun 2025' },
+                    { value: '6', label: 'Jan–Jun 2025' },
+                  ],
+                },
+                {
+                  label: 'Categoria de custo',
+                  value: categoria,
+                  onChange: setCategoria,
+                  defaultValue: 'todas',
+                  options: [
+                    { value: 'todas', label: 'Todas as categorias' },
+                    ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
+                  ],
+                },
+                {
+                  label: 'Safra',
+                  value: safra,
+                  onChange: setSafra,
+                  defaultValue: '25/26',
+                  options: [{ value: '25/26', label: 'Safra 25/26' }],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <DollarSign size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Custos do Confinamento</Heading>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '3', label: 'Abr–Jun 2025' },
-              { value: '6', label: 'Jan–Jun 2025' },
-            ]}
-            value={periodo}
-            onChange={setPeriodo}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por categoria de custo"
-            options={[
-              { value: 'todas', label: 'Todas as categorias' },
-              ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
-            ]}
-            value={categoria}
-            onChange={setCategoria}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por safra"
-            options={[{ value: '25/26', label: 'Safra 25/26' }]}
-            value={safra}
-            onChange={setSafra}
-          />
-        </div>
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ─────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{
-              fontSize: t.font.size.xs, color: colors.fg.subtle as string,
-              marginBottom: t.space[1], fontFamily: t.font.family.sans,
-            }}>
-              {kpi.label}
-            </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: kpi.valueColor, lineHeight: 1.1, marginBottom: t.space[2],
-              fontFamily: t.font.family.sans,
-            }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+            valueColor={kpi.valueColor}
+          >
             {kpi.sparkKey && (
-              <div style={{ marginTop: t.space[3], height: 40 }}>
-                <SparklineArea
-                  data={kpiSparklines[kpi.sparkKey]}
-                  color={kpi.sparkColor}
-                  height={40}
-                />
-              </div>
+              <SparklineArea
+                data={kpiSparklines[kpi.sparkKey]}
+                color={kpi.sparkColor}
+                height={t.size.sparkline}
+              />
             )}
-          </div>,
-        ])}
-      </div>
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
+      {/* Fileira 2 — Composição por mês + Evolução de custo */}
+      <DashboardRow>
+        <FocusableChartCard
+          title="Composição de custo por mês (R$ mil)"
+          flex={3}
+          allLabel="Todas as rubricas"
+          series={mockStackedSeries
+            .filter((s) => categoria === 'todas' || s.name === categoria)
+            .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+        >
+          {(series) => (
+            <StackedBarChart
+              series={series}
+              labels={MESES.slice(-Number(periodo))}
+              height={t.size.chart.lg}
+              showLegend
+              yFormat={(v) => `R$ ${v}`}
+            />
+          )}
+        </FocusableChartCard>
+        <FocusableChartCard
+          title="Custo por arroba e animal/dia"
+          flex={2}
+          allLabel="Ambas as bases"
+          series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={MESES.slice(-Number(periodo))}
+              height={t.size.chart.lg}
+              area={false}
+              showLegend
+              yFormat={(v) => `R$ ${v}`}
+            />
+          )}
+        </FocusableChartCard>
+      </DashboardRow>
 
-      {/* ── Gráficos: StackedBar (composição por mês) + LineChart (custo/@  e animal/dia) ── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Gráfico 1 — Composição de Custo por Mês */}
-        <div style={{ flex: 3, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Composição de Custo por Mês (R$ mil)
-            </span>
-          </div>
-          <StackedBarChart
-            series={mockStackedSeries
-              .filter((s) => categoria === 'todas' || s.name === categoria)
-              .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
-            labels={MESES.slice(-Number(periodo))}
-            height={260}
-            showLegend
-            yFormat={(v) => `R$ ${v}`}
-          />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Gráfico 2 — Custo/@ e Custo Animal/Dia ao longo do período */}
-        <div style={{ flex: 2, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <TrendingUp size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Evolução de Custo por Arroba e Animal/Dia
-            </span>
-          </div>
-          <LineChart
-            series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
-            labels={MESES.slice(-Number(periodo))}
-            height={260}
-            area={false}
-            showLegend
-            yFormat={(v) => `R$ ${v}`}
-          />
-        </div>
-
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Gráfico 3 — Donut composição total do período ─────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'center', padding: `${t.space[5]}px` }}>
-        <div style={{ width: '100%', maxWidth: 480 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <PieChart size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Composição Total do Período (R$ mil)
-            </span>
-          </div>
-          <DonutChart
-            data={mockDonutData}
-            height={240}
-            centerLabel="COE total"
-            centerValue={`R$ ${mockDonutData.reduce((a, d) => a + d.value, 0).toLocaleString('pt-BR')}`}
-            showLegend
-            valueFormat={(v) => `R$ ${v.toLocaleString('pt-BR')} mil`}
-          />
-        </div>
-      </div>
-
-    </div>
+      {/* Fileira 3 — Composição total do período */}
+      <DashboardCard title="Composição total do período (R$ mil)">
+        <DonutChart
+          data={mockDonutData}
+          height={t.size.chart.lg}
+          centerLabel="COE total"
+          centerValue={`R$ ${mockDonutData.reduce((a, d) => a + d.value, 0).toLocaleString('pt-BR')}`}
+          showLegend
+          valueFormat={(v) => `R$ ${v.toLocaleString('pt-BR')} mil`}
+        />
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

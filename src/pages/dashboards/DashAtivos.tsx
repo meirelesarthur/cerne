@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
+import { usePrefersReducedMotion } from '../../components/ui/usePrefersReducedMotion'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Ativos por Categoria ──────────────────────────────────────────────────────
 
@@ -29,7 +38,7 @@ const CATEGORIAS_SERIES = [
     color: t.color.brand[600],
   },
   {
-    name: 'Em Operação',
+    name: 'Em operação',
     data: CATEGORIAS.map(c => c.op),
     color: t.color.brand[200],
   },
@@ -46,13 +55,14 @@ interface StatusItem {
 
 const STATUS_ITEMS: StatusItem[] = [
   { label: 'Operacional',          count: 298, pct: 87.1, color: t.color.brand[600] },
-  { label: 'Manutenção Preventiva', count: 13,  pct: 3.8,  color: t.color.feedback.notice },
+  { label: 'Manutenção preventiva', count: 13,  pct: 3.8,  color: t.color.feedback.notice },
   { label: 'Corretiva / Parado',   count: 18,  pct: 5.3,  color: t.color.feedback.error.text },
   { label: 'Aposentado / Baixa',   count: 13,  pct: 3.8,  color: t.color.neutral[400] },
 ]
 
 function StatusCards() {
   const { colors, isGbMode } = useTheme()
+  const reducedMotion = usePrefersReducedMotion()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -69,7 +79,7 @@ function StatusCards() {
             padding: `${t.space[2]}px ${t.space[3]}px`,
             borderRadius: t.radius.lg,
             border: `1px solid ${colors.border.default}`,
-            background: isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50],
+            background: isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
@@ -82,15 +92,19 @@ function StatusCards() {
           <div style={{
             height: 6,
             borderRadius: t.radius.full,
-            background: isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[200],
+            background: isGbMode ? t.color.state.track.gb : t.color.state.track.base,
             overflow: 'hidden',
           }}>
             <div style={{
               height: '100%',
-              width: mounted ? `${item.pct}%` : '0%',
+              width: mounted || reducedMotion ? `${item.pct}%` : '0%',
               background: item.color,
               borderRadius: t.radius.full,
-              transition: `width 0.6s cubic-bezier(0.4,0,0.2,1) ${i * 80}ms`,
+              // Sem movimento quando o usuário pediu menos movimento no SO: a
+              // barra aparece já no valor final, sem crescer.
+              transition: reducedMotion
+                ? undefined
+                : `width ${t.animation.duration.slower} ${t.animation.easing.standard} ${i * 80}ms`,
             }} />
           </div>
         </div>
@@ -125,40 +139,28 @@ const MANUT_SERIES = [
 // ─── DashAtivos ───────────────────────────────────────────────────────────────
 
 const ATIVOS_KPIS = [
-  { label: 'Total de Ativos',   value: '342',     trend: '5,4%',  up: true  },
-  { label: 'Em Operação',       value: '298',     trend: '3,2%',  up: true  },
-  { label: 'Em Manutenção',     value: '31',      trend: '12,4%', up: false },
-  { label: 'Valor Patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
+  { label: 'Total de ativos',   value: '342',     trend: '5,4%',  up: true  },
+  { label: 'Em operação',       value: '298',     trend: '3,2%',  up: true  },
+  { label: 'Em manutenção',     value: '31',      trend: '12,4%', up: false },
+  { label: 'Valor patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
 ]
 
 export default function DashAtivos() {
-  const { colors, isGbMode } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const id = setTimeout(() => setLoading(false), 600)
     return () => clearTimeout(id)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(loading)
 
   if (loading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} /> : null
   }
 
   // Dados filtrados: período fatia os últimos N meses da série de manutenções
@@ -166,66 +168,109 @@ export default function DashAtivos() {
   const manutLabels = MANUT_LABELS.slice(-nMeses)
   const manutSeries = MANUT_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  // Leitura da tela — os mesmos dados dos blocos, na ordem em que aparecem
+  const analise: DashboardReadingInput = {
+    title: 'Ativos',
+    scope: `frota da fazenda · últimos ${nMeses} meses`,
+    kpis: ATIVOS_KPIS,
+    blocks: [
+      {
+        block: 'Ativos por categoria',
+        kind: 'composition',
+        labels: CATEGORIAS_LABELS,
+        series: [{ name: 'Total', data: CATEGORIAS.map((c) => c.total) }],
+        unit: 'ativos',
+      },
+      {
+        block: 'Status dos ativos',
+        kind: 'composition',
+        labels: STATUS_ITEMS.map((item) => item.label),
+        series: [{ name: 'Ativos', data: STATUS_ITEMS.map((item) => item.count) }],
+        unit: 'ativos',
+        // Composição de estado: concentrar no estado bom é o objetivo, não risco.
+        concentrationRisk: false,
+      },
+      {
+        block: 'Manutenções por mês',
+        kind: 'timeline',
+        labels: manutLabels,
+        series: manutSeries.map((serie) => ({ name: serie.name, data: serie.data })),
+        unit: 'manutenções',
+      },
+    ],
+    notes: [
+      `Em operação hoje: ${CATEGORIAS.reduce((acc, c) => acc + c.op, 0)} de ${CATEGORIAS.reduce((acc, c) => acc + c.total, 0)} ativos.`,
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="sm" weight="semibold">Ativos</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Ativos"
+        subtitle="Patrimônio, operação e manutenções da frota"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base de ativos" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {ATIVOS_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            <Trend value={kpi.trend} up={kpi.up} />
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {ATIVOS_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Grouped H-bar + Status */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-        <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Ativos por Categoria</div>
+      {/* Fileira 2 — Categorias + Status */}
+      <DashboardRow>
+        <FocusableChartCard title="Ativos por categoria" flex={3} series={CATEGORIAS_SERIES}>
+          {(series) => (
+            <GroupedBarChart
+              series={series}
+              labels={CATEGORIAS_LABELS}
+              height={t.size.chart.lg}
+              showLegend
+            />
+          )}
+        </FocusableChartCard>
+        <DashboardCard title="Status dos ativos" flex={2}>
+          <StatusCards />
+        </DashboardCard>
+      </DashboardRow>
+
+      {/* Fileira 3 — Manutenções */}
+      <FocusableChartCard title="Manutenções por mês" series={manutSeries}>
+        {(series) => (
           <GroupedBarChart
-            series={CATEGORIAS_SERIES}
-            labels={CATEGORIAS_LABELS}
-            height={260}
+            series={series}
+            labels={manutLabels}
+            height={t.size.chart.md}
             showLegend
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Status dos Ativos</div>
-          <StatusCards />
-        </div>
-      </div>
-      <HDivider color={bc} />
-
-      {/* Row 3 — Manutenções */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Manutenções por Mês</div>
-        <GroupedBarChart
-          series={manutSeries}
-          labels={manutLabels}
-          height={200}
-          showLegend
-        />
-      </div>
-    </div>
+        )}
+      </FocusableChartCard>
+    </DashboardGrid>
   )
 }

@@ -33,13 +33,22 @@ export function GaugeChart({
 
   const pct = max > 0 ? Math.min(Math.max(value / max, 0), 1) : 0
 
-  const W = 260
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `height` é a
+  // altura renderizada de fato — com viewBox fixo, o mesmo valor rendia
+  // alturas diferentes conforme a largura do card — e cada fonte sai no px do
+  // token, por isso `k` vale 1.
+  const FALLBACK_W = 260
   const H = height
-  const { ref, k } = useChartScale(W)
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
   const cx = W / 2
   const cy = H - 20
-  const r = 100
-  const sw = 18
+  // Raio de referência do medidor; encolhe se o card for mais estreito que o
+  // arco. Antes o gauge crescia junto com a largura (160 declarados viravam
+  // 310px renderizados num card largo).
+  const r = Math.min(100, Math.max(40, (W - 60) / 2), (H - 30))
+  const sw = Math.max(10, Math.round(r * 0.18))
 
   const describeArc = (startAngle: number, endAngle: number) => {
     const toRad = (a: number) => ((a - 90) * Math.PI) / 180
@@ -57,6 +66,7 @@ export function GaugeChart({
     <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
+      height={H}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid meet"
       style={{ display: 'block', fontFamily: t.font.family.sans }}
@@ -83,10 +93,9 @@ export function GaugeChart({
         x={cx}
         y={cy - 14}
         textAnchor="middle"
-        fontSize={t.font.size['2xl'] * k}
-        fontWeight={t.font.weight.bold}
         fill={isGbMode ? t.color.gb.accent : (colors.fg.default as string)}
         fontFamily={t.font.family.sans}
+        style={{ fontSize: t.font.size['2xl'] * k, fontWeight: t.font.weight.bold }}
       >
         {bigText}
       </text>
@@ -95,9 +104,9 @@ export function GaugeChart({
           x={cx}
           y={cy}
           textAnchor="middle"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {centerLabel}
         </text>

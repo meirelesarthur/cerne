@@ -153,6 +153,15 @@ const state = {
     text:   primitive.neutral[700],
     border: primitive.neutral[200],
   },
+  /**
+   * Trilha de barra de progresso inline — medidor de ocupação, participação,
+   * saldo por conta. Os dashboards usavam cinco alfas diferentes de branco no
+   * GBMode (0.04–0.15) para a mesma coisa.
+   */
+  track: {
+    base: primitive.neutral[200],          // light
+    gb:   'rgba(255,255,255,0.08)',        // GBMode
+  },
   /** Linhas de tabela (hover/selecionada/zebra) — light + GBMode */
   row: {
     hover:       primitive.neutral[100],            // light
@@ -168,6 +177,12 @@ const state = {
 const overlay = {
   modal:  'rgba(0,0,0,0.45)',
   drawer: 'rgba(0,0,0,0.18)',
+  /**
+   * Superfície de controle sobreposta a mídia (chip sobre o mapa de talhões).
+   * Clara nos dois temas de propósito: o fundo é a imagem de satélite, não a
+   * superfície do tema.
+   */
+  onMedia: 'rgba(255,255,255,0.92)',
 }
 
 /** Acentos exclusivos do GBMode (tema escuro) — ver FIGMA_NAMING `color/gb/*` */
@@ -204,7 +219,7 @@ export const color = {
 
 export interface ThemePalette {
   fg:     { default: string; muted: string; subtle: string; onAccent: string }
-  bg:     { canvas: string; outer: string; surface: string; subtle: string; input: string; sidebar: string }
+  bg:     { canvas: string; outer: string; content: string; surface: string; subtle: string; input: string; sidebar: string }
   border: { default: string; subtle: string }
   accent: { default: string; hover: string; subtle: string }
   nav: {
@@ -222,8 +237,17 @@ const lightPalette: ThemePalette = {
     onAccent: primitive.neutral[0],     // #ffffff
   },
   bg: {
-    canvas:  '#f0f0f0',
-    outer:   primitive.neutral[50],     // #fafafa
+    /** Fundo do app — nível mais externo, atrás do chassi inteiro */
+    canvas:  '#e8e8e8',
+    /** Segundo nível — card externo do chassi (onde fica a Topbar) */
+    outer:   '#f2f2f2',
+    /**
+     * Área de conteúdo (feature) — a região onde a tela é renderizada.
+     * No tema claro é branca, como os menus; no GBMode acompanha o `outer`,
+     * senão ficaria da mesma cor do `PageCard` e o card desapareceria no fundo.
+     */
+    content: primitive.neutral[0],      // #ffffff
+    /** Superfície de card/menu */
     surface: primitive.neutral[0],      // #ffffff
     subtle:  primitive.neutral[100],    // #f5f5f5
     input:   primitive.neutral[50],     // #fafafa
@@ -260,6 +284,7 @@ const gbModePalette: ThemePalette = {
   bg: {
     canvas:  '#051008',
     outer:   '#081a12',
+    content: '#081a12',                 // = outer: sem camada extra sob o card
     surface: '#0e2a1d',
     subtle:  '#0b1e14',
     input:   '#132f22',
@@ -415,6 +440,30 @@ export const size = {
   errorPayloadMax: 156,
   /** Largura da barra de rolagem — espelha `::-webkit-scrollbar { width }` em index.css */
   scrollbar: 4,
+  /**
+   * Alturas de área de gráfico nos dashboards. Escala fechada de 3 degraus —
+   * blocos da mesma fileira usam sempre o MESMO degrau, para os cards fecharem
+   * na mesma linha de base.
+   *   sm  bloco auxiliar / faixa densa (barra por hora, picos)
+   *   md  padrão de bloco em fileira de 2+ cards
+   *   lg  bloco protagonista (largura total ou gráfico de leitura fina)
+   */
+  chart: {
+    sm: 180,
+    md: 220,
+    lg: 260,
+  },
+  /** Altura do sparkline na base do KPI (DashboardKpiCard) */
+  sparkline: 40,
+  /**
+   * Largura mínima de um card de dashboard antes de a fileira quebrar.
+   * A fileira (`DashboardRow`) não usa breakpoint de viewport: os cards
+   * crescem para preencher o espaço e passam para a linha seguinte quando não
+   * cabem nesta largura — respondendo à área de conteúdo, não à janela.
+   */
+  dashCardMin: 300,
+  /** Idem para o card de KPI — cabem 4 por fileira em ~800px de conteúdo. */
+  dashKpiMin: 180,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

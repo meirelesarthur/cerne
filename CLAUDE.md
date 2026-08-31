@@ -175,6 +175,9 @@ corrigidos (não repetir):
 | Avatar `<div>` com iniciais + gradiente | `Avatar` |
 | Breadcrumb `<nav>` inline | `Breadcrumb` |
 | Tooltip inline com `position: fixed` | `Tooltip` |
+| Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
+| KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
+| Estado de foco de série montado na tela (useState + select no `action`) | `FocusableChartCard` |
 | `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
 
 Primitiva não existe → criar em `src/components/ui/` com story, tokens e suporte aos dois
@@ -220,11 +223,61 @@ PageContainer (style={{ paddingBottom: 0 }})
 - **Campos:** `FormField` (texto), `FormSelect` (select), `ToggleSwitch` (boolean).
 - Validação inline por campo, foco no primeiro erro ao submeter (ver Formulários).
 
+### Regra G — Composição canônica de Dashboards
+
+Dashboard não usa `PageCard`. A casca é o `DashboardGrid`: cada bloco é um card com fill
+próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos. O
+canvas assume o nível do chassi (`bg.outer`, sem raio): não lê como folha sobre a tela,
+e os blocos ficam sendo as únicas superfícies.
+
+```
+DashboardGrid                          ← canvas sem fill próprio (bg.outer) + gap entre as fileiras
+  └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
+  └── DashboardRow wrap → DashboardKpiCard ×N        ← 1 KPI = 1 card
+  └── DashboardRow → DashboardCard flex={3} + flex={2}
+  └── DashboardRow → DashboardStack flex={1} + DashboardStack width={320}
+  └── DashboardCard                    ← bloco de largura total
+isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
+```
+
+- **Filtro é botão + drawer:** `DashboardFilters` no `actions` do cabeçalho, nunca
+  `FilterSelect` solto. Cada campo declara `defaultValue` (define filtro ativo e Limpar).
+- Rótulo do bloco na prop `title`; legenda/botão na prop `action`.
+- Bloco que sangra (mapa) → `DashboardCard bare`.
+- Borda só no GBMode — regra do `DashboardCard`, nunca replicada na tela.
+- **Largura por espaço, não por janela:** card declara mínimo
+  (`t.size.dashCardMin`/`dashKpiMin`) e cresce pelo peso; a fileira quebra sozinha.
+  Não usar media query de viewport — a área de conteúdo é ~500px mais estreita que
+  a janela.
+- **Filtro na URL:** `useUrlFilter('periodo', '12')` em vez de `useState`.
+- **Loading atrás de guarda:** `useDelayedLoading(isLoading)` decide quando a casca
+  aparece — `isLoading ? (showSkeleton ? <DashboardSkeleton/> : null) : conteúdo`.
+- **Cor de série:** categoria distinta → `t.chart.series` em ordem (sem o vermelho
+  `series[4]` para categoria não-negativa); nível do mesmo indicador → tons da mesma
+  matiz; status/sinal → feedback; sobra ("Outros") → neutro.
+- **Altura de gráfico** de `t.size.chart.{sm,md,lg}` (180/220/260); mesma fileira, mesmo
+  degrau. Sparkline de KPI: `t.size.sparkline`.
+- **Rótulo em caixa de sentença e em uma linha**; aviso/detalhe vira chip no `action`.
+- **KPI sem `valueSize`**: o degrau sai do comprimento do valor.
+- **Legenda de série** via `ChartLegend`/legenda interna do gráfico — nunca ponto+rótulo
+  montado na tela. Não repetir na tela um número que a fileira de KPIs já mostra.
+- **Bloco de várias séries** usa `FocusableChartCard`: seletor no canto direito do rótulo
+  isola uma série, que ocupa o gráfico com o eixo reescalado. Não em composição de item
+  único (barra por categoria, donut) nem em bloco cujo sentido É a comparação de duas
+  séries (atual vs meta) — nesses, o recorte é o filtro da tela.
+- Em `<text>`/`<tspan>` de SVG, tamanho e peso de fonte vão em `style` — o atributo de
+  apresentação perde para o CSS global.
+- Referências: `OverviewPanel.tsx`, `DashAtivos.tsx`, `Pluviometria.tsx`.
+
 ### Regra D — Tokens disponíveis (use estes, não invente literais)
 
 `src/design/tokens.ts` já cobre os casos que antes viravam hardcode. Antes de escrever um
 literal, procure o token:
 
+- **Altura de gráfico:** `t.size.chart.{sm,md,lg}` (180/220/260) · `t.size.sparkline` (40).
+- **Card de dashboard:** `t.size.dashCardMin` (300) · `t.size.dashKpiMin` (180).
+- **Trilha de progresso:** `t.color.state.track.{base,gb}` · **sobre mídia:**
+  `t.color.overlay.onMedia`.
 - **Tamanhos de controle:** `t.size.control` (38, = input/select padrão), `controlSm` (34),
   `controlLg` (42), `btn.{sm,md,lg}`, `iconBtn.{sm,md,lg}`, `toggle.{track,trackHeight,thumb}`,
   `pageBtn` (34), `tableRow` (44), `drawer` (330), `stepBtn` (190).
@@ -394,7 +447,7 @@ produção:
 - [ ] Passei pela escada de reuso (Regra F) antes de escrever componente novo
 - [ ] Nenhuma primitiva reimplementada localmente (Regra A)
 - [ ] Zero `<button>/<input>/<select>/<table>/<h1-6>` crus na página (Lei 1)
-- [ ] Listagem segue a Regra B / formulário segue a Regra C
+- [ ] Listagem segue a Regra B / formulário segue a Regra C / dashboard segue a Regra G
 - [ ] Exclusão via `ConfirmDialog`; ações de linha via `IconButton`/`DropdownMenu`
 - [ ] Cabeçalho via `FormPageHeader`/`PageHeader`; títulos via `Heading` (Regra E)
 - [ ] Extensão de comportamento por prop no componente do kit, nunca `style` inline

@@ -1,4 +1,5 @@
 import { t } from '../../design/tokens'
+import { useChartScale } from '../../hooks/useChartScale'
 
 interface SparklineAreaProps {
   data: number[]
@@ -15,7 +16,12 @@ export function SparklineArea({
 }: SparklineAreaProps) {
   if (!data || data.length < 2) return null
 
-  const W = 400
+  // viewBox casado à largura real medida: 1 unidade = 1px, então `height` é a
+  // altura renderizada de fato. Com viewBox fixo e `preserveAspectRatio="none"`,
+  // 40px declarados renderizavam 22px num card de KPI.
+  const FALLBACK_W = 400
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
   const H = height
   const min = Math.min(...data)
   const max = Math.max(...data)
@@ -40,10 +46,11 @@ export function SparklineArea({
   const gradId = `spk_${color.replace(/[^a-zA-Z0-9]/g, '')}`
 
   return (
+    <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
+      height={H}
       viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
       style={{ display: 'block' }}
       aria-hidden="true"
     >
@@ -63,5 +70,6 @@ export function SparklineArea({
         strokeLinejoin="round"
       />
     </svg>
+    </div>
   )
 }

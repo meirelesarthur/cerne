@@ -8,23 +8,26 @@
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
 
 import { useEffect, useState } from 'react'
-import {
-  TrendingUp,
-  BarChart2,
-  Activity,
-  List,
-} from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
+import { EmptyState } from '../../components/ui/EmptyState'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -70,7 +73,7 @@ const mockGmdSeries = [
 // Histórico de sparklines (7 pontos de GMD médio diário)
 const kpiSparklines: Record<string, number[]> = {
   'Média GMD': [1.30, 1.33, 1.36, 1.38, 1.40, 1.42, 1.38],
-  'Ganho Total': [3200, 3580, 3940, 4260, 4600, 4920, 5180],
+  'Ganho total': [3200, 3580, 3940, 4260, 4600, 4920, 5180],
 }
 
 // Lista compacta de lotes com últimas pesagens
@@ -86,14 +89,12 @@ const mockLotesDetalhe = [
 // ─── DashDesempenhoLotes ──────────────────────────────────────────────────────
 
 export default function DashDesempenhoLotes() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('7')
-  const [curral, setCurral] = useState('todos')
-  const [lote, setLote] = useState('todos')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '7')
+  const [curral, setCurral] = useUrlFilter('curral', 'todos')
+  const [lote, setLote] = useUrlFilter('lote', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -102,24 +103,12 @@ export default function DashDesempenhoLotes() {
 
   const bc = colors.border.default as string
 
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} /> : null
   }
 
   // ── KPIs derivados dos mocks ────────────────────────────────────────────────
@@ -156,7 +145,7 @@ export default function DashDesempenhoLotes() {
   const kpis = [
     {
       label: 'Média GMD',
-      value: `${gmdMedio.toFixed(2)} kg/dia`,
+      value: `${gmdMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia`,
       trend: '0,08 kg/dia vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
@@ -164,16 +153,16 @@ export default function DashDesempenhoLotes() {
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Ganho Total',
+      label: 'Ganho total',
       value: `${ganhoTotal.toLocaleString('pt-BR')} kg`,
       trend: '5,8% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Ganho Total',
+      sparkKey: 'Ganho total',
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Peso Médio Final',
+      label: 'Peso médio final',
       value: `${pesoMedioFinal.toLocaleString('pt-BR')} kg`,
       trend: '3,2% vs pesagem ant.',
       up: true,
@@ -182,7 +171,7 @@ export default function DashDesempenhoLotes() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'Lotes Ativos',
+      label: 'Lotes ativos',
       value: String(lotesAtivos),
       trend: 'lotes em confinamento',
       up: true,
@@ -192,138 +181,148 @@ export default function DashDesempenhoLotes() {
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Desempenho de Lotes',
+    scope: `${lotesFiltrados.length} lote(s) · últimas ${nPesagens} pesagens`,
+    kpis,
+    blocks: [
+      {
+        block: 'Peso médio por lote (kg)',
+        kind: 'timeline',
+        labels: pesagemLabels,
+        series: lotesSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'kg',
+      },
+      {
+        block: 'GMD: atual vs meta (kg/dia)',
+        kind: 'composition',
+        labels: gmdLabels,
+        series: [{ name: 'GMD atual', data: gmdSeries[0]?.data ?? [] }],
+        unit: 'kg/dia',
+        concentrationRisk: false,
+      },
+    ],
+    notes: [
+      'Meta de GMD do confinamento: 1,40 kg/dia — lote abaixo disso aparece em vermelho no detalhamento.',
+      `Lotes acima da meta no recorte: ${lotesFiltrados.filter((l) => l.gmd >= 1.4).length} de ${lotesFiltrados.length}.`,
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Desempenho de Lotes"
+        subtitle="GMD, evolução de peso e detalhamento dos lotes em confinamento"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '7',
+                  options: [
+                    { value: '4', label: 'Últimas 4 pesagens' },
+                    { value: '7', label: 'Últimas 7 pesagens' },
+                  ],
+                },
+                {
+                  label: 'Curral',
+                  value: curral,
+                  onChange: setCurral,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os currais' },
+                    ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
+                  ],
+                },
+                {
+                  label: 'Lote',
+                  value: lote,
+                  onChange: setLote,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os lotes' },
+                    ...mockLoteLabels.map((l) => ({ value: l, label: l })),
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <TrendingUp size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Desempenho de Lotes</Heading>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '4', label: 'Últimas 4 pesagens' },
-              { value: '7', label: 'Últimas 7 pesagens' },
-            ]}
-            value={periodo}
-            onChange={setPeriodo}
+      {/* Filtro sem resultado não vira tela morta: um caminho de volta no lugar
+          de KPIs zerados, gráficos "Sem dados" e tabela só com cabeçalho. */}
+      {lotesFiltrados.length === 0 ? (
+        <DashboardCard>
+          <EmptyState
+            variant="search"
+            message="Nenhum lote nesse recorte"
+            description="A combinação de curral e lote selecionada não tem pesagem no período."
+            action={{
+              label: 'Limpar filtros',
+              onClick: () => { setCurral('todos'); setLote('todos') },
+            }}
           />
-          <FilterSelect
-            ariaLabel="Filtrar por curral"
-            options={[
-              { value: 'todos', label: 'Todos os currais' },
-              ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
-            ]}
-            value={curral}
-            onChange={setCurral}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por lote"
-            options={[
-              { value: 'todos', label: 'Todos os lotes' },
-              ...mockLoteLabels.map((l) => ({ value: l, label: l })),
-            ]}
-            value={lote}
-            onChange={setLote}
-          />
-        </div>
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{
-              fontSize: t.font.size.xs, color: colors.fg.subtle as string,
-              marginBottom: t.space[1], fontFamily: t.font.family.sans,
-            }}>
-              {kpi.label}
-            </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: kpi.valueColor, lineHeight: 1.1, marginBottom: t.space[2],
-              fontFamily: t.font.family.sans,
-            }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
+        </DashboardCard>
+      ) : (
+        <>
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+            valueColor={kpi.valueColor}
+          >
             {kpi.sparkKey && (
-              <div style={{ marginTop: t.space[3], height: 40 }}>
-                <SparklineArea
-                  data={kpiSparklines[kpi.sparkKey]}
-                  color={kpi.sparkColor}
-                  height={40}
-                />
-              </div>
+              <SparklineArea
+                data={kpiSparklines[kpi.sparkKey]}
+                color={kpi.sparkColor}
+                height={t.size.sparkline}
+              />
             )}
-          </div>,
-        ])}
-      </div>
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── Gráficos: LineChart (evolução peso) + GroupedBarChart (GMD) ──────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Gráfico 1 — Evolução de Peso Médio por Lote */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Activity size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Evolução de Peso Médio por Lote (kg)
-            </span>
-          </div>
-          <LineChart
-            series={lotesSeries}
-            labels={pesagemLabels}
-            height={260}
-            area={false}
-            showLegend
-            yFormat={(v) => `${v} kg`}
-          />
-        </div>
-
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Gráfico 2 — Comparativo de GMD por Lote */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Comparativo de GMD: atual vs meta (kg/dia)
-            </span>
-          </div>
+      {/* Fileira 2 — Evolução de peso + GMD */}
+      <DashboardRow>
+        <FocusableChartCard
+          title="Peso médio por lote (kg)"
+          series={lotesSeries}
+          allLabel="Todos os lotes"
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={pesagemLabels}
+              height={t.size.chart.lg}
+              area={false}
+              showLegend
+              yFormat={(v) => `${v} kg`}
+            />
+          )}
+        </FocusableChartCard>
+        <DashboardCard title="GMD: atual vs meta (kg/dia)">
           <GroupedBarChart
             series={gmdSeries}
             labels={gmdLabels}
-            height={260}
+            height={t.size.chart.lg}
             showLegend
-            yFormat={(v) => `${v.toFixed(2)} kg/dia`}
+            yFormat={(v) => `${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia`}
           />
-        </div>
+        </DashboardCard>
+      </DashboardRow>
 
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Lista compacta de lotes ───────────────────────────────────────────── */}
-      <div style={{ padding: `${t.space[5]}px` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-          <List size={12} color={colors.fg.subtle as string} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-            Detalhamento por Lote
-          </span>
-        </div>
-
+      {/* Fileira 3 — Detalhamento por lote */}
+      <DashboardCard title="Detalhamento por lote">
         {/* Tabela de detalhamento — grid CSS com semântica de tabela via ARIA */}
         <div role="table" aria-label="Detalhamento por lote">
           {/* Cabeçalho da lista */}
@@ -391,14 +390,15 @@ export default function DashDesempenhoLotes() {
                     : (t.color.feedback.error.text as string),
                   textAlign: 'right',
                 }}>
-                  {lote.gmd.toFixed(2)} kg/dia
+                  {lote.gmd.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia
                 </span>
               </div>
             )
           })}
         </div>
-      </div>
-
-    </div>
+      </DashboardCard>
+        </>
+      )}
+    </DashboardGrid>
   )
 }

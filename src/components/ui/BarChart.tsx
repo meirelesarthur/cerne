@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { niceAxisMax, formatAxisValue, axisLabelPad, truncateAxisLabel } from '../../utils/chartAxis'
 import { useChartScale } from '../../hooks/useChartScale'
 
 interface BarDatum {
@@ -27,15 +28,21 @@ export function BarChart({
   data,
   height = 220,
   horizontal = false,
-  yFormat = (v) => String(v),
+  yFormat = formatAxisValue,
   color = t.chart.series[0],
 }: BarChartProps) {
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState<HoverState | null>(null)
 
-  const W = 800
   const H = height
-  const { ref, k } = useChartScale(W)
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `height` é a
+  // altura renderizada de fato (antes o SVG escalava pelo viewBox e o mesmo
+  // valor rendia alturas diferentes conforme a largura do card) e cada fonte
+  // sai no px do token — por isso `k` vale 1.
+  const FALLBACK_W = 800
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
 
   // Guard: vazio ou todos zero
   if (data.length === 0 || data.every((d) => d.value === 0)) {
@@ -50,8 +57,8 @@ export function BarChart({
             x={W / 2}
             y={H / 2}
             textAnchor="middle"
-            fontSize={t.font.size.sm * k}
             fill={colors.fg.subtle as string}
+            style={{ fontSize: t.font.size.sm * k }}
           >
             Sem dados
           </text>
@@ -60,19 +67,25 @@ export function BarChart({
     )
   }
 
-  const maxVal = Math.max(...data.map((d) => d.value))
+  // Topo do eixo em degrau redondo — rótulos limpos em vez de frações longas
+  const maxVal = niceAxisMax(Math.max(...data.map((d) => d.value)))
 
   // Layout constants
-  const PAD_LEFT = horizontal ? 100 : 48
   const PAD_RIGHT = 16
   const PAD_TOP = 16
   const PAD_BOTTOM = horizontal ? 28 : 36
 
-  const chartW = W - PAD_LEFT - PAD_RIGHT
-  const chartH = H - PAD_TOP - PAD_BOTTOM
-
   const TICKS = 4
   const tickVals = Array.from({ length: TICKS }, (_, i) => (maxVal / (TICKS - 1)) * i)
+
+  // Padding do eixo dimensionado pelo rótulo mais longo — no modo horizontal os
+  // rótulos da esquerda são as categorias, que pedem mais espaço.
+  const PAD_LEFT = horizontal
+    ? axisLabelPad(data.map((d) => d.label), t.font.size.xs, 100)
+    : axisLabelPad(tickVals.map(yFormat), t.font.size.xs)
+
+  const chartW = W - PAD_LEFT - PAD_RIGHT
+  const chartH = H - PAD_TOP - PAD_BOTTOM
 
   // Tooltip
   const ttW = 110
@@ -118,9 +131,9 @@ export function BarChart({
             x={xScale(tv)}
             y={PAD_TOP + chartH + 16}
             textAnchor="middle"
-            fontSize={t.font.size.xs * k}
             fill={colors.fg.subtle as string}
             fontFamily={t.font.family.sans}
+            style={{ fontSize: t.font.size.xs * k }}
           >
             {yFormat(tv)}
           </text>
@@ -144,11 +157,11 @@ export function BarChart({
                 x={PAD_LEFT - 6}
                 y={by + barH / 2 + 4}
                 textAnchor="end"
-                fontSize={t.font.size.xs * k}
                 fill={colors.fg.subtle as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k }}
               >
-                {d.label}
+                {truncateAxisLabel(d.label, PAD_LEFT - 10, t.font.size.xs)}
               </text>
               <rect
                 x={PAD_LEFT}
@@ -189,19 +202,18 @@ export function BarChart({
               <text
                 x={ttX + 18}
                 y={ttY + 15}
-                fontSize={t.font.size.xs * k}
-                fontWeight={t.font.weight.semibold}
                 fill={colors.fg.muted as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k, fontWeight: t.font.weight.semibold }}
               >
                 {d.label}
               </text>
               <text
                 x={ttX + 10}
                 y={ttY + 28}
-                fontSize={t.font.size.xs * k}
                 fill={colors.fg.subtle as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k }}
               >
                 {yFormat(d.value)}
               </text>
@@ -253,9 +265,9 @@ export function BarChart({
           x={PAD_LEFT - 6}
           y={yScale(tv) + 4}
           textAnchor="end"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {yFormat(tv)}
         </text>
@@ -291,11 +303,11 @@ export function BarChart({
               x={cx}
               y={PAD_TOP + chartH + 18}
               textAnchor="middle"
-              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k }}
             >
-              {d.label}
+              {truncateAxisLabel(d.label, barW + barGap - 6, t.font.size.xs)}
             </text>
           </g>
         )
@@ -326,19 +338,18 @@ export function BarChart({
             <text
               x={ttX + 18}
               y={ttY + 15}
-              fontSize={t.font.size.xs * k}
-              fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k, fontWeight: t.font.weight.semibold }}
             >
               {d.label}
             </text>
             <text
               x={ttX + 10}
               y={ttY + 28}
-              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k }}
             >
               {yFormat(d.value)}
             </text>

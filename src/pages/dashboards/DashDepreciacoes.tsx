@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { ChartLegend } from '../../components/ui/ChartLegend'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Stacked Bar Data ─────────────────────────────────────────────────────────
 
@@ -31,18 +40,18 @@ const STACKED_DATA: { maq: number; vei: number; benf: number; outros: number }[]
 ]
 
 const STACKED_SERIES = [
-  { name: 'Máquinas/Equip.', data: STACKED_DATA.map(d => d.maq), color: t.color.brand[600] },
-  { name: 'Veículos',        data: STACKED_DATA.map(d => d.vei), color: t.color.brand[400] },
-  { name: 'Benfeitorias',   data: STACKED_DATA.map(d => d.benf), color: t.color.brand[200] },
+  { name: 'Máquinas/Equip.', data: STACKED_DATA.map(d => d.maq), color: t.chart.series[0] },
+  { name: 'Veículos',        data: STACKED_DATA.map(d => d.vei), color: t.chart.series[1] },
+  { name: 'Benfeitorias',    data: STACKED_DATA.map(d => d.benf), color: t.chart.series[2] },
   { name: 'Outros',          data: STACKED_DATA.map(d => d.outros), color: t.color.neutral[300] },
 ]
 
 // ─── Donut Data ───────────────────────────────────────────────────────────────
 
 const DONUT_SLICES = [
-  { label: 'Máquinas',     value: 8_400_000 * 0.45, color: t.color.brand[600] },
-  { label: 'Veículos',     value: 8_400_000 * 0.28, color: t.color.brand[400] },
-  { label: 'Benfeitorias', value: 8_400_000 * 0.18, color: t.color.brand[200] },
+  { label: 'Máquinas',     value: 8_400_000 * 0.45, color: t.chart.series[0] },
+  { label: 'Veículos',     value: 8_400_000 * 0.28, color: t.chart.series[1] },
+  { label: 'Benfeitorias', value: 8_400_000 * 0.18, color: t.chart.series[2] },
   { label: 'Outros',       value: 8_400_000 * 0.09, color: t.color.neutral[300] },
 ]
 
@@ -82,42 +91,31 @@ const PROJ_SERIES_FULL = [
 // ─── KPIs ─────────────────────────────────────────────────────────────────────
 
 const DEP_KPIS = [
-  { label: 'Valor Total Bens',   value: 'R$ 8,4M',   trend: '2,1%', up: true  },
-  { label: 'Depreciação Mensal', value: 'R$ 42.380',  trend: null,   up: true  },
-  { label: 'Dep. Acumulada',     value: 'R$ 2,1M',   trend: '6,3%', up: true  },
-  { label: 'Valor Residual',     value: 'R$ 6,3M',   trend: '0,8%', up: false },
+  { label: 'Valor total em bens',    value: 'R$ 8,4M',   trend: '2,1%', up: true  },
+  { label: 'Depreciação mensal',     value: 'R$ 42.380', trend: null,   up: true  },
+  { label: 'Depreciação acumulada',  value: 'R$ 2,1M',   trend: '6,3%', up: true  },
+  { label: 'Valor residual',         value: 'R$ 6,3M',   trend: '0,8%', up: false },
 ]
 
 // ─── DashDepreciacoes ─────────────────────────────────────────────────────────
 
 export default function DashDepreciacoes() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [loading, setLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(loading)
 
   if (loading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} /> : null
   }
 
   // Dados filtrados: período fatia os últimos N meses da série empilhada
@@ -125,100 +123,128 @@ export default function DashDepreciacoes() {
   const stackedLabels = MONTHS_SHORT.slice(-nMeses)
   const stackedSeries = STACKED_SERIES.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Depreciações',
+    scope: `patrimônio · últimos ${nMeses} meses`,
+    kpis: DEP_KPIS,
+    blocks: [
+      {
+        block: 'Depreciação por categoria',
+        kind: 'timeline',
+        labels: stackedLabels,
+        series: stackedSeries.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Composição por tipo de bem',
+        kind: 'composition',
+        labels: DONUT_SLICES.map((d) => d.label),
+        series: [{ name: 'Valor', data: DONUT_SLICES.map((d) => d.value) }],
+        currency: true,
+      },
+      {
+        block: 'Projeção — próximos 24 meses',
+        kind: 'timeline',
+        labels: PROJ_LABELS,
+        series: PROJ_SERIES_FULL.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+    ],
+    notes: ['A projeção repete o último valor realizado para os meses futuros — é extrapolação, não previsão de modelo.'],
+  }
+
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="md" weight="semibold">Depreciações</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Depreciações"
+        subtitle="Depreciação acumulada, composição e projeção do patrimônio"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {DEP_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>
-              {kpi.label}
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>
-              {kpi.value}
-            </div>
-            {kpi.trend && <Trend value={kpi.trend} up={kpi.up} />}
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {DEP_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Stacked bar — full width */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
-            Depreciação por Categoria — {nMeses} Meses
-          </div>
-        </div>
-        <StackedBarChart
-          series={stackedSeries}
-          labels={stackedLabels}
-          height={210}
-          yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
-          showLegend
-        />
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 2 — Depreciação por categoria */}
+      <FocusableChartCard title="Depreciação por categoria" series={stackedSeries}>
+        {(series) => (
+          <StackedBarChart
+            series={series}
+            labels={stackedLabels}
+            height={t.size.chart.md}
+            yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
+            showLegend
+          />
+        )}
+      </FocusableChartCard>
 
-      {/* Donut + Projection */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', alignItems: 'stretch' }}>
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string, marginBottom: t.space[4] }}>
-            Composição por Tipo de Bem
-          </div>
+      {/* Fileira 3 — Composição + Projeção */}
+      <DashboardRow>
+        <DashboardCard title="Composição por tipo de bem">
           <DonutChart
             data={DONUT_SLICES}
-            height={220}
-            centerValue="R$8,4M"
+            height={t.size.chart.md}
+            centerValue="R$ 8,4M"
             centerLabel="total"
             showLegend
-            valueFormat={(v) => `R$ ${(v / 1_000_000).toFixed(1)}M`}
+            valueFormat={(v) => `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
           />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 1, padding: t.space[5] }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-            <div style={{ fontSize: t.font.size.md, fontWeight: t.font.weight.medium, color: colors.fg.muted as string }}>
-              Projeção Próximos 24 Meses
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4] }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <div style={{ width: 16, height: 2, background: t.color.brand[600], borderRadius: 1 }} />
-                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Realizado</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={2}><line x1="0" y1="1" x2="16" y2="1" stroke={t.color.brand[400]} strokeWidth="2" strokeDasharray="4 2" /></svg>
-                <span style={{ fontSize: t.font.size.sm, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>Projeção</span>
-              </div>
-            </div>
-          </div>
-          <LineChart
-            series={PROJ_SERIES_FULL}
-            labels={PROJ_LABELS}
-            height={210}
-            yFormat={(v) => `${(v / 1_000_000).toFixed(1)}M`}
-            area
-            showLegend={false}
-          />
-        </div>
-      </div>
-    </div>
+        </DashboardCard>
+        <FocusableChartCard
+          title="Projeção — próximos 24 meses"
+          series={PROJ_SERIES_FULL}
+          allLabel="Realizado + projeção"
+          action={(series) => (
+            <ChartLegend
+              marker="line"
+              items={series.map((serie) => ({
+                label: serie.name,
+                color: serie.color,
+                dashed: serie.name === 'Projeção',
+              }))}
+            />
+          )}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={PROJ_LABELS}
+              height={t.size.chart.md}
+              yFormat={(v) => `${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
+              area
+              showLegend={false}
+            />
+          )}
+        </FocusableChartCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

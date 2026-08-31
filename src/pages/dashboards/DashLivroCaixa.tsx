@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
 import { DataTable, type Column } from '../../components/ui/DataTable'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { ChartLegend } from '../../components/ui/ChartLegend'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -51,7 +61,7 @@ const fluxoSeries = [
 
 const fluxoYFormat = (v: number) =>
   v >= 1_000_000
-    ? `R$ ${(v / 1_000_000).toFixed(1)}M`
+    ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`
     : `R$ ${(v / 1_000).toFixed(0)}K`
 
 // ─── Tabela de Movimentações ──────────────────────────────────────────────────
@@ -144,9 +154,9 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
               background: hovIdx === i
-                ? (isGbMode ? 'rgba(255,255,255,0.04)' : t.color.neutral[50])
+                ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover)
                 : 'transparent',
-              transition: 'background 0.15s ease',
+              transition: `background ${t.transition.base}`,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: t.space[1] }}>
@@ -157,14 +167,14 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
                 R$ {conta.saldo.toLocaleString('pt-BR')}
               </span>
             </div>
-            <div style={{ height: 8, background: isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100], borderRadius: t.radius.full, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: isGbMode ? t.color.state.track.gb : t.color.state.track.base, borderRadius: t.radius.full, overflow: 'hidden' }}>
               <div
                 style={{
                   height: '100%',
                   width: `${pct * 100}%`,
                   background: i === 0 ? t.color.brand[600] : i === 1 ? t.color.brand[500] : i === 2 ? t.color.brand[400] : t.color.brand[300],
                   borderRadius: t.radius.full,
-                  transition: 'opacity 0.18s ease',
+                  transition: `opacity ${t.transition.smooth}`,
                   opacity: hovIdx !== null && hovIdx !== i ? 0.35 : 1,
                 }}
               />
@@ -179,40 +189,29 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
 // ─── DashLivroCaixa ───────────────────────────────────────────────────────────
 
 const LC_KPIS = [
-  { label: 'Total Entradas', value: 'R$ 1.247.830', trend: '18,3%', up: true  },
-  { label: 'Total Saídas',   value: 'R$ 984.220',   trend: '7,4%',  up: false },
-  { label: 'Saldo Período',  value: 'R$ 263.610',   trend: '22,1%', up: true  },
-  { label: 'Saldo Anterior', value: 'R$ 412.800',   trend: null,    up: true  },
+  { label: 'Total de entradas', value: 'R$ 1.247.830', trend: '18,3%', up: true  },
+  { label: 'Total de saídas',   value: 'R$ 984.220',   trend: '7,4%',  up: false },
+  { label: 'Saldo do período',  value: 'R$ 263.610',   trend: '22,1%', up: true  },
+  { label: 'Saldo anterior',    value: 'R$ 412.800',   trend: null,    up: true  },
 ]
 
 export default function DashLivroCaixa() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('12')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '12')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex', flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return <div style={cardStyle}><Skeleton height={600} /></div>
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.lg]} /> : null
   }
 
   // Dados filtrados: período fatia os últimos N meses das séries mensais
@@ -220,81 +219,104 @@ export default function DashLivroCaixa() {
   const labels = monthLabels.slice(-nMeses)
   const fluxoSeriesFiltrado = fluxoSeries.map((s) => ({ ...s, data: s.data.slice(-nMeses) }))
 
+  const analise: DashboardReadingInput = {
+    title: 'Livro Caixa',
+    scope: `contas da fazenda · últimos ${nMeses} meses`,
+    kpis: LC_KPIS,
+    blocks: [
+      {
+        block: 'Fluxo de caixa realizado',
+        kind: 'timeline',
+        labels,
+        series: fluxoSeriesFiltrado.map((s) => ({ name: s.name, data: s.data })),
+        currency: true,
+      },
+      {
+        block: 'Saldo por conta',
+        kind: 'composition',
+        labels: contas.map((c) => c.nome),
+        series: [{ name: 'Saldo', data: contas.map((c) => c.saldo) }],
+        currency: true,
+      },
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space[4]}px ${t.space[5]}px` }}>
-        <Heading level={2} size="sm" weight="semibold">Livro Caixa</Heading>
-        <FilterSelect
-          ariaLabel="Filtrar por período"
-          options={[
-            { value: '3',  label: 'Últimos 3 meses' },
-            { value: '6',  label: 'Últimos 6 meses' },
-            { value: '12', label: 'Últimos 12 meses' },
-          ]}
-          value={periodo}
-          onChange={setPeriodo}
-        />
-      </div>
-      <HDivider color={bc} />
+    <DashboardGrid>
+      <DashboardHeader
+        title="Livro Caixa"
+        subtitle="Entradas, saídas e saldo das contas da fazenda"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '12',
+                  options: [
+                    { value: '3',  label: 'Últimos 3 meses' },
+                    { value: '6',  label: 'Últimos 6 meses' },
+                    { value: '12', label: 'Últimos 12 meses' },
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* KPI row */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {LC_KPIS.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[4]}px` }}>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[1] }}>{kpi.label}</div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default as string, lineHeight: 1.1, marginBottom: t.space[2] }}>{kpi.value}</div>
-            {kpi.trend && (
-              <span style={{ fontSize: t.font.size.xs, color: kpi.up ? t.color.feedback.success.text : t.color.feedback.error.text }}>{kpi.up ? '▲' : '▼'} {kpi.trend}</span>
-            )}
-          </div>,
-        ])}
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {LC_KPIS.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+          />
+        ))}
+      </DashboardRow>
 
-      {/* Row 2 — Fluxo area chart full width */}
-      <div style={{ padding: t.space[5] }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[4] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string }}>Fluxo de Caixa — Realizado</div>
-          <div style={{ display: 'flex', gap: t.space[5] }}>
-            {[
-              { label: 'Entradas', color: t.color.brand[600], dashed: false },
-              { label: 'Saídas',   color: t.color.feedback.error.solid, dashed: false },
-              { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
-            ].map(item => (
-              <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-                <svg width={16} height={4} style={{ display: 'block' }}>
-                  <line x1={0} y1={2} x2={16} y2={2} stroke={item.color} strokeWidth={2} strokeDasharray={item.dashed ? '4,3' : undefined} strokeLinecap="round" />
-                </svg>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <LineChart
-          series={fluxoSeriesFiltrado}
-          labels={labels}
-          height={220}
-          yFormat={fluxoYFormat}
-          area
-          showLegend={false}
-        />
-      </div>
-      <HDivider color={bc} />
+      {/* Fileira 2 — Fluxo de caixa */}
+      <FocusableChartCard
+        title="Fluxo de caixa realizado"
+        series={fluxoSeriesFiltrado}
+        action={(series) => (
+          <ChartLegend
+            marker="line"
+            items={series.map((serie) => ({
+              label: serie.name,
+              color: serie.color,
+              dashed: serie.name === 'Saldo',
+            }))}
+          />
+        )}
+      >
+        {(series) => (
+          <LineChart
+            series={series}
+            labels={labels}
+            height={t.size.chart.md}
+            yFormat={fluxoYFormat}
+            area
+            showLegend={false}
+          />
+        )}
+      </FocusableChartCard>
 
-      {/* Row 3 — Movimentações + Saldo por Conta */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-        <div style={{ flex: 3, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Últimas Movimentações</div>
+      {/* Fileira 3 — Movimentações + Saldo por Conta */}
+      <DashboardRow>
+        <DashboardCard title="Últimas movimentações" flex={3}>
           <MovimentacoesTabela colors={colors} isGbMode={isGbMode} />
-        </div>
-        {!stacked && <VDivider color={bc} />}
-        <div style={{ flex: 2, padding: t.space[5] }}>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, marginBottom: t.space[4] }}>Saldo por Conta</div>
+        </DashboardCard>
+        <DashboardCard title="Saldo por conta" flex={2}>
           <SaldoPorConta colors={colors} isGbMode={isGbMode} />
-        </div>
-      </div>
-    </div>
+        </DashboardCard>
+      </DashboardRow>
+    </DashboardGrid>
   )
 }

@@ -6,31 +6,33 @@
 // - Processar arquivos diferidos (Lei 8): importações de NF/XML de entrada de estoque em fila assíncrona; expor status via polling ou WebSocket
 
 import { useEffect, useState } from 'react'
-import {
-  Package,
-  BarChart2,
-  TrendingDown,
-  Activity,
-  AlertTriangle,
-} from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
-import { Heading } from '../../components/ui/Heading'
-import { Trend } from '../../components/ui/Trend'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 // KPI sparklines (últimas 7 semanas)
 const kpiSparklines: Record<string, number[]> = {
-  'Saldo Total': [142000, 138500, 151200, 147800, 155000, 149300, 157600],
-  'Consumo Médio Diário': [3820, 3940, 3870, 4010, 3950, 4080, 4120],
+  'Saldo total': [142000, 138500, 151200, 147800, 155000, 149300, 157600],
+  'Consumo médio diário': [3820, 3940, 3870, 4010, 3950, 4080, 4120],
 }
 
 // Gráfico 1 — Saldo de estoque por armazém (kg)
@@ -88,54 +90,38 @@ const itensCriticos = mockCoberturaProdutos.filter(d => d.value <= CRITICO_THRES
 // ─── DashEstoqueNutricao ──────────────────────────────────────────────────────
 
 export default function DashEstoqueNutricao() {
-  const { colors, isGbMode } = useTheme()
+  const { colors } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
-  const [periodo, setPeriodo] = useState('60')
-  const [produto, setProduto] = useState('todos')
-  const [armazem, setArmazem] = useState('todos')
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
+  const [periodo, setPeriodo] = useUrlFilter('periodo', '60')
+  const [produto, setProduto] = useUrlFilter('produto', 'todos')
+  const [armazem, setArmazem] = useUrlFilter('armazem', 'todos')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)
   }, [])
 
-  const bc = colors.border.default as string
-
-  const cardStyle: React.CSSProperties = {
-    margin: `${t.space[5]}px ${t.space[6]}px`,
-    display: 'flex',
-    flexDirection: 'column',
-    background: colors.bg.surface,
-    borderRadius: t.radius['2xl'],
-    border: `1px solid ${bc}`,
-    boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    overflow: 'hidden',
-    fontFamily: t.font.family.sans,
-  }
+  const showSkeleton = useDelayedLoading(isLoading)
 
   if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <Skeleton height={640} />
-      </div>
-    )
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.lg]} /> : null
   }
 
   const kpis = [
     {
-      label: 'Saldo Total',
+      label: 'Saldo total',
       value: `${(saldoTotalKg / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} t`,
       trend: '5,2% vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Saldo Total',
+      sparkKey: 'Saldo total',
       sparkColor: t.chart.series[0],
     },
     {
-      label: 'Cobertura Média',
+      label: 'Cobertura média',
       value: `${coberturaMediaDias} dias`,
       trend: itensCriticos > 0
         ? `${itensCriticos} item${itensCriticos > 1 ? 's' : ''} crítico${itensCriticos > 1 ? 's' : ''}`
@@ -148,7 +134,7 @@ export default function DashEstoqueNutricao() {
       sparkColor: t.chart.series[1],
     },
     {
-      label: 'Itens em Estoque',
+      label: 'Itens em estoque',
       value: String(itensEmEstoque),
       trend: 'produtos ativos',
       up: true,
@@ -157,157 +143,167 @@ export default function DashEstoqueNutricao() {
       sparkColor: t.chart.series[2],
     },
     {
-      label: 'Consumo Médio Diário',
+      label: 'Consumo médio diário',
       value: `${consumoMedioDiario.toLocaleString('pt-BR')} kg/dia`,
       trend: '1,8% vs sem. ant.',
       up: false,
       valueColor: colors.fg.default as string,
-      sparkKey: 'Consumo Médio Diário',
+      sparkKey: 'Consumo médio diário',
       sparkColor: t.chart.series[0],
     },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Estoque Nutrição',
+    scope: produto === 'todos' ? 'todos os produtos de nutrição' : `produto ${produto}`,
+    kpis,
+    blocks: [
+      {
+        block: 'Saldo por armazém (kg)',
+        kind: 'composition',
+        labels: mockSaldoArmazem.map((a) => a.label),
+        series: [{ name: 'Saldo', data: mockSaldoArmazem.map((a) => a.value) }],
+        unit: 'kg',
+      },
+      {
+        block: 'Consumo semanal (kg)',
+        kind: 'timeline',
+        labels: mockConsumoLabels,
+        series: mockConsumoSeries.map((s) => ({ name: s.name, data: s.data })),
+        unit: 'kg',
+      },
+      {
+        block: 'Cobertura por produto (dias)',
+        kind: 'composition',
+        labels: mockCoberturaProdutos.map((p) => p.label),
+        series: [{ name: 'Cobertura', data: mockCoberturaProdutos.map((p) => p.value) }],
+        unit: 'dias',
+        concentrationRisk: false,
+      },
+    ],
+    notes: [
+      `Limite crítico de cobertura: ${CRITICO_THRESHOLD} dias.`,
+      `Itens abaixo do limite no recorte: ${itensCriticos}.`,
+    ],
+  }
+
   return (
-    <div style={cardStyle}>
+    <DashboardGrid>
+      <DashboardHeader
+        title="Estoque Nutrição"
+        subtitle="Saldo, consumo e cobertura dos insumos de nutrição"
+        actions={
+          <>
+            <DashboardAnalysis input={analise} fonte="base do painel" />
+            <DashboardFilters
+              fields={[
+                {
+                  label: 'Período',
+                  value: periodo,
+                  onChange: setPeriodo,
+                  defaultValue: '60',
+                  options: [
+                    { value: '30', label: 'Últimos 30 dias' },
+                    { value: '60', label: 'Últimos 60 dias' },
+                  ],
+                },
+                {
+                  label: 'Produto',
+                  value: produto,
+                  onChange: setProduto,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Produtos' },
+                    ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
+                  ],
+                },
+                {
+                  label: 'Armazém',
+                  value: armazem,
+                  onChange: setArmazem,
+                  defaultValue: 'todos',
+                  options: [
+                    { value: 'todos', label: 'Todos os Armazéns' },
+                    ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
+                  ],
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
-      {/* ── Header ────────────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: `${t.space[4]}px ${t.space[5]}px`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <Package size={13} color={colors.fg.subtle as string} />
-          <Heading level={2} size="sm" weight="semibold">Estoque Nutrição</Heading>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '30', label: 'Últimos 30 dias' },
-              { value: '60', label: 'Últimos 60 dias' },
-            ]}
-            value={periodo}
-            onChange={setPeriodo}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por produto"
-            options={[
-              { value: 'todos', label: 'Todos os Produtos' },
-              ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
-            ]}
-            value={produto}
-            onChange={setProduto}
-          />
-          <FilterSelect
-            ariaLabel="Filtrar por armazém"
-            options={[
-              { value: 'todos', label: 'Todos os Armazéns' },
-              ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
-            ]}
-            value={armazem}
-            onChange={setArmazem}
-          />
-        </div>
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── KPI row ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: stacked ? 'wrap' : undefined }}>
-        {kpis.flatMap((kpi, i) => [
-          i > 0 && !stacked ? <VDivider key={`d${i}`} color={bc} /> : null,
-          <div key={kpi.label} style={{ flex: stacked ? '1 1 45%' : 1, padding: `${t.space[5]}px ${t.space[5]}px ${t.space[3]}px` }}>
-            <div style={{
-              fontSize: t.font.size.xs, color: colors.fg.subtle as string,
-              marginBottom: t.space[1], fontFamily: t.font.family.sans,
-            }}>
-              {kpi.label}
-            </div>
-            <div style={{
-              fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-              color: kpi.valueColor, lineHeight: 1.1, marginBottom: t.space[2],
-              fontFamily: t.font.family.sans,
-            }}>
-              {kpi.value}
-            </div>
-            <Trend value={kpi.trend} up={kpi.up} />
+      {/* Fileira 1 — KPIs */}
+      <DashboardRow>
+        {kpis.map((kpi) => (
+          <DashboardKpiCard
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            up={kpi.up}
+            valueColor={kpi.valueColor}
+          >
             {kpi.sparkKey && (
-              <div style={{ marginTop: t.space[3], height: 40 }}>
-                <SparklineArea
-                  data={kpiSparklines[kpi.sparkKey]}
-                  color={kpi.sparkColor}
-                  height={40}
-                />
-              </div>
+              <SparklineArea
+                data={kpiSparklines[kpi.sparkKey]}
+                color={kpi.sparkColor}
+                height={t.size.sparkline}
+              />
             )}
-          </div>,
-        ])}
-      </div>
+          </DashboardKpiCard>
+        ))}
+      </DashboardRow>
 
-      <HDivider color={bc} />
-
-      {/* ── Gráficos linha 1: Saldo por Armazém + Evolução de Consumo ────────── */}
-      <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row' }}>
-
-        {/* Gráfico 1 — Saldo de estoque por armazém */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <BarChart2 size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Saldo por Armazém (kg)
-            </span>
-          </div>
+      {/* Fileira 2 — Saldo por armazém + Evolução de consumo */}
+      <DashboardRow>
+        <DashboardCard title="Saldo por armazém (kg)">
           <BarChart
             data={mockSaldoArmazem.filter((a) => armazem === 'todos' || a.label === armazem)}
-            height={240}
+            height={t.size.chart.md}
             yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
           />
-        </div>
+        </DashboardCard>
+        <FocusableChartCard
+          title="Consumo semanal (kg)"
+          series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
+              height={t.size.chart.md}
+              area
+              showLegend
+              yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
+            />
+          )}
+        </FocusableChartCard>
+      </DashboardRow>
 
-        {!stacked && <VDivider color={bc} />}
-
-        {/* Gráfico 2 — Evolução de consumo de ração no tempo */}
-        <div style={{ flex: 1, padding: `${t.space[5]}px` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-            <Activity size={12} color={colors.fg.subtle as string} />
-            <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-              Evolução de Consumo (kg/semana)
-            </span>
-          </div>
-          <LineChart
-            series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
-            labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
-            height={240}
-            area
-            showLegend
-            yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
-          />
-        </div>
-
-      </div>
-
-      <HDivider color={bc} />
-
-      {/* ── Gráfico 3 — Cobertura de estoque por produto (dias restantes) ────── */}
-      <div style={{ padding: `${t.space[5]}px` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], marginBottom: t.space[4] }}>
-          <TrendingDown size={12} color={colors.fg.subtle as string} />
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle as string, fontFamily: t.font.family.sans }}>
-            Cobertura por Produto (dias restantes) — itens críticos (
-            <AlertTriangle size={10} color={t.color.feedback.error.solid as string} style={{ verticalAlign: -1, margin: '0 2px' }} aria-hidden="true" />
-            ) abaixo de {CRITICO_THRESHOLD} dias
+      {/* Fileira 3 — Cobertura por produto */}
+      <DashboardCard
+        title="Cobertura por produto (dias)"
+        action={
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: t.space[1],
+            fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+            color: t.color.feedback.error.text, background: t.color.feedback.error.bg,
+            borderRadius: t.radius.full, padding: `2px ${t.space[2]}px`,
+            fontFamily: t.font.family.sans, whiteSpace: 'nowrap',
+          }}>
+            <AlertTriangle size={t.font.size.xs} aria-hidden="true" />
+            crítico abaixo de {CRITICO_THRESHOLD} dias
           </span>
-        </div>
+        }
+      >
         <BarChart
-          data={mockCoberturaProdutos
-            .filter((p) => produto === 'todos' || p.label === produto)
-            .map((p) => ({ ...p, label: p.value <= CRITICO_THRESHOLD ? `⚠ ${p.label}` : p.label }))}
-          height={260}
+          data={mockCoberturaProdutos.filter((p) => produto === 'todos' || p.label === produto)}
+          height={t.size.chart.lg}
           horizontal
           yFormat={(v) => `${Math.round(v)}d`}
         />
-      </div>
-
-    </div>
+      </DashboardCard>
+    </DashboardGrid>
   )
 }

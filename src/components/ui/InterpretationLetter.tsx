@@ -10,6 +10,13 @@ interface InterpretationLetterProps {
   carta:   Carta
   /** Nome da base/fonte exibido no cabeçalho e rodapé (ex.: nome da fazenda). */
   fonte?:  string
+  /**
+   * A carta acompanha os filtros da tela? Default `false` (escopo fixo, caso do
+   * Painel Geral, cuja carta lê a base inteira). Quando `true`, o aviso diz que
+   * a leitura foi feita sobre o recorte visível — o que é verdade no motor
+   * genérico, que recebe as séries já filtradas.
+   */
+  filterAware?: boolean
 }
 
 /**
@@ -18,7 +25,7 @@ interface InterpretationLetterProps {
  * (`src/insights/*`): leituras individuais, leitura cruzada, conclusão,
  * sugestões, provocações e glossário, com os disclaimers de governança.
  */
-export function InterpretationLetter({ open, onClose, carta, fonte }: InterpretationLetterProps) {
+export function InterpretationLetter({ open, onClose, carta, fonte, filterAware = false }: InterpretationLetterProps) {
   const { colors } = useTheme()
 
   const geradaEm = new Date().toLocaleString('pt-BR', {
@@ -43,7 +50,7 @@ export function InterpretationLetter({ open, onClose, carta, fonte }: Interpreta
       onClose={onClose}
       size="lg"
       title={`Carta de interpretação — ${carta.title}`}
-      subtitle="Leitura técnica assistida por IA · dados gerais do painel"
+      subtitle={`Leitura técnica assistida por IA · ${carta.scope}`}
     >
       {/* Metadados */}
       <div style={{
@@ -71,9 +78,19 @@ export function InterpretationLetter({ open, onClose, carta, fonte }: Interpreta
         Trate as conclusões como ponto de partida, não como veredicto.
       </div>
       <div style={{ ...noteStyle(t.color.feedback.warning.solid), marginBottom: t.space[4] }}>
-        <strong style={{ color: colors.fg.default }}>Escopo fixo.</strong>{' '}
-        Esta carta interpreta o período completo do painel; alterar filtros de visualização não altera
-        este conteúdo. Ao atualizar os dados da base, uma nova carta é gerada automaticamente.
+        {filterAware ? (
+          <>
+            <strong style={{ color: colors.fg.default }}>Segue os filtros.</strong>{' '}
+            Esta carta foi escrita sobre o recorte que está na tela agora — trocar um filtro gera uma
+            leitura nova, dos dados que passarem a aparecer.
+          </>
+        ) : (
+          <>
+            <strong style={{ color: colors.fg.default }}>Escopo fixo.</strong>{' '}
+            Esta carta interpreta o período completo do painel; alterar filtros de visualização não altera
+            este conteúdo. Ao atualizar os dados da base, uma nova carta é gerada automaticamente.
+          </>
+        )}
       </div>
 
       {/* Seções numeradas */}
@@ -131,7 +148,8 @@ export function InterpretationLetter({ open, onClose, carta, fonte }: Interpreta
         paddingTop: t.space[2], borderTop: `1px solid ${colors.border.subtle}`, lineHeight: t.font.lineHeight.normal,
       }}>
         Carta gerada automaticamente pelo GB CERNE a partir da base em uso · leitura técnica assistida —
-        não substitui a análise humana · escopo: dados gerais do painel, independente de filtros.
+        não substitui a análise humana · escopo: {carta.scope}
+        {filterAware ? ' (recorte na tela)' : ' (base completa)'}.
       </div>
     </Modal>
   )

@@ -257,7 +257,7 @@ export const SCREEN_SHOWCASE: ScreenShowcaseEntry[] = [
     kind: 'fora-de-escopo',
     description: 'Família de gráficos já 100% demonstrada (BarChart, LineChart, DonutChart, KpiStatCard, etc.). Endereçados um a um, separadamente — fora deste backlog.',
     moduleId: 'dashboards', itemId: 'dash-overview',
-    components: ['BarChart', 'LineChart', 'DonutChart', 'StackedBarChart', 'GroupedBarChart', 'GaugeChart', 'HeatmapChart', 'SparklineArea', 'SankeyFunnel', 'ChartCard', 'KpiStatCard', 'Trend', 'SectionDividers', 'InterpretationLetter'],
+    components: ['BarChart', 'LineChart', 'DonutChart', 'StackedBarChart', 'GroupedBarChart', 'GaugeChart', 'HeatmapChart', 'SparklineArea', 'SankeyFunnel', 'ChartCard', 'KpiStatCard', 'Trend', 'DashboardGrid', 'InterpretationLetter'],
   },
   {
     screen: 'Estados de Conta & RBAC',
@@ -278,7 +278,7 @@ export const SHOWCASE_FILTERABLE_COMPONENTS: string[] = Array.from(
   new Set(SCREEN_SHOWCASE.flatMap((entry) => entry.components ?? [])),
 ).sort((a, b) => a.localeCompare(b))
 
-// ─── Componentes de src/components/ui/ (85) ────────────────────────────────
+// ─── Componentes de src/components/ui/ (92) ────────────────────────────────
 
 const AMPLO = 'Uso amplo — presente na maioria das telas de Cadastros/Financeiro/Administrativo (ver Storybook para exemplos isolados).'
 
@@ -331,9 +331,14 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'BarChart', status: 'coberto', screens: 'pages/dashboards/* (fora de escopo, mas coberto)' },
   { name: 'Button', status: 'coberto', screens: AMPLO },
   { name: 'Card', status: 'coberto', screens: 'design-system/EstadosContaPage, pages/planos' },
-  { name: 'ChartCard', status: 'coberto', screens: 'pages/dashboards/*' },
+  { name: 'ChartCard', status: 'referencia-unica', screens: 'pages/dashboards/Pluviometria (frame do DashboardCard + expandir)' },
+  { name: 'ChartLegend', status: 'coberto', screens: 'pages/dashboards/* (legenda de série no action do card)' },
+  { name: 'ChartSvgLegend', status: 'coberto', screens: 'components/ui/{Bar,GroupedBar,StackedBar,Line}Chart (legenda interna)' },
   { name: 'Checkbox', status: 'coberto', screens: AMPLO },
   { name: 'ConfirmDialog', status: 'coberto', screens: AMPLO },
+  { name: 'DashboardAnalysis', status: 'coberto', screens: 'pages/dashboards/* (botão Análise + carta de leitura)' },
+  { name: 'DashboardFilters', status: 'coberto', screens: 'pages/dashboards/* (botão Filtros + FilterDrawer)' },
+  { name: 'DashboardGrid', status: 'coberto', screens: 'pages/dashboards/* (casca das 14 telas: Grid/Header/Row/Stack/Card/KpiCard/Skeleton)' },
   { name: 'DataTable', status: 'coberto', screens: 'integracoes/dominio, planejamento-pecuario, ofx (+ via CrudPattern/ResponsiveDataTable)' },
   { name: 'Divider', status: 'coberto', screens: 'pages/Login, pages/planos' },
   { name: 'DonutChart', status: 'coberto', screens: 'pages/dashboards/*' },
@@ -341,6 +346,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'EmptyState', status: 'coberto', screens: AMPLO },
   { name: 'FarmSwitcher', status: 'coberto', screens: 'components/layout/Topbar' },
   { name: 'FeedbackBanner', status: 'coberto', screens: 'autorizacao, baixa-titulos, ofx, dominio, mapa-confinamento, usuarios, design-system/EstadosContaPage' },
+  { name: 'FocusableChartCard', status: 'coberto', screens: 'pages/dashboards/* (bloco de várias séries com seletor de foco)' },
   { name: 'FormField', status: 'coberto', screens: AMPLO },
   { name: 'FormPageHeader', status: 'coberto', screens: 'AMPLO — cabeçalho de todos os formulários de cadastro' },
   { name: 'FormSection', status: 'coberto', screens: AMPLO },
@@ -351,7 +357,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'HeatmapChart', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'IconButton', status: 'coberto', screens: 'AMPLO — ações de linha em listagens e cabeçalhos' },
   { name: 'InterpretationLetter', status: 'coberto', screens: 'pages/dashboards/*' },
-  { name: 'KpiStatCard', status: 'coberto', screens: 'pages/dashboards/*' },
+  { name: 'KpiStatCard', status: 'referencia-unica', screens: 'apenas story — dashboards usam DashboardKpiCard (rótulo + valor + Trend, sem ícone)' },
   { name: 'LineChart', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'ListToolbar', status: 'coberto', screens: AMPLO },
   { name: 'Modal', status: 'coberto', screens: AMPLO },
@@ -361,7 +367,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'Pagination', status: 'coberto', screens: 'AMPLO (+ via CrudPattern/ResponsiveDataTable)' },
   { name: 'ProgressBar', status: 'coberto', screens: 'pages/Login (indicador de progresso)' },
   { name: 'SankeyFunnel', status: 'coberto', screens: 'pages/dashboards/* (funil)' },
-  { name: 'SectionDividers', status: 'coberto', screens: 'pages/dashboards/* (HDivider/VDivider)' },
+  { name: 'SectionDividers', status: 'referencia-unica', screens: 'cadastros/safras/SafraDetalhe (HDivider/VDivider) — dashboards migraram para DashboardGrid' },
   { name: 'Skeleton', status: 'coberto', screens: 'AMPLO — estado de loading das listagens' },
   { name: 'SparklineArea', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'Spinner', status: 'coberto', screens: 'pages/Login, Button (prop loading)' },

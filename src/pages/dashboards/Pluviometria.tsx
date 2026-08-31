@@ -1,24 +1,30 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { t } from '../../design/tokens'
-import {
-  CloudRain, Droplets,
-  Filter, X, Sun, Cloud, CloudSun, TrendingUp,
-  BarChart2, Activity,
-} from 'lucide-react'
+import { CloudRain, Droplets, Filter, X, Sun, Cloud, CloudSun } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { IconButton } from '../../components/ui/IconButton'
 import { FormField } from '../../components/ui/FormField'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FilterDrawer } from '../../components/ui/FilterDrawer'
-import { PageHeader } from '../../components/ui/PageHeader'
-import { HDivider, VDivider } from '../../components/ui/SectionDividers'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { ChartCard } from '../../components/ui/ChartCard'
-import { Trend } from '../../components/ui/Trend'
+import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import type { DashboardReadingInput } from '../../insights/dashboardReading'
+import { ChartLegend } from '../../components/ui/ChartLegend'
+import {
+  DashboardGrid,
+  DashboardHeader,
+  DashboardRow,
+  DashboardCard,
+  DashboardKpiCard,
+  DashboardSkeleton,
+} from '../../components/ui/DashboardGrid'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useSeriesFocus } from '../../hooks/useSeriesFocus'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -85,23 +91,20 @@ function PluvioBarChart() {
   ]
   const barLabels = BAR_DATA.map(d => d.month)
 
+  const foco = useSeriesFocus(barSeries)
   const legend = (
-    <div style={{ display: 'flex', gap: t.space[4] }}>
-      {barSeries.map(s => (
-        <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: t.space[1] }}>
-          <div style={{ width: 10, height: 10, borderRadius: 3, background: s.color }} />
-          <span style={{ fontSize: t.font.size.xs, color: isGbMode ? t.color.neutral[400] : t.color.neutral[400], fontFamily: t.font.family.sans }}>{s.name}</span>
-        </div>
-      ))}
-    </div>
+    <>
+      <ChartLegend items={foco.series.map(s => ({ label: s.name, color: s.color }))} />
+      {foco.selector}
+    </>
   )
 
   return (
-    <ChartCard icon={BarChart2} title="Pluviometria (dias)" action={legend}>
+    <ChartCard title="Pluviometria (dias)" action={legend}>
       <GroupedBarChart
-        series={barSeries}
+        series={foco.series}
         labels={barLabels}
-        height={190}
+        height={t.size.chart.lg}
         yFormat={v => `${v}d`}
         showLegend={false}
       />
@@ -124,20 +127,14 @@ function VolumeAreaChart() {
 
   const lineColor = isGbMode ? t.color.brand[500] : t.color.brand[600]
 
-  const areaLegend = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
-      <TrendingUp size={14} color={lineColor} />
-      <div style={{ width: 24, height: 2.5, background: lineColor, borderRadius: 2 }} />
-      <span style={{ fontSize: t.font.size.xs, color: isGbMode ? t.color.neutral[400] : t.color.neutral[400], fontFamily: t.font.family.sans }}>Realizado</span>
-    </div>
-  )
+  const areaLegend = <ChartLegend marker="line" items={[{ label: 'Realizado', color: lineColor }]} />
 
   return (
-    <ChartCard icon={Activity} title="Volume Pluviométrico (mm)" action={areaLegend}>
+    <ChartCard title="Volume pluviométrico (mm)" action={areaLegend}>
       <LineChart
         series={lineSeries}
         labels={VOLUME_LABELS}
-        height={170}
+        height={t.size.chart.md}
         yFormat={v => `${v}mm`}
         area
         showLegend={false}
@@ -152,8 +149,8 @@ export default function Pluviometria() {
   const { colors, isGbMode } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
   const [selectedAreas, setSelectedAreas] = useState<string[]>(ALL_AREAS)
-  const [dateStart, setDateStart] = useState('01/06/2025')
-  const [dateEnd, setDateEnd] = useState('25/05/2026')
+  const [dateStart, setDateStart] = useUrlFilter('de', '01/06/2025')
+  const [dateEnd, setDateEnd] = useUrlFilter('ate', '25/05/2026')
   const [filterOpen, setFilterOpen] = useState(false)
 
   useEffect(() => {
@@ -174,11 +171,16 @@ export default function Pluviometria() {
     (dateEnd !== '25/05/2026' ? 1 : 0) +
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
-  const bc = colors.border.default as string
+  const showSkeleton = useDelayedLoading(isLoading)
 
-  // KPIs em linha única dentro do card do dashboard, separados por linhas
-  // finas (HDivider/VDivider) — mesmo padrão do Financeiro/Pecuária, em vez
-  // de cartões individuais com sombra própria (que duplicava a moldura).
+  if (isLoading) {
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} /> : null
+  }
+
+  // KPIs da fileira de topo — cada um vira um card com fill próprio; quem
+  // separa é o canvas do DashboardGrid.
   const kpis: {
     label: string
     value: string
@@ -187,62 +189,226 @@ export default function Pluviometria() {
     badge?: { label: string; variant: 'warning' | 'danger' }
   }[] = [
     { label: 'Acumulado (7 dias)', value: '19.2mm', trend: '+3.4mm vs mês ant.', up: true },
-    { label: 'Umidade do Solo', value: '17%', trend: '-5% vs mês ant.', up: false },
-    { label: 'Próxima Chuva (>15mm)', value: 'Sem prev.', badge: { label: 'Sem previsão', variant: 'warning' } },
-    { label: 'Alertas Ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
+    { label: 'Umidade do solo', value: '17%', trend: '-5% vs mês ant.', up: false },
+    { label: 'Próxima chuva (>15mm)', value: 'Sem prev.', badge: { label: 'Sem previsão', variant: 'warning' } },
+    { label: 'Alertas ativos', value: 'Déficit Hídrico', badge: { label: 'Atenção', variant: 'danger' } },
   ]
 
+  const analise: DashboardReadingInput = {
+    title: 'Pluviômetro',
+    scope: `chuva e umidade · ${dateStart} a ${dateEnd}`,
+    kpis: kpis.map((kpi) => ({ label: kpi.label, value: kpi.value, trend: kpi.trend, up: kpi.up })),
+    blocks: [
+      {
+        block: 'Pluviometria (dias)',
+        kind: 'timeline',
+        labels: BAR_DATA.map((d) => d.month),
+        series: [
+          { name: 'Dias com chuva', data: BAR_DATA.map((d) => d.comChuva) },
+          { name: 'Dias sem chuva', data: BAR_DATA.map((d) => d.semChuva) },
+        ],
+        unit: 'dias',
+      },
+      {
+        block: 'Volume pluviométrico (mm)',
+        kind: 'timeline',
+        labels: VOLUME_LABELS,
+        series: [{ name: 'Volume', data: VOLUME_DATA }],
+        unit: 'mm',
+      },
+    ],
+    notes: [
+      `Previsão da semana: ${FORECAST.filter((f) => f.rain > 0).length} de ${FORECAST.length} dias com chuva prevista.`,
+      `Áreas no recorte: ${selectedAreas.length} de ${ALL_AREAS.length}.`,
+    ],
+  }
+
   return (
-    <div style={{
-      margin: `${t.space[5]}px ${t.space[6]}px`,
-      background: colors.bg.surface,
-      borderRadius: t.radius['2xl'],
-      border: `1px solid ${colors.border.default}`,
-      boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-    }}>
-    <div
-      style={{
-        padding: t.space[4],
-        display: 'flex',
-        flexDirection: 'column',
-        gap: t.space[4],
-        minHeight: '100%',
-        boxSizing: 'border-box',
-        fontFamily: t.font.family.sans,
-      }}
-    >
-      {/* ── Header ──────────────────────────────────────────────────── */}
-      <PageHeader
-        title="Pluviômetro"
-        breadcrumb={
-          <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans }}>
-            Dashboards /{' '}
-            <span style={{ color: colors.accent.default }}>Pluviometria</span>
-          </span>
-        }
-        actions={
-          <>
-            {isGbMode && (
-              <span style={{
-                fontSize: t.font.size.xs,
-                color: colors.accent.default,
-                fontFamily: t.font.family.sans,
-                background: colors.accent.subtle,
-                border: `1px solid ${t.color.brand[500]}40`,
-                borderRadius: t.radius.full,
-                padding: `${t.space[1]}px ${t.space[3]}px`,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase' as const,
-              }}>
-                ● Open-Meteo Live
-              </span>
-            )}
-            <Button icon={<Filter size={14} />} size="md" onClick={() => setFilterOpen(true)}>
-              Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
-            </Button>
-          </>
-        }
-      />
+    <>
+      <DashboardGrid>
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <DashboardHeader
+          title="Pluviômetro"
+          subtitle="Chuva acumulada, umidade do solo e previsão da semana"
+          actions={
+            <>
+              {isGbMode && (
+                <span style={{
+                  fontSize: t.font.size.xs,
+                  color: colors.accent.default,
+                  fontFamily: t.font.family.sans,
+                  background: colors.accent.subtle,
+                  border: `1px solid ${t.color.brand[500]}40`,
+                  borderRadius: t.radius.full,
+                  padding: `${t.space[1]}px ${t.space[3]}px`,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase' as const,
+                }}>
+                  ● Open-Meteo Live
+                </span>
+              )}
+              <DashboardAnalysis input={analise} fonte="Open-Meteo · Prata (MG)" />
+              <Button icon={<Filter size={t.icon.xs} />} size="md" onClick={() => setFilterOpen(true)}>
+                Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
+              </Button>
+            </>
+          }
+        />
+
+        {/* ── Fileira 1 — KPIs ────────────────────────────────────────── */}
+        <DashboardRow>
+          {kpis.map((kpi) => (
+            <DashboardKpiCard
+              key={kpi.label}
+              label={kpi.label}
+              value={kpi.value}
+              trend={kpi.trend}
+              up={!!kpi.up}
+            >
+              {kpi.badge && <Badge label={kpi.badge.label} variant={kpi.badge.variant} />}
+            </DashboardKpiCard>
+          ))}
+        </DashboardRow>
+
+        {/* ── Fileira 2 — Pluviometria + Painel lateral ────────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[4], alignItems: 'stretch' }}>
+          {/* Bar chart */}
+          <PluvioBarChart />
+
+          {/* Right panel */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[4], height: '100%' }}>
+            {/* Janela de aplicação */}
+            <DashboardCard title="Janela de aplicação" tone="warning">
+              <div style={{ fontSize: t.font.size.xl, fontWeight: t.font.weight.bold, color: isGbMode ? t.color.amber[400] : t.color.amber[800], fontFamily: t.font.family.sans, marginBottom: t.space[2], lineHeight: t.font.lineHeight.tight }}>
+                Atenção
+              </div>
+              <div style={{ fontSize: t.font.size.sm, color: isGbMode ? `${t.color.amber[400]}a6` : t.color.amber[900], fontFamily: t.font.family.sans, lineHeight: t.font.lineHeight.relaxed, marginBottom: t.space[2] }}>
+                Vento em 2.4km/h e probabilidade de chuva de 4% para as próximas 8 horas.
+              </div>
+              <div style={{ fontSize: t.font.size.xs, color: t.color.feedback.notice, fontFamily: t.font.family.sans }}>
+                Fonte: Open-Meteo · Prata (MG)
+              </div>
+            </DashboardCard>
+
+            {/* Previsão da semana */}
+            <DashboardCard
+              title="Previsão da semana"
+              action={
+                <span style={{
+                  fontSize: t.font.size.xs,
+                  color: colors.accent.default,
+                  fontFamily: t.font.family.sans,
+                  background: colors.accent.subtle,
+                  borderRadius: t.radius.full,
+                  padding: `2px ${t.space[2]}px`,
+                  whiteSpace: 'nowrap',
+                }}>
+                  Open-Meteo
+                </span>
+              }
+            >
+              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[3] }}>
+                Prata (MG)
+              </div>
+
+              {/* 7-day strip */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+                {FORECAST.map((f, i) => {
+                  const hasRain   = f.rain > 0
+                  const rainColor = isGbMode ? t.color.blue[400] : t.color.blue[500]
+                  const sunColor  = isGbMode ? t.color.gb.accent : t.color.amber[600]
+                  const iconColor = hasRain ? rainColor : sunColor
+                  const isToday   = i === 0
+                  const DAY_ABBR  = ['Hoje', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+
+                  return (
+                    <div
+                      key={f.day}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 4,
+                        padding: `${t.space[2]}px 0`,
+                        borderRadius: t.radius.lg,
+                        background: isToday
+                          ? (isGbMode ? `${t.color.brand[500]}1a` : `${t.color.brand[600]}12`)
+                          : 'transparent',
+                      }}
+                    >
+                      {/* Day label */}
+                      <span style={{
+                        fontSize: t.font.size['2xs'],
+                        fontFamily: t.font.family.sans,
+                        fontWeight: isToday ? t.font.weight.semibold : t.font.weight.normal,
+                        color: isToday ? colors.accent.default : colors.fg.subtle,
+                        letterSpacing: '0.03em',
+                        lineHeight: 1,
+                      }}>
+                        {DAY_ABBR[i]}
+                      </span>
+
+                      {/* Weather icon */}
+                      <WeatherIcon condition={f.condition} size={17} color={iconColor} />
+
+                      {/* Max temp */}
+                      <span style={{
+                        fontSize: t.font.size.sm,
+                        fontFamily: t.font.family.sans,
+                        fontWeight: t.font.weight.semibold,
+                        color: isToday
+                          ? (isGbMode ? t.color.brand[400] : t.color.brand[600])
+                          : colors.fg.default,
+                        lineHeight: 1,
+                      }}>
+                        {f.max}°
+                      </span>
+
+                      {/* Min temp */}
+                      <span style={{
+                        fontSize: t.font.size['2xs'],
+                        fontFamily: t.font.family.sans,
+                        color: colors.fg.subtle,
+                        lineHeight: 1,
+                      }}>
+                        {f.min}°
+                      </span>
+
+                      {/* Rain indicator */}
+                      <div style={{
+                        height: 14,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                        {hasRain ? (
+                          <span style={{
+                            fontSize: t.font.size['3xs'],
+                            fontFamily: t.font.family.sans,
+                            fontWeight: t.font.weight.semibold,
+                            color: rainColor,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}>
+                            <Droplets size={8} />
+                            {f.rain}
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: t.font.size['3xs'], color: colors.border.subtle, fontFamily: t.font.family.sans }}>—</span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </DashboardCard>
+          </div>
+        </div>
+
+        {/* ── Fileira 3 — Volume pluviométrico ─────────────────────────── */}
+        <VolumeAreaChart />
+      </DashboardGrid>
 
       {/* ── Filter Drawer ────────────────────────────────────────────── */}
       <FilterDrawer
@@ -316,207 +482,6 @@ export default function Pluviometria() {
           </div>
         </div>
       </FilterDrawer>
-
-      {/* ── KPI row ─────────────────────────────────────────────────── */}
-      {isLoading ? (
-        <Skeleton height={96} />
-      ) : (
-        <>
-          <HDivider color={bc} />
-          <div style={{ display: 'flex' }}>
-            {kpis.flatMap((kpi, i) => [
-              i > 0 ? <VDivider key={`d${i}`} color={bc} /> : null,
-              <div key={kpi.label} style={{ flex: 1, padding: `0 ${t.space[5]}px ${t.space[1]}px` }}>
-                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[1] }}>
-                  {kpi.label}
-                </div>
-                <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1.1, marginBottom: t.space[2] }}>
-                  {kpi.value}
-                </div>
-                {kpi.trend ? (
-                  <Trend value={kpi.trend} up={!!kpi.up} />
-                ) : kpi.badge ? (
-                  <Badge label={kpi.badge.label} variant={kpi.badge.variant} />
-                ) : null}
-              </div>,
-            ])}
-          </div>
-          <HDivider color={bc} />
-        </>
-      )}
-
-      {/* ── Bar chart + Right panel ──────────────────────────────────── */}
-      {isLoading ? (
-        <Skeleton height={300} />
-      ) : (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 296px', gap: t.space[3], alignItems: 'stretch' }}>
-        {/* Bar chart */}
-        <PluvioBarChart />
-
-        {/* Right panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: t.space[3], height: '100%' }}>
-          {/* Alert */}
-          <div
-            style={{
-              background: isGbMode ? t.color.gb.surface : t.color.feedback.warning.bg,
-              backdropFilter: isGbMode ? 'blur(20px)' : undefined,
-              WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
-              borderRadius: t.radius['2xl'],
-              border: `1px solid ${colors.border.default}`,
-              boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-              padding: t.space[4],
-              boxSizing: 'border-box',
-            }}
-          >
-            <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: t.color.feedback.notice, fontFamily: t.font.family.sans, letterSpacing: '0.06em', textTransform: 'uppercase' as const, marginBottom: t.space[2] }}>
-              Janela de Aplicação
-            </div>
-            <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: isGbMode ? t.color.amber[400] : t.color.amber[800], fontFamily: t.font.family.sans, marginBottom: t.space[2], textShadow: isGbMode ? `0 0 20px ${t.color.amber[400]}66` : undefined }}>
-              Atenção
-            </div>
-            <div style={{ fontSize: t.font.size.sm, color: isGbMode ? `${t.color.amber[400]}a6` : t.color.amber[900], fontFamily: t.font.family.sans, lineHeight: 1.65, marginBottom: t.space[2] }}>
-              Vento em 2.4km/h e probabilidade de chuva de 4% para as próximas 8 horas.
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: t.color.feedback.notice, fontFamily: t.font.family.sans, opacity: 0.65 }}>
-              Fonte: Open-Meteo · Prata (MG)
-            </div>
-          </div>
-
-          {/* Forecast */}
-          <div style={{
-            background: isGbMode ? t.color.gb.surface : colors.bg.surface,
-            backdropFilter: isGbMode ? 'blur(20px)' : undefined,
-            WebkitBackdropFilter: isGbMode ? 'blur(20px)' : undefined,
-            borderRadius: t.radius['2xl'],
-            border: `1px solid ${colors.border.default}`,
-            boxShadow: isGbMode ? t.shadow.cardDark : t.shadow.card,
-            padding: `${t.space[4]}px ${t.space[3]}px`,
-            flex: 1,
-            boxSizing: 'border-box' as const,
-          }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1], paddingInline: t.space[1] }}>
-              <span style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.semibold, color: colors.fg.default, fontFamily: t.font.family.sans }}>
-                Previsão da Semana
-              </span>
-              <span style={{
-                fontSize: t.font.size.xs,
-                color: colors.accent.default,
-                fontFamily: t.font.family.sans,
-                background: colors.accent.subtle,
-                borderRadius: t.radius.full,
-                padding: `2px ${t.space[2]}px`,
-              }}>
-                Open-Meteo
-              </span>
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, fontFamily: t.font.family.sans, marginBottom: t.space[3], paddingInline: t.space[1] }}>
-              Prata (MG)
-            </div>
-
-            {/* 7-day strip */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
-              {FORECAST.map((f, i) => {
-                const hasRain   = f.rain > 0
-                const rainColor = isGbMode ? t.color.blue[400] : t.color.blue[500]
-                const sunColor  = isGbMode ? t.color.gb.accent : t.color.amber[600]
-                const iconColor = hasRain ? rainColor : sunColor
-                const isToday   = i === 0
-                const DAY_ABBR  = ['Hoje', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
-
-                return (
-                  <div
-                    key={f.day}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 4,
-                      padding: `${t.space[2]}px 0`,
-                      borderRadius: t.radius.lg,
-                      background: isToday
-                        ? (isGbMode ? `${t.color.brand[500]}1a` : `${t.color.brand[600]}12`)
-                        : 'transparent',
-                    }}
-                  >
-                    {/* Day label */}
-                    <span style={{
-                      fontSize: t.font.size['2xs'],
-                      fontFamily: t.font.family.sans,
-                      fontWeight: isToday ? t.font.weight.semibold : t.font.weight.normal,
-                      color: isToday ? colors.accent.default : colors.fg.subtle,
-                      letterSpacing: '0.03em',
-                      lineHeight: 1,
-                    }}>
-                      {DAY_ABBR[i]}
-                    </span>
-
-                    {/* Weather icon */}
-                    <WeatherIcon condition={f.condition} size={17} color={iconColor} />
-
-                    {/* Max temp */}
-                    <span style={{
-                      fontSize: t.font.size.sm,
-                      fontFamily: t.font.family.sans,
-                      fontWeight: t.font.weight.semibold,
-                      color: isToday
-                        ? (isGbMode ? t.color.brand[400] : t.color.brand[600])
-                        : colors.fg.default,
-                      lineHeight: 1,
-                    }}>
-                      {f.max}°
-                    </span>
-
-                    {/* Min temp */}
-                    <span style={{
-                      fontSize: t.font.size['2xs'],
-                      fontFamily: t.font.family.sans,
-                      color: colors.fg.subtle,
-                      lineHeight: 1,
-                    }}>
-                      {f.min}°
-                    </span>
-
-                    {/* Rain indicator */}
-                    <div style={{
-                      height: 14,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {hasRain ? (
-                        <span style={{
-                          fontSize: t.font.size['3xs'],
-                          fontFamily: t.font.family.sans,
-                          fontWeight: t.font.weight.semibold,
-                          color: rainColor,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 1,
-                        }}>
-                          <Droplets size={8} />
-                          {f.rain}
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: t.font.size['3xs'], color: colors.border.subtle, fontFamily: t.font.family.sans }}>—</span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-      )}
-
-      {/* ── Volume area chart ────────────────────────────────────────── */}
-      {isLoading ? (
-        <Skeleton height={220} />
-      ) : (
-        <VolumeAreaChart />
-      )}
-    </div>
-    </div>
+    </>
   )
 }

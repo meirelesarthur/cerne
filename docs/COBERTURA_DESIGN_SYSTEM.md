@@ -1,7 +1,7 @@
 # Cobertura do Design System — matriz componente → tela-referência
 
 Este documento é a **fonte de dados única** de cobertura do design system GB CERNE: quais dos
-85 componentes de `src/components/ui/` já têm uma tela-referência viva, e qual o veredito de
+94 componentes de `src/components/ui/` já têm uma tela-referência viva, e qual o veredito de
 riqueza de cada um dos 11 padrões-âncora do discovery agro365→GB.Cerne (Dashboards e Relatórios
 ficam fora — tratados um a um, separadamente).
 
@@ -19,11 +19,14 @@ dev-only; ver seção "Visibilidade do painel" abaixo.
 
 | Métrica | Valor |
 |---|---:|
-| Componentes de `ui/` com tela-referência viva | **85 / 85** |
+| Componentes de `ui/` com tela-referência viva | **92 / 94** |
 | Padrões primários (fora dashboard/relatório) com referência Rica | **10 / 10** |
 | Sub-componentes de CRUD com referência Rica | 5 / 5 |
 | Lacunas de conteúdo (RBAC visível) | 0 (fechada) |
 | Telas catalogadas na Vitrine por tela | 22 |
+
+Fora do catálogo por enquanto: `EditableFieldTable` e `PermissionMatrixField` — ainda sem
+linha em `designSystemCoverage.ts`.
 
 ## Vitrine por tela — taxonomia para handoff
 
@@ -155,6 +158,13 @@ Confirmado em `LINKS_NOVAS_FUNCIONALIDADES.md` — a simplicidade é intencional
   (`BarChart`, `LineChart`, `DonutChart`, `StackedBarChart`, `GroupedBarChart`, `GaugeChart`,
   `HeatmapChart`, `SparklineArea`, `SankeyFunnel`, `ChartCard`, `KpiStatCard`, `Trend`) já 100%
   demonstrada; endereçados um a um, separadamente.
+  A **casca** das 14 telas é única: `DashboardGrid` (canvas) + `DashboardHeader` +
+  `DashboardRow`/`DashboardStack` + `DashboardCard`/`DashboardKpiCard` + `DashboardSkeleton` —
+  cada bloco é um card com fill próprio e o canvas é o que forma os separadores (o card único
+  com `HDivider`/`VDivider` internos foi retirado dos dashboards).
+  A legenda de série saiu das telas para o kit: `ChartLegend` (HTML, no `action` do card) e
+  `ChartSvgLegend` (dentro do SVG). Eixo, padding e afinamento de rótulo vivem em
+  `src/utils/chartAxis.ts` — medindo o texto, não estimando.
 - **Relatórios (92 telas no discovery)** — `ReportWorkspace` é a âncora; endereçados um a um.
 
 ## Histórico de fechamento (Fases do backlog de cobertura)

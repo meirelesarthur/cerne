@@ -60,18 +60,24 @@ const mockConsumoSeries = [
 ]
 
 // Gráfico 3 — Cobertura de estoque por produto (dias restantes), ordenado desc
-// Itens com cobertura ≤ 14 dias recebem cor crítica
-const CRITICO_THRESHOLD = 14
+// minDias reflete products.min_stock — mínimo de cobertura varia por tipo de produto
+// (minerais/premix têm lead time de reposição maior; itens de giro rápido toleram menos)
+// Itens com cobertura ≤ minDias recebem cor crítica
 const mockCoberturaProdutos = [
-  { label: 'Milho Moído',       value: 62, color: t.chart.series[0] },
-  { label: 'Farelo de Soja',    value: 48, color: t.chart.series[1] },
-  { label: 'Núcleo Mineral',    value: 35, color: t.chart.series[2] },
-  { label: 'Uréia Pecuária',    value: 27, color: t.chart.series[3] },
-  { label: 'Sal Mineral',       value: 21, color: t.chart.series[4] },
-  { label: 'Premix Vitamínico', value: 12, color: t.color.feedback.error.solid },
-  { label: 'Calcário',          value: 9,  color: t.color.feedback.error.solid },
-  { label: 'Bicarbonato',       value: 7,  color: t.color.feedback.error.solid },
-].sort((a, b) => b.value - a.value)
+  { label: 'Milho Moído',       value: 62, minDias: 15 },
+  { label: 'Farelo de Soja',    value: 48, minDias: 15 },
+  { label: 'Núcleo Mineral',    value: 35, minDias: 20 },
+  { label: 'Uréia Pecuária',    value: 27, minDias: 12 },
+  { label: 'Sal Mineral',       value: 21, minDias: 20 },
+  { label: 'Premix Vitamínico', value: 12, minDias: 25 },
+  { label: 'Calcário',          value: 9,  minDias: 10 },
+  { label: 'Bicarbonato',       value: 7,  minDias: 10 },
+]
+  .sort((a, b) => b.value - a.value)
+  .map((item, i) => ({
+    ...item,
+    color: item.value <= item.minDias ? t.color.feedback.error.solid : t.chart.series[i % t.chart.series.length],
+  }))
 
 // ─── KPI derivados ────────────────────────────────────────────────────────────
 
@@ -84,7 +90,7 @@ const itensEmEstoque = mockCoberturaProdutos.length
 const consumoMedioDiario = Math.round(
   mockConsumoSeries.reduce((acc, s) => acc + s.data[s.data.length - 1], 0) / 7,
 )
-const itensCriticos = mockCoberturaProdutos.filter(d => d.value <= CRITICO_THRESHOLD).length
+const itensCriticos = mockCoberturaProdutos.filter(d => d.value <= d.minDias).length
 
 
 // ─── DashEstoqueNutricao ──────────────────────────────────────────────────────
@@ -182,7 +188,7 @@ export default function DashEstoqueNutricao() {
       },
     ],
     notes: [
-      `Limite crítico de cobertura: ${CRITICO_THRESHOLD} dias.`,
+      'Limite crítico de cobertura varia por produto (10 a 25 dias, conforme min_stock).',
       `Itens abaixo do limite no recorte: ${itensCriticos}.`,
     ],
   }
@@ -293,7 +299,7 @@ export default function DashEstoqueNutricao() {
             fontFamily: t.font.family.sans, whiteSpace: 'nowrap',
           }}>
             <Icon name="warning" size={t.font.size.xs} />
-            crítico abaixo de {CRITICO_THRESHOLD} dias
+            crítico abaixo do mínimo do produto
           </span>
         }
       >

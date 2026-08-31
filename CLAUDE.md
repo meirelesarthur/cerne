@@ -67,6 +67,12 @@ contexto — listagem, formulário, modal, dashboard — sem exceção.
 **Proibido usar diretamente em páginas:** `<button>`, `<input>`, `<select>`, `<table>`,
 `<thead>`, `<tr>`, `<td>`, `<h1>`–`<h6>`.
 
+**Ícone é componente, não import.** Todo ícone vem de `<Icon name="…">`; a família
+(HugeIcons) só é importada em `src/design/icons.ts`. Importar biblioteca de ícone em
+qualquer outro arquivo quebra o `npm run build` (guarda em
+`scripts/check-icon-imports.ts`). Papel novo → adicione no registry com nome do que ele
+**significa** (`delete`, `harvest`), nunca do desenho (`Delete02Icon`).
+
 - Ao criar uma tela nova: apenas **importar e chamar** componentes existentes.
 - Componente necessário não existe no catálogo → criá-lo em `src/components/ui/`
   **antes** de usá-lo na tela.
@@ -175,6 +181,8 @@ corrigidos (não repetir):
 | Avatar `<div>` com iniciais + gradiente | `Avatar` |
 | Breadcrumb `<nav>` inline | `Breadcrumb` |
 | Tooltip inline com `position: fixed` | `Tooltip` |
+| `import { Pencil } from` qualquer lib de ícone | `<Icon name="edit">` + papel em `design/icons.ts` |
+| `strokeWidth` em ícone | nada — a espessura é `t.stroke.icon` (1.5), aplicada pelo `Icon` |
 | Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
 | KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
 | Estado de foco de série montado na tela (useState + select no `action`) | `FocusableChartCard` |
@@ -460,4 +468,5 @@ produção:
 - [ ] Fonte Outfit em toda tipografia (Lei 3)
 - [ ] `tokens.ts` mudou → `npm run tokens:export` rodado e `tokens.json` commitado
       (Lei 5)
+- [ ] Nenhum import direto de biblioteca de ícone (`npm run check:icons` passa)
 - [ ] Commit criado com mensagem Conventional Commits (Lei 4)

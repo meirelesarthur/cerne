@@ -307,7 +307,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
       <div
         ref={containerRef}
         style={{
-          height: 460,
+          height: t.size.mapMinHeight,
           borderRadius: t.radius.xl,
           border: `1px solid ${colors.border.default}`,
           overflow: 'hidden',

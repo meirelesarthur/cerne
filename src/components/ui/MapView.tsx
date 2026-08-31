@@ -29,7 +29,7 @@ function toNum(v: number | string | undefined): number | null {
  * Renderiza o polígono do perímetro quando há `geoJSON`; caso contrário,
  * posiciona um marcador na coordenada informada.
  */
-export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
+export function MapView({ geoJSON, lat, lng, height = t.size.mapMinHeight }: MapViewProps) {
   const { colors } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)

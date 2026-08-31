@@ -15,6 +15,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
 import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -151,8 +152,12 @@ export default function DashFinanceiro() {
     return () => clearTimeout(timer)
   }, [])
 
+  const showSkeleton = useDelayedLoading(isLoading)
+
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} />
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.md]} /> : null
   }
 
   const kpis = [

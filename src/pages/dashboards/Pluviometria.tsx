@@ -20,6 +20,7 @@ import {
 } from '../../components/ui/DashboardGrid'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
 import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -161,8 +162,12 @@ export default function Pluviometria() {
     (dateEnd !== '25/05/2026' ? 1 : 0) +
     (selectedAreas.length < ALL_AREAS.length ? 1 : 0)
 
+  const showSkeleton = useDelayedLoading(isLoading)
+
   if (isLoading) {
-    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} />
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.lg, t.size.chart.md]} /> : null
   }
 
   // KPIs da fileira de topo — cada um vira um card com fill próprio; quem

@@ -13,6 +13,7 @@ import {
   DashboardKpiCard,
   DashboardSkeleton,
 } from '../../components/ui/DashboardGrid'
+import { useDelayedLoading } from '../../hooks/useDelayedLoading'
 import { useUrlFilter } from '../../hooks/useUrlFilter'
 
 // ─── Area Chart — Acessos Diários ─────────────────────────────────────────────
@@ -130,8 +131,12 @@ export default function DashUsuarios() {
     return () => clearTimeout(id)
   }, [])
 
+  const showSkeleton = useDelayedLoading(loading)
+
   if (loading) {
-    return <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.sm]} />
+    // Anti-flash: espera curta não pisca a casca; anti-flicker: uma vez
+    // visível, ela fica o mínimo de `t.delay.loadingMin`.
+    return showSkeleton ? <DashboardSkeleton kpis={4} blocks={[t.size.chart.md, t.size.chart.sm]} /> : null
   }
 
   return (

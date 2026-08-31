@@ -419,6 +419,20 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `DashboardKpiCard` | KPI como card: rótulo, valor, `Trend`, sparkline opcional |
 | `DashboardSkeleton` | Loading do dashboard reproduzindo a própria grade |
 
+### Hooks do kit
+
+Antes de escrever lógica de tela, veja se já existe (Regra F, degrau 2):
+
+| Hook | Uso |
+|---|---|
+| `useTheme` | Cores do tema ativo + `isGbMode` (`src/context/ThemeContext`) |
+| `useUrlFilter` | Filtro de tela espelhado na query string (deep-link) |
+| `useDelayedLoading` | Guardas de loading: anti-flash (`t.delay.loadingShow`) e anti-flicker (`t.delay.loadingMin`) |
+| `useChartScale` | Largura real medida do wrapper do gráfico — base do `viewBox` 1:1 |
+| `usePrefersReducedMotion` | Anula transição/animação inline quando o SO pede menos movimento |
+| `useMediaQuery` | Media query real onde `@media` não alcança (estilo inline). Em dashboard, prefira largura mínima de card + quebra de fileira |
+| `useFocusTrap` | Prende o foco em modal/drawer aberto |
+
 ### Navegação & Progresso
 
 | Componente | Uso |
@@ -527,9 +541,11 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 > global do app — todo texto de gráfico renderizava 16px em vez do token. Em `<text>`/
 > `<tspan>` o tamanho e o peso vão sempre em `style={{ … }}`.
 >
-> **Escala:** o `viewBox` dos gráficos é casado à largura real medida (`useChartScale().width`),
-> então 1 unidade = 1px: `height` é a altura renderizada de fato e cada fonte sai no px do
-> token. Eixo, padding e afinamento de rótulo saem de `src/utils/chartAxis.ts`
+> **Escala:** o `viewBox` de TODO gráfico do kit é casado à largura real medida
+> (`useChartScale().width`), então 1 unidade = 1px: `height` é a altura renderizada de fato
+> e cada fonte sai no px do token. Com `viewBox` fixo o mesmo valor rendia alturas
+> diferentes conforme a largura do card — medido antes da correção: sparkline de 40px
+> renderizando 22px, funil de 160 em 101, e gauge de 160 em 310. Eixo, padding e afinamento de rótulo saem de `src/utils/chartAxis.ts`
 > (`niceAxisMax`/`niceAxisTicks`/`axisLabelPad`/`axisLabelStep`/`truncateAxisLabel`), que
 > mede o texto de verdade em canvas em vez de estimar por caractere.
 
@@ -744,7 +760,7 @@ Todo componente e toda tela deve ter **todos os estados desenhados** antes de ir
 
 | Estado | Implementação |
 |---|---|
-| Loading | `Skeleton` (listas/cards) ou prop `loading` do `Button` |
+| Loading | `Skeleton` (listas/cards) ou prop `loading` do `Button`, atrás de `useDelayedLoading` |
 | Vazio | `EmptyState` com mensagem + ação de recuperação |
 | Erro | Mensagem orientada à solução + ação de retry |
 | Sucesso | `Toast` ou `Badge` success |

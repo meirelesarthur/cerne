@@ -245,6 +245,8 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
   Não usar media query de viewport — a área de conteúdo é ~500px mais estreita que
   a janela.
 - **Filtro na URL:** `useUrlFilter('periodo', '12')` em vez de `useState`.
+- **Loading atrás de guarda:** `useDelayedLoading(isLoading)` decide quando a casca
+  aparece — `isLoading ? (showSkeleton ? <DashboardSkeleton/> : null) : conteúdo`.
 - **Cor de série:** categoria distinta → `t.chart.series` em ordem (sem o vermelho
   `series[4]` para categoria não-negativa); nível do mesmo indicador → tons da mesma
   matiz; status/sinal → feedback; sobra ("Outros") → neutro.

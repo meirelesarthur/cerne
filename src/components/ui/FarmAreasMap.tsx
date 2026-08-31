@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
+import { ensureLeafletControlTheme } from './leafletControlTheme'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -303,6 +304,7 @@ export function FarmAreasMap({
     const container = containerRef.current
     if (!container || mapRef.current) return
     ensureStyles()
+    ensureLeafletControlTheme()
     const map = L.map(container, { zoomControl: false, attributionControl: false })
       .setView(center ?? [-15.78, -47.93], center ? zoom : 4)
     L.tileLayer(

@@ -8,6 +8,7 @@ import { StepHeader } from '../../../../components/ui/StepHeader'
 import { Button } from '../../../../components/ui/Button'
 import { t } from '../../../../design/tokens'
 import { useTheme } from '../../../../context/ThemeContext'
+import { ensureLeafletControlTheme } from '../../../../components/ui/leafletControlTheme'
 import type { FazendaFormData } from '../fazendas.types'
 
 interface Step3MapaProps {
@@ -110,6 +111,7 @@ export function Step3Mapa({ data, onChange }: Step3MapaProps) {
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
+    ensureLeafletControlTheme()
 
     // Fix Leaflet default icon paths broken by Vite bundling
     delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl

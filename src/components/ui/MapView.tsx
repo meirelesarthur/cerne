@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { ensureLeafletControlTheme } from './leafletControlTheme'
 
 interface MapViewProps {
   /** Perímetro em GeoJSON (FeatureCollection) serializado — fonte primária. */
@@ -36,6 +37,7 @@ export function MapView({ geoJSON, lat, lng, height = 320 }: MapViewProps) {
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
+    ensureLeafletControlTheme()
 
     // Corrige os ícones default do Leaflet quebrados pelo bundling do Vite
     delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl

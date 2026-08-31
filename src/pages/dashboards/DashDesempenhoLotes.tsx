@@ -12,6 +12,7 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { EmptyState } from '../../components/ui/EmptyState'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import {
@@ -136,7 +137,7 @@ export default function DashDesempenhoLotes() {
   const kpis = [
     {
       label: 'Média GMD',
-      value: `${gmdMedio.toFixed(2)} kg/dia`,
+      value: `${gmdMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia`,
       trend: '0,08 kg/dia vs mês ant.',
       up: true,
       valueColor: colors.fg.default as string,
@@ -210,6 +211,22 @@ export default function DashDesempenhoLotes() {
         }
       />
 
+      {/* Filtro sem resultado não vira tela morta: um caminho de volta no lugar
+          de KPIs zerados, gráficos "Sem dados" e tabela só com cabeçalho. */}
+      {lotesFiltrados.length === 0 ? (
+        <DashboardCard>
+          <EmptyState
+            variant="search"
+            message="Nenhum lote nesse recorte"
+            description="A combinação de curral e lote selecionada não tem pesagem no período."
+            action={{
+              label: 'Limpar filtros',
+              onClick: () => { setCurral('todos'); setLote('todos') },
+            }}
+          />
+        </DashboardCard>
+      ) : (
+        <>
       {/* Fileira 1 — KPIs */}
       <DashboardRow>
         {kpis.map((kpi) => (
@@ -250,7 +267,7 @@ export default function DashDesempenhoLotes() {
             labels={gmdLabels}
             height={t.size.chart.lg}
             showLegend
-            yFormat={(v) => `${v.toFixed(2)} kg/dia`}
+            yFormat={(v) => `${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia`}
           />
         </DashboardCard>
       </DashboardRow>
@@ -324,13 +341,15 @@ export default function DashDesempenhoLotes() {
                     : (t.color.feedback.error.text as string),
                   textAlign: 'right',
                 }}>
-                  {lote.gmd.toFixed(2)} kg/dia
+                  {lote.gmd.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/dia
                 </span>
               </div>
             )
           })}
         </div>
       </DashboardCard>
+        </>
+      )}
     </DashboardGrid>
   )
 }

@@ -167,7 +167,7 @@ export default function DashDepreciacoes() {
             centerValue="R$ 8,4M"
             centerLabel="total"
             showLegend
-            valueFormat={(v) => `R$ ${(v / 1_000_000).toFixed(1)}M`}
+            valueFormat={(v) => `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
           />
         </DashboardCard>
         <DashboardCard
@@ -186,7 +186,7 @@ export default function DashDepreciacoes() {
             series={PROJ_SERIES_FULL}
             labels={PROJ_LABELS}
             height={t.size.chart.md}
-            yFormat={(v) => `${(v / 1_000_000).toFixed(1)}M`}
+            yFormat={(v) => `${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
             area
             showLegend={false}
           />

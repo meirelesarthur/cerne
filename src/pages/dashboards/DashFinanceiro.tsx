@@ -171,7 +171,7 @@ export default function DashFinanceiro() {
   ]
 
   const yFormat = (v: number) =>
-    v >= 1000000 ? `R$ ${(v / 1000000).toFixed(1)}M` : `R$ ${(v / 1000).toFixed(0)}K`
+    v >= 1000000 ? `R$ ${(v / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M` : `R$ ${(v / 1000).toFixed(0)}K`
 
   const donutSlices = donutData.map(d => ({ label: d.label, value: d.pct, color: d.color }))
 

@@ -128,7 +128,7 @@ export default function DashConsumoRacao() {
     },
     {
       label: 'Consumo médio',
-      value: `${consumoMedio.toFixed(1)} kg/an./dia`,
+      value: `${consumoMedio.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg/an./dia`,
       trend: '0,5 kg vs sem. ant.',
       up: true,
       valueColor: colors.fg.default as string,
@@ -214,7 +214,7 @@ export default function DashConsumoRacao() {
           height={t.size.chart.md}
           area
           showLegend
-          yFormat={(v) => `${v.toFixed(1)} kg`}
+          yFormat={(v) => `${v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg`}
         />
       </DashboardCard>
 

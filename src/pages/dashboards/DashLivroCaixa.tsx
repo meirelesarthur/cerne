@@ -57,7 +57,7 @@ const fluxoSeries = [
 
 const fluxoYFormat = (v: number) =>
   v >= 1_000_000
-    ? `R$ ${(v / 1_000_000).toFixed(1)}M`
+    ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`
     : `R$ ${(v / 1_000).toFixed(0)}K`
 
 // ─── Tabela de Movimentações ──────────────────────────────────────────────────

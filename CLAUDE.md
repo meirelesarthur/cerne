@@ -177,6 +177,7 @@ corrigidos (não repetir):
 | Tooltip inline com `position: fixed` | `Tooltip` |
 | Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
 | KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
+| Estado de foco de série montado na tela (useState + select no `action`) | `FocusableChartCard` |
 | `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
 
 Primitiva não existe → criar em `src/components/ui/` com story, tokens e suporte aos dois
@@ -260,6 +261,10 @@ isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 - **KPI sem `valueSize`**: o degrau sai do comprimento do valor.
 - **Legenda de série** via `ChartLegend`/legenda interna do gráfico — nunca ponto+rótulo
   montado na tela. Não repetir na tela um número que a fileira de KPIs já mostra.
+- **Bloco de várias séries** usa `FocusableChartCard`: seletor no canto direito do rótulo
+  isola uma série, que ocupa o gráfico com o eixo reescalado. Não em composição de item
+  único (barra por categoria, donut) nem em bloco cujo sentido É a comparação de duas
+  séries (atual vs meta) — nesses, o recorte é o filtro da tela.
 - Em `<text>`/`<tspan>` de SVG, tamanho e peso de fonte vão em `style` — o atributo de
   apresentação perde para o CSS global.
 - Referências: `OverviewPanel.tsx`, `DashAtivos.tsx`, `Pluviometria.tsx`.

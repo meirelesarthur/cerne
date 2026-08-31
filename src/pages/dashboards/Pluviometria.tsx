@@ -22,6 +22,7 @@ import {
 } from '../../components/ui/DashboardGrid'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { useSeriesFocus } from '../../hooks/useSeriesFocus'
 import { useDelayedLoading } from '../../hooks/useDelayedLoading'
 import { useUrlFilter } from '../../hooks/useUrlFilter'
 
@@ -90,12 +91,18 @@ function PluvioBarChart() {
   ]
   const barLabels = BAR_DATA.map(d => d.month)
 
-  const legend = <ChartLegend items={barSeries.map(s => ({ label: s.name, color: s.color }))} />
+  const foco = useSeriesFocus(barSeries)
+  const legend = (
+    <>
+      <ChartLegend items={foco.series.map(s => ({ label: s.name, color: s.color }))} />
+      {foco.selector}
+    </>
+  )
 
   return (
     <ChartCard title="Pluviometria (dias)" action={legend}>
       <GroupedBarChart
-        series={barSeries}
+        series={foco.series}
         labels={barLabels}
         height={t.size.chart.lg}
         yFormat={v => `${v}d`}

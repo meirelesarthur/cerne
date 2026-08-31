@@ -207,6 +207,15 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
   (`DashboardKpiCard`), para "R$ 8,4M" e "Déficit Hídrico" conviverem na mesma fileira.
 - **Legenda de série** é `ChartLegend` (no `action` do card) ou a legenda interna do
   próprio gráfico — nunca ponto + rótulo montados na tela.
+- **Bloco de várias séries é `FocusableChartCard`:** o seletor no canto direito do
+  rótulo isola uma série, que passa a ocupar o gráfico com o eixo reescalado nela —
+  comparar é uma leitura, olhar uma série de perto é outra. O estado mora no card, não
+  na tela (e não vai para a URL: é leitura, não recorte de dado). Não use em
+  **composição de item único** (barra por categoria, donut): ali o valor do gráfico é
+  justamente a comparação entre as partes, e isolar um item deixaria uma barra sozinha —
+  esse recorte é papel do filtro da tela, que reflete em todos os blocos. Também não use
+  quando o próprio bloco É a comparação de duas séries ("GMD: atual vs meta") — sem a
+  outra, a série não diz nada.
 - **Sem número repetido**: se o valor já está na fileira de KPIs, não repetir como herói
   dentro do card do gráfico.
 - Referências: `OverviewPanel.tsx` (grade completa, 2 colunas), `DashAtivos.tsx` (grade
@@ -423,6 +432,7 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `DashboardKpiCard` | KPI como card: rótulo, valor, `Trend`, sparkline opcional |
 | `DashboardSkeleton` | Loading do dashboard reproduzindo a própria grade |
 | `DashboardFilters` | Botão "Filtros" do cabeçalho + `FilterDrawer` lateral com os campos |
+| `FocusableChartCard` | Bloco de gráfico com seletor de foco de série no canto do rótulo |
 
 ### Hooks do kit
 
@@ -437,6 +447,7 @@ Antes de escrever lógica de tela, veja se já existe (Regra F, degrau 2):
 | `usePrefersReducedMotion` | Anula transição/animação inline quando o SO pede menos movimento |
 | `useMediaQuery` | Media query real onde `@media` não alcança (estilo inline). Em dashboard, prefira largura mínima de card + quebra de fileira |
 | `useFocusTrap` | Prende o foco em modal/drawer aberto |
+| `useSeriesFocus` | Foco de uma série dentro do card do gráfico — devolve as séries visíveis e o seletor (use `FocusableChartCard`, que já o encapsula) |
 
 ### Navegação & Progresso
 

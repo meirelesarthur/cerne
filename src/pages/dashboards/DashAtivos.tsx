@@ -5,6 +5,7 @@ import { usePrefersReducedMotion } from '../../components/ui/usePrefersReducedMo
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -244,28 +245,32 @@ export default function DashAtivos() {
 
       {/* Fileira 2 — Categorias + Status */}
       <DashboardRow>
-        <DashboardCard title="Ativos por categoria" flex={3}>
-          <GroupedBarChart
-            series={CATEGORIAS_SERIES}
-            labels={CATEGORIAS_LABELS}
-            height={t.size.chart.lg}
-            showLegend
-          />
-        </DashboardCard>
+        <FocusableChartCard title="Ativos por categoria" flex={3} series={CATEGORIAS_SERIES}>
+          {(series) => (
+            <GroupedBarChart
+              series={series}
+              labels={CATEGORIAS_LABELS}
+              height={t.size.chart.lg}
+              showLegend
+            />
+          )}
+        </FocusableChartCard>
         <DashboardCard title="Status dos ativos" flex={2}>
           <StatusCards />
         </DashboardCard>
       </DashboardRow>
 
       {/* Fileira 3 — Manutenções */}
-      <DashboardCard title="Manutenções por mês">
-        <GroupedBarChart
-          series={manutSeries}
-          labels={manutLabels}
-          height={t.size.chart.md}
-          showLegend
-        />
-      </DashboardCard>
+      <FocusableChartCard title="Manutenções por mês" series={manutSeries}>
+        {(series) => (
+          <GroupedBarChart
+            series={series}
+            labels={manutLabels}
+            height={t.size.chart.md}
+            showLegend
+          />
+        )}
+      </FocusableChartCard>
     </DashboardGrid>
   )
 }

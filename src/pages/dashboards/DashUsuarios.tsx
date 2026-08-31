@@ -6,6 +6,7 @@ import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -228,15 +229,17 @@ export default function DashUsuarios() {
       </DashboardRow>
 
       {/* Fileira 3 — Picos por hora */}
-      <DashboardCard title="Picos de acesso por hora">
-        <StackedBarChart
-          series={HOURLY_SERIES}
-          labels={HOURLY_LABELS}
-          height={t.size.chart.sm}
-          showLegend
-          yFormat={(v) => String(Math.round(v))}
-        />
-      </DashboardCard>
+      <FocusableChartCard title="Picos de acesso por hora" series={HOURLY_SERIES}>
+        {(series) => (
+          <StackedBarChart
+            series={series}
+            labels={HOURLY_LABELS}
+            height={t.size.chart.sm}
+            showLegend
+            yFormat={(v) => String(Math.round(v))}
+          />
+        )}
+      </FocusableChartCard>
     </DashboardGrid>
   )
 }

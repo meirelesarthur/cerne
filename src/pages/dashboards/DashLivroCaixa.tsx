@@ -6,6 +6,7 @@ import { LineChart } from '../../components/ui/LineChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -281,28 +282,31 @@ export default function DashLivroCaixa() {
       </DashboardRow>
 
       {/* Fileira 2 — Fluxo de caixa */}
-      <DashboardCard
+      <FocusableChartCard
         title="Fluxo de caixa realizado"
-        action={
+        series={fluxoSeriesFiltrado}
+        action={(series) => (
           <ChartLegend
             marker="line"
-            items={[
-              { label: 'Entradas', color: t.color.brand[600] },
-              { label: 'Saídas',   color: t.color.feedback.error.solid },
-              { label: 'Saldo',    color: t.color.neutral[500], dashed: true },
-            ]}
+            items={series.map((serie) => ({
+              label: serie.name,
+              color: serie.color,
+              dashed: serie.name === 'Saldo',
+            }))}
           />
-        }
+        )}
       >
-        <LineChart
-          series={fluxoSeriesFiltrado}
-          labels={labels}
-          height={t.size.chart.md}
-          yFormat={fluxoYFormat}
-          area
-          showLegend={false}
-        />
-      </DashboardCard>
+        {(series) => (
+          <LineChart
+            series={series}
+            labels={labels}
+            height={t.size.chart.md}
+            yFormat={fluxoYFormat}
+            area
+            showLegend={false}
+          />
+        )}
+      </FocusableChartCard>
 
       {/* Fileira 3 — Movimentações + Saldo por Conta */}
       <DashboardRow>

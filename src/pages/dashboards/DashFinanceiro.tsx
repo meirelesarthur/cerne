@@ -8,6 +8,7 @@ import { GaugeChart } from '../../components/ui/GaugeChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -254,28 +255,28 @@ export default function DashFinanceiro() {
 
       {/* Fileira 2 — Receitas vs despesas + Categorias */}
       <DashboardRow>
-        <DashboardCard
+        <FocusableChartCard
           title={`Receitas vs despesas (${nMeses} meses)`}
           flex={2}
-          action={
+          series={lineSeries}
+          action={(series) => (
             <ChartLegend
               marker="line"
-              items={[
-                { label: 'Receitas', color: t.color.brand[600] },
-                { label: 'Despesas', color: t.color.feedback.error.solid },
-              ]}
+              items={series.map((serie) => ({ label: serie.name, color: serie.color }))}
             />
-          }
+          )}
         >
-          <LineChart
-            series={lineSeries}
-            labels={chartLabels}
-            height={t.size.chart.md}
-            yFormat={yFormat}
-            area
-            showLegend={false}
-          />
-        </DashboardCard>
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={chartLabels}
+              height={t.size.chart.md}
+              yFormat={yFormat}
+              area
+              showLegend={false}
+            />
+          )}
+        </FocusableChartCard>
 
         <DashboardCard title="Despesas por categoria" flex={1}>
           <DonutChart

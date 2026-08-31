@@ -14,6 +14,7 @@ import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -263,16 +264,21 @@ export default function DashEstoqueNutricao() {
             yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
           />
         </DashboardCard>
-        <DashboardCard title="Consumo semanal (kg)">
-          <LineChart
-            series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
-            labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
-            height={t.size.chart.md}
-            area
-            showLegend
-            yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
-          />
-        </DashboardCard>
+        <FocusableChartCard
+          title="Consumo semanal (kg)"
+          series={mockConsumoSeries.map((s) => ({ ...s, data: s.data.slice(periodo === '30' ? -4 : -8) }))}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={mockConsumoLabels.slice(periodo === '30' ? -4 : -8)}
+              height={t.size.chart.md}
+              area
+              showLegend
+              yFormat={(v) => `${(v / 1000).toFixed(0)}t`}
+            />
+          )}
+        </FocusableChartCard>
       </DashboardRow>
 
       {/* Fileira 3 — Cobertura por produto */}

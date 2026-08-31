@@ -23,6 +23,7 @@ import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Trend } from '../../components/ui/Trend'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { Tabs } from '../../components/ui/Tabs'
+import { FilterSelect } from '../../components/ui/FilterSelect'
 import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
 import {
   buildOverviewCarta, headlineInsight, fmtCompact,
@@ -94,6 +95,10 @@ const PREV_SAFRA_RECEITAS = [280, 1290, 520, 700, 690, 820, 1010, 870, 1150, 104
 
 // Cor de margem (3ª série do gráfico de área) — distinta de receita/despesa.
 const MARGEM_COLOR = t.color.accent.purple.text
+
+/** Série que o card de receitas mostra sozinha; `null` = as três juntas. */
+type AreaFocus = 'receitas' | 'despesas' | 'margem'
+const AREA_FOCUS_ALL = '__todas__'
 
 // ─── Cruzamentos derivados ──────────────────────────────────────────────────
 // Em vez de "produção total" solta, cruzamos os talhões em distribuição de área
@@ -300,10 +305,12 @@ function smoothPath(pts: [number, number][]): string {
   return d
 }
 
-function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
+function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries, focus = null }: {
   colors: ThemeColors; isGbMode: boolean; data?: typeof AREA_DATA
   /** Receitas da safra anterior alinhadas por índice — linha fantasma YoY. */
   prevSeries?: number[]
+  /** Série em foco — ela ocupa o gráfico e o eixo se reescala nela. */
+  focus?: AreaFocus | null
 }) {
   const [hov, setHov] = useState<number | null>(null)
   const FALLBACK_W = 700; const H = 200; const PL = 44; const PT = 16; const PR = 8; const PB = 32
@@ -312,7 +319,16 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
   const W = width || FALLBACK_W
   const k = 1
   const cW = W - PL - PR; const cH = H - PT - PB
-  const yTicks = niceAxisTicks(0, Math.max(...data.map(d => d.receitas), ...(prevSeries ?? [])))
+  // Em foco, só a série escolhida entra na escala — é o que faz ela ocupar o
+  // gráfico em vez de ficar achatada contra a maior das três.
+  const margens = data.map(d => d.receitas - d.despesas)
+  const escala =
+    focus === 'receitas' ? data.map(d => d.receitas)
+    : focus === 'despesas' ? data.map(d => d.despesas)
+    : focus === 'margem' ? margens
+    : [...data.map(d => d.receitas), ...(prevSeries ?? [])]
+  const yTicks = niceAxisTicks(0, Math.max(...escala, 1))
+  const mostra = (serie: AreaFocus) => focus === null || focus === serie
   const maxV = yTicks[yTicks.length - 1]
   const pts = (key: 'receitas' | 'despesas'): [number, number][] =>
     data.map((d, i) => [PL + (i / (data.length - 1)) * cW, PT + cH - (d[key] / maxV) * cH])
@@ -369,17 +385,23 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
         ))}
 
         {/* Area fills */}
-        <path d={areaClose(recPath, PT + cH)} fill={`url(#${recGradId})`} />
-        <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />
+        {mostra('receitas') && <path d={areaClose(recPath, PT + cH)} fill={`url(#${recGradId})`} />}
+        {mostra('despesas') && <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />}
 
         {/* Lines */}
-        {prevPts.length > 1 && (
+        {focus === null && prevPts.length > 1 && (
           <path d={smoothPath(prevPts)} fill="none" stroke={colors.fg.subtle as string} strokeWidth={1.25}
             strokeLinejoin="round" strokeLinecap="round" strokeDasharray="2 4" opacity={0.7} />
         )}
-        <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
-        <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
+        {mostra('receitas') && (
+          <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        )}
+        {mostra('despesas') && (
+          <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
+        )}
+        {mostra('margem') && (
+          <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
+        )}
 
         {/* X labels */}
         {data.map((d, i) => {
@@ -399,9 +421,15 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries }: {
               {isH && (
                 <g>
                   <line x1={x} y1={PT} x2={x} y2={PT + cH} stroke={colors.border.default} strokeWidth={1} strokeDasharray="3 2" />
-                  <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.bg.surface} strokeWidth={2} />
-                  <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.feedback.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
-                  <circle cx={mgPts[i][0]} cy={mgPts[i][1]} r={3.5} fill={MARGEM_COLOR} stroke={colors.bg.surface} strokeWidth={2} />
+                  {mostra('receitas') && (
+                    <circle cx={recPts[i][0]} cy={recPts[i][1]} r={4} fill={t.color.brand[600]} stroke={colors.bg.surface} strokeWidth={2} />
+                  )}
+                  {mostra('despesas') && (
+                    <circle cx={dspPts[i][0]} cy={dspPts[i][1]} r={3.5} fill={t.color.feedback.error.solid} stroke={colors.bg.surface} strokeWidth={2} />
+                  )}
+                  {mostra('margem') && (
+                    <circle cx={mgPts[i][0]} cy={mgPts[i][1]} r={3.5} fill={MARGEM_COLOR} stroke={colors.bg.surface} strokeWidth={2} />
+                  )}
                 </g>
               )}
             </g>
@@ -745,6 +773,9 @@ export default function OverviewPanel() {
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useUrlFilter('periodo', '10')
   const [serie, setSerie] = useUrlFilter<'realizado' | 'previsto'>('serie', 'realizado')
+  // Foco de série do card de receitas: leitura, não recorte de dado — fica local.
+  const [foco, setFoco] = useState<AreaFocus | typeof AREA_FOCUS_ALL>(AREA_FOCUS_ALL)
+  const focoAtivo = foco === AREA_FOCUS_ALL ? null : foco
   const [cartaOpen, setCartaOpen] = useState(false)
   // Tablet/estreito: empilha colunas e dispensa divisores verticais
   const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
@@ -853,12 +884,25 @@ export default function OverviewPanel() {
             <DashboardCard
               action={
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: t.space[2] }}>
-                  <Tabs
-                    label="Série"
-                    items={[{ id: 'realizado', label: 'Realizado' }, { id: 'previsto', label: 'Previsto' }]}
-                    activeId={serie}
-                    onChange={(id) => setSerie(id as 'realizado' | 'previsto')}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <Tabs
+                      label="Série"
+                      items={[{ id: 'realizado', label: 'Realizado' }, { id: 'previsto', label: 'Previsto' }]}
+                      activeId={serie}
+                      onChange={(id) => setSerie(id as 'realizado' | 'previsto')}
+                    />
+                    <FilterSelect
+                      ariaLabel="Focar uma série do gráfico"
+                      options={[
+                        { value: AREA_FOCUS_ALL, label: 'Todas as séries' },
+                        { value: 'receitas', label: 'Receitas' },
+                        { value: 'despesas', label: 'Despesas' },
+                        { value: 'margem',   label: 'Margem' },
+                      ]}
+                      value={foco}
+                      onChange={(v) => setFoco(v as AreaFocus | typeof AREA_FOCUS_ALL)}
+                    />
+                  </div>
                   <Trend value={serieInfo.trend} up={serieInfo.up} />
                 </div>
               }
@@ -877,8 +921,13 @@ export default function OverviewPanel() {
                     { label: 'Receitas', color: t.color.brand[600] },
                     { label: 'Despesas', color: t.color.feedback.error.solid },
                     { label: 'Margem',   color: MARGEM_COLOR },
-                    ...(serie === 'realizado' ? [{ label: 'Safra anterior', color: colors.fg.subtle as string }] : []),
-                  ]}
+                  ]
+                    .filter((item) => focoAtivo === null || item.label.toLowerCase() === focoAtivo)
+                    .concat(
+                      focoAtivo === null && serie === 'realizado'
+                        ? [{ label: 'Safra anterior', color: colors.fg.subtle as string }]
+                        : [],
+                    )}
                 />
               </div>
               <AreaChart
@@ -886,6 +935,7 @@ export default function OverviewPanel() {
                 isGbMode={isGbMode}
                 data={activeData}
                 prevSeries={serie === 'realizado' ? PREV_SAFRA_RECEITAS.slice(-Number(periodo)) : undefined}
+                focus={focoAtivo}
               />
             </DashboardCard>
 

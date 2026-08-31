@@ -16,6 +16,7 @@ import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -293,16 +294,22 @@ export default function DashDesempenhoLotes() {
 
       {/* Fileira 2 — Evolução de peso + GMD */}
       <DashboardRow>
-        <DashboardCard title="Peso médio por lote (kg)">
-          <LineChart
-            series={lotesSeries}
-            labels={pesagemLabels}
-            height={t.size.chart.lg}
-            area={false}
-            showLegend
-            yFormat={(v) => `${v} kg`}
-          />
-        </DashboardCard>
+        <FocusableChartCard
+          title="Peso médio por lote (kg)"
+          series={lotesSeries}
+          allLabel="Todos os lotes"
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={pesagemLabels}
+              height={t.size.chart.lg}
+              area={false}
+              showLegend
+              yFormat={(v) => `${v} kg`}
+            />
+          )}
+        </FocusableChartCard>
         <DashboardCard title="GMD: atual vs meta (kg/dia)">
           <GroupedBarChart
             series={gmdSeries}

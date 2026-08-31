@@ -14,6 +14,7 @@ import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -219,19 +220,24 @@ export default function DashLotacaoCurrais() {
             valueFormat={(v) => `${v} currais`}
           />
         </DashboardCard>
-        <DashboardCard title="Ocupação por setor (cab.)">
-          <StackedBarChart
-            series={mockStackedSeries.map((s) => ({
-              ...s,
-              data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
-            }))}
-            labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
-            height={t.size.chart.lg}
-            horizontal
-            showLegend
-            yFormat={(v) => `${v}`}
-          />
-        </DashboardCard>
+        <FocusableChartCard
+          title="Ocupação por setor (cab.)"
+          series={mockStackedSeries.map((s) => ({
+            ...s,
+            data: s.data.filter((_, i) => setor === 'todos' || mockSetores[i] === setor),
+          }))}
+        >
+          {(series) => (
+            <StackedBarChart
+              series={series}
+              labels={mockSetores.filter((s) => setor === 'todos' || s === setor)}
+              height={t.size.chart.lg}
+              horizontal
+              showLegend
+              yFormat={(v) => `${v}`}
+            />
+          )}
+        </FocusableChartCard>
       </DashboardRow>
     </DashboardGrid>
   )

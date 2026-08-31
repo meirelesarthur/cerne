@@ -18,6 +18,7 @@ import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -281,27 +282,41 @@ export default function DashCustosConfinamento() {
 
       {/* Fileira 2 — Composição por mês + Evolução de custo */}
       <DashboardRow>
-        <DashboardCard title="Composição de custo por mês (R$ mil)" flex={3}>
-          <StackedBarChart
-            series={mockStackedSeries
-              .filter((s) => categoria === 'todas' || s.name === categoria)
-              .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
-            labels={MESES.slice(-Number(periodo))}
-            height={t.size.chart.lg}
-            showLegend
-            yFormat={(v) => `R$ ${v}`}
-          />
-        </DashboardCard>
-        <DashboardCard title="Custo por arroba e animal/dia" flex={2}>
-          <LineChart
-            series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
-            labels={MESES.slice(-Number(periodo))}
-            height={t.size.chart.lg}
-            area={false}
-            showLegend
-            yFormat={(v) => `R$ ${v}`}
-          />
-        </DashboardCard>
+        <FocusableChartCard
+          title="Composição de custo por mês (R$ mil)"
+          flex={3}
+          allLabel="Todas as rubricas"
+          series={mockStackedSeries
+            .filter((s) => categoria === 'todas' || s.name === categoria)
+            .map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+        >
+          {(series) => (
+            <StackedBarChart
+              series={series}
+              labels={MESES.slice(-Number(periodo))}
+              height={t.size.chart.lg}
+              showLegend
+              yFormat={(v) => `R$ ${v}`}
+            />
+          )}
+        </FocusableChartCard>
+        <FocusableChartCard
+          title="Custo por arroba e animal/dia"
+          flex={2}
+          allLabel="Ambas as bases"
+          series={mockLineSeries.map((s) => ({ ...s, data: s.data.slice(-Number(periodo)) }))}
+        >
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={MESES.slice(-Number(periodo))}
+              height={t.size.chart.lg}
+              area={false}
+              showLegend
+              yFormat={(v) => `R$ ${v}`}
+            />
+          )}
+        </FocusableChartCard>
       </DashboardRow>
 
       {/* Fileira 3 — Composição total do período */}

@@ -7,6 +7,7 @@ import { LineChart } from '../../components/ui/LineChart'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -193,15 +194,17 @@ export default function DashDepreciacoes() {
       </DashboardRow>
 
       {/* Fileira 2 — Depreciação por categoria */}
-      <DashboardCard title="Depreciação por categoria">
-        <StackedBarChart
-          series={stackedSeries}
-          labels={stackedLabels}
-          height={t.size.chart.md}
-          yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
-          showLegend
-        />
-      </DashboardCard>
+      <FocusableChartCard title="Depreciação por categoria" series={stackedSeries}>
+        {(series) => (
+          <StackedBarChart
+            series={series}
+            labels={stackedLabels}
+            height={t.size.chart.md}
+            yFormat={(v) => `${(v / 1000).toFixed(0)}K`}
+            showLegend
+          />
+        )}
+      </FocusableChartCard>
 
       {/* Fileira 3 — Composição + Projeção */}
       <DashboardRow>
@@ -215,27 +218,32 @@ export default function DashDepreciacoes() {
             valueFormat={(v) => `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
           />
         </DashboardCard>
-        <DashboardCard
+        <FocusableChartCard
           title="Projeção — próximos 24 meses"
-          action={
+          series={PROJ_SERIES_FULL}
+          allLabel="Realizado + projeção"
+          action={(series) => (
             <ChartLegend
               marker="line"
-              items={[
-                { label: 'Realizado', color: t.color.brand[600] },
-                { label: 'Projeção',  color: t.color.brand[400], dashed: true },
-              ]}
+              items={series.map((serie) => ({
+                label: serie.name,
+                color: serie.color,
+                dashed: serie.name === 'Projeção',
+              }))}
             />
-          }
+          )}
         >
-          <LineChart
-            series={PROJ_SERIES_FULL}
-            labels={PROJ_LABELS}
-            height={t.size.chart.md}
-            yFormat={(v) => `${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
-            area
-            showLegend={false}
-          />
-        </DashboardCard>
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={PROJ_LABELS}
+              height={t.size.chart.md}
+              yFormat={(v) => `${(v / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`}
+              area
+              showLegend={false}
+            />
+          )}
+        </FocusableChartCard>
       </DashboardRow>
     </DashboardGrid>
   )

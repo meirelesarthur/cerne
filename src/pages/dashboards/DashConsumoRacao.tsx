@@ -17,6 +17,7 @@ import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -251,16 +252,22 @@ export default function DashConsumoRacao() {
       </DashboardRow>
 
       {/* Fileira 2 — Consumo por lote */}
-      <DashboardCard title="Consumo por lote (kg/animal/dia)">
-        <LineChart
-          series={consumoSeries}
-          labels={weekLabels}
-          height={t.size.chart.md}
-          area
-          showLegend
-          yFormat={(v) => `${v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg`}
-        />
-      </DashboardCard>
+      <FocusableChartCard
+        title="Consumo por lote (kg/animal/dia)"
+        series={consumoSeries}
+        allLabel="Todos os lotes"
+      >
+        {(series) => (
+          <LineChart
+            series={series}
+            labels={weekLabels}
+            height={t.size.chart.md}
+            area
+            showLegend
+            yFormat={(v) => `${v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} kg`}
+          />
+        )}
+      </FocusableChartCard>
 
       {/* Fileira 3 — Custo da batida + Composição */}
       <DashboardRow>

@@ -225,7 +225,7 @@ export function DashboardStack({ children, flex, width }: DashboardStackProps) {
 
 // ─── DashboardCard ─────────────────────────────────────────────────────────────
 
-interface DashboardCardProps {
+export interface DashboardCardProps {
   children: React.ReactNode
   /** Rótulo do bloco, no topo do card. Aceita nó para rótulos com ícone/legenda. */
   title?: React.ReactNode

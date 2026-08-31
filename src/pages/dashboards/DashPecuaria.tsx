@@ -5,6 +5,7 @@ import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { FocusableChartCard } from '../../components/ui/FocusableChartCard'
 import type { DashboardReadingInput } from '../../insights/dashboardReading'
 import {
   DashboardGrid,
@@ -158,16 +159,18 @@ export default function DashPecuaria() {
 
       {/* Fileira 2 — Evolução + Composição */}
       <DashboardRow>
-        <DashboardCard title="Evolução do rebanho" flex={2}>
-          <LineChart
-            series={rebanhoSeries}
-            labels={labels}
-            height={t.size.chart.md}
-            area
-            showLegend
-            yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
-          />
-        </DashboardCard>
+        <FocusableChartCard title="Evolução do rebanho" flex={2} series={rebanhoSeries}>
+          {(series) => (
+            <LineChart
+              series={series}
+              labels={labels}
+              height={t.size.chart.md}
+              area
+              showLegend
+              yFormat={(v) => Math.round(v).toLocaleString('pt-BR')}
+            />
+          )}
+        </FocusableChartCard>
         <DashboardCard title="Composição do rebanho" flex={1}>
           <DonutChart
             data={rebanhoComp.map((d) => ({ label: d.label, value: d.pct, color: d.color }))}
@@ -181,14 +184,16 @@ export default function DashPecuaria() {
       </DashboardRow>
 
       {/* Fileira 3 — Manejos */}
-      <DashboardCard title="Manejos por mês">
-        <GroupedBarChart
-          series={manejosSeries}
-          labels={labels}
-          height={t.size.chart.md}
-          showLegend
-        />
-      </DashboardCard>
+      <FocusableChartCard title="Manejos por mês" series={manejosSeries}>
+        {(series) => (
+          <GroupedBarChart
+            series={series}
+            labels={labels}
+            height={t.size.chart.md}
+            showLegend
+          />
+        )}
+      </FocusableChartCard>
     </DashboardGrid>
   )
 }

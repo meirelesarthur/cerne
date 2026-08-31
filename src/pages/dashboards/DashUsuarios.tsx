@@ -64,8 +64,8 @@ function DonutModulos() {
               gap: t.space[2],
               padding: `${t.space[1]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
-              background: hovSeg === i ? (isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[50]) : 'transparent',
-              transition: 'background 0.15s ease',
+              background: hovSeg === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+              transition: `background ${t.transition.base}`,
               cursor: 'default',
             }}
             onMouseEnter={() => setHovSeg(i)}

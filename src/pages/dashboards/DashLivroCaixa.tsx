@@ -149,9 +149,9 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
               background: hovIdx === i
-                ? (isGbMode ? 'rgba(255,255,255,0.04)' : t.color.neutral[50])
+                ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover)
                 : 'transparent',
-              transition: 'background 0.15s ease',
+              transition: `background ${t.transition.base}`,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: t.space[1] }}>
@@ -162,14 +162,14 @@ function SaldoPorConta({ colors, isGbMode }: { colors: ReturnType<typeof useThem
                 R$ {conta.saldo.toLocaleString('pt-BR')}
               </span>
             </div>
-            <div style={{ height: 8, background: isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[100], borderRadius: t.radius.full, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: isGbMode ? t.color.state.track.gb : t.color.state.track.base, borderRadius: t.radius.full, overflow: 'hidden' }}>
               <div
                 style={{
                   height: '100%',
                   width: `${pct * 100}%`,
                   background: i === 0 ? t.color.brand[600] : i === 1 ? t.color.brand[500] : i === 2 ? t.color.brand[400] : t.color.brand[300],
                   borderRadius: t.radius.full,
-                  transition: 'opacity 0.18s ease',
+                  transition: `opacity ${t.transition.smooth}`,
                   opacity: hovIdx !== null && hovIdx !== i ? 0.35 : 1,
                 }}
               />

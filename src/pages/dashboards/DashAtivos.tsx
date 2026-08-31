@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { usePrefersReducedMotion } from '../../components/ui/usePrefersReducedMotion'
 import { FilterSelect } from '../../components/ui/FilterSelect'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
 import {
@@ -56,6 +57,7 @@ const STATUS_ITEMS: StatusItem[] = [
 
 function StatusCards() {
   const { colors, isGbMode } = useTheme()
+  const reducedMotion = usePrefersReducedMotion()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -72,7 +74,7 @@ function StatusCards() {
             padding: `${t.space[2]}px ${t.space[3]}px`,
             borderRadius: t.radius.lg,
             border: `1px solid ${colors.border.default}`,
-            background: isGbMode ? 'rgba(255,255,255,0.03)' : t.color.neutral[50],
+            background: isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] + 2 }}>
@@ -85,15 +87,19 @@ function StatusCards() {
           <div style={{
             height: 6,
             borderRadius: t.radius.full,
-            background: isGbMode ? 'rgba(255,255,255,0.08)' : t.color.neutral[200],
+            background: isGbMode ? t.color.state.track.gb : t.color.state.track.base,
             overflow: 'hidden',
           }}>
             <div style={{
               height: '100%',
-              width: mounted ? `${item.pct}%` : '0%',
+              width: mounted || reducedMotion ? `${item.pct}%` : '0%',
               background: item.color,
               borderRadius: t.radius.full,
-              transition: `width 0.6s cubic-bezier(0.4,0,0.2,1) ${i * 80}ms`,
+              // Sem movimento quando o usuário pediu menos movimento no SO: a
+              // barra aparece já no valor final, sem crescer.
+              transition: reducedMotion
+                ? undefined
+                : `width ${t.animation.duration.slower} ${t.animation.easing.standard} ${i * 80}ms`,
             }} />
           </div>
         </div>

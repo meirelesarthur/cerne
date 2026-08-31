@@ -77,7 +77,7 @@ function ArcGauge({ colors }: { colors: ReturnType<typeof useTheme>['colors'] })
         {segments.map((seg, i) => (
           <div key={i} onMouseEnter={() => setSegHov(i)} onMouseLeave={() => setSegHov(null)}
             title={`${seg.label}: ${(seg.pct * 100).toFixed(0)}%`}
-            style={{ flex: seg.pct, background: seg.color, opacity: segHov !== null && segHov !== i ? 0.3 : 1, transition: 'opacity 0.18s ease', cursor: 'pointer' }} />
+            style={{ flex: seg.pct, background: seg.color, opacity: segHov !== null && segHov !== i ? 0.3 : 1, transition: `opacity ${t.transition.smooth}`, cursor: 'pointer' }} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: t.space[2] }}>
@@ -106,8 +106,8 @@ function VencimentosList({ colors, isGbMode }: { colors: ReturnType<typeof useTh
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
-              background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
-              transition: 'background 0.15s ease', cursor: 'default',
+              background: hovIdx === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+              transition: `background ${t.transition.base}`, cursor: 'default',
             }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default as string, fontFamily: t.font.family.sans }}>

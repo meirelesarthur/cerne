@@ -354,7 +354,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'HeatmapChart', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'IconButton', status: 'coberto', screens: 'AMPLO — ações de linha em listagens e cabeçalhos' },
   { name: 'InterpretationLetter', status: 'coberto', screens: 'pages/dashboards/*' },
-  { name: 'KpiStatCard', status: 'coberto', screens: 'pages/dashboards/*' },
+  { name: 'KpiStatCard', status: 'referencia-unica', screens: 'apenas story — dashboards usam DashboardKpiCard (rótulo + valor + Trend, sem ícone)' },
   { name: 'LineChart', status: 'coberto', screens: 'pages/dashboards/*' },
   { name: 'ListToolbar', status: 'coberto', screens: AMPLO },
   { name: 'Modal', status: 'coberto', screens: AMPLO },

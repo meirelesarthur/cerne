@@ -75,8 +75,8 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
             style={{
               padding: `${t.space[2]}px ${t.space[2]}px`,
               borderRadius: t.radius.base,
-              background: hovIdx === i ? (isGbMode ? 'rgba(255,255,255,0.05)' : t.color.neutral[50]) : 'transparent',
-              transition: 'background 0.15s ease', cursor: 'default',
+              background: hovIdx === i ? (isGbMode ? t.color.state.row.hoverGb : t.color.state.row.hover) : 'transparent',
+              transition: `background ${t.transition.base}`, cursor: 'default',
             }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[1] }}>
               <div>
@@ -100,7 +100,7 @@ function FornecedoresList({ colors, isGbMode, categoria }: { colors: ReturnType<
                 </span>
               </div>
             </div>
-            <div style={{ height: 4, background: isGbMode ? 'rgba(255,255,255,0.06)' : t.color.neutral[100], borderRadius: t.radius.full, overflow: 'hidden' }}>
+            <div style={{ height: 4, background: isGbMode ? t.color.state.track.gb : t.color.state.track.base, borderRadius: t.radius.full, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${f.pct}%`, background: t.color.brand[600], borderRadius: t.radius.full }} />
             </div>
           </div>

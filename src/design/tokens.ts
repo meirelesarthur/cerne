@@ -153,6 +153,15 @@ const state = {
     text:   primitive.neutral[700],
     border: primitive.neutral[200],
   },
+  /**
+   * Trilha de barra de progresso inline — medidor de ocupação, participação,
+   * saldo por conta. Os dashboards usavam cinco alfas diferentes de branco no
+   * GBMode (0.04–0.15) para a mesma coisa.
+   */
+  track: {
+    base: primitive.neutral[200],          // light
+    gb:   'rgba(255,255,255,0.08)',        // GBMode
+  },
   /** Linhas de tabela (hover/selecionada/zebra) — light + GBMode */
   row: {
     hover:       primitive.neutral[100],            // light
@@ -168,6 +177,12 @@ const state = {
 const overlay = {
   modal:  'rgba(0,0,0,0.45)',
   drawer: 'rgba(0,0,0,0.18)',
+  /**
+   * Superfície de controle sobreposta a mídia (chip sobre o mapa de talhões).
+   * Clara nos dois temas de propósito: o fundo é a imagem de satélite, não a
+   * superfície do tema.
+   */
+  onMedia: 'rgba(255,255,255,0.92)',
 }
 
 /** Acentos exclusivos do GBMode (tema escuro) — ver FIGMA_NAMING `color/gb/*` */

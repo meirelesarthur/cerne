@@ -428,7 +428,7 @@ function RadialGauge({ value, label, sub, pct, colors, isGbMode }: {
   })
 
   const activeColor = isGbMode ? t.color.brand[400] : t.color.neutral[800]
-  const inactiveColor = isGbMode ? 'rgba(255,255,255,0.10)' : t.color.neutral[200]
+  const inactiveColor = isGbMode ? t.color.state.track.gb : t.color.state.track.base
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -793,7 +793,7 @@ export default function OverviewPanel() {
             <div style={{
               position: 'absolute', top: t.space[3], left: t.space[4], zIndex: 1000,
               display: 'flex', alignItems: 'center', gap: t.space[1],
-              background: 'rgba(255,255,255,0.92)', borderRadius: t.radius.base,
+              background: t.color.overlay.onMedia, borderRadius: t.radius.base,
               padding: `5px ${t.space[2]}px`, backdropFilter: 'blur(4px)',
               boxShadow: t.shadow.sm, cursor: 'pointer',
             }}>
@@ -1021,14 +1021,14 @@ export default function OverviewPanel() {
                     flex: 1, height: 10, borderRadius: 1,
                     background: i < 31
                       ? (isGbMode ? t.color.brand[500] : t.color.neutral[700])
-                      : (isGbMode ? 'rgba(255,255,255,0.10)' : t.color.neutral[200]),
+                      : (isGbMode ? t.color.state.track.gb : t.color.state.track.base),
                   }} />
                 ))}
               </div>
               <ChartLegend
                 items={[
                   { label: 'Realizado', color: isGbMode ? t.color.brand[500] : t.color.neutral[700] },
-                  { label: 'Previsto',  color: isGbMode ? 'rgba(255,255,255,0.15)' : t.color.neutral[200] },
+                  { label: 'Previsto',  color: isGbMode ? t.color.state.track.gb : t.color.state.track.base },
                 ]}
               />
             </DashboardCard>

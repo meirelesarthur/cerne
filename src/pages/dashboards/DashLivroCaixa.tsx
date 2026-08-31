@@ -230,7 +230,7 @@ export default function DashLivroCaixa() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {LC_KPIS.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

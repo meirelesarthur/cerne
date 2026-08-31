@@ -151,7 +151,7 @@ export default function DashUsuarios() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {USR_KPIS.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

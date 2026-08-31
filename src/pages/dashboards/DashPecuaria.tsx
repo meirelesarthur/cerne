@@ -96,7 +96,7 @@ export default function DashPecuaria() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {PEC_KPIS.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

@@ -56,7 +56,7 @@ export const Default: Story = {
         }
       />
 
-      <DashboardRow wrap>
+      <DashboardRow>
         <DashboardKpiCard label="Receita realizada" value="R$ 18,9M" trend="4,1%" up />
         <DashboardKpiCard label="Margem bruta" value="12,5%" trend="2,7%" up />
         <DashboardKpiCard label="Saldo operacional" value="R$ 14,5M" trend="1,3%" up={false} />
@@ -91,7 +91,7 @@ export const Default: Story = {
 export const FileiraDeKpis: Story = {
   render: () => (
     <DashboardGrid>
-      <DashboardRow wrap>
+      <DashboardRow>
         <DashboardKpiCard label="Total de ativos" value="342" trend="5,4%" up />
         <DashboardKpiCard label="Em operação" value="298" trend="3,2%" up />
         <DashboardKpiCard label="Em manutenção" value="31" trend="12,4%" up={false} />

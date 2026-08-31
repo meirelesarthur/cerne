@@ -134,7 +134,7 @@ export default function DashDepreciacoes() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {DEP_KPIS.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

@@ -430,6 +430,15 @@ export const size = {
   },
   /** Altura do sparkline na base do KPI (DashboardKpiCard) */
   sparkline: 40,
+  /**
+   * Largura mínima de um card de dashboard antes de a fileira quebrar.
+   * A fileira (`DashboardRow`) não usa breakpoint de viewport: os cards
+   * crescem para preencher o espaço e passam para a linha seguinte quando não
+   * cabem nesta largura — respondendo à área de conteúdo, não à janela.
+   */
+  dashCardMin: 300,
+  /** Idem para o card de KPI — cabem 4 por fileira em ~800px de conteúdo. */
+  dashKpiMin: 180,
 }
 
 // ─── Ícones ─────────────────────────────────────────────────────────────────

@@ -211,7 +211,7 @@ export default function Pluviometria() {
         />
 
         {/* ── Fileira 1 — KPIs ────────────────────────────────────────── */}
-        <DashboardRow wrap>
+        <DashboardRow>
           {kpis.map((kpi) => (
             <DashboardKpiCard
               key={kpi.label}

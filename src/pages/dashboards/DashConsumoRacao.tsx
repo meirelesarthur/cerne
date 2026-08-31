@@ -184,7 +184,7 @@ export default function DashConsumoRacao() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {kpis.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

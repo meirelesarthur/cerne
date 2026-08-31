@@ -173,7 +173,7 @@ export default function DashAtivos() {
       />
 
       {/* Fileira 1 — KPIs */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {ATIVOS_KPIS.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

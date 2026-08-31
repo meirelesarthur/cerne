@@ -153,7 +153,7 @@ export default function DashSuprimentos() {
       />
 
       {/* Fileira 1 — KPIs com sparkline */}
-      <DashboardRow wrap>
+      <DashboardRow>
         {kpis.map((kpi) => (
           <DashboardKpiCard
             key={kpi.label}

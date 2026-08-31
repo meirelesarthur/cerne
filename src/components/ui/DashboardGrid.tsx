@@ -4,7 +4,6 @@ import { useTheme } from '../../context/ThemeContext'
 import { Heading } from './Heading'
 import { Trend } from './Trend'
 import { Skeleton } from './Skeleton'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
 
 // ─── DashboardGrid ─────────────────────────────────────────────────────────────
 // Casca dos dashboards no estilo "card fill sobre canvas": o dashboard não é mais
@@ -15,29 +14,29 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 //
 //   DashboardGrid                       ← canvas + gap entre as fileiras
 //     ├── DashboardHeader               ← título + filtros, sobre o canvas
-//     ├── DashboardRow wrap             ← fileira de KPIs
+//     ├── DashboardRow                  ← fileira de KPIs
 //     │     └── DashboardKpiCard ×N
 //     ├── DashboardRow                  ← fileira de blocos com pesos
 //     │     ├── DashboardCard flex={3}
 //     │     └── DashboardCard flex={2}
 //     └── DashboardCard                 ← bloco de largura total
 //
+// Responsividade por ESPAÇO, não por janela: a fileira não troca de layout num
+// breakpoint. Cada card declara uma largura mínima (`t.size.dashCardMin` /
+// `dashKpiMin`) e cresce para ocupar a sobra; quando os mínimos não caibem, o
+// card passa para a linha seguinte e a fileira se redistribui. Isso responde à
+// área de conteúdo — que é 400–500px mais estreita que a janela por causa da
+// sidebar e do submenu, e por isso a media query de viewport errava o alvo.
+//
 // Fonte única (Lei 2): canvas, raio, sombra e gap ajustados aqui propagam para
 // todos os dashboards. Não recriar esta casca inline nas páginas.
-
-/** Empilhamento das fileiras — tablet e abaixo. */
-const STACK_QUERY = `(max-width: ${t.breakpoint.md - 1}px)`
 
 interface RowContextValue {
   /** O card está dentro de uma `DashboardRow`? Define se ele divide a largura. */
   inRow: boolean
-  /** A fileira está empilhada (tablet/mobile)? */
-  stacked: boolean
-  /** Fileira empilhada quebra em 2 colunas em vez de 1 card por linha (KPIs). */
-  wrap: boolean
 }
 
-const RowContext = createContext<RowContextValue>({ inRow: false, stacked: false, wrap: false })
+const RowContext = createContext<RowContextValue>({ inRow: false })
 
 // ─── DashboardGrid ─────────────────────────────────────────────────────────────
 
@@ -101,20 +100,24 @@ export function DashboardHeader({
   size = '2xl',
 }: DashboardHeaderProps) {
   const { colors } = useTheme()
-  const stacked = useMediaQuery(STACK_QUERY)
 
   return (
     <div
       style={{
         display: 'flex',
-        flexDirection: stacked ? 'column' : 'row',
-        alignItems: stacked ? 'stretch' : 'center',
+        flexWrap: 'wrap',
+        alignItems: 'center',
         justifyContent: 'space-between',
         gap: t.space[3],
         padding: `0 ${t.space[1]}px`,
+        // Título nunca racha no meio da palavra: o CSS global do app herda
+        // `overflow-wrap: break-word`, que em caixa estreita quebrava
+        // "Desempenho" em duas linhas. Quem cede espaço primeiro são as ações,
+        // que passam para a linha de baixo.
+        overflowWrap: 'normal',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: '1 1 auto' }}>
         {subtitle && (
           <span
             style={{
@@ -131,7 +134,10 @@ export function DashboardHeader({
         </Heading>
       </div>
       {actions && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexShrink: 0 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', flexWrap: 'wrap',
+          gap: t.space[2], marginLeft: 'auto',
+        }}>
           {actions}
         </div>
       )}
@@ -145,28 +151,20 @@ interface DashboardRowProps {
   children: React.ReactNode
   /** Alinhamento vertical dos cards da fileira. Default `stretch` (mesma altura). */
   align?: 'stretch' | 'flex-start'
-  /**
-   * Ao empilhar, quebra em 2 colunas em vez de 1 card por linha. Usar em
-   * fileiras de KPI, onde o card é baixo e ainda cabe lado a lado no tablet.
-   */
-  wrap?: boolean
 }
 
 /**
  * Fileira de cards do dashboard. Distribui a largura pelos pesos de cada
- * `DashboardCard` (`flex`) e empilha abaixo de `t.breakpoint.md`.
+ * `DashboardCard` (`flex`) e quebra para a linha seguinte quando os cards não
+ * caibem na largura mínima — sem breakpoint de viewport.
  */
-export function DashboardRow({ children, align = 'stretch', wrap = false }: DashboardRowProps) {
-  const stacked = useMediaQuery(STACK_QUERY)
-  const wrapped = stacked && wrap
-
+export function DashboardRow({ children, align = 'stretch' }: DashboardRowProps) {
   return (
-    <RowContext.Provider value={{ inRow: true, stacked, wrap }}>
+    <RowContext.Provider value={{ inRow: true }}>
       <div
         style={{
           display: 'flex',
-          flexDirection: stacked && !wrap ? 'column' : 'row',
-          flexWrap: wrapped ? 'wrap' : undefined,
+          flexWrap: 'wrap',
           alignItems: align,
           gap: t.space[4],
         }}
@@ -184,9 +182,10 @@ interface DashboardStackProps {
   /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
   flex?: number
   /**
-   * Largura fixa em px — coluna que não deve esticar (ex.: painel lateral de
-   * 320px do Painel Geral). Ignorada quando a fileira empilha. Tem precedência
-   * sobre `flex`.
+   * Largura PREFERIDA em px (base do flex) — coluna que tende a um tamanho, como
+   * o painel lateral do Painel Geral. Ela ainda encolhe até
+   * `t.size.dashCardMin` e, quando não cabe, passa para a linha seguinte e
+   * ocupa a largura toda.
    */
   width?: number
 }
@@ -197,31 +196,20 @@ interface DashboardStackProps {
  * mesmo gap do canvas e devolve largura total aos cards internos.
  */
 export function DashboardStack({ children, flex, width }: DashboardStackProps) {
-  const { inRow, stacked, wrap } = useContext(RowContext)
-
-  const fixed = width !== undefined && !stacked
-
-  const flexValue = !inRow
-    ? undefined
-    : fixed
-      ? '0 0 auto'
-      : stacked
-        ? (wrap ? '1 1 45%' : undefined)
-        : `${flex ?? 1} 1 0%`
+  const { inRow } = useContext(RowContext)
 
   return (
     <div
       style={{
-        flex: flexValue,
-        width: fixed ? width : undefined,
-        minWidth: inRow && !fixed ? 0 : undefined,
+        flex: inRow ? `${flex ?? 1} 1 ${width ?? t.size.dashCardMin}px` : undefined,
+        minWidth: inRow ? Math.min(width ?? t.size.dashCardMin, t.size.dashCardMin) : undefined,
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[4],
       }}
     >
       {/* Cards internos voltam a ser de largura total dentro da coluna. */}
-      <RowContext.Provider value={{ inRow: false, stacked, wrap: false }}>
+      <RowContext.Provider value={{ inRow: false }}>
         {children}
       </RowContext.Provider>
     </div>
@@ -238,6 +226,11 @@ interface DashboardCardProps {
   action?: React.ReactNode
   /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
   flex?: number
+  /**
+   * Largura mínima antes de o card passar para a linha seguinte da fileira.
+   * Default `t.size.dashCardMin`; o KPI usa `t.size.dashKpiMin`.
+   */
+  minWidth?: number
   /** Remove o padding interno — blocos que sangram até a borda (mapa, tabela). */
   bare?: boolean
   /** Altura mínima do bloco. */
@@ -260,26 +253,24 @@ export function DashboardCard({
   title,
   action,
   flex,
+  minWidth = t.size.dashCardMin,
   bare = false,
   minHeight,
   tone = 'default',
 }: DashboardCardProps) {
   const { colors, isGbMode } = useTheme()
-  const { inRow, stacked, wrap } = useContext(RowContext)
+  const { inRow } = useContext(RowContext)
 
-  // Fora de fileira o card é de largura total (altura pelo conteúdo); dentro da
-  // fileira divide a largura pelo peso, e ao empilhar vira 1 ou 2 por linha.
-  const flexValue = !inRow
-    ? undefined
-    : stacked
-      ? (wrap ? '1 1 45%' : undefined)
-      : `${flex ?? 1} 1 0%`
+  // Fora de fileira o card é de largura total. Dentro da fileira ele parte da
+  // largura mínima, cresce pelo peso para ocupar a sobra e passa para a linha
+  // seguinte quando os mínimos da fileira não caibem — sem breakpoint.
+  const flexValue = inRow ? `${flex ?? 1} 1 ${minWidth}px` : undefined
 
   return (
     <div
       style={{
         flex: flexValue,
-        minWidth: inRow ? 0 : undefined,
+        minWidth: inRow ? minWidth : undefined,
         minHeight,
         display: 'flex',
         flexDirection: 'column',
@@ -306,6 +297,7 @@ export function DashboardCard({
             gap: t.space[3],
             marginBottom: t.space[4],
             padding: bare ? `${t.space[4]}px ${t.space[5]}px 0` : undefined,
+            overflowWrap: 'normal',
           }}
         >
           {title ? (
@@ -354,9 +346,9 @@ export function DashboardSkeleton({ kpis = 4, blocks = [260, 200] }: DashboardSk
         <Skeleton height={26} width={200} />
       </div>
       {kpis > 0 && (
-        <DashboardRow wrap>
+        <DashboardRow>
           {Array.from({ length: kpis }, (_, i) => (
-            <DashboardCard key={i}>
+            <DashboardCard key={i} minWidth={t.size.dashKpiMin}>
               <Skeleton height={62} />
             </DashboardCard>
           ))}
@@ -384,6 +376,8 @@ interface DashboardKpiCardProps {
   sub?: string
   /** Peso da largura dentro da fileira. Default `1`. */
   flex?: number
+  /** Largura mínima antes de quebrar a linha. Default `t.size.dashKpiMin`. */
+  minWidth?: number
   /**
    * Tamanho do valor principal. Por padrão desce em degraus conforme o
    * comprimento do texto (ver `kpiValueSize`) — informe para forçar um degrau
@@ -423,6 +417,7 @@ export function DashboardKpiCard({
   up = true,
   sub,
   flex,
+  minWidth = t.size.dashKpiMin,
   valueSize,
   valueColor,
   children,
@@ -431,7 +426,7 @@ export function DashboardKpiCard({
   const resolvedValueSize = valueSize ?? kpiValueSize(value)
 
   return (
-    <DashboardCard flex={flex}>
+    <DashboardCard flex={flex} minWidth={minWidth}>
       <div
         style={{
           fontSize: t.font.size.xs,

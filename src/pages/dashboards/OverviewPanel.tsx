@@ -814,7 +814,7 @@ export default function OverviewPanel() {
         </DashboardCard>
 
         {/* ── Fileira de KPIs ───────────────────────────────────────────────── */}
-        <DashboardRow wrap>
+        <DashboardRow>
           {[
             { label: 'Margem bruta',        value: '12,5%',    trend: '2,7% vs 30 dias', up: true  },
             { label: 'Receitas realizadas', value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true  },

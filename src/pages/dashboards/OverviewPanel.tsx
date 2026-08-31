@@ -414,6 +414,8 @@ const EXCEPTIONS: { label: string; value?: string; tone: 'error' | 'warning' | '
   { label: 'Óleo diesel abaixo da cobertura mínima', value: '9 dias', tone: 'error' },
   { label: '3 DFe recebidas aguardam manifestação', tone: 'info' },
   { label: 'Safra 25/26 sem configuração de semanas', tone: 'info' },
+  // reflete service_orders.deadline — primeira aparição do domínio de manutenção/OS na Visão Geral
+  { label: '2 ordens de serviço vencem esta semana', tone: 'warning' },
 ]
 
 // ─── Resultado operacional realizado x previsto x atrasado ───────────────────

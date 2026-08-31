@@ -97,10 +97,12 @@ const MARGEM_COLOR = t.color.accent.purple.text
 // Em vez de "produção total" solta, cruzamos os talhões em distribuição de área
 // por cultura (ha × cultura). Cores estáveis por cultura.
 
+// Culturas são categorias — paleta categórica em ordem; pastagem (área não
+// cultivada) fica neutra.
 const CROP_COLOR: Record<string, string> = {
-  'Soja':           t.color.brand[600],
-  'Milho':          t.color.feedback.warning.solid,
-  'Cana-de-açúcar': t.color.accent.purple.text,
+  'Soja':           t.chart.series[0],
+  'Milho':          t.chart.series[2],
+  'Cana-de-açúcar': t.chart.series[3],
   'Pastagem':       t.color.neutral[400],
 }
 

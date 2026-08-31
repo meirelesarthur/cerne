@@ -35,18 +35,18 @@ const STACKED_DATA: { maq: number; vei: number; benf: number; outros: number }[]
 ]
 
 const STACKED_SERIES = [
-  { name: 'Máquinas/Equip.', data: STACKED_DATA.map(d => d.maq), color: t.color.brand[600] },
-  { name: 'Veículos',        data: STACKED_DATA.map(d => d.vei), color: t.color.brand[400] },
-  { name: 'Benfeitorias',   data: STACKED_DATA.map(d => d.benf), color: t.color.brand[200] },
+  { name: 'Máquinas/Equip.', data: STACKED_DATA.map(d => d.maq), color: t.chart.series[0] },
+  { name: 'Veículos',        data: STACKED_DATA.map(d => d.vei), color: t.chart.series[1] },
+  { name: 'Benfeitorias',    data: STACKED_DATA.map(d => d.benf), color: t.chart.series[2] },
   { name: 'Outros',          data: STACKED_DATA.map(d => d.outros), color: t.color.neutral[300] },
 ]
 
 // ─── Donut Data ───────────────────────────────────────────────────────────────
 
 const DONUT_SLICES = [
-  { label: 'Máquinas',     value: 8_400_000 * 0.45, color: t.color.brand[600] },
-  { label: 'Veículos',     value: 8_400_000 * 0.28, color: t.color.brand[400] },
-  { label: 'Benfeitorias', value: 8_400_000 * 0.18, color: t.color.brand[200] },
+  { label: 'Máquinas',     value: 8_400_000 * 0.45, color: t.chart.series[0] },
+  { label: 'Veículos',     value: 8_400_000 * 0.28, color: t.chart.series[1] },
+  { label: 'Benfeitorias', value: 8_400_000 * 0.18, color: t.chart.series[2] },
   { label: 'Outros',       value: 8_400_000 * 0.09, color: t.color.neutral[300] },
 ]
 

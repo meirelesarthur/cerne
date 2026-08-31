@@ -22,10 +22,12 @@ const matrizes  = [1160, 1170, 1175, 1180, 1190, 1185, 1195, 1200, 1195, 1205, 1
 const bezerros  = [730,  740,  745,  755,  760,  750,  765,  770,  755,  770,  780,  754]
 
 const rebanhoComp = [
-  { label: 'Novilhos',  pct: 38, color: t.color.brand[600] },
-  { label: 'Matrizes',  pct: 28, color: t.chart.series[6] },
+  { label: 'Novilhos',  pct: 38, color: t.chart.series[0] },
+  { label: 'Matrizes',  pct: 28, color: t.chart.series[1] },
   { label: 'Touros',    pct: 8,  color: t.chart.series[3] },
-  { label: 'Bezerros',  pct: 18, color: t.color.brand[400] },
+  { label: 'Bezerros',  pct: 18, color: t.chart.series[2] },
+  // Descarte é a sobra da composição — neutro de propósito, não compete com
+  // as categorias produtivas.
   { label: 'Descarte',  pct: 8,  color: t.color.neutral[400] },
 ] as const
 
@@ -35,16 +37,16 @@ const pesagensData = [30, 28, 40, 35, 45, 32, 38, 42, 30, 36, 48, 35]
 // ─── Séries para LineChart ────────────────────────────────────────────────────
 
 const REBANHO_SERIES = [
-  { name: 'Novilhos', data: novilhos, color: t.color.brand[600] },
-  { name: 'Matrizes', data: matrizes, color: t.chart.series[6] },
-  { name: 'Bezerros', data: bezerros, color: t.color.brand[400] },
+  { name: 'Novilhos', data: novilhos, color: t.chart.series[0] },
+  { name: 'Matrizes', data: matrizes, color: t.chart.series[1] },
+  { name: 'Bezerros', data: bezerros, color: t.chart.series[2] },
 ]
 
 // ─── Séries para GroupedBarChart ──────────────────────────────────────────────
 
 const MANEJOS_SERIES = [
-  { name: 'Vermifugações', data: vermifugData, color: t.color.brand[600] },
-  { name: 'Pesagens',      data: pesagensData, color: t.chart.series[6] },
+  { name: 'Vermifugações', data: vermifugData, color: t.chart.series[0] },
+  { name: 'Pesagens',      data: pesagensData, color: t.chart.series[1] },
 ]
 
 // ─── DashPecuaria ─────────────────────────────────────────────────────────────

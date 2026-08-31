@@ -28,12 +28,14 @@ const DAILY_LABELS = Array.from({ length: 30 }, (_, i) => `D${i + 1}`)
 
 // ─── Donut — Módulos ──────────────────────────────────────────────────────────
 
+// Módulos são categorias sem ordem — paleta categórica, pulando o vermelho
+// (`series[4]`), que num rótulo de módulo leria como erro.
 const MODULOS = [
-  { label: 'Financeiro',      pct: 28, acessos: 51, color: t.color.brand[700] },
-  { label: 'Dashboards',      pct: 22, acessos: 40, color: t.color.brand[500] },
-  { label: 'Cadastros',       pct: 18, acessos: 33, color: t.color.brand[300] },
-  { label: 'Fiscal',          pct: 14, acessos: 26, color: t.color.feedback.info.solid },
-  { label: 'Administrativo',  pct: 11, acessos: 20, color: t.color.neutral[400] },
+  { label: 'Financeiro',      pct: 28, acessos: 51, color: t.chart.series[0] },
+  { label: 'Dashboards',      pct: 22, acessos: 40, color: t.chart.series[1] },
+  { label: 'Cadastros',       pct: 18, acessos: 33, color: t.chart.series[2] },
+  { label: 'Fiscal',          pct: 14, acessos: 26, color: t.chart.series[3] },
+  { label: 'Administrativo',  pct: 11, acessos: 20, color: t.chart.series[5] },
   { label: 'Outros',          pct:  7, acessos: 13, color: t.color.neutral[300] },
 ]
 

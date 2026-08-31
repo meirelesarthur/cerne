@@ -8,6 +8,7 @@ import {
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -17,7 +18,6 @@ import {
   DashboardKpiCard,
 } from '../../components/ui/DashboardGrid'
 import { Button } from '../../components/ui/Button'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { Trend } from '../../components/ui/Trend'
 import { ChartLegend } from '../../components/ui/ChartLegend'
@@ -773,15 +773,20 @@ export default function OverviewPanel() {
           subtitle={currentFarm ? `Visão geral · ${currentFarm.name}` : 'Visão geral da safra'}
           actions={
             <>
-              <FilterSelect
-                ariaLabel="Filtrar por período"
-                options={[
-                  { value: '3',  label: 'Últimos 3 meses' },
-                  { value: '6',  label: 'Últimos 6 meses' },
-                  { value: '10', label: 'Últimos 10 meses' },
+              <DashboardFilters
+                fields={[
+                  {
+                    label: 'Período',
+                    value: periodo,
+                    onChange: setPeriodo,
+                    defaultValue: '10',
+                    options: [
+                      { value: '3',  label: 'Últimos 3 meses' },
+                      { value: '6',  label: 'Últimos 6 meses' },
+                      { value: '10', label: 'Últimos 10 meses' },
+                    ],
+                  },
                 ]}
-                value={periodo}
-                onChange={setPeriodo}
               />
               <Button variant="secondary" size="sm" icon={<Settings2 size={12} />} disabled title="Personalização em breve">
                 Personalizar

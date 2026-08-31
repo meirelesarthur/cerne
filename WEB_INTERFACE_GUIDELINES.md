@@ -176,7 +176,11 @@ isLoading → DashboardSkeleton          ← reproduz a própria grade (sem layo
 overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
 ```
 
-- **Rótulo do bloco** vai na prop `title` do card; legenda, `FilterSelect`, `Tabs` e botões
+- **Filtro é botão + drawer:** `DashboardFilters` no `actions` do cabeçalho — nunca uma
+  fileira de `FilterSelect` soltos, que crescia com o número de filtros e não mostrava
+  quantos estavam ativos. Cada campo declara seu `defaultValue`, que é o que define
+  "filtro ativo" e o que o "Limpar" restaura.
+- **Rótulo do bloco** vai na prop `title` do card; legenda, `Tabs` e botões
   vão na prop `action`. Nunca um `<div>` de título solto dentro do card.
 - **Bloco que sangra** (mapa, imagem) usa `DashboardCard bare` — sem padding interno.
 - **Sem borda no tema claro** (quem separa é o canvas); no GBMode o card mantém a hairline
@@ -418,6 +422,7 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `DashboardCard` | Bloco preenchido do dashboard: título, ação, `bare` para sangrar |
 | `DashboardKpiCard` | KPI como card: rótulo, valor, `Trend`, sparkline opcional |
 | `DashboardSkeleton` | Loading do dashboard reproduzindo a própria grade |
+| `DashboardFilters` | Botão "Filtros" do cabeçalho + `FilterDrawer` lateral com os campos |
 
 ### Hooks do kit
 
@@ -788,7 +793,9 @@ Três degraus, do mais externo ao conteúdo (tema claro):
 da mesma cor do próprio fundo e desapareceria.
 
 O canvas do dashboard **não tem fill próprio**: assume o `bg.outer`, o mesmo dos
-vãos e da faixa da Topbar em volta, e sem raio. Assim ele não lê como uma folha
+vãos e da faixa da Topbar em volta, sem raio e **sem padding** — o vão de 8px do
+chassi já é o respiro, e um padding aqui somava a ele (os blocos ficavam a 24px
+do submenu em vez de 8px). Assim ele não lê como uma folha
 posta sobre a tela — continua na moldura do chassi, e as únicas superfícies que
 sobram são os blocos.
 

@@ -10,9 +10,9 @@ import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -132,23 +132,27 @@ export default function DashLotacaoCurrais() {
         title="Lotação de Currais"
         subtitle="Ocupação, status e capacidade do pátio de confinamento"
         actions={
-          <>
-            <FilterSelect
-              ariaLabel="Filtrar por pátio"
-              options={[{ value: 'principal', label: 'Pátio Principal' }]}
-              value={patio}
-              onChange={setPatio}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por setor"
-              options={[
-                { value: 'todos', label: 'Todos os Setores' },
-                ...mockSetores.map((s) => ({ value: s, label: s })),
-              ]}
-              value={setor}
-              onChange={setSetor}
-            />
-          </>
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Pátio',
+                value: patio,
+                onChange: setPatio,
+                defaultValue: 'principal',
+                options: [{ value: 'principal', label: 'Pátio Principal' }],
+              },
+              {
+                label: 'Setor',
+                value: setor,
+                onChange: setSetor,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os Setores' },
+                  ...mockSetores.map((s) => ({ value: s, label: s })),
+                ],
+              },
+            ]}
+          />
         }
       />
 

@@ -64,7 +64,9 @@ export function DashboardGrid({ children }: DashboardGridProps) {
         display: 'flex',
         flexDirection: 'column',
         gap: t.space[4],
-        padding: t.space[4],
+        // Sem padding: o vão de 8px do chassi (gap entre submenu, Topbar e área
+        // de conteúdo) já é o respiro do dashboard. Um padding aqui somava ao
+        // vão e afastava os blocos do submenu em 24px.
         background: colors.bg.outer,
         // Sem raio: a área de conteúdo já arredonda o que está dentro dela
         // (`overflow: auto` recorta pelo raio), e um raio aqui deixaria a cor da
@@ -83,7 +85,7 @@ interface DashboardHeaderProps {
   title: string
   /** Linha de apoio acima do título (ex.: "Acompanhe e analise sua safra"). */
   subtitle?: string
-  /** Slot de ações à direita — FilterSelect, Tabs, Button. */
+  /** Slot de ações à direita — `DashboardFilters`, `Tabs`, `Button`. */
   actions?: React.ReactNode
   /** Nível semântico do título. Default `2`. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
@@ -116,7 +118,6 @@ export function DashboardHeader({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: t.space[3],
-        padding: `0 ${t.space[1]}px`,
         // Título nunca racha no meio da palavra: o CSS global do app herda
         // `overflow-wrap: break-word`, que em caixa estreita quebrava
         // "Desempenho" em duas linhas. Quem cede espaço primeiro são as ações,
@@ -229,7 +230,7 @@ interface DashboardCardProps {
   children: React.ReactNode
   /** Rótulo do bloco, no topo do card. Aceita nó para rótulos com ícone/legenda. */
   title?: React.ReactNode
-  /** Slot à direita do rótulo — FilterSelect, Tabs, Button, IconButton. */
+  /** Slot à direita do rótulo — `ChartLegend`, `Tabs`, `Button`, `IconButton`. */
   action?: React.ReactNode
   /** Peso da largura dentro de uma `DashboardRow`. Default `1`. */
   flex?: number
@@ -316,7 +317,7 @@ export function DashboardCard({
           )}
           {action && (
             // `flexWrap` deixa legenda longa quebrar em vez de ser cortada pela
-            // borda do card; controles (FilterSelect/Button) não encolhem abaixo
+            // borda do card; controles (select/botão) não encolhem abaixo
             // do próprio conteúdo, então continuam íntegros.
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
@@ -349,9 +350,7 @@ interface DashboardSkeletonProps {
 export function DashboardSkeleton({ kpis = 4, blocks = [260, 200] }: DashboardSkeletonProps) {
   return (
     <DashboardGrid>
-      <div style={{ padding: `0 ${t.space[1]}px` }}>
-        <Skeleton height={26} width={200} />
-      </div>
+      <Skeleton height={26} width={200} />
       {kpis > 0 && (
         <DashboardRow>
           {Array.from({ length: kpis }, (_, i) => (

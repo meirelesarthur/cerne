@@ -3,8 +3,8 @@ import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { BarChart } from '../../components/ui/BarChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -146,14 +146,19 @@ export default function DashSuprimentos() {
         title="Suprimentos"
         subtitle="Do pedido ao recebimento — funil, gastos e fornecedores"
         actions={
-          <FilterSelect
-            ariaLabel="Filtrar por categoria"
-            options={[
-              { value: 'todas', label: 'Todas as categorias' },
-              ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Categoria',
+                value: categoria,
+                onChange: setCategoria,
+                defaultValue: 'todas',
+                options: [
+                  { value: 'todas', label: 'Todas as categorias' },
+                  ...categoriaData.map((c) => ({ value: c.label, label: c.label })),
+                ],
+              },
             ]}
-            value={categoria}
-            onChange={setCategoria}
           />
         }
       />

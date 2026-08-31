@@ -12,10 +12,10 @@ import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -157,35 +157,40 @@ export default function DashConsumoRacao() {
         title="Consumo de Ração"
         subtitle="Produção, distribuição, custo da batida e composição"
         actions={
-          <>
-            <FilterSelect
-              ariaLabel="Filtrar por período"
-              options={[
-                { value: '30', label: 'Últimos 30 dias' },
-                { value: '60', label: 'Últimos 60 dias' },
-              ]}
-              value={periodo}
-              onChange={setPeriodo}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por formulação"
-              options={[
-                { value: 'todas', label: 'Todas as formulações' },
-                ...mockCustoBatidaData.map((f) => ({ value: f.label, label: f.label })),
-              ]}
-              value={formulacao}
-              onChange={setFormulacao}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por lote"
-              options={[
-                { value: 'todos', label: 'Todos os lotes' },
-                ...mockConsumoSeries.map((s) => ({ value: s.name, label: s.name })),
-              ]}
-              value={lote}
-              onChange={setLote}
-            />
-          </>
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '60',
+                options: [
+                  { value: '30', label: 'Últimos 30 dias' },
+                  { value: '60', label: 'Últimos 60 dias' },
+                ],
+              },
+              {
+                label: 'Formulação',
+                value: formulacao,
+                onChange: setFormulacao,
+                defaultValue: 'todas',
+                options: [
+                  { value: 'todas', label: 'Todas as formulações' },
+                  ...mockCustoBatidaData.map((f) => ({ value: f.label, label: f.label })),
+                ],
+              },
+              {
+                label: 'Lote',
+                value: lote,
+                onChange: setLote,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os lotes' },
+                  ...mockConsumoSeries.map((s) => ({ value: s.name, label: s.name })),
+                ],
+              },
+            ]}
+          />
         }
       />
 

@@ -11,10 +11,10 @@ import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { LineChart } from '../../components/ui/LineChart'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -184,35 +184,40 @@ export default function DashDesempenhoLotes() {
         title="Desempenho de Lotes"
         subtitle="GMD, evolução de peso e detalhamento dos lotes em confinamento"
         actions={
-          <>
-            <FilterSelect
-              ariaLabel="Filtrar por período"
-              options={[
-                { value: '4', label: 'Últimas 4 pesagens' },
-                { value: '7', label: 'Últimas 7 pesagens' },
-              ]}
-              value={periodo}
-              onChange={setPeriodo}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por curral"
-              options={[
-                { value: 'todos', label: 'Todos os currais' },
-                ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
-              ]}
-              value={curral}
-              onChange={setCurral}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por lote"
-              options={[
-                { value: 'todos', label: 'Todos os lotes' },
-                ...mockLoteLabels.map((l) => ({ value: l, label: l })),
-              ]}
-              value={lote}
-              onChange={setLote}
-            />
-          </>
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '7',
+                options: [
+                  { value: '4', label: 'Últimas 4 pesagens' },
+                  { value: '7', label: 'Últimas 7 pesagens' },
+                ],
+              },
+              {
+                label: 'Curral',
+                value: curral,
+                onChange: setCurral,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os currais' },
+                  ...mockLotesDetalhe.map((l) => ({ value: l.curral, label: l.curral })),
+                ],
+              },
+              {
+                label: 'Lote',
+                value: lote,
+                onChange: setLote,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os lotes' },
+                  ...mockLoteLabels.map((l) => ({ value: l, label: l })),
+                ],
+              },
+            ]}
+          />
         }
       />
 

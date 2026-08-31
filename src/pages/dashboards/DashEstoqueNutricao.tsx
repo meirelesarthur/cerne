@@ -10,9 +10,9 @@ import { AlertTriangle } from 'lucide-react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -156,35 +156,40 @@ export default function DashEstoqueNutricao() {
         title="Estoque Nutrição"
         subtitle="Saldo, consumo e cobertura dos insumos de nutrição"
         actions={
-          <>
-            <FilterSelect
-              ariaLabel="Filtrar por período"
-              options={[
-                { value: '30', label: 'Últimos 30 dias' },
-                { value: '60', label: 'Últimos 60 dias' },
-              ]}
-              value={periodo}
-              onChange={setPeriodo}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por produto"
-              options={[
-                { value: 'todos', label: 'Todos os Produtos' },
-                ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
-              ]}
-              value={produto}
-              onChange={setProduto}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por armazém"
-              options={[
-                { value: 'todos', label: 'Todos os Armazéns' },
-                ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
-              ]}
-              value={armazem}
-              onChange={setArmazem}
-            />
-          </>
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '60',
+                options: [
+                  { value: '30', label: 'Últimos 30 dias' },
+                  { value: '60', label: 'Últimos 60 dias' },
+                ],
+              },
+              {
+                label: 'Produto',
+                value: produto,
+                onChange: setProduto,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os Produtos' },
+                  ...mockCoberturaProdutos.map((p) => ({ value: p.label, label: p.label })),
+                ],
+              },
+              {
+                label: 'Armazém',
+                value: armazem,
+                onChange: setArmazem,
+                defaultValue: 'todos',
+                options: [
+                  { value: 'todos', label: 'Todos os Armazéns' },
+                  ...mockSaldoArmazem.map((a) => ({ value: a.label, label: a.label })),
+                ],
+              },
+            ]}
+          />
         }
       />
 

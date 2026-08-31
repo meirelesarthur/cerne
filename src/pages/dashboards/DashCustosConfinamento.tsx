@@ -13,10 +13,10 @@ import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { LineChart } from '../../components/ui/LineChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -181,32 +181,37 @@ export default function DashCustosConfinamento() {
         title="Custos do Confinamento"
         subtitle="Custo por arroba, COE, margem e composição de custo"
         actions={
-          <>
-            <FilterSelect
-              ariaLabel="Filtrar por período"
-              options={[
-                { value: '3', label: 'Abr–Jun 2025' },
-                { value: '6', label: 'Jan–Jun 2025' },
-              ]}
-              value={periodo}
-              onChange={setPeriodo}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por categoria de custo"
-              options={[
-                { value: 'todas', label: 'Todas as categorias' },
-                ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
-              ]}
-              value={categoria}
-              onChange={setCategoria}
-            />
-            <FilterSelect
-              ariaLabel="Filtrar por safra"
-              options={[{ value: '25/26', label: 'Safra 25/26' }]}
-              value={safra}
-              onChange={setSafra}
-            />
-          </>
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '6',
+                options: [
+                  { value: '3', label: 'Abr–Jun 2025' },
+                  { value: '6', label: 'Jan–Jun 2025' },
+                ],
+              },
+              {
+                label: 'Categoria de custo',
+                value: categoria,
+                onChange: setCategoria,
+                defaultValue: 'todas',
+                options: [
+                  { value: 'todas', label: 'Todas as categorias' },
+                  ...mockStackedSeries.map((s) => ({ value: s.name, label: s.name })),
+                ],
+              },
+              {
+                label: 'Safra',
+                value: safra,
+                onChange: setSafra,
+                defaultValue: '25/26',
+                options: [{ value: '25/26', label: 'Safra 25/26' }],
+              },
+            ]}
+          />
         }
       />
 

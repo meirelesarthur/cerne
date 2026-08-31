@@ -226,7 +226,8 @@ PageContainer (style={{ paddingBottom: 0 }})
 
 Dashboard não usa `PageCard`. A casca é o `DashboardGrid`: cada bloco é um card com fill
 próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos. O
-canvas assume o nível do chassi (`bg.outer`, sem raio): não lê como folha sobre a tela,
+canvas assume o nível do chassi (`bg.outer`, sem raio e sem padding — o vão de 8px do
+chassi é o respiro): não lê como folha sobre a tela,
 e os blocos ficam sendo as únicas superfícies.
 
 ```
@@ -239,7 +240,9 @@ DashboardGrid                          ← canvas sem fill próprio (bg.outer) +
 isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
 ```
 
-- Rótulo do bloco na prop `title`; legenda/filtro/botão na prop `action`.
+- **Filtro é botão + drawer:** `DashboardFilters` no `actions` do cabeçalho, nunca
+  `FilterSelect` solto. Cada campo declara `defaultValue` (define filtro ativo e Limpar).
+- Rótulo do bloco na prop `title`; legenda/botão na prop `action`.
 - Bloco que sangra (mapa) → `DashboardCard bare`.
 - Borda só no GBMode — regra do `DashboardCard`, nunca replicada na tela.
 - **Largura por espaço, não por janela:** card declara mínimo

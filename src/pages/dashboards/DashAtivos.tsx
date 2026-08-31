@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { usePrefersReducedMotion } from '../../components/ui/usePrefersReducedMotion'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { GroupedBarChart } from '../../components/ui/GroupedBarChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -171,15 +171,20 @@ export default function DashAtivos() {
         title="Ativos"
         subtitle="Patrimônio, operação e manutenções da frota"
         actions={
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '3',  label: 'Últimos 3 meses' },
-              { value: '6',  label: 'Últimos 6 meses' },
-              { value: '12', label: 'Últimos 12 meses' },
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '12',
+                options: [
+                  { value: '3',  label: 'Últimos 3 meses' },
+                  { value: '6',  label: 'Últimos 6 meses' },
+                  { value: '12', label: 'Últimos 12 meses' },
+                ],
+              },
             ]}
-            value={periodo}
-            onChange={setPeriodo}
           />
         }
       />

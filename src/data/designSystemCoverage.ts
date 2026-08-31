@@ -336,6 +336,7 @@ export const COMPONENT_COVERAGE: ComponentCoverageEntry[] = [
   { name: 'ChartSvgLegend', status: 'coberto', screens: 'components/ui/{Bar,GroupedBar,StackedBar,Line}Chart (legenda interna)' },
   { name: 'Checkbox', status: 'coberto', screens: AMPLO },
   { name: 'ConfirmDialog', status: 'coberto', screens: AMPLO },
+  { name: 'DashboardFilters', status: 'coberto', screens: 'pages/dashboards/* (botão Filtros + FilterDrawer)' },
   { name: 'DashboardGrid', status: 'coberto', screens: 'pages/dashboards/* (casca das 14 telas: Grid/Header/Row/Stack/Card/KpiCard/Skeleton)' },
   { name: 'DataTable', status: 'coberto', screens: 'integracoes/dominio, planejamento-pecuario, ofx (+ via CrudPattern/ResponsiveDataTable)' },
   { name: 'Divider', status: 'coberto', screens: 'pages/Login, pages/planos' },

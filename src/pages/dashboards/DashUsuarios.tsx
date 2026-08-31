@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
-import { FilterSelect } from '../../components/ui/FilterSelect'
 import { LineChart } from '../../components/ui/LineChart'
 import { StackedBarChart } from '../../components/ui/StackedBarChart'
 import { DonutChart } from '../../components/ui/DonutChart'
+import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -145,15 +145,20 @@ export default function DashUsuarios() {
         title="Análise de Usuários"
         subtitle="Acessos, módulos e horários de pico da equipe"
         actions={
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '7',  label: 'Últimos 7 dias' },
-              { value: '15', label: 'Últimos 15 dias' },
-              { value: '30', label: 'Últimos 30 dias' },
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: periodo,
+                onChange: setPeriodo,
+                defaultValue: '30',
+                options: [
+                  { value: '7',  label: 'Últimos 7 dias' },
+                  { value: '15', label: 'Últimos 15 dias' },
+                  { value: '30', label: 'Últimos 30 dias' },
+                ],
+              },
             ]}
-            value={periodo}
-            onChange={setPeriodo}
           />
         }
       />

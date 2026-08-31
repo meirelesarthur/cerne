@@ -209,7 +209,7 @@ export default function Pluviometria() {
                   ● Open-Meteo Live
                 </span>
               )}
-              <Button icon={<Filter size={14} />} size="md" onClick={() => setFilterOpen(true)}>
+              <Button icon={<Filter size={t.icon.xs} />} size="md" onClick={() => setFilterOpen(true)}>
                 Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
               </Button>
             </>

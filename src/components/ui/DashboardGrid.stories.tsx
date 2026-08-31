@@ -8,7 +8,7 @@ import {
 } from './DashboardGrid'
 import { LineChart } from './LineChart'
 import { DonutChart } from './DonutChart'
-import { FilterSelect } from './FilterSelect'
+import { DashboardFilters } from './DashboardFilters'
 import { t } from '../../design/tokens'
 
 const meta: Meta<typeof DashboardGrid> = {
@@ -44,14 +44,19 @@ export const Default: Story = {
         title="Financeiro"
         subtitle="Acompanhe receitas, despesas e margem da safra"
         actions={
-          <FilterSelect
-            ariaLabel="Filtrar por período"
-            options={[
-              { value: '6', label: 'Últimos 6 meses' },
-              { value: '12', label: 'Últimos 12 meses' },
+          <DashboardFilters
+            fields={[
+              {
+                label: 'Período',
+                value: '6',
+                onChange: () => {},
+                defaultValue: '6',
+                options: [
+                  { value: '6',  label: 'Últimos 6 meses' },
+                  { value: '12', label: 'Últimos 12 meses' },
+                ],
+              },
             ]}
-            value="6"
-            onChange={() => {}}
           />
         }
       />

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { useChartScale } from '../../hooks/useChartScale'
+import { measureLabelWidth, truncateAxisLabel, widestLabel } from '../../utils/chartAxis'
 
 export interface DonutSlice {
   label: string
@@ -67,14 +68,55 @@ export function DonutChart({
     )
   }
 
-  const LEGEND_H = showLegend ? Math.ceil(data.length / 2) * 22 : 0
+  // Legenda ao LADO quando o card é retangular: embaixo ela come a altura, o anel
+  // encolhe e o valor do centro deixa de caber. Ao lado, o donut usa a altura
+  // inteira. Só quando as linhas caibem na altura — senão volta para baixo.
+  const LEGEND_ROW_H = 22
+  const LEGEND_GAP = 24
+  const LEGEND_DOT_W = 22
+  const legendW = Math.min(
+    220,
+    Math.ceil(LEGEND_DOT_W + widestLabel(data.map((d) => d.label), t.font.size.xs)) + 4,
+  )
+  const legendSide =
+    showLegend && W - legendW - LEGEND_GAP >= H && data.length * LEGEND_ROW_H <= H
+
+  const LEGEND_H = showLegend && !legendSide ? Math.ceil(data.length / 2) * LEGEND_ROW_H : 0
   const donutAreaH = H - LEGEND_H
 
-  // Donut geometry
-  const cx = W / 2
-  const cy = donutAreaH / 2
-  const R = Math.min(cx, cy) * 0.82
+  // Donut geometry — na coluna lateral o par donut+legenda é centrado como um
+  // bloco só, senão sobrava uma faixa vazia entre os dois.
+  const availW = legendSide ? W - legendW - LEGEND_GAP : W
+  const R = Math.min(availW / 2, donutAreaH / 2) * 0.82
   const innerR = R * 0.58
+  const groupW = legendSide ? 2 * R + LEGEND_GAP + legendW : W
+  const groupX = Math.max(0, (W - groupW) / 2)
+  const cx = legendSide ? groupX + R : W / 2
+  const cy = donutAreaH / 2
+
+  // Texto do centro dimensionado pelo buraco do donut — o degrau maior que cabe.
+  // O bold do Outfit mede um pouco mais que o regular medido pelo canvas.
+  const holeW = innerR * 2 * 0.88
+  const BOLD_RATIO = 1.06
+  const fitSize = (text: string, steps: number[], ratio = 1) =>
+    steps.find((step) => measureLabelWidth(text, step) * ratio <= holeW) ?? steps[steps.length - 1]
+
+  const valueSize = centerValue
+    ? fitSize(
+        centerValue,
+        [t.font.size['2xl'], t.font.size.xl, t.font.size.lg, t.font.size.md, t.font.size.sm],
+        BOLD_RATIO,
+      )
+    : 0
+  const labelSize = centerLabel
+    ? fitSize(centerLabel, [t.font.size.xs, t.font.size['2xs'], t.font.size['3xs']])
+    : 0
+  const labelText = centerLabel ? truncateAxisLabel(centerLabel, holeW, labelSize) : ''
+
+  // Par valor+rótulo centrado no buraco, qualquer que seja o degrau escolhido
+  const centerBlockH = valueSize + (labelSize ? labelSize + 4 : 0)
+  const valueY = cy - centerBlockH / 2 + valueSize * 0.78
+  const labelY = (valueSize ? valueY : cy - labelSize / 2) + labelSize + 4
 
   const getColor = (d: DonutSlice, i: number) => d.color ?? t.chart.series[i % 8]
 
@@ -165,11 +207,11 @@ export function DonutChart({
           {centerValue && (
             <text
               x={cx}
-              y={cy + (centerLabel ? -2 : 6)}
+              y={valueY}
               textAnchor="middle"
               fill={colors.fg.default as string}
               fontFamily={t.font.family.sans}
-              style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold }}
+              style={{ fontSize: valueSize, fontWeight: t.font.weight.bold }}
             >
               {centerValue}
             </text>
@@ -177,13 +219,13 @@ export function DonutChart({
           {centerLabel && (
             <text
               x={cx}
-              y={cy + (centerValue ? 20 : 6)}
+              y={labelY}
               textAnchor="middle"
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
-              style={{ fontSize: t.font.size.xs }}
+              style={{ fontSize: labelSize }}
             >
-              {centerLabel}
+              {labelText}
             </text>
           )}
         </g>
@@ -232,18 +274,23 @@ export function DonutChart({
         )
       })()}
 
-      {/* Legend */}
+      {/* Legend — ao lado no card retangular, abaixo em duas colunas no estreito */}
       {showLegend && (() => {
-        const legendTop = donutAreaH + 8
-        const colW = W / 2
+        const colW = legendSide ? legendW : W / 2
+        // Coluna lateral centrada na altura; abaixo, ancorada sob o donut
+        const top = legendSide
+          ? Math.max(0, Math.round((H - data.length * LEGEND_ROW_H) / 2))
+          : donutAreaH + 8
+        const textW = colW - LEGEND_DOT_W
+        const sideX = cx + R + LEGEND_GAP
+
         return (
           <g>
             {data.map((d, i) => {
               const col = getColor(d, i)
-              const row = Math.floor(i / 2)
-              const col_ = i % 2
-              const lx = col_ * colW + 8
-              const ly = legendTop + row * 22
+              const row = legendSide ? i : Math.floor(i / 2)
+              const lx = legendSide ? sideX : (i % 2) * colW + 8
+              const ly = top + row * LEGEND_ROW_H
               return (
                 <g key={i}>
                   <circle cx={lx + 6} cy={ly + 8} r={5} fill={col} />
@@ -254,7 +301,7 @@ export function DonutChart({
                     fontFamily={t.font.family.sans}
                     style={{ fontSize: t.font.size.xs }}
                   >
-                    {d.label}
+                    {truncateAxisLabel(d.label, textW, t.font.size.xs)}
                   </text>
                 </g>
               )

@@ -41,7 +41,7 @@ export function measureLabelWidth(label: string, fontSize: number): number {
 }
 
 /** Largura do rótulo mais largo da lista. */
-function widestLabel(labels: string[], fontSize: number): number {
+export function widestLabel(labels: string[], fontSize: number): number {
   return labels.reduce((acc, label) => Math.max(acc, measureLabelWidth(label, fontSize)), 0)
 }
 

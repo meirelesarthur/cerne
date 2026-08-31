@@ -200,6 +200,11 @@ overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
   paleta de feedback; sobra de composição ("Outros") → neutro.
 - **Altura de gráfico** vem de `t.size.chart.{sm,md,lg}` — nunca número solto. Cards na
   mesma fileira usam o mesmo degrau, senão um fecha antes do outro.
+- **Texto dentro de forma fechada se ajusta à forma, não ao contrário:** o valor central
+  do `DonutChart` escolhe o maior degrau de `t.font.size` que cabe no buraco do anel (e a
+  legenda vira coluna à direita quando o card é retangular, liberando a altura inteira
+  para o anel). Nunca deixar o número vazar nem abreviar o valor por conta própria — o
+  formato do número é do chamador.
 - **Rótulo em caixa de sentença**, em uma linha: "Ativos por categoria", não "Ativos por
   Categoria" nem "Cobertura por Produto (dias restantes) — itens críticos abaixo de 14
   dias". Detalhe/aviso vai como chip no `action`, não no título.
@@ -542,7 +547,7 @@ Antes de escrever lógica de tela, veja se já existe (Regra F, degrau 2):
 | `GroupedBarChart` | Barras agrupadas SVG |
 | `StackedBarChart` | Barras empilhadas SVG, vertical/horizontal |
 | `LineChart` | Linha/área SVG multi-série |
-| `DonutChart` | Donut SVG com hover, tooltip, legenda, rótulo central |
+| `DonutChart` | Donut SVG com hover, tooltip, rótulo central que se ajusta ao buraco e legenda ao lado (card largo) ou abaixo |
 | `GaugeChart` | Medidor semicircular SVG proporcional a valor/máximo |
 | `HeatmapChart` | Mapa de calor em grid, intensidade por opacidade |
 | `SankeyFunnel` | Funil SVG com conectores de fluxo e tooltip por estágio |

@@ -11,7 +11,7 @@ const meta: Meta<typeof DonutChart> = {
     docs: {
       description: {
         component:
-          'Gráfico de rosca (donut) SVG com rótulo central, tooltip e legenda em grid. Slice ativa expande levemente no hover. Funciona em Light e GBMode.',
+          'Gráfico de rosca (donut) SVG com rótulo central, tooltip e legenda. A legenda vai ao LADO quando o card é retangular (o donut usa a altura inteira) e abaixo, em duas colunas, no card estreito. O valor do centro é dimensionado pelo buraco do donut — escolhe o maior degrau da escala que cabe. Slice ativa expande levemente no hover. Funciona em Light e GBMode.',
       },
     },
   },
@@ -39,6 +39,48 @@ export const DistribuicaoCustos: Story = {
     showLegend: true,
     valueFormat: (v) => `R$${(v / 1000).toFixed(1)}k`,
   },
+}
+
+// ─── Legenda ao lado × abaixo ─────────────────────────────────────────────────
+// Mesmos dados, larguras diferentes: no card largo a legenda vira coluna à
+// direita e o donut cresce; no estreito, volta para duas colunas embaixo.
+
+const COE = [
+  { label: 'Ração', value: 1290 },
+  { label: 'Sanitário', value: 240 },
+  { label: 'Mão de obra', value: 280 },
+  { label: 'Depreciação', value: 130 },
+  { label: 'Outros', value: 108 },
+]
+
+export const LegendaAoLado: Story = {
+  name: 'Legenda ao lado (card largo)',
+  render: () => (
+    <div style={{ width: 860 }}>
+      <DonutChart
+        data={COE}
+        height={260}
+        centerLabel="COE total"
+        centerValue="R$ 2.048"
+        valueFormat={(v) => `R$ ${v} mil`}
+      />
+    </div>
+  ),
+}
+
+export const LegendaAbaixo: Story = {
+  name: 'Legenda abaixo (card estreito)',
+  render: () => (
+    <div style={{ width: 300 }}>
+      <DonutChart
+        data={COE}
+        height={220}
+        centerLabel="COE total"
+        centerValue="R$ 2.048"
+        valueFormat={(v) => `R$ ${v} mil`}
+      />
+    </div>
+  ),
 }
 
 // ─── Culturas por área ────────────────────────────────────────────────────────

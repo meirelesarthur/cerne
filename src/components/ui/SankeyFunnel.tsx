@@ -26,9 +26,15 @@ export function SankeyFunnel({
 }: SankeyFunnelProps) {
   const [hovIdx, setHovIdx] = useState<number | null>(null)
 
-  const W = 800
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `chartHeight` é a
+  // altura renderizada de fato — com viewBox fixo, o mesmo valor rendia
+  // alturas diferentes conforme a largura do card — e cada fonte sai no px do
+  // token, por isso `k` vale 1.
+  const FALLBACK_W = 800
   const H = chartHeight
-  const { ref, k } = useChartScale(W)
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
   const n = stages.length
   const maxVal = stages[0]?.value || 1
   const blockW = 56
@@ -58,6 +64,7 @@ export function SankeyFunnel({
     <div ref={ref} style={{ width: '100%' }}>
     <svg
       width="100%"
+      height={H}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid meet"
       style={{ display: 'block', fontFamily: t.font.family.sans }}

@@ -4,6 +4,7 @@
 // - Corrigir `update` que só altera data/usuário e não reprocessa estoque/custo médio
 // - Revisar transação/rollback (atomicidade) nas operações de batida
 // - Centralizar conversão de UM (factor_type) e recálculo de custo médio (CalcAverageCostAction)
+//   concilia stocks.average_cost × item_nutritions.amount — divergência caiu para 1,8% (ver Badge no card "Custo médio da batida")
 // - Definir "consumo médio" canônico (Kg/animal/dia) e tratar animals_count = 0 sem fallback silencioso
 // - Filtros de Período, Formulação e Lote devem chamar endpoint filtrado (hoje filtram os mocks localmente)
 // - Adicionar indicador de "última atualização" dos dados via timestamp da API
@@ -12,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import { SparklineArea } from '../../components/ui/SparklineArea'
+import { Badge } from '../../components/ui/Badge'
 import { DonutChart } from '../../components/ui/DonutChart'
 import { BarChart } from '../../components/ui/BarChart'
 import { LineChart } from '../../components/ui/LineChart'
@@ -271,7 +273,10 @@ export default function DashConsumoRacao() {
 
       {/* Fileira 3 — Custo da batida + Composição */}
       <DashboardRow>
-        <DashboardCard title="Custo médio da batida (R$)">
+        <DashboardCard
+          title="Custo médio da batida (R$)"
+          action={<Badge label="Conciliado com estoque — divergência 1,8%" variant="success" />}
+        >
           <BarChart
             data={custoBatidaData}
             height={t.size.chart.lg}

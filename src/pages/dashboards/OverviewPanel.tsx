@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type { LatLngTuple } from 'leaflet'
 import { Icon } from '../../components/ui/Icon'
 import { t } from '../../design/tokens'
@@ -16,6 +16,7 @@ import {
 } from '../../components/ui/DashboardGrid'
 import { Button } from '../../components/ui/Button'
 import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
+import { SparklineArea } from '../../components/ui/SparklineArea'
 import { Trend } from '../../components/ui/Trend'
 import { ChartLegend } from '../../components/ui/ChartLegend'
 import { Tabs } from '../../components/ui/Tabs'
@@ -563,6 +564,9 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries, focus = nul
 
   const recGradId = isGbMode ? 'recGbGrad' : 'recGrad'
   const dspGradId = isGbMode ? 'dspGbGrad' : 'dspGrad'
+  // Revelação da esquerda para a direita (estilo de entrada Recharts) — só o
+  // traçado de dado é recortado; grade e eixos aparecem de imediato.
+  const clipId = `area-clip-${useId()}`
 
   return (
     <div ref={chartRef} style={{ position: 'relative', width: '100%' }}>
@@ -576,6 +580,13 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries, focus = nul
             <stop offset="0%" stopColor={t.color.feedback.error.solid} stopOpacity={isGbMode ? 0.25 : 0.10} />
             <stop offset="100%" stopColor={t.color.feedback.error.solid} stopOpacity={0} />
           </linearGradient>
+          <clipPath id={clipId}>
+            <rect
+              className="chart-reveal-rect"
+              x={PL} y={0} width={cW} height={H}
+              style={{ ['--reveal-w' as string]: `${cW}px` }}
+            />
+          </clipPath>
         </defs>
 
         {/* Y grid */}
@@ -588,24 +599,26 @@ function AreaChart({ colors, isGbMode, data = AREA_DATA, prevSeries, focus = nul
           </g>
         ))}
 
-        {/* Area fills */}
-        {mostra('receitas') && <path d={areaClose(recPath, PT + cH)} fill={`url(#${recGradId})`} />}
-        {mostra('despesas') && <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />}
+        <g clipPath={`url(#${clipId})`}>
+          {/* Area fills */}
+          {mostra('receitas') && <path d={areaClose(recPath, PT + cH)} fill={`url(#${recGradId})`} />}
+          {mostra('despesas') && <path d={areaClose(dspPath, PT + cH)} fill={`url(#${dspGradId})`} />}
 
-        {/* Lines */}
-        {focus === null && prevPts.length > 1 && (
-          <path d={smoothPath(prevPts)} fill="none" stroke={colors.fg.subtle as string} strokeWidth={1.25}
-            strokeLinejoin="round" strokeLinecap="round" strokeDasharray="2 4" opacity={0.7} />
-        )}
-        {mostra('receitas') && (
-          <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        )}
-        {mostra('despesas') && (
-          <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
-        )}
-        {mostra('margem') && (
-          <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
-        )}
+          {/* Lines */}
+          {focus === null && prevPts.length > 1 && (
+            <path d={smoothPath(prevPts)} fill="none" stroke={colors.fg.subtle as string} strokeWidth={1.25}
+              strokeLinejoin="round" strokeLinecap="round" strokeDasharray="2 4" opacity={0.7} />
+          )}
+          {mostra('receitas') && (
+            <path d={recPath} fill="none" stroke={t.color.brand[600]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          )}
+          {mostra('despesas') && (
+            <path d={dspPath} fill="none" stroke={t.color.feedback.error.solid} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" />
+          )}
+          {mostra('margem') && (
+            <path d={mgPath} fill="none" stroke={MARGEM_COLOR} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
+          )}
+        </g>
 
         {/* X labels */}
         {data.map((d, i) => {
@@ -795,36 +808,71 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
   const cum: number[] = []
   data.reduce((acc, m) => { const v = acc + m.net; cum.push(v); return v }, 0)
 
-  const maxAbs = Math.max(...data.map(d => Math.abs(d.net)), ...cum.map(Math.abs)) * 1.15
-  const y = (v: number) => PT + cH / 2 - (v / maxAbs) * (cH / 2)
+  // Escala pelo range real da série (barras + acumulado) em vez de simétrica ao
+  // redor do centro: com saldo negativo, uma escala simétrica desperdiça metade
+  // da altura do lado que a série quase não usa e esmaga o lado que usa — as
+  // barras somem contra uma faixa vermelha de fundo do tamanho errado. Aqui o
+  // zero fica onde o valor 0 realmente cai dentro do range mín/máx.
+  const allVals = [...data.map(d => d.net), ...cum, 0]
+  const rawMin = Math.min(...allVals)
+  const rawMax = Math.max(...allVals)
+  const pad = (rawMax - rawMin || 1) * 0.12
+  const scaleMin = rawMin - pad
+  const scaleMax = rawMax + pad
+  const scaleRange = scaleMax - scaleMin
+  const y = (v: number) => PT + cH - ((v - scaleMin) / scaleRange) * cH
   const x = (i: number) => PL + (i / (data.length - 1)) * cW
   const barW = (cW / data.length) * 0.42
 
   const cumPts: [number, number][] = cum.map((v, i) => [x(i), y(v)])
   const zeroY = y(0)
+  const clipId = `cashflow-clip-${useId()}`
 
   return (
     <div ref={chartRef} style={{ width: '100%' }}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', maxHeight: H }}>
+        <defs>
+          <clipPath id={clipId}>
+            <rect
+              className="chart-reveal-rect"
+              x={PL} y={0} width={cW} height={H}
+              style={{ ['--reveal-w' as string]: `${cW}px` }}
+            />
+          </clipPath>
+        </defs>
+
         {/* Zona negativa */}
-        <rect x={PL} y={zeroY} width={cW} height={PT + cH - zeroY}
+        <rect x={PL} y={zeroY} width={cW} height={Math.max(PT + cH - zeroY, 0)}
           fill={t.color.feedback.error.solid} opacity={isGbMode ? 0.06 : 0.04} />
         {/* Linha do zero */}
         <line x1={PL} y1={zeroY} x2={W - PR} y2={zeroY} stroke={colors.border.default} strokeWidth={1} />
         <text x={PL - 6} y={zeroY + 3} textAnchor="end" fill={colors.fg.subtle as string} fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k }}>0</text>
 
-        {/* Barras de fluxo líquido mensal */}
-        {data.map((d, i) => {
-          const bx = x(i) - barW / 2
-          const by = d.net >= 0 ? y(d.net) : zeroY
-          const bh = Math.abs(y(d.net) - zeroY)
-          const isH = hov === i
-          return (
-            <g key={d.month}>
-              <rect x={bx} y={by} width={barW} height={Math.max(bh, 1)} rx={2}
+        <g clipPath={`url(#${clipId})`}>
+          {/* Barras de fluxo líquido mensal */}
+          {data.map((d, i) => {
+            const bx = x(i) - barW / 2
+            const by = d.net >= 0 ? y(d.net) : zeroY
+            const bh = Math.abs(y(d.net) - zeroY)
+            const isH = hov === i
+            return (
+              <rect key={d.month} x={bx} y={by} width={barW} height={Math.max(bh, 1)} rx={2}
                 fill={d.net >= 0 ? t.color.brand[600] : t.color.feedback.error.solid}
                 opacity={hov === null ? 0.55 : isH ? 0.9 : 0.25}
                 style={{ transition: `opacity ${t.transition.fast}` }} />
+            )
+          })}
+
+          {/* Curva acumulada */}
+          <path d={smoothPath(cumPts)} fill="none" stroke={t.color.accent.purple.text} strokeWidth={2}
+            strokeLinejoin="round" strokeLinecap="round" />
+        </g>
+
+        {/* Rótulos e zonas de hover — fora do clipe de entrada, sempre visíveis */}
+        {data.map((d, i) => {
+          const isH = hov === i
+          return (
+            <g key={d.month}>
               <text x={x(i)} y={H - 8} textAnchor="middle"
                 fill={isH ? (colors.fg.default as string) : (colors.fg.subtle as string)}
                 fontFamily="Outfit,sans-serif" style={{ fontSize: t.font.size['3xs'] * k, fontWeight: isH ? 600 : 400 }}>
@@ -835,10 +883,6 @@ function CashflowChart({ colors, isGbMode }: { colors: ThemeColors; isGbMode: bo
             </g>
           )
         })}
-
-        {/* Curva acumulada */}
-        <path d={smoothPath(cumPts)} fill="none" stroke={t.color.accent.purple.text} strokeWidth={2}
-          strokeLinejoin="round" strokeLinecap="round" />
 
         {/* Hover: valores */}
         {hov !== null && (
@@ -911,52 +955,54 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
   const folgaApertada = folga !== null && folga < 15
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: t.space[4], padding: `${t.space[2] + 2}px 0`, borderBottom: `1px solid ${colors.border.subtle}` }}>
-      <div style={{ width: 130, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: color, flexShrink: 0 }} />
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{crop}</div>
-          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{ha.toLocaleString('pt-BR')} ha</div>
+    <div style={{ padding: `${t.space[2] + 2}px 0`, borderBottom: `1px solid ${colors.border.subtle}` }}>
+      {/* Linha 1 — identificação da cultura + indicadores, lado a lado */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: t.space[4], flexWrap: 'wrap' }}>
+        <div style={{ minWidth: 130, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: color, flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: t.font.size.sm, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{crop}</div>
+            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{ha.toLocaleString('pt-BR')} ha</div>
+          </div>
         </div>
-      </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
         {total > 0 ? (
-          <>
-            <div style={{ display: 'flex', height: 8, borderRadius: t.radius.full, overflow: 'hidden', gap: 2 }}>
-              <div style={{ flex: perf.realizada, background: t.color.brand[600], borderRadius: t.radius.full }} />
-              <div style={{ flex: perf.aRealizar, background: t.color.brand[200], borderRadius: t.radius.full }} />
-            </div>
-            <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 4 }}>
-              {fmtCompact(total)} em receita
-            </div>
-          </>
+          <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+            <StatMini label="Produtividade" value={`${perf.produtividade} ${perf.unidProd}`} colors={colors} />
+            <StatMini label="Margem/ha"     value={`R$ ${perf.margemHa.toLocaleString('pt-BR')}`} colors={colors} />
+            <StatMini label="Custo médio"   value={`${perf.custoMedio} ${perf.unidPreco}`} colors={colors} />
+            <StatMini label="Preço médio"   value={`${perf.precoMedio} ${perf.unidPreco}`} colors={colors} />
+            {folga !== null && (
+              <div
+                title={`Folga do preço médio sobre o custo médio (breakeven)${folgaApertada ? ' — abaixo de 15%: oscilação de preço dessa ordem zera a margem' : ''}`}
+                style={{
+                  textAlign: 'center', minWidth: 64, flexShrink: 0,
+                  padding: `${t.space[1]}px ${t.space[2]}px`, borderRadius: t.radius.md,
+                  background: folgaApertada ? t.color.feedback.warning.bg : t.color.feedback.success.bg,
+                }}
+              >
+                <div style={{ fontSize: t.font.size.xs, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>Folga s/ custo</div>
+                <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>
+                  {folga.toFixed(0)}%
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Sem produção comercial no período</div>
         )}
       </div>
 
+      {/* Linha 2 — barra de progresso, largura total, abaixo dos indicadores */}
       {total > 0 && (
-        <div style={{ display: 'flex', gap: t.space[4], flexShrink: 0, alignItems: 'center' }}>
-          <StatMini label="Produtividade" value={`${perf.produtividade} ${perf.unidProd}`} colors={colors} />
-          <StatMini label="Margem/ha"     value={`R$ ${perf.margemHa.toLocaleString('pt-BR')}`} colors={colors} />
-          <StatMini label="Custo médio"   value={`${perf.custoMedio} ${perf.unidPreco}`} colors={colors} />
-          <StatMini label="Preço médio"   value={`${perf.precoMedio} ${perf.unidPreco}`} colors={colors} />
-          {folga !== null && (
-            <div
-              title={`Folga do preço médio sobre o custo médio (breakeven)${folgaApertada ? ' — abaixo de 15%: oscilação de preço dessa ordem zera a margem' : ''}`}
-              style={{
-                textAlign: 'center', minWidth: 64, flexShrink: 0,
-                padding: `${t.space[1]}px ${t.space[2]}px`, borderRadius: t.radius.md,
-                background: folgaApertada ? t.color.feedback.warning.bg : t.color.feedback.success.bg,
-              }}
-            >
-              <div style={{ fontSize: t.font.size.xs, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>Folga s/ custo</div>
-              <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: folgaApertada ? t.color.feedback.warning.text : t.color.feedback.success.text }}>
-                {folga.toFixed(0)}%
-              </div>
-            </div>
-          )}
+        <div style={{ marginTop: t.space[3] }}>
+          <div style={{ display: 'flex', height: 8, borderRadius: t.radius.full, overflow: 'hidden', gap: 2 }}>
+            <div style={{ flex: perf.realizada, background: t.color.brand[600], borderRadius: t.radius.full }} />
+            <div style={{ flex: perf.aRealizar, background: t.color.brand[200], borderRadius: t.radius.full }} />
+          </div>
+          <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: 4 }}>
+            {fmtCompact(total)} em receita
+          </div>
         </div>
       )}
     </div>
@@ -1064,9 +1110,18 @@ export default function OverviewPanel() {
         {/* ── Fileira de KPIs ───────────────────────────────────────────────── */}
         <DashboardRow>
           {[
-            { label: 'Margem bruta',        value: '12,5%',    trend: '2,7% vs 30 dias', up: true  },
-            { label: 'Receitas realizadas', value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true  },
-            { label: 'Saldo operacional',   value: 'R$ 14,5M', trend: '1,3% vs 30 dias', up: false },
+            {
+              label: 'Margem bruta', value: '12,5%', trend: '2,7% vs 30 dias', up: true,
+              spark: AREA_DATA.map(d => d.receitas - d.despesas), sparkColor: MARGEM_COLOR,
+            },
+            {
+              label: 'Receitas realizadas', value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true,
+              spark: AREA_DATA.map(d => d.receitas), sparkColor: t.color.brand[600],
+            },
+            {
+              label: 'Saldo operacional', value: 'R$ 14,5M', trend: '1,3% vs 30 dias', up: false,
+              spark: AREA_DATA.map(d => d.receitas - d.despesas).reverse(), sparkColor: t.color.feedback.error.solid,
+            },
           ].map((kpi) => (
             <DashboardKpiCard
               key={kpi.label}
@@ -1074,7 +1129,9 @@ export default function OverviewPanel() {
               value={kpi.value}
               trend={kpi.trend}
               up={kpi.up}
-            />
+            >
+              <SparklineArea data={kpi.spark} color={kpi.sparkColor} height={t.size.sparkline} />
+            </DashboardKpiCard>
           ))}
         </DashboardRow>
 
@@ -1084,39 +1141,42 @@ export default function OverviewPanel() {
           {/* ── Coluna principal ───────────────────────────────────────────── */}
           <DashboardStack flex={1}>
 
-            {/* Receitas mensais (realizado x previsto) */}
-            <DashboardCard
-              action={
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: t.space[2] }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <Tabs
-                      label="Série"
-                      items={[{ id: 'realizado', label: 'Realizado' }, { id: 'previsto', label: 'Previsto' }]}
-                      activeId={serie}
-                      onChange={(id) => setSerie(id as 'realizado' | 'previsto')}
-                    />
-                    <FilterSelect
-                      ariaLabel="Focar uma série do gráfico"
-                      options={[
-                        { value: AREA_FOCUS_ALL, label: 'Todas as séries' },
-                        { value: 'receitas', label: 'Receitas' },
-                        { value: 'despesas', label: 'Despesas' },
-                        { value: 'margem',   label: 'Margem' },
-                      ]}
-                      value={foco}
-                      onChange={(v) => setFoco(v as AreaFocus | typeof AREA_FOCUS_ALL)}
-                    />
+            {/* Receitas mensais (realizado x previsto) — valor e controles na
+                mesma linha (sem slot de título/ação vazio sobrando em cima). */}
+            <DashboardCard>
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+                flexWrap: 'wrap', gap: t.space[3], marginBottom: t.space[4],
+              }}>
+                <div>
+                  <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: t.font.lineHeight.tight }}>
+                    {serieInfo.hero}
                   </div>
-                  <Trend value={serieInfo.trend} up={serieInfo.up} />
+                  <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[1] }}>
+                    {serieInfo.label}
+                  </div>
+                  <div style={{ marginTop: t.space[2] }}>
+                    <Trend value={serieInfo.trend} up={serieInfo.up} />
+                  </div>
                 </div>
-              }
-            >
-              <div style={{ marginBottom: t.space[4] }}>
-                <div style={{ fontSize: t.font.size['3xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: t.font.lineHeight.tight }}>
-                  {serieInfo.hero}
-                </div>
-                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginTop: t.space[1] }}>
-                  {serieInfo.label}
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <FilterSelect
+                    ariaLabel="Focar uma série do gráfico"
+                    options={[
+                      { value: AREA_FOCUS_ALL, label: 'Todas as séries' },
+                      { value: 'receitas', label: 'Receitas' },
+                      { value: 'despesas', label: 'Despesas' },
+                      { value: 'margem',   label: 'Margem' },
+                    ]}
+                    value={foco}
+                    onChange={(v) => setFoco(v as AreaFocus | typeof AREA_FOCUS_ALL)}
+                  />
+                  <Tabs
+                    label="Série"
+                    items={[{ id: 'realizado', label: 'Realizado' }, { id: 'previsto', label: 'Previsto' }]}
+                    activeId={serie}
+                    onChange={(id) => setSerie(id as 'realizado' | 'previsto')}
+                  />
                 </div>
               </div>
               <div style={{ marginBottom: t.space[3] }}>

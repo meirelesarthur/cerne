@@ -107,16 +107,15 @@ export function SankeyFunnel({
               style={{ transition: 'opacity 0.18s ease' }}
             />
 
-            {/* Value */}
+            {/* Value — em faixa fina (sem badge de %) o número vai ao centro da
+                faixa; a 9px acima ele invadia o sublabel desenhado logo acima. */}
             <text
               x={cx}
-              y={midY - 9}
+              y={bandH[i] > 36 ? midY - 9 : midY + 4}
               textAnchor="middle"
-              fontSize={t.font.size.base * k}
-              fontWeight={700}
               fill={t.color.neutral[0]}
               opacity={dimmed ? 0.2 : 1}
-              style={{ transition: 'opacity 0.18s ease' }}
+              style={{ fontSize: t.font.size.base * k, fontWeight: 700, transition: 'opacity 0.18s ease' }}
             >
               {fmtVal(stage.value)}
             </text>
@@ -138,11 +137,9 @@ export function SankeyFunnel({
                   x={cx}
                   y={midY + 13}
                   textAnchor="middle"
-                  fontSize={t.font.size['3xs'] * k}
-                  fontWeight={600}
                   fill={t.color.neutral[0]}
                   opacity={dimmed ? 0 : 1}
-                  style={{ transition: 'opacity 0.18s ease' }}
+                  style={{ fontSize: t.font.size['3xs'] * k, fontWeight: 600, transition: 'opacity 0.18s ease' }}
                 >
                   {pct(stage.value)}%
                 </text>
@@ -154,10 +151,9 @@ export function SankeyFunnel({
               x={labelX}
               y={H - 4}
               textAnchor={labelAnchor}
-              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.subtle as string}
               opacity={dimmed ? 0.3 : 1}
-              style={{ transition: 'opacity 0.18s ease' }}
+              style={{ fontSize: t.font.size['3xs'] * k, transition: 'opacity 0.18s ease' }}
             >
               {stage.label}
             </text>
@@ -168,8 +164,8 @@ export function SankeyFunnel({
                 x={labelX}
                 y={topY[i] - 6}
                 textAnchor={labelAnchor}
-                fontSize={t.font.size['3xs'] * k}
                 fill={colors.fg.subtle as string}
+                style={{ fontSize: t.font.size['3xs'] * k }}
               >
                 {stage.sublabel}
               </text>
@@ -205,10 +201,9 @@ export function SankeyFunnel({
             <text
               x={ttX + 8}
               y={finalY + 14}
-              fontSize={t.font.size['3xs'] * k}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
-              fontWeight={600}
+              style={{ fontSize: t.font.size['3xs'] * k, fontWeight: 600 }}
             >
               {stage.label}: {fmtVal(stage.value)}
             </text>
@@ -216,9 +211,9 @@ export function SankeyFunnel({
               <text
                 x={ttX + 8}
                 y={finalY + 27}
-                fontSize={t.font.size['3xs'] * k}
                 fill={color}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size['3xs'] * k }}
               >
                 Conv. {pct(stage.value)}% do total
               </text>

@@ -57,8 +57,8 @@ export function DonutChart({
             x={W / 2}
             y={H / 2}
             textAnchor="middle"
-            fontSize={t.font.size.sm}
             fill={colors.fg.subtle as string}
+            style={{ fontSize: t.font.size.sm }}
           >
             Sem dados
           </text>
@@ -167,10 +167,9 @@ export function DonutChart({
               x={cx}
               y={cy + (centerLabel ? -2 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size['2xl']}
-              fontWeight={t.font.weight.bold}
               fill={colors.fg.default as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold }}
             >
               {centerValue}
             </text>
@@ -180,9 +179,9 @@ export function DonutChart({
               x={cx}
               y={cy + (centerValue ? 20 : 6)}
               textAnchor="middle"
-              fontSize={t.font.size.xs}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs }}
             >
               {centerLabel}
             </text>
@@ -214,19 +213,18 @@ export function DonutChart({
             <text
               x={ttX + 18}
               y={ttY + 16}
-              fontSize={t.font.size.xs}
-              fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold }}
             >
               {sl.d.label}
             </text>
             <text
               x={ttX + 10}
               y={ttY + 30}
-              fontSize={t.font.size.xs}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs }}
             >
               {valueFormat(sl.d.value)} ({pct}%)
             </text>
@@ -252,9 +250,9 @@ export function DonutChart({
                   <text
                     x={lx + 16}
                     y={ly + 12}
-                    fontSize={t.font.size.xs}
                     fill={colors.fg.muted as string}
                     fontFamily={t.font.family.sans}
+                    style={{ fontSize: t.font.size.xs }}
                   >
                     {d.label}
                   </text>

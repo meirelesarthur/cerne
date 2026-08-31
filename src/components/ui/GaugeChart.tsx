@@ -83,10 +83,9 @@ export function GaugeChart({
         x={cx}
         y={cy - 14}
         textAnchor="middle"
-        fontSize={t.font.size['2xl'] * k}
-        fontWeight={t.font.weight.bold}
         fill={isGbMode ? t.color.gb.accent : (colors.fg.default as string)}
         fontFamily={t.font.family.sans}
+        style={{ fontSize: t.font.size['2xl'] * k, fontWeight: t.font.weight.bold }}
       >
         {bigText}
       </text>
@@ -95,9 +94,9 @@ export function GaugeChart({
           x={cx}
           y={cy}
           textAnchor="middle"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {centerLabel}
         </text>

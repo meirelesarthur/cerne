@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
+import { ChartSvgLegend, chartLegendHeight } from './ChartSvgLegend'
+import { niceAxisMax, formatAxisValue, axisLabelPad, axisLabelStep, truncateAxisLabel } from '../../utils/chartAxis'
 import { useChartScale } from '../../hooks/useChartScale'
 
 export interface StackSeries {
@@ -28,15 +30,21 @@ export function StackedBarChart({
   labels,
   height = 220,
   horizontal = false,
-  yFormat = (v) => String(v),
+  yFormat = formatAxisValue,
   showLegend = true,
 }: StackedBarChartProps) {
   const { colors, isGbMode } = useTheme()
   const [hov, setHov] = useState<HoverState | null>(null)
 
-  const W = 800
   const H = height
-  const { ref, k } = useChartScale(W)
+  // viewBox casado à largura real medida: 1 unidade = 1px. Assim `height` é a
+  // altura renderizada de fato (antes o SVG escalava pelo viewBox e o mesmo
+  // valor rendia alturas diferentes conforme a largura do card) e cada fonte
+  // sai no px do token — por isso `k` vale 1.
+  const FALLBACK_W = 800
+  const { ref, width } = useChartScale(FALLBACK_W)
+  const W = width || FALLBACK_W
+  const k = 1
 
   const allData = series.flatMap((s) => s.data)
 
@@ -52,8 +60,8 @@ export function StackedBarChart({
             x={W / 2}
             y={H / 2}
             textAnchor="middle"
-            fontSize={t.font.size.sm * k}
             fill={colors.fg.subtle as string}
+            style={{ fontSize: t.font.size.sm * k }}
           >
             Sem dados
           </text>
@@ -66,19 +74,27 @@ export function StackedBarChart({
   const totals = labels.map((_, gi) =>
     series.reduce((sum, s) => sum + (s.data[gi] ?? 0), 0)
   )
-  const maxTotal = Math.max(...totals)
+  // Topo do eixo em degrau redondo — rótulos limpos em vez de frações longas
+  const maxTotal = niceAxisMax(Math.max(...totals))
 
-  const LEGEND_H = showLegend ? 28 : 0
+  const LEGEND_H = showLegend ? chartLegendHeight(k) : 0
   const PAD_TOP = 16
   const PAD_BOTTOM = horizontal ? 28 : 36
-  const PAD_LEFT = horizontal ? 100 : 52
   const PAD_RIGHT = 16
-
-  const chartH = H - PAD_TOP - PAD_BOTTOM - LEGEND_H
-  const chartW = W - PAD_LEFT - PAD_RIGHT
 
   const TICKS = 4
   const tickVals = Array.from({ length: TICKS }, (_, i) => (maxTotal / (TICKS - 1)) * i)
+
+  // Padding do eixo dimensionado pelo rótulo mais longo — no modo horizontal os
+  // rótulos da esquerda são as categorias, que pedem mais espaço.
+  const PAD_LEFT = horizontal
+    ? axisLabelPad(labels, t.font.size.xs, 100)
+    : axisLabelPad(tickVals.map(yFormat), t.font.size.xs)
+
+  const chartH = H - PAD_TOP - PAD_BOTTOM - LEGEND_H
+  const chartW = W - PAD_LEFT - PAD_RIGHT
+  // Rótulos do eixo X afinados para não colidirem quando há muitos grupos (24h).
+  const xStep = axisLabelStep(labels, chartW, t.font.size.xs)
 
   const getColor = (s: StackSeries, i: number) => s.color ?? t.chart.series[i % 8]
 
@@ -123,9 +139,9 @@ export function StackedBarChart({
             x={xScale(tv)}
             y={PAD_TOP + chartH + 16}
             textAnchor="middle"
-            fontSize={t.font.size.xs * k}
             fill={colors.fg.subtle as string}
             fontFamily={t.font.family.sans}
+            style={{ fontSize: t.font.size.xs * k }}
           >
             {yFormat(tv)}
           </text>
@@ -141,11 +157,11 @@ export function StackedBarChart({
                 x={PAD_LEFT - 6}
                 y={by + barH / 2 + 4}
                 textAnchor="end"
-                fontSize={t.font.size.xs * k}
                 fill={colors.fg.subtle as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k }}
               >
-                {label}
+                {truncateAxisLabel(label, PAD_LEFT - 10, t.font.size.xs)}
               </text>
               {series.map((s, si) => {
                 const val = s.data[gi] ?? 0
@@ -208,19 +224,18 @@ export function StackedBarChart({
               <text
                 x={ttX + 18}
                 y={ttY + 15}
-                fontSize={t.font.size.xs * k}
-                fontWeight={t.font.weight.semibold}
                 fill={colors.fg.muted as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k, fontWeight: t.font.weight.semibold }}
               >
                 {s.name} — {labels[gi]}
               </text>
               <text
                 x={ttX + 10}
                 y={ttY + 28}
-                fontSize={t.font.size.xs * k}
                 fill={colors.fg.subtle as string}
                 fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k }}
               >
                 {yFormat(val)}
               </text>
@@ -230,25 +245,13 @@ export function StackedBarChart({
 
         {/* Legend */}
         {showLegend && (
-          <g transform={`translate(${PAD_LEFT}, ${H - LEGEND_H + 4})`}>
-            {series.map((s, i) => {
-              const col = getColor(s, i)
-              return (
-                <g key={i} transform={`translate(${i * 120}, 0)`}>
-                  <circle cx={6} cy={8} r={5} fill={col} />
-                  <text
-                    x={14}
-                    y={12}
-                    fontSize={t.font.size.xs * k}
-                    fill={colors.fg.muted as string}
-                    fontFamily={t.font.family.sans}
-                  >
-                    {s.name}
-                  </text>
-                </g>
-              )
-            })}
-          </g>
+          <ChartSvgLegend
+            items={series.map((s, i) => ({ name: s.name, color: getColor(s, i) }))}
+            k={k}
+            x={PAD_LEFT}
+            y={H - LEGEND_H + 4}
+            maxWidth={chartW}
+          />
         )}
       </svg>
       </div>
@@ -294,9 +297,9 @@ export function StackedBarChart({
           x={PAD_LEFT - 6}
           y={yScale(tv) + 4}
           textAnchor="end"
-          fontSize={t.font.size.xs * k}
           fill={colors.fg.subtle as string}
           fontFamily={t.font.family.sans}
+          style={{ fontSize: t.font.size.xs * k }}
         >
           {yFormat(tv)}
         </text>
@@ -335,16 +338,18 @@ export function StackedBarChart({
             })}
 
             {/* X label */}
-            <text
-              x={xOfGroup(gi)}
-              y={PAD_TOP + chartH + 18}
-              textAnchor="middle"
-              fontSize={t.font.size.xs * k}
-              fill={colors.fg.subtle as string}
-              fontFamily={t.font.family.sans}
-            >
-              {label}
-            </text>
+            {gi % xStep === 0 && (
+              <text
+                x={xOfGroup(gi)}
+                y={PAD_TOP + chartH + 18}
+                textAnchor="middle"
+                fill={colors.fg.subtle as string}
+                fontFamily={t.font.family.sans}
+                style={{ fontSize: t.font.size.xs * k }}
+              >
+                {label}
+              </text>
+            )}
           </g>
         )
       })}
@@ -379,19 +384,18 @@ export function StackedBarChart({
             <text
               x={ttX + 18}
               y={ttY + 15}
-              fontSize={t.font.size.xs * k}
-              fontWeight={t.font.weight.semibold}
               fill={colors.fg.muted as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k, fontWeight: t.font.weight.semibold }}
             >
               {s.name} — {labels[gi]}
             </text>
             <text
               x={ttX + 10}
               y={ttY + 28}
-              fontSize={t.font.size.xs * k}
               fill={colors.fg.subtle as string}
               fontFamily={t.font.family.sans}
+              style={{ fontSize: t.font.size.xs * k }}
             >
               {yFormat(val)}
             </text>
@@ -401,25 +405,13 @@ export function StackedBarChart({
 
       {/* Legend */}
       {showLegend && (
-        <g transform={`translate(${PAD_LEFT}, ${H - LEGEND_H + 4})`}>
-          {series.map((s, i) => {
-            const col = getColor(s, i)
-            return (
-              <g key={i} transform={`translate(${i * 120}, 0)`}>
-                <circle cx={6} cy={8} r={5} fill={col} />
-                <text
-                  x={14}
-                  y={12}
-                  fontSize={t.font.size.xs * k}
-                  fill={colors.fg.muted as string}
-                  fontFamily={t.font.family.sans}
-                >
-                  {s.name}
-                </text>
-              </g>
-            )
-          })}
-        </g>
+        <ChartSvgLegend
+          items={series.map((s, i) => ({ name: s.name, color: getColor(s, i) }))}
+          k={k}
+          x={PAD_LEFT}
+          y={H - LEGEND_H + 4}
+          maxWidth={chartW}
+        />
       )}
     </svg>
     </div>

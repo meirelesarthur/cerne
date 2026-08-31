@@ -116,6 +116,8 @@ Antes de escrever qualquer JSX de tela, verifique o catálogo da [Seção 4](#4-
 | Avatar `<div>` com iniciais + gradiente | `Avatar` |
 | Breadcrumb `<nav>` inline | `Breadcrumb` |
 | Tooltip inline com `position: fixed` | `Tooltip` |
+| Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
+| KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
 | `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
 | Tabela que precisa virar cards no mobile, feita na mão | `ResponsiveDataTable` |
 | Busca + chips de filtro + "Limpar tudo" remontados na página | `ListToolbar` ou `TableToolbar` |
@@ -151,6 +153,36 @@ PageContainer (style={{ paddingBottom: 0 }})
 - Validação inline por campo, foco no primeiro erro ao submeter (ver [Seção 8](#8-formulários)).
 
 > `CrudPattern`, `ReconciliationWorkspace`, `ReportWorkspace` e `EntityBoard` já existem no repositório como telas-padrão que montam esse fluxo inteiro (listagem+modal+exclusão, conciliação, relatório, kanban). São referência de composição consolidada, não primitivas para importar dentro de uma tela nova — ver observação na [Seção 4](#4-catálogo-de-componentes).
+
+### Regra G — Composição canônica de Dashboards
+
+Dashboard **não** usa a casca de listagem (`PageCard`). A casca é o `DashboardGrid`: cada
+bloco é um card com fill próprio e o **canvas é o que forma os separadores** — sem
+`HDivider`/`VDivider` entre blocos, sem card único embrulhando a tela.
+
+```
+DashboardGrid                          ← canvas (bg.canvas) + gap uniforme entre as fileiras
+  └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
+  └── DashboardRow wrap                ← fileira de KPIs
+        └── DashboardKpiCard ×N        ← 1 KPI = 1 card (antes eram colunas com VDivider)
+  └── DashboardRow                     ← fileira de blocos com pesos
+        ├── DashboardCard flex={3}
+        └── DashboardCard flex={2}
+  └── DashboardRow
+        ├── DashboardStack flex={1}    ← coluna de cards dentro da fileira
+        └── DashboardStack width={320} ← coluna de largura fixa (painel lateral)
+  └── DashboardCard                    ← bloco de largura total
+isLoading → DashboardSkeleton          ← reproduz a própria grade (sem layout shift)
+overlays (InterpretationLetter, FilterDrawer, Modal) ficam FORA do DashboardGrid
+```
+
+- **Rótulo do bloco** vai na prop `title` do card; legenda, `FilterSelect`, `Tabs` e botões
+  vão na prop `action`. Nunca um `<div>` de título solto dentro do card.
+- **Bloco que sangra** (mapa, imagem) usa `DashboardCard bare` — sem padding interno.
+- **Sem borda no tema claro** (quem separa é o canvas); no GBMode o card mantém a hairline
+  verde, necessária sobre fundo escuro. Isso vive no `DashboardCard` — não replicar na tela.
+- Referências: `OverviewPanel.tsx` (grade completa, 2 colunas), `DashAtivos.tsx` (grade
+  simples), `Pluviometria.tsx` (grade + overlay de filtros).
 
 ### Regra D — Tokens disponíveis (use estes, não invente literais)
 
@@ -349,6 +381,13 @@ Todos em `src/components/ui/`. Antes de criar um componente novo, procure aqui �
 | `Card` | Contêiner de superfície genérico com sombra/borda/raio configuráveis |
 | `Divider` | Linha divisória horizontal com rótulo opcional |
 | `SectionDividers` | Divisores H/V com gradiente esmaecido nas pontas |
+| `DashboardGrid` | Canvas do dashboard: fundo que separa os blocos + gap entre fileiras |
+| `DashboardHeader` | Cabeçalho de dashboard: título, subtítulo e filtros sobre o canvas |
+| `DashboardRow` | Fileira de cards com pesos por `flex`, empilha abaixo de `md` |
+| `DashboardStack` | Coluna de cards dentro de uma fileira (peso ou largura fixa) |
+| `DashboardCard` | Bloco preenchido do dashboard: título, ação, `bare` para sangrar |
+| `DashboardKpiCard` | KPI como card: rótulo, valor, `Trend`, sparkline opcional |
+| `DashboardSkeleton` | Loading do dashboard reproduzindo a própria grade |
 
 ### Navegação & Progresso
 

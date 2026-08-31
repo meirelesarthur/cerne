@@ -155,6 +155,10 @@ Confirmado em `LINKS_NOVAS_FUNCIONALIDADES.md` — a simplicidade é intencional
   (`BarChart`, `LineChart`, `DonutChart`, `StackedBarChart`, `GroupedBarChart`, `GaugeChart`,
   `HeatmapChart`, `SparklineArea`, `SankeyFunnel`, `ChartCard`, `KpiStatCard`, `Trend`) já 100%
   demonstrada; endereçados um a um, separadamente.
+  A **casca** das 14 telas é única: `DashboardGrid` (canvas) + `DashboardHeader` +
+  `DashboardRow`/`DashboardStack` + `DashboardCard`/`DashboardKpiCard` + `DashboardSkeleton` —
+  cada bloco é um card com fill próprio e o canvas é o que forma os separadores (o card único
+  com `HDivider`/`VDivider` internos foi retirado dos dashboards).
 - **Relatórios (92 telas no discovery)** — `ReportWorkspace` é a âncora; endereçados um a um.
 
 ## Histórico de fechamento (Fases do backlog de cobertura)

@@ -175,6 +175,8 @@ corrigidos (não repetir):
 | Avatar `<div>` com iniciais + gradiente | `Avatar` |
 | Breadcrumb `<nav>` inline | `Breadcrumb` |
 | Tooltip inline com `position: fixed` | `Tooltip` |
+| Card único de dashboard com `HDivider`/`VDivider` internos | `DashboardGrid` + `DashboardCard` |
+| KPI de dashboard montado à mão (rótulo + valor + `Trend`) | `DashboardKpiCard` |
 | `<h1>`–`<h6>` cru estilizado | `Heading` (ou `PageHeader`/`FormPageHeader`) |
 
 Primitiva não existe → criar em `src/components/ui/` com story, tokens e suporte aos dois
@@ -219,6 +221,26 @@ PageContainer (style={{ paddingBottom: 0 }})
   Referência: `FazendaCadastro.tsx`, `SafraCadastro.tsx`.
 - **Campos:** `FormField` (texto), `FormSelect` (select), `ToggleSwitch` (boolean).
 - Validação inline por campo, foco no primeiro erro ao submeter (ver Formulários).
+
+### Regra G — Composição canônica de Dashboards
+
+Dashboard não usa `PageCard`. A casca é o `DashboardGrid`: cada bloco é um card com fill
+próprio e o **canvas forma os separadores** — sem `HDivider`/`VDivider` entre blocos.
+
+```
+DashboardGrid                          ← canvas (bg.canvas) + gap entre as fileiras
+  └── DashboardHeader                  ← título + subtítulo + filtros, sobre o canvas
+  └── DashboardRow wrap → DashboardKpiCard ×N        ← 1 KPI = 1 card
+  └── DashboardRow → DashboardCard flex={3} + flex={2}
+  └── DashboardRow → DashboardStack flex={1} + DashboardStack width={320}
+  └── DashboardCard                    ← bloco de largura total
+isLoading → DashboardSkeleton  ·  overlays FORA do DashboardGrid
+```
+
+- Rótulo do bloco na prop `title`; legenda/filtro/botão na prop `action`.
+- Bloco que sangra (mapa) → `DashboardCard bare`.
+- Borda só no GBMode — regra do `DashboardCard`, nunca replicada na tela.
+- Referências: `OverviewPanel.tsx`, `DashAtivos.tsx`, `Pluviometria.tsx`.
 
 ### Regra D — Tokens disponíveis (use estes, não invente literais)
 
@@ -394,7 +416,7 @@ produção:
 - [ ] Passei pela escada de reuso (Regra F) antes de escrever componente novo
 - [ ] Nenhuma primitiva reimplementada localmente (Regra A)
 - [ ] Zero `<button>/<input>/<select>/<table>/<h1-6>` crus na página (Lei 1)
-- [ ] Listagem segue a Regra B / formulário segue a Regra C
+- [ ] Listagem segue a Regra B / formulário segue a Regra C / dashboard segue a Regra G
 - [ ] Exclusão via `ConfirmDialog`; ações de linha via `IconButton`/`DropdownMenu`
 - [ ] Cabeçalho via `FormPageHeader`/`PageHeader`; títulos via `Heading` (Regra E)
 - [ ] Extensão de comportamento por prop no componente do kit, nunca `style` inline

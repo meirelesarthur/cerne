@@ -143,6 +143,8 @@ const ATIVOS_KPIS = [
   { label: 'Em operação',       value: '298',     trend: '3,2%',  up: true  },
   { label: 'Em manutenção',     value: '31',      trend: '12,4%', up: false },
   { label: 'Valor patrimonial', value: 'R$ 8,4M', trend: '2,1%',  up: true  },
+  // reflete service_orders.deadline/status
+  { label: 'OS em aberto',      value: '9',       trend: '8,1%',  up: false },
 ]
 
 export default function DashAtivos() {

@@ -139,7 +139,7 @@ export default function SuprimentosReportPage() {
         columns={SUPPLY_PDF_COLUMNS}
         rows={preview}
         firstPageRows={7}
-        rowsPerPage={9}
+        rowsPerPage={7}
         getRowKey={(row) => row.id}
         getRowDetail={(row) => `${row.justification}${row.authorizer ? ` · Autorizador: ${row.authorizer}` : ''}`}
       />,

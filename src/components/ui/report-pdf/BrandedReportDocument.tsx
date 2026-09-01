@@ -7,9 +7,7 @@ Font.register({
   family: 'Outfit',
   fonts: [
     { src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf', fontWeight: 400 },
-    { src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf', fontWeight: 500 },
     { src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf', fontWeight: 600 },
-    { src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf', fontWeight: 700 },
   ],
 })
 
@@ -52,7 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: t.color.neutral[0],
     color: t.color.neutral[900],
     fontFamily: 'Outfit',
-    fontSize: 8,
+    fontSize: 8.5,
     paddingTop: 28,
     paddingHorizontal: 30,
     paddingBottom: 30,
@@ -60,31 +58,31 @@ const styles = StyleSheet.create({
   brandLine: { height: 4, backgroundColor: t.color.brand[600], position: 'absolute', top: 0, left: 0, right: 0 },
   header: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 },
   heading: { flex: 1, paddingLeft: 22 },
-  eyebrow: { color: t.color.brand[700], fontSize: 7, fontWeight: 700, letterSpacing: 1.3, marginBottom: 4 },
-  title: { fontSize: 18, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 },
-  description: { color: t.color.neutral[600], fontSize: 8.5, lineHeight: 1.35 },
-  emitted: { color: t.color.neutral[500], fontSize: 7, textAlign: 'right', width: 120 },
+  eyebrow: { color: t.color.brand[700], fontSize: 7, fontWeight: 600, letterSpacing: 1.3, marginBottom: 4 },
+  title: { fontSize: 18, fontWeight: 600, lineHeight: 1.2, marginBottom: 4 },
+  description: { color: t.color.neutral[600], fontSize: 8.75, lineHeight: 1.4 },
+  emitted: { color: t.color.neutral[500], fontSize: 7.25, textAlign: 'right', width: 120, lineHeight: 1.35 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
   metaItem: { flexDirection: 'row', backgroundColor: t.color.neutral[100], borderRadius: 4, paddingVertical: 4, paddingHorizontal: 7 },
-  metaLabel: { color: t.color.neutral[500], fontSize: 7, marginRight: 3 },
-  metaValue: { color: t.color.neutral[800], fontSize: 7, fontWeight: 600 },
+  metaLabel: { color: t.color.neutral[500], fontSize: 7.25, marginRight: 3 },
+  metaValue: { color: t.color.neutral[800], fontSize: 7.25 },
   highlights: { flexDirection: 'row', gap: 7, marginBottom: 13 },
   highlight: { flex: 1, borderWidth: 1, borderColor: t.color.neutral[200], borderRadius: 6, paddingVertical: 7, paddingHorizontal: 8 },
-  highlightLabel: { color: t.color.neutral[500], fontSize: 6.5, fontWeight: 600, marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.45 },
-  highlightValue: { color: t.color.neutral[900], fontSize: 12, fontWeight: 700 },
-  highlightHelper: { color: t.color.neutral[500], fontSize: 6.5, marginTop: 2 },
+  highlightLabel: { color: t.color.neutral[500], fontSize: 6.75, marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.45 },
+  highlightValue: { color: t.color.neutral[900], fontSize: 12, fontWeight: 600, lineHeight: 1.15 },
+  highlightHelper: { color: t.color.neutral[500], fontSize: 6.75, marginTop: 2, lineHeight: 1.3 },
   table: { borderWidth: 1, borderColor: t.color.neutral[200], borderRadius: 6, overflow: 'hidden' },
   tableHeader: { flexDirection: 'row', backgroundColor: t.color.brand[800], minHeight: 28, alignItems: 'center' },
-  tableHeaderCell: { color: t.color.neutral[0], fontSize: 6.5, fontWeight: 600, paddingHorizontal: 5, paddingVertical: 6 },
+  tableHeaderCell: { color: t.color.neutral[0], fontSize: 7, paddingLeft: 6, paddingRight: 2, paddingVertical: 6 },
   tableRow: { borderTopWidth: 1, borderTopColor: t.color.neutral[200] },
-  tableRowMain: { flexDirection: 'row', minHeight: 29, alignItems: 'center' },
+  tableRowMain: { flexDirection: 'row', minHeight: 31, alignItems: 'center' },
   tableRowAlt: { backgroundColor: t.color.neutral[50] },
-  tableCell: { color: t.color.neutral[800], fontSize: 7, lineHeight: 1.25, paddingHorizontal: 5, paddingVertical: 6 },
-  detail: { color: t.color.neutral[600], fontSize: 6.5, lineHeight: 1.3, paddingHorizontal: 5, paddingBottom: 6 },
+  tableCell: { color: t.color.neutral[800], fontSize: 7.25, lineHeight: 1.35, paddingHorizontal: 4, paddingVertical: 6 },
+  detail: { color: t.color.neutral[600], fontSize: 6.75, lineHeight: 1.35, paddingHorizontal: 4, paddingBottom: 6 },
   detailLabel: { color: t.color.brand[700], fontWeight: 600 },
   empty: { padding: 24, textAlign: 'center', color: t.color.neutral[500] },
-  continuation: { color: t.color.neutral[500], fontSize: 7, marginBottom: 7 },
-  footer: { position: 'absolute', bottom: 12, left: 30, right: 30, flexDirection: 'row', justifyContent: 'space-between', color: t.color.neutral[500], fontSize: 6.5 },
+  continuation: { color: t.color.neutral[500], fontSize: 7.25, marginBottom: 7 },
+  footer: { position: 'absolute', bottom: 12, left: 30, right: 30, flexDirection: 'row', justifyContent: 'space-between', color: t.color.neutral[500], fontSize: 6.75 },
   pageNumber: { color: t.color.neutral[700], fontWeight: 600 },
 })
 
@@ -117,7 +115,7 @@ export function BrandedReportDocument<T>({
   return (
     <Document title={title} author="GB CERNE" subject={description} creator="GB CERNE - React PDF">
       {pages.map((pageRows, pageIndex) => (
-        <Page key={`${title}-${pageIndex}`} size="A4" orientation="landscape" style={styles.page}>
+        <Page key={`${title}-${pageIndex}`} size="A4" orientation="landscape" style={styles.page} wrap={false}>
           <View style={styles.brandLine} fixed />
           <View style={styles.header}>
             <PdfBrandLogo />
@@ -153,12 +151,14 @@ export function BrandedReportDocument<T>({
             <Text style={styles.continuation}>Continuação · {rows.length} registros no período</Text>
           )}
 
-          <View style={styles.table}>
+          <View style={styles.table} wrap={false}>
             <View style={styles.tableHeader}>
               {columns.map((column) => (
-                <Text key={column.key} style={[styles.tableHeaderCell, { flex: column.width, textAlign: column.align ?? 'left' }]}>
-                  {column.label}
-                </Text>
+                <View key={column.key} style={{ flex: column.width }}>
+                  <Text style={[styles.tableHeaderCell, { textAlign: column.align ?? 'left' }]}>
+                    {column.label}
+                  </Text>
+                </View>
               ))}
             </View>
             {pageRows.length === 0 ? (
@@ -169,9 +169,11 @@ export function BrandedReportDocument<T>({
                 <View key={getRowKey(row)} style={[styles.tableRow, rowIndex % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
                   <View style={styles.tableRowMain}>
                     {columns.map((column) => (
-                      <Text key={column.key} style={[styles.tableCell, { flex: column.width, textAlign: column.align ?? 'left' }]}>
-                        {column.render(row)}
-                      </Text>
+                      <View key={column.key} style={{ flex: column.width }}>
+                        <Text style={[styles.tableCell, { textAlign: column.align ?? 'left' }]}>
+                          {column.render(row)}
+                        </Text>
+                      </View>
                     ))}
                   </View>
                   {detail && (

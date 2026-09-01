@@ -25,6 +25,8 @@ interface ReportWorkspaceProps<T extends object> {
   error?: string
   onPreview: () => void
   onExport: (type: ReportExportType) => void
+  exportTypes?: ReportExportType[]
+  summary?: ReactNode
   previewLabel?: string
   emptyMessage?: string
 }
@@ -46,27 +48,33 @@ export function ReportWorkspace<T extends object>({
   error,
   onPreview,
   onExport,
+  exportTypes = ['PDF', 'Excel'],
+  summary,
   previewLabel = 'Gerar prévia',
   emptyMessage = 'Nenhum item corresponde aos filtros selecionados.',
 }: ReportWorkspaceProps<T>) {
   const exportActions = (
     <>
-      <Button
-        variant="secondary"
-        icon={<Icon name="download" size={t.icon.sm} />}
-        disabled={!hasPreview || loading}
-        onClick={() => onExport('PDF')}
-      >
-        Gerar PDF
-      </Button>
-      <Button
-        variant="secondary"
-        icon={<Icon name="spreadsheet" size={t.icon.sm} />}
-        disabled={!hasPreview || loading}
-        onClick={() => onExport('Excel')}
-      >
-        Gerar Excel
-      </Button>
+      {exportTypes.includes('PDF') && (
+        <Button
+          variant="secondary"
+          icon={<Icon name="download" size={t.icon.sm} />}
+          disabled={!hasPreview || loading}
+          onClick={() => onExport('PDF')}
+        >
+          Gerar PDF
+        </Button>
+      )}
+      {exportTypes.includes('Excel') && (
+        <Button
+          variant="secondary"
+          icon={<Icon name="spreadsheet" size={t.icon.sm} />}
+          disabled={!hasPreview || loading}
+          onClick={() => onExport('Excel')}
+        >
+          Gerar Excel
+        </Button>
+      )}
     </>
   )
 
@@ -96,6 +104,7 @@ export function ReportWorkspace<T extends object>({
 
         {hasPreview && !error && (
           <FormSection title="Prévia" subtitle={`${data.length} registro(s) encontrado(s).`}>
+            {summary}
             <ResponsiveDataTable
               columns={columns}
               data={data}

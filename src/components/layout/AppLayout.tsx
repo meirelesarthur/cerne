@@ -34,6 +34,9 @@ import AgrupadoresContabeisPage from '../../pages/cadastros/agrupadores-contabei
 import PlanejamentoPecuarioPage from '../../pages/operacional/planejamento-pecuario/PlanejamentoPecuarioPage'
 import MapaConfinamentoPage from '../../pages/operacional/mapa-confinamento/MapaConfinamentoPage'
 import EstoqueConsolidadoReportPage from '../../pages/relatorios/estoque-consolidado/EstoqueConsolidadoReportPage'
+import EquipamentosReportPage from '../../pages/relatorios/equipamentos/EquipamentosReportPage'
+import SuprimentosReportPage from '../../pages/relatorios/suprimentos/SuprimentosReportPage'
+import ContasPagarReportPage from '../../pages/relatorios/contas-a-pagar/ContasPagarReportPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -172,6 +175,9 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'ope-pec-pla')      return <PlanejamentoPecuarioPage />
   if (itemId === 'ope-pec-map')      return <MapaConfinamentoPage />
   if (itemId === 'rel-est')          return <EstoqueConsolidadoReportPage />
+  if (itemId === 'rel-ben')          return <EquipamentosReportPage />
+  if (itemId === 'rel-sup')          return <SuprimentosReportPage />
+  if (itemId === 'rel-fin')          return <ContasPagarReportPage />
   if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />

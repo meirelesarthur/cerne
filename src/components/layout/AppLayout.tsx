@@ -37,6 +37,7 @@ import EstoqueConsolidadoReportPage from '../../pages/relatorios/estoque-consoli
 import EquipamentosReportPage from '../../pages/relatorios/equipamentos/EquipamentosReportPage'
 import SuprimentosReportPage from '../../pages/relatorios/suprimentos/SuprimentosReportPage'
 import ContasPagarReportPage from '../../pages/relatorios/contas-a-pagar/ContasPagarReportPage'
+import DreAnualReportPage from '../../pages/relatorios/dre-anual/DreAnualReportPage'
 import Pluviometria      from '../../pages/dashboards/Pluviometria'
 import OverviewPanel     from '../../pages/dashboards/OverviewPanel'
 import DashFinanceiro    from '../../pages/dashboards/DashFinanceiro'
@@ -178,6 +179,7 @@ function renderPage(itemId: string | null, module?: NavModule) {
   if (itemId === 'rel-ben')          return <EquipamentosReportPage />
   if (itemId === 'rel-sup')          return <SuprimentosReportPage />
   if (itemId === 'rel-fin')          return <ContasPagarReportPage />
+  if (itemId === 'rel-dre')          return <DreAnualReportPage />
   if (itemId === 'cad-fis-emi')      return <EmissoresPage />
   if (itemId === 'dash-overview') return <OverviewPanel />
   if (itemId === 'dash-plu' || itemId === 'ope-plu') return <Pluviometria />

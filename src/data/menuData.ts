@@ -438,6 +438,7 @@ export const menuModules: NavModule[] = [
       { id: 'rel-pec', label: 'Pecuária',          path: '/relatorios/pecuaria',        icon: 'cattle' },
       { id: 'rel-plu', label: 'Pluviometria',      path: '/relatorios/pluviometria',    icon: 'rain' },
       { id: 'rel-fin', label: 'Financeiro',        path: '/relatorios/financeiro',      icon: 'wallet' },
+      { id: 'rel-dre', label: 'DRE Anual',         path: '/relatorios/dre-anual',       icon: 'wallet' },
       { id: 'rel-est', label: 'Estoque',           path: '/relatorios/estoque',         icon: 'warehouse' },
       { id: 'rel-sup', label: 'Suprimentos',       path: '/relatorios/suprimentos',     icon: 'cart' },
       { id: 'rel-ven', label: 'Vendas',            path: '/relatorios/vendas',          icon: 'shopping-bag' },

@@ -25,10 +25,9 @@ import { Tabs } from '../../components/ui/Tabs'
 import { FarmAreasMap } from '../../components/ui/FarmAreasMap'
 import type { FarmArea, FarmAreaIcon } from '../../components/ui/FarmAreasMap'
 import { FilterSelect } from '../../components/ui/FilterSelect'
-import { MultiSelectField } from '../../components/ui/MultiSelectField'
-import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
+import { SearchSelect } from '../../components/ui/SearchSelect'
 import {
-  buildOverviewCarta, headlineInsight, fmtCompact,
+  buildOverviewCarta, fmtCompact,
   type OverviewDataset,
 } from '../../insights/overviewInsights'
 import { useFarm } from '../../context/FarmContext'
@@ -1204,16 +1203,19 @@ export default function OverviewPanel() {
   const [margemFim, setMargemFim] = useUrlFilter('margemFim', PERIODO_PADRAO_FIM)
   const [receitasGaugeInicio, setReceitasGaugeInicio] = useUrlFilter('receitasGaugeInicio', PERIODO_PADRAO_INICIO)
   const [receitasGaugeFim, setReceitasGaugeFim] = useUrlFilter('receitasGaugeFim', PERIODO_PADRAO_FIM)
-  // Filtros do "Resultado por cultura" — área (cultura), produtos (cultivares,
-  // string separada por vírgula para caber em useUrlFilter) e métrica em foco.
+  // Filtros do "Resultado por cultura" — produto (cultivar, seleção única),
+  // área (cultura) e métrica em foco.
   const [culturaFiltro, setCulturaFiltro] = useUrlFilter('culturaArea', 'todas')
-  const [produtosParam, setProdutosParam] = useUrlFilter('culturaProdutos', '')
-  const produtosSel = produtosParam ? produtosParam.split(',') : []
+  const [produtoFiltro, setProdutoFiltro] = useUrlFilter('culturaProduto', '')
+  // Texto de busca do SearchSelect — local (não deep-linkado); nasce já
+  // preenchido com o rótulo do produto vindo da URL, se houver.
+  const [produtoQuery, setProdutoQuery] = useState(
+    () => PRODUTO_OPTIONS.find(o => o.id === produtoFiltro)?.label ?? '',
+  )
   const [metricaCultura, setMetricaCultura] = useUrlFilter<CultureMetric>('culturaMetrica', 'margemHa')
   // Foco de série do card de receitas: leitura, não recorte de dado — fica local.
   const [foco, setFoco] = useState<AreaFocus | typeof AREA_FOCUS_ALL>(AREA_FOCUS_ALL)
   const focoAtivo = foco === AREA_FOCUS_ALL ? null : foco
-  const [cartaOpen, setCartaOpen] = useState(false)
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
@@ -1222,9 +1224,9 @@ export default function OverviewPanel() {
   const activeData = (serie === 'realizado' ? AREA_DATA : FORECAST_DATA).slice(-Number(periodo))
   const serieInfo = SERIE_INFO[serie]
 
-  // Motor de interpretação — insight de destaque e carta completa, ambos
-  // computados dos mesmos dados que alimentam os charts (nunca inventados).
-  const insight = headlineInsight(OVERVIEW_DATASET)
+  // Carta de interpretação — mesmos dados dos gráficos, nunca inventada; o
+  // botão "Análise" do cabeçalho (DashboardAnalysis) é o único ponto de
+  // entrada dela nesta tela.
   const carta = buildOverviewCarta(OVERVIEW_DATASET)
 
   const saldoPrevisto = CASH_FORECAST.aReceber - CASH_FORECAST.aPagar
@@ -1232,7 +1234,7 @@ export default function OverviewPanel() {
   // Recorte de "Resultado por cultura" pelos filtros de área/produto ativos.
   const culturasFiltradas = AREA_BY_CROP.filter(([crop]) => {
     if (culturaFiltro !== 'todas' && crop !== culturaFiltro) return false
-    if (produtosSel.length > 0 && !produtosSel.some(p => CULTIVAR_TO_CROP[p] === crop)) return false
+    if (produtoFiltro && CULTIVAR_TO_CROP[produtoFiltro] !== crop) return false
     return true
   })
 
@@ -1398,26 +1400,13 @@ export default function OverviewPanel() {
               />
             </DashboardCard>
 
-            {/* Insight computado pelo motor de interpretação */}
-            <DashboardCard
-              title="Insights"
-              action={
-                <Button variant="ghost" size="sm" icon={<Icon name="message" size={11} />} onClick={() => setCartaOpen(true)}>
-                  Ler a carta
-                </Button>
-              }
-            >
-              <p style={{ fontSize: t.font.size.base, color: colors.fg.subtle, lineHeight: t.font.lineHeight.relaxed, margin: 0, fontWeight: t.font.weight.normal }}>
-                {insight.text}
-                <strong style={{ color: colors.fg.default, fontWeight: t.font.weight.bold }}>{insight.strong}</strong>
-                {insight.tail}
-              </p>
-            </DashboardCard>
-
-            {/* Resultado por cultura — subiu para logo abaixo dos Insights (mais
-                evidência) e ganhou filtro de área/produto/período + um
+            {/* Resultado por cultura — ganhou filtro de produto/período/área +
                 comparativo por métrica em gráfico de barras, no lugar dos
-                números soltos de produtividade/margem/custo/preço. */}
+                números soltos de produtividade/margem/custo/preço. Ordem do
+                filtro: Produto → Período → Área (a ordem em que o usuário
+                normalmente decide o recorte). Nenhum dos três campos usa
+                label visível — mesmo padrão bare do FilterSelect/
+                DateRangePicker, para os três alinharem na mesma linha. */}
             <DashboardCard
               title="Resultado por cultura"
               action={
@@ -1429,16 +1418,16 @@ export default function OverviewPanel() {
                 />
               }
             >
-              <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap', marginBottom: t.space[4] }}>
-                <div style={{ flex: '1 1 160px', minWidth: 160 }}>
-                  <FilterSelect
-                    ariaLabel="Filtrar por área (cultura)"
-                    options={[
-                      { value: 'todas', label: 'Todas as culturas' },
-                      ...AREA_BY_CROP.map(([crop]) => ({ value: crop, label: crop })),
-                    ]}
-                    value={culturaFiltro}
-                    onChange={setCulturaFiltro}
+              <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap', alignItems: 'center', marginBottom: t.space[4] }}>
+                <div style={{ flex: '2 1 220px', minWidth: 220 }}>
+                  <SearchSelect
+                    query={produtoQuery}
+                    onQueryChange={setProdutoQuery}
+                    options={PRODUTO_OPTIONS}
+                    selectedId={produtoFiltro || null}
+                    onSelect={(opt) => { setProdutoFiltro(opt.id); setProdutoQuery(opt.label) }}
+                    onClear={() => { setProdutoFiltro(''); setProdutoQuery('') }}
+                    placeholder="Buscar produto…"
                   />
                 </div>
                 <DateRangePicker
@@ -1448,13 +1437,15 @@ export default function OverviewPanel() {
                     setCulturaFim(range.end ?? '')
                   }}
                 />
-                <div style={{ flex: '2 1 220px', minWidth: 220 }}>
-                  <MultiSelectField
-                    label="Produtos"
-                    options={PRODUTO_OPTIONS}
-                    value={produtosSel}
-                    onChange={(v) => setProdutosParam(v.join(','))}
-                    placeholder="Buscar cultivar…"
+                <div style={{ flex: '1 1 160px', minWidth: 160 }}>
+                  <FilterSelect
+                    ariaLabel="Filtrar por área (cultura)"
+                    options={[
+                      { value: 'todas', label: 'Todas as culturas' },
+                      ...AREA_BY_CROP.map(([crop]) => ({ value: crop, label: crop })),
+                    ]}
+                    value={culturaFiltro}
+                    onChange={setCulturaFiltro}
                   />
                 </div>
               </div>
@@ -1801,14 +1792,6 @@ export default function OverviewPanel() {
           </DashboardStack>
         </DashboardRow>
       </DashboardGrid>
-
-      {/* Carta de Interpretação — leitura técnica dos dados do painel */}
-      <InterpretationLetter
-        open={cartaOpen}
-        onClose={() => setCartaOpen(false)}
-        carta={carta}
-        fonte={currentFarm ? `${currentFarm.name} · base do painel` : undefined}
-      />
     </>
   )
 }

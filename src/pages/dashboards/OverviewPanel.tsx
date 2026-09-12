@@ -4,7 +4,6 @@ import { Icon } from '../../components/ui/Icon'
 import { t } from '../../design/tokens'
 import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
-import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
 import { DateRangePicker } from '../../components/ui/DatePicker'
 import { Tooltip } from '../../components/ui/Tooltip'
@@ -1252,24 +1251,20 @@ export default function OverviewPanel() {
                 carta={carta}
                 fonte={currentFarm ? `${currentFarm.name} · base do painel` : undefined}
               />
-              <DashboardFilters
-                fields={[
-                  {
-                    label: 'Período',
-                    value: periodo,
-                    onChange: setPeriodo,
-                    defaultValue: '10',
-                    options: [
-                      { value: '3',  label: 'Últimos 3 meses' },
-                      { value: '6',  label: 'Últimos 6 meses' },
-                      { value: '10', label: 'Últimos 10 meses' },
-                    ],
-                  },
+              {/* Um filtro só (Período) não precisa do drawer de "Filtros" —
+                  vai direto no FilterSelect, sem clique extra para abrir um
+                  painel com um campo dentro. */}
+              <FilterSelect
+                ariaLabel="Período"
+                prefix="Período:"
+                options={[
+                  { value: '3',  label: 'Últimos 3 meses' },
+                  { value: '6',  label: 'Últimos 6 meses' },
+                  { value: '10', label: 'Últimos 10 meses' },
                 ]}
+                value={periodo}
+                onChange={setPeriodo}
               />
-              <Button variant="secondary" size="sm" icon={<Icon name="settings-sliders" size={12} />} disabled title="Personalização em breve">
-                Personalizar
-              </Button>
             </>
           }
         />

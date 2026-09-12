@@ -364,18 +364,15 @@ function toMapArea(tl: Talhao): FarmArea {
 
 const MAP_AREAS: FarmArea[] = TALHAOES.map(toMapArea)
 
-// Resultado operacional (DRE) — receita decrescendo através das camadas de custo
-// até o resultado. Cruza o total de receita com a composição de custo (COE/COT).
-const DRE_STAGES = [
-  { label: 'Receita bruta',  value: 18900, sublabel: 'R$ 18,9M' },
-  { label: 'Após COE',       value: 11000, sublabel: '− custeio' },
-  { label: 'Após COT',       value: 7400,  sublabel: '− c. total' },
-  { label: 'Resultado',      value: 3500,  sublabel: 'R$ 3,5M'  },
-]
-
 // ─── Previsão de fluxo (contas a receber/pagar em aberto) ─────────────────────
 
 const CASH_FORECAST = { aReceber: 3_084_785.19, aPagar: 3_975_108.84 }
+
+// Período padrão de todo card com corte de data — cada card guarda seu próprio
+// filtro (useUrlFilter isolado), mas nasce preenchido igual a este default; o
+// usuário pode divergir gráfico a gráfico sem afetar os demais.
+const PERIODO_PADRAO_INICIO = '2025-10-01'
+const PERIODO_PADRAO_FIM = '2026-09-30'
 
 // Aging dos títulos em aberto — mesma lógica do "backlog por idade": título
 // envelhecendo silenciosamente é o maior risco de caixa.
@@ -799,71 +796,50 @@ function MiniDivergingBar({ label, positive, negative, colors }: {
   )
 }
 
-// ─── Célula de resultado operacional (Realizado/Previsto/Atrasado/Total) ─────
-// Hint descritivo no hover/foco (Tooltip do kit) explica o que cada situação
-// significa — a mesma leitura que antes só existia na carta de interpretação.
+// ─── Comparativo Realizado/Previsto/Atrasado em barras (Resultado operacional)
+// Antes eram 4 caixas de número por categoria (Realizado/Previsto/Atrasado/
+// Total) — 3 valores comparáveis na mesma unidade cabem em gráfico, então
+// viram barras; só o Total (um agregado, não um par da mesma comparação) fica
+// como número em destaque no cabeçalho do grupo. Hint descritivo no
+// hover/foco (Tooltip do kit) explica o que cada situação significa.
 
-function ResultCell({ label, value, tone, solid, hint, colors }: {
-  label: string; value: number
-  tone: 'success' | 'error'
-  /** Célula de total — preenchida com a cor sólida, texto branco. */
-  solid?: boolean
-  hint: string
+interface ResultBarSpec { label: string; value: number; color: string; hint: string }
+
+function ResultBarGroup({ title, total, totalColor, totalHint, bars, colors }: {
+  title: string
+  total: number; totalColor: string; totalHint: string
+  bars: ResultBarSpec[]
   colors: ThemeColors
 }) {
-  const palette = t.color.feedback[tone]
-  return (
-    <Tooltip label={hint}>
-      <div
-        tabIndex={0}
-        className="gb-focusable"
-        style={{
-          flex: '1 1 180px', minWidth: 180, boxSizing: 'border-box',
-          padding: `${t.space[3]}px ${t.space[3] + 2}px`,
-          borderRadius: t.radius.md,
-          background: solid ? palette.solid : colors.bg.surface,
-          border: solid ? 'none' : `1px solid ${colors.border.default}`,
-          borderLeft: solid ? 'none' : `3px solid ${palette.solid}`,
-          cursor: 'default',
-        }}
-      >
-        <div style={{
-          fontSize: t.font.size['3xs'], fontWeight: t.font.weight.semibold,
-          letterSpacing: '0.04em', textTransform: 'uppercase',
-          color: solid ? 'rgba(255,255,255,0.85)' : colors.fg.subtle,
-          marginBottom: 4,
-        }}>
-          {label}
-        </div>
-        <div style={{
-          fontSize: t.font.size.base, fontWeight: t.font.weight.bold,
-          color: solid ? t.color.neutral[0] : palette.text,
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
-          {formatCurrency(value)}
-        </div>
-      </div>
-    </Tooltip>
-  )
-}
-
-interface ResultCellSpec { label: string; value: number; tone: 'success' | 'error'; solid?: boolean; hint: string }
-
-function ResultGroup({ title, cells, colors }: { title: string; cells: ResultCellSpec[]; colors: ThemeColors }) {
+  const max = Math.max(...bars.map(b => Math.abs(b.value)), 1)
   return (
     <div style={{ marginBottom: t.space[4] }}>
-      <div style={{
-        fontSize: t.font.size['3xs'], fontWeight: t.font.weight.medium,
-        letterSpacing: '0.03em', textTransform: 'uppercase',
-        color: colors.fg.subtle, marginBottom: t.space[2],
-      }}>
-        {title}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: t.space[2], marginBottom: t.space[3] }}>
+        <span style={{
+          fontSize: t.font.size['3xs'], fontWeight: t.font.weight.medium,
+          letterSpacing: '0.03em', textTransform: 'uppercase', color: colors.fg.subtle,
+        }}>
+          {title}
+        </span>
+        <Tooltip label={totalHint}>
+          <span tabIndex={0} className="gb-focusable" style={{ fontSize: t.font.size.base, fontWeight: t.font.weight.bold, color: totalColor, cursor: 'default' }}>
+            {formatCurrency(total)}
+          </span>
+        </Tooltip>
       </div>
-      <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap' }}>
-        {cells.map(c => (
-          <ResultCell key={c.label} label={c.label} value={c.value} tone={c.tone} solid={c.solid} hint={c.hint} colors={colors} />
-        ))}
-      </div>
+      {bars.map(b => (
+        <Tooltip key={b.label} label={b.hint}>
+          <div tabIndex={0} className="gb-focusable" style={{ width: '100%', marginBottom: t.space[2] + 2, cursor: 'default' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{b.label}</span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{formatCurrency(b.value)}</span>
+            </div>
+            <div style={{ height: 8, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${(Math.abs(b.value) / max) * 100}%`, background: b.color, borderRadius: t.radius.full }} />
+            </div>
+          </div>
+        </Tooltip>
+      ))}
     </div>
   )
 }
@@ -1037,6 +1013,49 @@ function AgingRows({ colors }: { colors: ThemeColors }) {
   )
 }
 
+// ─── Cobertura de estoque em barras (dias × mínimo) ──────────────────────────
+// Marcador vertical no ponto do mínimo — a barra que o ultrapassa está segura,
+// a que fica aquém já entra vermelha. Hint com os dois números no hover.
+
+function StockCoverageBars({ items, colors }: { items: typeof STOCK_COVERAGE; colors: ThemeColors }) {
+  const max = Math.max(...items.map(s => Math.max(s.dias, s.min))) * 1.15 || 1
+  return (
+    <div>
+      {items.map(s => {
+        const abaixo = s.dias < s.min
+        const barColor = abaixo ? t.color.feedback.error.solid : t.color.feedback.success.solid
+        return (
+          <Tooltip key={s.item} label={`${s.item}: ${s.dias} dias de cobertura (mínimo ${s.min} dias).`}>
+            <div tabIndex={0} className="gb-focusable" style={{ width: '100%', marginBottom: t.space[3], cursor: 'default' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{
+                  fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {s.item}
+                </span>
+                <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.bold, color: abaixo ? t.color.feedback.error.text : t.color.feedback.success.text }}>
+                  {s.dias} dias
+                </span>
+              </div>
+              <div style={{ position: 'relative', height: 8 }}>
+                <div style={{ height: 8, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.min((s.dias / max) * 100, 100)}%`, background: barColor, borderRadius: t.radius.full }} />
+                </div>
+                {/* Marcador do mínimo operacional */}
+                <div style={{
+                  position: 'absolute', top: -2, bottom: -2, width: 2,
+                  left: `${(s.min / max) * 100}%`, background: colors.fg.subtle, borderRadius: 1,
+                }} />
+              </div>
+            </div>
+          </Tooltip>
+        )
+      })}
+    </div>
+  )
+}
+
 function StatMini({ label, value, colors }: { label: string; value: string; colors: ThemeColors }) {
   return (
     <div style={{ textAlign: 'right', minWidth: 76, flexShrink: 0 }}>
@@ -1134,7 +1153,7 @@ function CultureMetricBars({ crops, metric, colors }: {
     <div>
       {rows.map(r => (
         <Tooltip key={r.crop} label={`${r.crop}: ${r.value.toLocaleString('pt-BR')} ${r.unit}`}>
-          <div tabIndex={0} className="gb-focusable" style={{ marginBottom: t.space[2] + 2, cursor: 'default' }}>
+          <div tabIndex={0} className="gb-focusable" style={{ width: '100%', marginBottom: t.space[2] + 2, cursor: 'default' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: t.font.size.xs, color: colors.fg.default }}>
                 <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: CROP_COLOR[r.crop] ?? t.color.neutral[400], flexShrink: 0 }} />
@@ -1168,10 +1187,23 @@ export default function OverviewPanel() {
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useUrlFilter('periodo', '10')
   const [serie, setSerie] = useUrlFilter<'realizado' | 'previsto'>('serie', 'realizado')
-  // Período do "Resultado operacional (R$)" — datas de início/fim, deep-linkadas
-  // à parte (não usam o mesmo filtro de "últimos N meses" do gráfico de área).
-  const [resultadoInicio, setResultadoInicio] = useUrlFilter('resultadoInicio', '2025-10-01')
-  const [resultadoFim, setResultadoFim] = useUrlFilter('resultadoFim', '2026-09-30')
+  // Todo card com corte de data tem seu próprio filtro (chave própria no
+  // useUrlFilter), mas todos nascem preenchidos com o mesmo período padrão —
+  // ver PERIODO_PADRAO_*. Cada um pode divergir sem afetar os demais.
+  const [resultadoInicio, setResultadoInicio] = useUrlFilter('resultadoInicio', PERIODO_PADRAO_INICIO)
+  const [resultadoFim, setResultadoFim] = useUrlFilter('resultadoFim', PERIODO_PADRAO_FIM)
+  const [culturaInicio, setCulturaInicio] = useUrlFilter('culturaInicio', PERIODO_PADRAO_INICIO)
+  const [culturaFim, setCulturaFim] = useUrlFilter('culturaFim', PERIODO_PADRAO_FIM)
+  const [fluxoInicio, setFluxoInicio] = useUrlFilter('fluxoInicio', PERIODO_PADRAO_INICIO)
+  const [fluxoFim, setFluxoFim] = useUrlFilter('fluxoFim', PERIODO_PADRAO_FIM)
+  const [custoInicio, setCustoInicio] = useUrlFilter('custoInicio', PERIODO_PADRAO_INICIO)
+  const [custoFim, setCustoFim] = useUrlFilter('custoFim', PERIODO_PADRAO_FIM)
+  const [concentracaoInicio, setConcentracaoInicio] = useUrlFilter('concentracaoInicio', PERIODO_PADRAO_INICIO)
+  const [concentracaoFim, setConcentracaoFim] = useUrlFilter('concentracaoFim', PERIODO_PADRAO_FIM)
+  const [margemInicio, setMargemInicio] = useUrlFilter('margemInicio', PERIODO_PADRAO_INICIO)
+  const [margemFim, setMargemFim] = useUrlFilter('margemFim', PERIODO_PADRAO_FIM)
+  const [receitasGaugeInicio, setReceitasGaugeInicio] = useUrlFilter('receitasGaugeInicio', PERIODO_PADRAO_INICIO)
+  const [receitasGaugeFim, setReceitasGaugeFim] = useUrlFilter('receitasGaugeFim', PERIODO_PADRAO_FIM)
   // Filtros do "Resultado por cultura" — área (cultura), produtos (cultivares,
   // string separada por vírgula para caber em useUrlFilter) e métrica em foco.
   const [culturaFiltro, setCulturaFiltro] = useUrlFilter('culturaArea', 'todas')
@@ -1266,20 +1298,24 @@ export default function OverviewPanel() {
           </div>
         </DashboardCard>
 
-        {/* ── Fileira de KPIs ───────────────────────────────────────────────── */}
+        {/* ── Fileira de KPIs ───────────────────────────────────────────────────
+            Sem seletor próprio: compartilha o "Período" do cabeçalho (mesmo
+            corte de data do gráfico de receitas logo abaixo) — os dois formam
+            uma única seção hero, então um segundo controle aqui duplicaria o
+            que já está a poucos px de distância. */}
         <DashboardRow>
           {[
             {
               label: 'Margem bruta', value: '12,5%', trend: '2,7% vs 30 dias', up: true,
-              spark: AREA_DATA.map(d => d.receitas - d.despesas), sparkColor: MARGEM_COLOR,
+              spark: activeData.map(d => d.receitas - d.despesas), sparkColor: MARGEM_COLOR,
             },
             {
               label: 'Receitas realizadas', value: 'R$ 18,9M', trend: '4,1% vs 30 dias', up: true,
-              spark: AREA_DATA.map(d => d.receitas), sparkColor: t.color.brand[600],
+              spark: activeData.map(d => d.receitas), sparkColor: t.color.brand[600],
             },
             {
               label: 'Saldo operacional', value: 'R$ 14,5M', trend: '1,3% vs 30 dias', up: false,
-              spark: AREA_DATA.map(d => d.receitas - d.despesas).reverse(), sparkColor: t.color.feedback.error.solid,
+              spark: activeData.map(d => d.receitas - d.despesas).reverse(), sparkColor: t.color.feedback.error.solid,
             },
           ].map((kpi) => (
             <DashboardKpiCard
@@ -1406,10 +1442,10 @@ export default function OverviewPanel() {
                   />
                 </div>
                 <DateRangePicker
-                  value={{ start: resultadoInicio, end: resultadoFim }}
+                  value={{ start: culturaInicio, end: culturaFim }}
                   onChange={(range) => {
-                    setResultadoInicio(range.start ?? '')
-                    setResultadoFim(range.end ?? '')
+                    setCulturaInicio(range.start ?? '')
+                    setCulturaFim(range.end ?? '')
                   }}
                 />
                 <div style={{ flex: '2 1 220px', minWidth: 220 }}>
@@ -1468,49 +1504,63 @@ export default function OverviewPanel() {
                 />
               }
             >
-              <ResultGroup
-                title="Receitas realizadas / previstas / atrasadas"
+              <ResultBarGroup
+                title="Receitas — realizadas / previstas / atrasadas"
+                total={TOTAL_RECEITAS} totalColor={t.color.feedback.success.text}
+                totalHint="Soma de receitas realizadas, previstas e atrasadas no período."
                 colors={colors}
-                cells={[
-                  { label: 'Receitas realizadas', value: RESULTADO_OPERACIONAL[0].receitas, tone: 'success', hint: 'Receitas já recebidas e conciliadas no período selecionado.' },
-                  { label: 'Receitas previstas',  value: RESULTADO_OPERACIONAL[1].receitas, tone: 'success', hint: 'Receitas com vencimento futuro, ainda não recebidas.' },
-                  { label: 'Receitas atrasadas',  value: RESULTADO_OPERACIONAL[2].receitas, tone: 'success', hint: 'Receitas vencidas e ainda não recebidas — título em atraso.' },
-                  { label: 'Receitas total', value: TOTAL_RECEITAS, tone: 'success', solid: true, hint: 'Soma de receitas realizadas, previstas e atrasadas no período.' },
+                bars={[
+                  { label: 'Realizadas', value: RESULTADO_OPERACIONAL[0].receitas, color: t.color.brand[600], hint: 'Receitas já recebidas e conciliadas no período selecionado.' },
+                  { label: 'Previstas',  value: RESULTADO_OPERACIONAL[1].receitas, color: t.color.brand[300], hint: 'Receitas com vencimento futuro, ainda não recebidas.' },
+                  { label: 'Atrasadas',  value: RESULTADO_OPERACIONAL[2].receitas, color: t.color.feedback.warning.solid, hint: 'Receitas vencidas e ainda não recebidas — título em atraso.' },
                 ]}
               />
-              <ResultGroup
-                title="Despesas realizadas / previstas / atrasadas"
+              <ResultBarGroup
+                title="Despesas — realizadas / previstas / atrasadas"
+                total={TOTAL_DESPESAS} totalColor={t.color.feedback.error.text}
+                totalHint="Soma de despesas realizadas, previstas e atrasadas no período."
                 colors={colors}
-                cells={[
-                  { label: 'Despesas realizadas', value: RESULTADO_OPERACIONAL[0].despesas, tone: 'error', hint: 'Despesas já pagas e conciliadas no período selecionado.' },
-                  { label: 'Despesas previstas',  value: RESULTADO_OPERACIONAL[1].despesas, tone: 'error', hint: 'Despesas com vencimento futuro, ainda não pagas.' },
-                  { label: 'Despesas atrasadas',  value: RESULTADO_OPERACIONAL[2].despesas, tone: 'error', hint: 'Despesas vencidas e ainda não pagas — título em atraso.' },
-                  { label: 'Despesas total', value: TOTAL_DESPESAS, tone: 'error', solid: true, hint: 'Soma de despesas realizadas, previstas e atrasadas no período.' },
+                bars={[
+                  { label: 'Realizadas', value: RESULTADO_OPERACIONAL[0].despesas, color: t.color.feedback.error.solid, hint: 'Despesas já pagas e conciliadas no período selecionado.' },
+                  { label: 'Previstas',  value: RESULTADO_OPERACIONAL[1].despesas, color: t.color.feedback.error.text, hint: 'Despesas com vencimento futuro, ainda não pagas.' },
+                  { label: 'Atrasadas',  value: RESULTADO_OPERACIONAL[2].despesas, color: t.color.feedback.warning.solid, hint: 'Despesas vencidas e ainda não pagas — título em atraso.' },
                 ]}
               />
-              <ResultGroup
-                title="Saldo realizado / previsto / atrasado"
+              <ResultBarGroup
+                title="Saldo — realizado / previsto / atrasado"
+                total={SALDO_TOTAL_OPERACIONAL}
+                totalColor={SALDO_TOTAL_OPERACIONAL >= 0 ? t.color.feedback.success.text : t.color.feedback.error.text}
+                totalHint="Resultado operacional do período: total de receitas menos total de despesas."
                 colors={colors}
-                cells={[
-                  { label: 'Saldo realizado', value: RESULTADO_SALDOS[0], tone: RESULTADO_SALDOS[0] >= 0 ? 'success' : 'error', hint: 'Receitas realizadas menos despesas realizadas.' },
-                  { label: 'Saldo previsto',  value: RESULTADO_SALDOS[1], tone: RESULTADO_SALDOS[1] >= 0 ? 'success' : 'error', hint: 'Receitas previstas menos despesas previstas.' },
-                  { label: 'Saldo atrasado',  value: RESULTADO_SALDOS[2], tone: RESULTADO_SALDOS[2] >= 0 ? 'success' : 'error', hint: 'Receitas atrasadas menos despesas atrasadas.' },
-                  { label: 'Saldo total', value: SALDO_TOTAL_OPERACIONAL, tone: SALDO_TOTAL_OPERACIONAL >= 0 ? 'success' : 'error', solid: true, hint: 'Resultado operacional do período: total de receitas menos total de despesas.' },
+                bars={[
+                  { label: 'Realizado', value: RESULTADO_SALDOS[0], color: RESULTADO_SALDOS[0] >= 0 ? t.color.feedback.success.solid : t.color.feedback.error.solid, hint: 'Receitas realizadas menos despesas realizadas.' },
+                  { label: 'Previsto',  value: RESULTADO_SALDOS[1], color: RESULTADO_SALDOS[1] >= 0 ? t.color.feedback.success.solid : t.color.feedback.error.solid, hint: 'Receitas previstas menos despesas previstas.' },
+                  { label: 'Atrasado',  value: RESULTADO_SALDOS[2], color: RESULTADO_SALDOS[2] >= 0 ? t.color.feedback.success.solid : t.color.feedback.error.solid, hint: 'Receitas atrasadas menos despesas atrasadas.' },
                 ]}
               />
             </DashboardCard>
 
-            {/* Fluxo de caixa projetado — acumulado 12 meses */}
+            {/* Fluxo de caixa projetado — corte de data próprio, mesmo padrão
+                preenchido pelo período compartilhado */}
             <DashboardCard
-              title="Fluxo de caixa projetado (12 meses)"
+              title="Fluxo de caixa projetado"
               action={
-                <ChartLegend
-                  items={[
-                    { label: 'Fluxo líquido +', color: t.color.brand[600] },
-                    { label: 'Fluxo líquido −', color: t.color.feedback.error.solid },
-                    { label: 'Acumulado',       color: t.color.accent.purple.text },
-                  ]}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space[3], flexWrap: 'wrap' }}>
+                  <ChartLegend
+                    items={[
+                      { label: 'Fluxo líquido +', color: t.color.brand[600] },
+                      { label: 'Fluxo líquido −', color: t.color.feedback.error.solid },
+                      { label: 'Acumulado',       color: t.color.accent.purple.text },
+                    ]}
+                  />
+                  <DateRangePicker
+                    value={{ start: fluxoInicio, end: fluxoFim }}
+                    onChange={(range) => {
+                      setFluxoInicio(range.start ?? '')
+                      setFluxoFim(range.end ?? '')
+                    }}
+                  />
+                </div>
               }
             >
               <CashflowChart colors={colors} isGbMode={isGbMode} />
@@ -1540,8 +1590,19 @@ export default function OverviewPanel() {
           {/* ── Painel lateral ─────────────────────────────────────────────── */}
           <DashboardStack width={320}>
 
-            {/* Margem operacional */}
-            <DashboardCard>
+            {/* Margem operacional — corte de data próprio */}
+            <DashboardCard
+              title="Margem operacional"
+              action={
+                <DateRangePicker
+                  value={{ start: margemInicio, end: margemFim }}
+                  onChange={(range) => {
+                    setMargemInicio(range.start ?? '')
+                    setMargemFim(range.end ?? '')
+                  }}
+                />
+              }
+            >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <RadialGauge
                   value="R$ 14,5M"
@@ -1557,11 +1618,20 @@ export default function OverviewPanel() {
               </div>
             </DashboardCard>
 
-            {/* Receitas realizadas */}
+            {/* Receitas realizadas — corte de data próprio */}
             <DashboardCard
               title="Receitas realizadas"
               action={
-                <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>78%</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2] }}>
+                  <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>78%</span>
+                  <DateRangePicker
+                    value={{ start: receitasGaugeInicio, end: receitasGaugeFim }}
+                    onChange={(range) => {
+                      setReceitasGaugeInicio(range.start ?? '')
+                      setReceitasGaugeFim(range.end ?? '')
+                    }}
+                  />
+                </div>
               }
             >
               <div style={{ fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold, color: colors.fg.default, lineHeight: 1, marginBottom: t.space[3] }}>
@@ -1586,8 +1656,19 @@ export default function OverviewPanel() {
               />
             </DashboardCard>
 
-            {/* Custo de produção — composição COE x COT */}
-            <DashboardCard title="Custo de produção — COE x COT">
+            {/* Custo de produção — composição COE x COT — corte de data próprio */}
+            <DashboardCard
+              title="Custo de produção — COE x COT"
+              action={
+                <DateRangePicker
+                  value={{ start: custoInicio, end: custoFim }}
+                  onChange={(range) => {
+                    setCustoInicio(range.start ?? '')
+                    setCustoFim(range.end ?? '')
+                  }}
+                />
+              }
+            >
               <div style={{ display: 'flex', gap: t.space[4], marginBottom: t.space[4] }}>
                 <div>
                   <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Margem bruta</div>
@@ -1648,44 +1729,45 @@ export default function OverviewPanel() {
               <AgingRows colors={colors} />
             </DashboardCard>
 
-            {/* Cobertura de estoque — insumos críticos */}
-            <DashboardCard title="Cobertura de estoque — insumos críticos">
-              {STOCK_COVERAGE.map(s => {
-                const abaixo = s.dias < s.min
-                return (
-                  <div key={s.item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: t.space[2] }}>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.medium, color: colors.fg.default, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {s.item}
-                      </div>
-                      <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>mínimo {s.min} dias</div>
-                    </div>
-                    <span style={{
-                      flexShrink: 0, fontSize: t.font.size.xs, fontWeight: t.font.weight.bold,
-                      padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
-                      color: abaixo ? t.color.feedback.error.text : t.color.feedback.success.text,
-                      background: abaixo ? t.color.feedback.error.bg : t.color.feedback.success.bg,
-                    }}>
-                      {s.dias} dias
-                    </span>
-                  </div>
-                )
-              })}
+            {/* Cobertura de estoque — insumos críticos — barras com marcador do
+                mínimo, no lugar da lista de badges soltos (agrupa os 4
+                insumos numa mesma escala de dias, comparável de relance). */}
+            <DashboardCard
+              title="Cobertura de estoque — insumos críticos"
+              action={
+                <ChartLegend
+                  items={[
+                    { label: 'Acima do mínimo', color: t.color.feedback.success.solid },
+                    { label: 'Abaixo do mínimo', color: t.color.feedback.error.solid },
+                  ]}
+                />
+              }
+            >
+              <StockCoverageBars items={STOCK_COVERAGE} colors={colors} />
             </DashboardCard>
 
-            {/* Concentração de receita por comprador */}
+            {/* Concentração de receita por comprador — corte de data próprio */}
             <DashboardCard
               title="Concentração de receita"
               action={
-                REVENUE_SHARE[0].pct > 40 ? (
-                  <span style={{
-                    fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
-                    color: t.color.feedback.warning.text, background: t.color.feedback.warning.bg,
-                    padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
-                  }}>
-                    {REVENUE_SHARE[0].pct}% em 1 comprador
-                  </span>
-                ) : undefined
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space[2], flexWrap: 'wrap' }}>
+                  {REVENUE_SHARE[0].pct > 40 && (
+                    <span style={{
+                      fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold,
+                      color: t.color.feedback.warning.text, background: t.color.feedback.warning.bg,
+                      padding: `2px ${t.space[2]}px`, borderRadius: t.radius.full,
+                    }}>
+                      {REVENUE_SHARE[0].pct}% em 1 comprador
+                    </span>
+                  )}
+                  <DateRangePicker
+                    value={{ start: concentracaoInicio, end: concentracaoFim }}
+                    onChange={(range) => {
+                      setConcentracaoInicio(range.start ?? '')
+                      setConcentracaoFim(range.end ?? '')
+                    }}
+                  />
+                </div>
               }
             >
               <SegmentedBar

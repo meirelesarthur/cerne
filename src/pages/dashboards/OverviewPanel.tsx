@@ -6,6 +6,9 @@ import { useTheme } from '../../context/ThemeContext'
 import type { ThemeColors } from '../../context/ThemeContext'
 import { DashboardFilters } from '../../components/ui/DashboardFilters'
 import { DashboardAnalysis } from '../../components/ui/DashboardAnalysis'
+import { DateRangePicker } from '../../components/ui/DatePicker'
+import { Tooltip } from '../../components/ui/Tooltip'
+import { formatCurrency } from '../../components/ui/CurrencyField'
 import {
   DashboardGrid,
   DashboardHeader,
@@ -15,7 +18,6 @@ import {
   DashboardKpiCard,
 } from '../../components/ui/DashboardGrid'
 import { Button } from '../../components/ui/Button'
-import { SankeyFunnel } from '../../components/ui/SankeyFunnel'
 import { SparklineArea } from '../../components/ui/SparklineArea'
 import { Trend } from '../../components/ui/Trend'
 import { ChartLegend } from '../../components/ui/ChartLegend'
@@ -23,6 +25,7 @@ import { Tabs } from '../../components/ui/Tabs'
 import { FarmAreasMap } from '../../components/ui/FarmAreasMap'
 import type { FarmArea, FarmAreaIcon } from '../../components/ui/FarmAreasMap'
 import { FilterSelect } from '../../components/ui/FilterSelect'
+import { MultiSelectField } from '../../components/ui/MultiSelectField'
 import { InterpretationLetter } from '../../components/ui/InterpretationLetter'
 import {
   buildOverviewCarta, headlineInsight, fmtCompact,
@@ -30,7 +33,6 @@ import {
 } from '../../insights/overviewInsights'
 import { useFarm } from '../../context/FarmContext'
 import { useUrlFilter } from '../../hooks/useUrlFilter'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useChartScale } from '../../hooks/useChartScale'
 import { niceAxisTicks, formatAxisValue } from '../../utils/chartAxis'
 
@@ -428,6 +430,12 @@ const RESULTADO_OPERACIONAL = [
 ]
 const SALDO_TOTAL_OPERACIONAL = 2_050_030.84
 
+// Saldo por situação (mesma ordem de RESULTADO_OPERACIONAL: Realizado/Previsto/Atrasado)
+// e totais por categoria — usados no card "Resultado operacional (R$)".
+const RESULTADO_SALDOS = RESULTADO_OPERACIONAL.map(r => r.receitas - r.despesas)
+const TOTAL_RECEITAS = RESULTADO_OPERACIONAL.reduce((s, r) => s + r.receitas, 0)
+const TOTAL_DESPESAS = RESULTADO_OPERACIONAL.reduce((s, r) => s + r.despesas, 0)
+
 // ─── Composição de custo — COE x COT ──────────────────────────────────────────
 
 const COST_LABEL_COLOR: Record<string, string> = {
@@ -471,6 +479,30 @@ const CROP_PERFORMANCE: Record<string, {
   'Milho':          { realizada: 31_800_000, aRealizar: 5_100_000, produtividade: 136, unidProd: 'sc/ha', margemHa: 2_640, custoMedio: 52,  precoMedio: 58,  unidPreco: 'R$/sc' },
   'Cana-de-açúcar': { realizada: 9_400_000,  aRealizar: 1_600_000, produtividade: 85,  unidProd: 't/ha',  margemHa: 1_980, custoMedio: 96,  precoMedio: 118, unidPreco: 'R$/t'  },
   'Pastagem':       { realizada: 0,          aRealizar: 0,         produtividade: 0,   unidProd: '—',     margemHa: 0,    custoMedio: 0,   precoMedio: 0,   unidPreco: '—'    },
+}
+
+// Cultivar → cultura, para o filtro "Produtos" (multiselect de cultivares)
+// caçar em qual cultura cada um cai — mesmo dado do TALHAOES, sem duplicar.
+const CULTIVAR_TO_CROP: Record<string, string> = {}
+for (const tl of TALHAOES) {
+  if (tl.cultivar && tl.cultivar !== '—') CULTIVAR_TO_CROP[tl.cultivar] = tl.crop
+}
+const PRODUTO_OPTIONS = Object.keys(CULTIVAR_TO_CROP).map(c => ({ id: c, label: c }))
+
+type CultureMetric = 'margemHa' | 'produtividade' | 'custoMedio' | 'precoMedio'
+const METRIC_OPTIONS: { value: CultureMetric; label: string }[] = [
+  { value: 'margemHa',      label: 'Margem por hectare' },
+  { value: 'produtividade', label: 'Produtividade' },
+  { value: 'custoMedio',    label: 'Custo médio' },
+  { value: 'precoMedio',    label: 'Preço médio' },
+]
+
+function metricUnit(crop: string, metric: CultureMetric): string {
+  const p = CROP_PERFORMANCE[crop]
+  if (!p) return ''
+  if (metric === 'produtividade') return p.unidProd
+  if (metric === 'margemHa') return 'R$/ha'
+  return p.unidPreco
 }
 
 // ─── Dataset consolidado para o motor de interpretação ───────────────────────
@@ -767,6 +799,75 @@ function MiniDivergingBar({ label, positive, negative, colors }: {
   )
 }
 
+// ─── Célula de resultado operacional (Realizado/Previsto/Atrasado/Total) ─────
+// Hint descritivo no hover/foco (Tooltip do kit) explica o que cada situação
+// significa — a mesma leitura que antes só existia na carta de interpretação.
+
+function ResultCell({ label, value, tone, solid, hint, colors }: {
+  label: string; value: number
+  tone: 'success' | 'error'
+  /** Célula de total — preenchida com a cor sólida, texto branco. */
+  solid?: boolean
+  hint: string
+  colors: ThemeColors
+}) {
+  const palette = t.color.feedback[tone]
+  return (
+    <Tooltip label={hint}>
+      <div
+        tabIndex={0}
+        className="gb-focusable"
+        style={{
+          flex: '1 1 180px', minWidth: 180, boxSizing: 'border-box',
+          padding: `${t.space[3]}px ${t.space[3] + 2}px`,
+          borderRadius: t.radius.md,
+          background: solid ? palette.solid : colors.bg.surface,
+          border: solid ? 'none' : `1px solid ${colors.border.default}`,
+          borderLeft: solid ? 'none' : `3px solid ${palette.solid}`,
+          cursor: 'default',
+        }}
+      >
+        <div style={{
+          fontSize: t.font.size['3xs'], fontWeight: t.font.weight.semibold,
+          letterSpacing: '0.04em', textTransform: 'uppercase',
+          color: solid ? 'rgba(255,255,255,0.85)' : colors.fg.subtle,
+          marginBottom: 4,
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontSize: t.font.size.base, fontWeight: t.font.weight.bold,
+          color: solid ? t.color.neutral[0] : palette.text,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {formatCurrency(value)}
+        </div>
+      </div>
+    </Tooltip>
+  )
+}
+
+interface ResultCellSpec { label: string; value: number; tone: 'success' | 'error'; solid?: boolean; hint: string }
+
+function ResultGroup({ title, cells, colors }: { title: string; cells: ResultCellSpec[]; colors: ThemeColors }) {
+  return (
+    <div style={{ marginBottom: t.space[4] }}>
+      <div style={{
+        fontSize: t.font.size['3xs'], fontWeight: t.font.weight.medium,
+        letterSpacing: '0.03em', textTransform: 'uppercase',
+        color: colors.fg.subtle, marginBottom: t.space[2],
+      }}>
+        {title}
+      </div>
+      <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap' }}>
+        {cells.map(c => (
+          <ResultCell key={c.label} label={c.label} value={c.value} tone={c.tone} solid={c.solid} hint={c.hint} colors={colors} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ─── Barra de composição de custo (segmentos categóricos, ordem fixa) ────────
 
 function CostCompositionBar({ label, total, segments, colors }: {
@@ -1009,6 +1110,50 @@ function CropPerformanceRow({ crop, ha, colors }: { crop: string; ha: number; co
   )
 }
 
+// ─── Comparativo por métrica entre culturas (barras, não caixa de número) ────
+// Hint descritivo por barra via `Tooltip` — mesmo padrão do card "Resultado
+// operacional (R$)". Recorte pelo filtro ativo (área/produto) da tela.
+
+function CultureMetricBars({ crops, metric, colors }: {
+  crops: [string, number][]; metric: CultureMetric; colors: ThemeColors
+}) {
+  const rows = crops
+    .map(([crop]) => ({ crop, value: CROP_PERFORMANCE[crop]?.[metric] ?? 0, unit: metricUnit(crop, metric) }))
+    .filter(r => r.value > 0)
+  const max = Math.max(...rows.map(r => r.value), 1)
+
+  if (rows.length === 0) {
+    return (
+      <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>
+        Sem produção comercial no período para o recorte atual.
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {rows.map(r => (
+        <Tooltip key={r.crop} label={`${r.crop}: ${r.value.toLocaleString('pt-BR')} ${r.unit}`}>
+          <div tabIndex={0} className="gb-focusable" style={{ marginBottom: t.space[2] + 2, cursor: 'default' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: t.font.size.xs, color: colors.fg.default }}>
+                <span style={{ width: 8, height: 8, borderRadius: t.radius.full, background: CROP_COLOR[r.crop] ?? t.color.neutral[400], flexShrink: 0 }} />
+                {r.crop}
+              </span>
+              <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>
+                {r.value.toLocaleString('pt-BR')} {r.unit}
+              </span>
+            </div>
+            <div style={{ height: 8, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${(r.value / max) * 100}%`, background: CROP_COLOR[r.crop] ?? t.color.neutral[400], borderRadius: t.radius.full }} />
+            </div>
+          </div>
+        </Tooltip>
+      ))}
+    </div>
+  )
+}
+
 // ─── Divider ──────────────────────────────────────────────────────────────────
 
 function Div({ colors }: { colors: ThemeColors }) {
@@ -1023,12 +1168,20 @@ export default function OverviewPanel() {
   // Filtros — aplicados sobre os mocks; trocar por chamada filtrada quando houver API
   const [periodo, setPeriodo] = useUrlFilter('periodo', '10')
   const [serie, setSerie] = useUrlFilter<'realizado' | 'previsto'>('serie', 'realizado')
+  // Período do "Resultado operacional (R$)" — datas de início/fim, deep-linkadas
+  // à parte (não usam o mesmo filtro de "últimos N meses" do gráfico de área).
+  const [resultadoInicio, setResultadoInicio] = useUrlFilter('resultadoInicio', '2025-10-01')
+  const [resultadoFim, setResultadoFim] = useUrlFilter('resultadoFim', '2026-09-30')
+  // Filtros do "Resultado por cultura" — área (cultura), produtos (cultivares,
+  // string separada por vírgula para caber em useUrlFilter) e métrica em foco.
+  const [culturaFiltro, setCulturaFiltro] = useUrlFilter('culturaArea', 'todas')
+  const [produtosParam, setProdutosParam] = useUrlFilter('culturaProdutos', '')
+  const produtosSel = produtosParam ? produtosParam.split(',') : []
+  const [metricaCultura, setMetricaCultura] = useUrlFilter<CultureMetric>('culturaMetrica', 'margemHa')
   // Foco de série do card de receitas: leitura, não recorte de dado — fica local.
   const [foco, setFoco] = useState<AreaFocus | typeof AREA_FOCUS_ALL>(AREA_FOCUS_ALL)
   const focoAtivo = foco === AREA_FOCUS_ALL ? null : foco
   const [cartaOpen, setCartaOpen] = useState(false)
-  // Tablet/estreito: empilha colunas e dispensa divisores verticais
-  const stacked = useMediaQuery(`(max-width: ${t.breakpoint.md - 1}px)`)
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
@@ -1043,7 +1196,13 @@ export default function OverviewPanel() {
   const carta = buildOverviewCarta(OVERVIEW_DATASET)
 
   const saldoPrevisto = CASH_FORECAST.aReceber - CASH_FORECAST.aPagar
-  const fluxoMax = Math.max(CASH_FORECAST.aReceber, CASH_FORECAST.aPagar)
+
+  // Recorte de "Resultado por cultura" pelos filtros de área/produto ativos.
+  const culturasFiltradas = AREA_BY_CROP.filter(([crop]) => {
+    if (culturaFiltro !== 'todas' && crop !== culturaFiltro) return false
+    if (produtosSel.length > 0 && !produtosSel.some(p => CULTIVAR_TO_CROP[p] === crop)) return false
+    return true
+  })
 
   return (
     <>
@@ -1219,42 +1378,126 @@ export default function OverviewPanel() {
               </p>
             </DashboardCard>
 
-            {/* Resultado operacional (DRE) — receita → custos → resultado */}
+            {/* Resultado por cultura — subiu para logo abaixo dos Insights (mais
+                evidência) e ganhou filtro de área/produto/período + um
+                comparativo por métrica em gráfico de barras, no lugar dos
+                números soltos de produtividade/margem/custo/preço. */}
             <DashboardCard
-              title="Resultado operacional (DRE)"
-              action={
-                <Button variant="ghost" size="sm" icon={<Icon name="grain" size={11} />}>
-                  Detalhes
-                </Button>
-              }
-            >
-              <SankeyFunnel stages={DRE_STAGES} colors={colors} isGbMode={isGbMode} chartHeight={150} />
-            </DashboardCard>
-
-            {/* Resultado operacional — realizado x previsto x atrasado */}
-            <DashboardCard
-              title="Realizado x previsto no período"
+              title="Resultado por cultura"
               action={
                 <ChartLegend
                   items={[
-                    { label: 'Receitas', color: t.color.brand[600] },
-                    { label: 'Despesas', color: t.color.feedback.error.solid },
+                    { label: 'Realizada',  color: t.color.brand[600] },
+                    { label: 'A realizar', color: t.color.brand[200] },
                   ]}
                 />
               }
             >
-              <div style={{
-                fontSize: t.font.size['2xl'], fontWeight: t.font.weight.bold,
-                lineHeight: t.font.lineHeight.tight, marginBottom: t.space[4],
-                color: SALDO_TOTAL_OPERACIONAL >= 0 ? t.color.feedback.success.text : t.color.feedback.error.text,
-              }}>
-                {fmtCompact(SALDO_TOTAL_OPERACIONAL)}
+              <div style={{ display: 'flex', gap: t.space[3], flexWrap: 'wrap', marginBottom: t.space[4] }}>
+                <div style={{ flex: '1 1 160px', minWidth: 160 }}>
+                  <FilterSelect
+                    ariaLabel="Filtrar por área (cultura)"
+                    options={[
+                      { value: 'todas', label: 'Todas as culturas' },
+                      ...AREA_BY_CROP.map(([crop]) => ({ value: crop, label: crop })),
+                    ]}
+                    value={culturaFiltro}
+                    onChange={setCulturaFiltro}
+                  />
+                </div>
+                <DateRangePicker
+                  value={{ start: resultadoInicio, end: resultadoFim }}
+                  onChange={(range) => {
+                    setResultadoInicio(range.start ?? '')
+                    setResultadoFim(range.end ?? '')
+                  }}
+                />
+                <div style={{ flex: '2 1 220px', minWidth: 220 }}>
+                  <MultiSelectField
+                    label="Produtos"
+                    options={PRODUTO_OPTIONS}
+                    value={produtosSel}
+                    onChange={(v) => setProdutosParam(v.join(','))}
+                    placeholder="Buscar cultivar…"
+                  />
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: stacked ? 'column' : 'row', gap: t.space[6] }}>
-                {RESULTADO_OPERACIONAL.map(r => (
-                  <MiniDivergingBar key={r.label} label={r.label} positive={r.receitas} negative={r.despesas} colors={colors} />
-                ))}
+
+              {culturasFiltradas.length === 0 ? (
+                <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>
+                  Nenhuma cultura corresponde a esse filtro.
+                </div>
+              ) : (
+                culturasFiltradas.map(([crop, ha]) => (
+                  <CropPerformanceRow key={crop} crop={crop} ha={ha} colors={colors} />
+                ))
+              )}
+
+              <div style={{ marginTop: t.space[4] }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: t.space[2], marginBottom: t.space[3] }}>
+                  <span style={{
+                    fontSize: t.font.size.xs, fontWeight: t.font.weight.medium,
+                    textTransform: 'uppercase', letterSpacing: '0.03em', color: colors.fg.subtle,
+                  }}>
+                    Comparativo por métrica
+                  </span>
+                  <FilterSelect
+                    ariaLabel="Métrica do comparativo entre culturas"
+                    options={METRIC_OPTIONS.map(m => ({ value: m.value, label: m.label }))}
+                    value={metricaCultura}
+                    onChange={(v) => setMetricaCultura(v as CultureMetric)}
+                  />
+                </div>
+                <CultureMetricBars crops={culturasFiltradas} metric={metricaCultura} colors={colors} />
               </div>
+            </DashboardCard>
+
+            {/* Resultado operacional (R$) — Realizado/Previsto/Atrasado por
+                categoria, com hint descritivo por célula e filtro por período
+                (data início/fim). Substitui o funil (Regra A: não cabia essa
+                granularidade por situação em faixas decrescentes de funil). */}
+            <DashboardCard
+              title="Resultado operacional (R$)"
+              action={
+                <DateRangePicker
+                  value={{ start: resultadoInicio, end: resultadoFim }}
+                  onChange={(range) => {
+                    setResultadoInicio(range.start ?? '')
+                    setResultadoFim(range.end ?? '')
+                  }}
+                />
+              }
+            >
+              <ResultGroup
+                title="Receitas realizadas / previstas / atrasadas"
+                colors={colors}
+                cells={[
+                  { label: 'Receitas realizadas', value: RESULTADO_OPERACIONAL[0].receitas, tone: 'success', hint: 'Receitas já recebidas e conciliadas no período selecionado.' },
+                  { label: 'Receitas previstas',  value: RESULTADO_OPERACIONAL[1].receitas, tone: 'success', hint: 'Receitas com vencimento futuro, ainda não recebidas.' },
+                  { label: 'Receitas atrasadas',  value: RESULTADO_OPERACIONAL[2].receitas, tone: 'success', hint: 'Receitas vencidas e ainda não recebidas — título em atraso.' },
+                  { label: 'Receitas total', value: TOTAL_RECEITAS, tone: 'success', solid: true, hint: 'Soma de receitas realizadas, previstas e atrasadas no período.' },
+                ]}
+              />
+              <ResultGroup
+                title="Despesas realizadas / previstas / atrasadas"
+                colors={colors}
+                cells={[
+                  { label: 'Despesas realizadas', value: RESULTADO_OPERACIONAL[0].despesas, tone: 'error', hint: 'Despesas já pagas e conciliadas no período selecionado.' },
+                  { label: 'Despesas previstas',  value: RESULTADO_OPERACIONAL[1].despesas, tone: 'error', hint: 'Despesas com vencimento futuro, ainda não pagas.' },
+                  { label: 'Despesas atrasadas',  value: RESULTADO_OPERACIONAL[2].despesas, tone: 'error', hint: 'Despesas vencidas e ainda não pagas — título em atraso.' },
+                  { label: 'Despesas total', value: TOTAL_DESPESAS, tone: 'error', solid: true, hint: 'Soma de despesas realizadas, previstas e atrasadas no período.' },
+                ]}
+              />
+              <ResultGroup
+                title="Saldo realizado / previsto / atrasado"
+                colors={colors}
+                cells={[
+                  { label: 'Saldo realizado', value: RESULTADO_SALDOS[0], tone: RESULTADO_SALDOS[0] >= 0 ? 'success' : 'error', hint: 'Receitas realizadas menos despesas realizadas.' },
+                  { label: 'Saldo previsto',  value: RESULTADO_SALDOS[1], tone: RESULTADO_SALDOS[1] >= 0 ? 'success' : 'error', hint: 'Receitas previstas menos despesas previstas.' },
+                  { label: 'Saldo atrasado',  value: RESULTADO_SALDOS[2], tone: RESULTADO_SALDOS[2] >= 0 ? 'success' : 'error', hint: 'Receitas atrasadas menos despesas atrasadas.' },
+                  { label: 'Saldo total', value: SALDO_TOTAL_OPERACIONAL, tone: SALDO_TOTAL_OPERACIONAL >= 0 ? 'success' : 'error', solid: true, hint: 'Resultado operacional do período: total de receitas menos total de despesas.' },
+                ]}
+              />
             </DashboardCard>
 
             {/* Fluxo de caixa projetado — acumulado 12 meses */}
@@ -1290,23 +1533,6 @@ export default function OverviewPanel() {
                   label: `${crop} — ${Math.round((ha / TOTAL_HA) * 100)}%`,
                 }))}
               />
-            </DashboardCard>
-
-            {/* Resultado por cultura — receita realizada/a realizar */}
-            <DashboardCard
-              title="Resultado por cultura"
-              action={
-                <ChartLegend
-                  items={[
-                    { label: 'Realizada',  color: t.color.brand[600] },
-                    { label: 'A realizar', color: t.color.brand[200] },
-                  ]}
-                />
-              }
-            >
-              {AREA_BY_CROP.map(([crop, ha]) => (
-                <CropPerformanceRow key={crop} crop={crop} ha={ha} colors={colors} />
-              ))}
             </DashboardCard>
 
           </DashboardStack>
@@ -1390,41 +1616,35 @@ export default function OverviewPanel() {
               </Button>
             </DashboardCard>
 
-            {/* Previsão de receitas x despesas (contas em aberto) */}
-            <DashboardCard title="Previsão de receitas x despesas">
+            {/* Previsão de receitas x despesas (contas em aberto) — mesmo padrão
+                de KPI card + sparkline da fileira do topo, aplicado às 3 leituras
+                de fluxo previsto (aging dos títulos dá a forma da sparkline). */}
+            <DashboardRow>
               {[
-                { label: 'A receber', value: CASH_FORECAST.aReceber, color: t.color.brand[600] },
-                { label: 'A pagar',   value: CASH_FORECAST.aPagar,   color: t.color.feedback.error.solid },
-              ].map(row => (
-                <div key={row.label} style={{ marginBottom: t.space[3] }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>{row.label}</span>
-                    <span style={{ fontSize: t.font.size.xs, fontWeight: t.font.weight.semibold, color: colors.fg.default }}>{fmtCompact(row.value)}</span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: t.radius.full, background: colors.bg.subtle, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${(row.value / fluxoMax) * 100}%`, background: row.color, borderRadius: t.radius.full }} />
-                  </div>
-                </div>
+                {
+                  label: 'Valores à Receber', value: fmtCompact(CASH_FORECAST.aReceber),
+                  trend: `${((AGING_BUCKETS[3].receber / CASH_FORECAST.aReceber) * 100).toFixed(1)}% em atraso`,
+                  up: false, spark: AGING_BUCKETS.map(b => b.receber), sparkColor: t.color.brand[600],
+                },
+                {
+                  label: 'Valores à Pagar', value: fmtCompact(CASH_FORECAST.aPagar),
+                  trend: `${((AGING_BUCKETS[3].pagar / CASH_FORECAST.aPagar) * 100).toFixed(1)}% em atraso`,
+                  up: false, spark: AGING_BUCKETS.map(b => b.pagar), sparkColor: t.color.feedback.error.solid,
+                },
+                {
+                  label: 'Saldo Previsto', value: fmtCompact(saldoPrevisto),
+                  trend: `cobre ${((CASH_FORECAST.aReceber / CASH_FORECAST.aPagar) * 100).toFixed(0)}% do a pagar`,
+                  up: saldoPrevisto >= 0, spark: AGING_BUCKETS.map(b => b.receber - b.pagar), sparkColor: MARGEM_COLOR,
+                },
+              ].map(kpi => (
+                <DashboardKpiCard key={kpi.label} label={kpi.label} value={kpi.value} trend={kpi.trend} up={kpi.up}>
+                  <SparklineArea data={kpi.spark} color={kpi.sparkColor} height={t.size.sparkline} />
+                </DashboardKpiCard>
               ))}
+            </DashboardRow>
 
-              <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                paddingTop: t.space[2], borderTop: `1px solid ${colors.border.default}`,
-                marginBottom: t.space[3],
-              }}>
-                <span style={{ fontSize: t.font.size.xs, color: colors.fg.subtle }}>Saldo previsto</span>
-                <span style={{
-                  fontSize: t.font.size.base, fontWeight: t.font.weight.bold,
-                  color: saldoPrevisto >= 0 ? t.color.feedback.success.text : t.color.feedback.error.text,
-                }}>
-                  {fmtCompact(saldoPrevisto)}
-                </span>
-              </div>
-
-              {/* Aging dos títulos em aberto */}
-              <div style={{ fontSize: t.font.size.xs, color: colors.fg.subtle, marginBottom: t.space[2] }}>
-                Aging dos títulos em aberto
-              </div>
+            {/* Aging dos títulos em aberto — detalhe por faixa, separado do resumo acima */}
+            <DashboardCard title="Aging dos títulos em aberto">
               <AgingRows colors={colors} />
             </DashboardCard>
 
